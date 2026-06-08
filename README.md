@@ -1,16 +1,19 @@
-# modelviz <img src="man/figures/logo.png" align="right" height="120" alt="" />
+# statviz <img src="man/figures/logo.png" align="right" height="120" alt="" />
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/pablobernabeu/modelviz/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/pablobernabeu/modelviz/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/pablobernabeu/statviz/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/pablobernabeu/statviz/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
-**modelviz** turns the output of common statistical analyses into clear,
-publication-ready graphics, and adds a family of exploratory plots for the data
-behind those analyses. Every function returns a
-[ggplot2](https://ggplot2.tidyverse.org) object, so you can keep customising
-with the usual `+` syntax.
+**statviz** is a single, consistent toolkit of publication-ready plots that span
+the whole analysis workflow -- from a first look at the data, through model
+estimates and predictions, to diagnostics, uncertainty and reporting. Where most
+packages own one slice of this work, statviz aims to cover it end to end with
+*one* theme, *one* palette and *one* set of label conventions. Every plotting
+function returns a [ggplot2](https://ggplot2.tidyverse.org) object (or a
+[patchwork](https://patchwork.data-imaginist.com) for composite panels), so you
+can keep customising with the usual `+` syntax.
 
 It grew out of three focused plotting functions
 ([frequentist_bayesian_plot](https://github.com/pablobernabeu/frequentist_bayesian_plot),
@@ -22,55 +25,58 @@ and unified into one coherent package.
 
 ```r
 # install.packages("remotes")
-remotes::install_github("pablobernabeu/modelviz")
+remotes::install_github("pablobernabeu/statviz")
 ```
 
 ## What's in the box
 
-### Model-result plots
+**Explore data** — `explore_distribution()`, `explore_categorical()`,
+`explore_bivariate()`, `explore_pairs()`, `correlation_heatmap()`,
+`missingness_map()`, `outlier_plot()`, `scatter_trend()`, `summary_table()`.
 
-| Function | What it does |
-|---|---|
-| `coef_plot()` | Forest / coefficient plot from a model or a tidy estimate table. |
-| `compare_estimates_plot()` | Overlay estimates from several models or sources. |
-| `frequentist_bayesian_plot()` | Frequentist vs. Bayesian estimates, side by side. |
-| `optimizer_fixef_plot()` | Fixed effects across the optimisers from `lme4::allFit()`. |
-| `power_curve_plot()` | Power against sample size, from `simr` or a data frame. |
-| `residual_diagnostics_plot()` | Residual-diagnostic panel for `lm`/`glm`. |
+**Model estimates & inference** — `tidy_estimates()`, `coefficient_plot()`,
+`compare_models()`, `frequentist_bayesian_plot()`, `effects_plot()`,
+`interaction_plot()`, `random_effects_plot()`, `optimizer_fixef_plot()`,
+`model_fit_table()`.
 
-### Data-exploration plots
+**Diagnostics & classification** — `residual_diagnostics_plot()`,
+`influence_plot()`, `qq_plot()`, `roc_curve_plot()`, `calibration_plot()`,
+`confusion_matrix_plot()`.
 
-| Function | What it does |
-|---|---|
-| `distribution_plot()` | Histograms / densities, optionally by group. |
-| `scatter_trend_plot()` | Scatter plot with a fitted trend. |
-| `correlation_matrix_plot()` | Correlation heatmap. |
-| `missingness_plot()` | Map of missing values. |
+**Uncertainty & power** — `posterior_plot()`, `power_curve_plot()`.
 
-### Shared building blocks
+**Theming & reporting** — `theme_statviz()`, `statviz_palette()` /
+`scale_colour_statviz()`, `palette_preview()`, `format_terms()`,
+`arrange_plots()`, `save_plot()`.
 
-`tidy_estimates()` (the common estimate table), `theme_modelviz()`,
-`modelviz_palette()` / `scale_colour_modelviz()`, and `format_terms()`.
+Heavier modelling back-ends (`lme4`, `broom`, `simr`) are optional (in
+`Suggests`) and used only when present; the core functions, examples, tests and
+vignettes run on base `lm`/`glm` and the bundled data alone.
 
-## A quick example
+## A quick tour
 
 ```r
-library(modelviz)
+library(statviz)
 
-fit <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment,
-          data = crop_yield)
+# Explore
+explore_bivariate(crop_yield, fertilizer, yield)
+correlation_heatmap(wellbeing_survey)
 
-coef_plot(fit, order = "descending", title = "Drivers of crop yield")
-```
+# Model
+fit <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment, data = crop_yield)
+coefficient_plot(fit, order = "descending")
+effects_plot(fit, "fertilizer")
+interaction_plot(lm(yield ~ fertilizer * treatment, data = crop_yield),
+                 "fertilizer", "treatment")
 
-Compare two models:
+# Diagnose & classify
+residual_diagnostics_plot(fit)
+gfit <- glm(accuracy ~ word_frequency + RT, data = lexical_decision,
+            family = binomial)
+roc_curve_plot(gfit)
 
-```r
-m1 <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
-m2 <- lm(yield ~ rainfall + fertilizer + soil_ph,
-         data = subset(crop_yield, treatment == "standard"))
-
-compare_estimates_plot(`All fields` = m1, `Standard only` = m2)
+# Report
+arrange_plots(qq_plot(fit), influence_plot(fit), ncol = 2, tag_levels = "A")
 ```
 
 ## Bundled data
@@ -83,9 +89,24 @@ agronomy field trial). They are generated by
 
 ## Learn more
 
-* `vignette("modelviz")` -- getting started
-* `vignette("model-estimates")` -- model-result plots
-* `vignette("data-exploration")` -- exploratory plots
+* `vignette("statviz")` — getting started
+* `vignette("exploring-data")` — exploratory plots and tables
+* `vignette("model-estimates")` — estimates, comparison, predictions, random effects
+* `vignette("diagnostics-and-uncertainty")` — diagnostics, classification, posteriors, power
+
+## How statviz relates to other packages
+
+statviz deliberately spans the workflow rather than competing feature-for-feature
+with the specialists. For deep dives you may still reach for
+[`ggstatsplot`](https://indrajeetpatil.github.io/ggstatsplot/) (statistical
+details on plots), [`sjPlot`](https://strengejacke.github.io/sjPlot/) and the
+[easystats](https://easystats.github.io/easystats/) family (`see`, `parameters`,
+`performance`), [`marginaleffects`](https://marginaleffects.com) /
+[`ggeffects`](https://strengejacke.github.io/ggeffects/) (predictions),
+[`GGally`](https://ggobi.github.io/ggally/) (pairs) and
+[`bayesplot`](https://mc-stan.org/bayesplot/) / `tidybayes` (Bayesian). statviz
+gives you a consistent, good-looking default across all of these tasks from one
+package.
 
 ## License
 

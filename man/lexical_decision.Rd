@@ -26,7 +26,7 @@ lexical_decision
 A reproducibly simulated psycholinguistic lexical-decision experiment, in
 which participants judge whether letter strings are real words. The crossed
 participant and item structure makes it a natural fit for mixed-effects
-models, and hence for \code{\link[=optimizer_fixef_plot]{optimizer_fixef_plot()}}, \code{\link[=coef_plot]{coef_plot()}} and the
+models, and hence for \code{\link[=optimizer_fixef_plot]{optimizer_fixef_plot()}}, \code{\link[=coefficient_plot]{coefficient_plot()}} and the
 distribution plots.
 }
 \details{

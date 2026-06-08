@@ -1,34 +1,45 @@
-# modelviz 0.1.0
+# statviz 0.1.0
 
-First release. modelviz unifies and generalises three earlier plotting
-functions into a single package for visualising statistical models and data.
+First release. statviz is a unified, consistent toolkit of publication-ready
+plots spanning the whole analysis workflow. It grew out of, and generalises,
+three earlier plotting functions (`frequentist_bayesian_plot`,
+`plot.fixef.allFit` and `powercurvePlot`).
 
-## Model-result plots
+## Exploring data
 
-* `coef_plot()` -- forest / coefficient plot from a fitted model or a tidy
-  estimate table.
-* `compare_estimates_plot()` -- overlay estimates from several models or
-  sources on one plot.
-* `frequentist_bayesian_plot()` -- a self-contained successor to the original
-  gist; no longer requires a pre-built `brms::mcmc_plot()` object.
-* `optimizer_fixef_plot()` -- successor to `plot.fixef.allFit()`, with robust
-  faceting in place of the original manual layout.
-* `power_curve_plot()` -- successor to `powercurvePlot()`, accepting both
-  `simr` objects and tidy data frames.
-* `residual_diagnostics_plot()` -- residual-diagnostic panel for `lm`/`glm`.
+* `explore_distribution()`, `explore_categorical()`, `explore_bivariate()`,
+  `explore_pairs()`, `correlation_heatmap()`, `missingness_map()`,
+  `outlier_plot()`, `scatter_trend()` and `summary_table()`.
 
-## Data-exploration plots
+## Model estimates and inference
 
-* `distribution_plot()`, `scatter_trend_plot()`,
-  `correlation_matrix_plot()` and `missingness_plot()`.
+* `tidy_estimates()` -- the shared tidy estimate table (methods for `lm`,
+  `glm`, `merMod` and data frames; falls back to `broom::tidy()`).
+* `coefficient_plot()`, `compare_models()`, `frequentist_bayesian_plot()`,
+  `effects_plot()`, `interaction_plot()`, `random_effects_plot()`,
+  `optimizer_fixef_plot()` and `model_fit_table()`.
 
-## Shared building blocks
+## Diagnostics and classification
 
-* `tidy_estimates()` -- standardise model output into one tidy table.
-* `theme_modelviz()`, `modelviz_palette()`, `scale_colour_modelviz()` and
-  `format_terms()`.
+* `residual_diagnostics_plot()`, `influence_plot()`, `qq_plot()`,
+  `roc_curve_plot()`, `calibration_plot()` and `confusion_matrix_plot()`.
+
+## Uncertainty and power
+
+* `posterior_plot()` and `power_curve_plot()`.
+
+## Theming and reporting
+
+* `theme_statviz()`, `statviz_palette()`, `scale_colour_statviz()` (and
+  `scale_color_statviz()`, `scale_fill_statviz()`), `palette_preview()`,
+  `format_terms()`, `arrange_plots()` and `save_plot()`.
 
 ## Data
 
 * Three reproducibly simulated datasets: `lexical_decision`,
   `wellbeing_survey` and `crop_yield`.
+
+## Notes
+
+* Heavier modelling back-ends (`lme4`, `broom`, `simr`) are in `Suggests` and
+  used only when available, so the package installs and checks without them.

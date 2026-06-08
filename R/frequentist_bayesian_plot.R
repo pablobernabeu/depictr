@@ -5,7 +5,7 @@
 #' Presents the estimates from a frequentist model and a Bayesian model side by
 #' side on one forest plot, in the familiar red (frequentist) and blue
 #' (Bayesian) styling. This is a convenience wrapper around
-#' [compare_estimates_plot()].
+#' [compare_models()].
 #'
 #' This is a modernised, self-contained successor to the original
 #' `frequentist_bayesian_plot()` gist. Rather than requiring a pre-built
@@ -20,13 +20,13 @@
 #'   `lmerTest::lmer`) or a tidy data frame of estimates.
 #' @param bayesian A Bayesian model or a tidy data frame of posterior summaries.
 #' @param conf_level Confidence/credible level for models.
-#' @param labels,interaction,intercept See [compare_estimates_plot()].
+#' @param labels,interaction,intercept See [compare_models()].
 #'   `intercept` defaults to `TRUE` here, matching the original behaviour.
 #' @param note_frequentist_no_prior If `TRUE`, append "(no prior)" to the
 #'   frequentist legend label -- useful when the title names the Bayesian prior.
 #' @param vertical_line_at_x Position of the vertical reference line.
 #' @param title,subtitle,x_lab Title, subtitle and x-axis label.
-#' @param ... Further arguments passed to [compare_estimates_plot()].
+#' @param ... Further arguments passed to [compare_models()].
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export
@@ -65,7 +65,7 @@ frequentist_bayesian_plot <- function(frequentist,
   names(args) <- c(freq_label, bayes_label)
 
   do.call(
-    compare_estimates_plot,
+    compare_models,
     c(args, list(
       conf_level = conf_level,
       intercept = intercept,

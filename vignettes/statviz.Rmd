@@ -1,0 +1,97 @@
+---
+title: "Getting started with statviz"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with statviz}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+                      fig.width = 7, fig.height = 4.5, dpi = 96)
+```
+
+**statviz** is a single, consistent toolkit of plots that span the whole
+analysis workflow -- from a first look at the data, through model estimates and
+predictions, to diagnostics, uncertainty and reporting. Every plotting function
+returns a `ggplot2` object (or a `patchwork` for composite panels), so you can
+keep customising with the usual `+` syntax, and every plot shares one theme, one
+palette and one set of label conventions.
+
+```{r}
+library(statviz)
+```
+
+The package ships with three reproducibly simulated datasets used throughout the
+documentation: `lexical_decision`, `wellbeing_survey` and `crop_yield`.
+
+## One example per family
+
+**Explore the data.** Pick the right plot for any pair of variables:
+
+```{r}
+explore_bivariate(crop_yield, fertilizer, yield)
+```
+
+**Look at model estimates.** Fit a model and draw a forest plot:
+
+```{r}
+fit <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment, data = crop_yield)
+coefficient_plot(fit, order = "descending", title = "Drivers of crop yield")
+```
+
+**Show predictions.** What does the model predict as one predictor varies?
+
+```{r}
+effects_plot(fit, "fertilizer")
+```
+
+**Check the fit.** A residual-diagnostics panel:
+
+```{r, fig.height = 6}
+residual_diagnostics_plot(fit)
+```
+
+**Convey uncertainty.** Summarise posterior or simulation draws:
+
+```{r}
+set.seed(1)
+draws <- data.frame(intercept = rnorm(2000, 2, 0.2),
+                    fertilizer = rnorm(2000, 0.012, 0.002),
+                    rainfall = rnorm(2000, 0.004, 0.001))
+posterior_plot(draws)
+```
+
+## The shared spine: `tidy_estimates()`
+
+Most model functions are built on `tidy_estimates()`, which turns a model -- or
+a data frame of pre-computed estimates -- into one standard table. Because the
+plotting functions also accept that table, you can plug in estimates from any
+source (Bayesian posteriors, bootstrap intervals, numbers from a paper).
+
+```{r}
+tidy_estimates(fit)
+```
+
+## A consistent, reusable look
+
+`theme_statviz()`, `statviz_palette()` and `scale_colour_statviz()` style your
+own plots too:
+
+```{r}
+library(ggplot2)
+ggplot(crop_yield, aes(fertilizer, yield, colour = treatment)) +
+  geom_point(alpha = 0.7) +
+  scale_colour_statviz() +
+  theme_statviz()
+```
+
+## Where to next
+
+* `vignette("exploring-data")` -- distributions, categories, bivariate plots,
+  scatter-plot matrices, correlations, missingness, outliers and summary tables.
+* `vignette("model-estimates")` -- forest plots, model comparison, predicted
+  values, interactions, random effects and goodness-of-fit.
+* `vignette("diagnostics-and-uncertainty")` -- residuals, influence, Q-Q, ROC,
+  calibration, confusion matrices, posteriors and power curves.

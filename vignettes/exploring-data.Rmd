@@ -1,0 +1,84 @@
+---
+title: "Exploring data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Exploring data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+                      fig.width = 7, fig.height = 4.5, dpi = 96)
+library(statviz)
+```
+
+statviz provides a coherent set of exploratory plots and a descriptive table,
+all sharing the package theme and palette. Column names can be given quoted or
+unquoted.
+
+## One variable
+
+`explore_distribution()` for a numeric variable, `explore_categorical()` for a
+categorical one.
+
+```{r}
+explore_distribution(lexical_decision, RT, group = condition, type = "density")
+```
+
+```{r}
+explore_categorical(wellbeing_survey, education, group = region,
+                    proportion = TRUE, position = "dodge")
+```
+
+## Two variables, any types
+
+`explore_bivariate()` picks the appropriate plot automatically -- scatter for
+two numerics, boxplots for numeric-by-categorical, a filled bar chart for two
+categoricals.
+
+```{r}
+explore_bivariate(lexical_decision, condition, RT)
+```
+
+For a focused scatter with a fitted trend, use `scatter_trend()`:
+
+```{r}
+scatter_trend(crop_yield, fertilizer, yield, group = treatment)
+```
+
+## Many variables at once
+
+`explore_pairs()` is a scatter-plot matrix; `correlation_heatmap()` condenses
+the same information into a single coloured grid.
+
+```{r, fig.height = 6}
+explore_pairs(crop_yield, cols = c("rainfall", "fertilizer", "soil_ph", "yield"))
+```
+
+```{r, fig.height = 5}
+correlation_heatmap(wellbeing_survey)
+```
+
+## Data quality: outliers and missingness
+
+```{r}
+outlier_plot(crop_yield, yield)
+```
+
+```{r, fig.height = 5}
+missingness_map(wellbeing_survey)
+```
+
+## A descriptive summary table
+
+`summary_table()` builds a "Table 1": mean (SD) for numeric variables, counts
+and percentages for categorical ones, optionally by group. It returns a plain
+data frame, ready for `knitr::kable()`.
+
+```{r}
+tab <- summary_table(wellbeing_survey,
+                     vars = c("life_satisfaction", "stress", "education"),
+                     group = "region")
+knitr::kable(tab)
+```

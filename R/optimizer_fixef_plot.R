@@ -25,7 +25,7 @@
 #'   intercept and slopes are usually on very different scales.
 #' @param ncol Number of facet columns. If `NULL`, chosen automatically.
 #' @param point_size Point size.
-#' @param palette Colours for the optimisers; defaults to [modelviz_palette()].
+#' @param palette Colours for the optimisers; defaults to [statviz_palette()].
 #' @param y_lab,title Axis label and plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -93,7 +93,7 @@ optimizer_fixef_plot <- function(x,
                           tidy_intercept = TRUE)
   )
 
-  pal <- palette %||% modelviz_palette(nlevels(df$optimizer))
+  pal <- palette %||% statviz_palette(nlevels(df$optimizer))
 
   ggplot2::ggplot(
     df,
@@ -111,7 +111,7 @@ optimizer_fixef_plot <- function(x,
     ) +
     ggplot2::scale_colour_manual(values = pal) +
     ggplot2::labs(x = NULL, y = y_lab, colour = "Optimiser", title = title) +
-    theme_modelviz(grid = "y") +
+    theme_statviz(grid = "y") +
     ggplot2::theme(
       axis.text.x = ggplot2::element_blank(),
       axis.ticks.x = ggplot2::element_blank()

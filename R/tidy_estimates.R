@@ -5,7 +5,7 @@
 #' `tidy_estimates()` turns the output of a model (or an existing data frame of
 #' results) into a single standardised table with the columns `term`,
 #' `estimate`, `std.error`, `conf.low` and `conf.high`. It is the common
-#' currency used by [coef_plot()] and [compare_estimates_plot()], but is useful
+#' currency used by [coefficient_plot()] and [compare_models()], but is useful
 #' on its own.
 #'
 #' Methods are provided for `lm`, `glm` and `merMod` (mixed models fitted with

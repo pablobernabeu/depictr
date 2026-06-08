@@ -46,7 +46,18 @@ check_columns <- function(data, cols, arg = "data") {
 resolve_var <- function(data, quo, arg) {
   if (rlang::quo_is_null(quo)) return(NULL)
   expr <- rlang::quo_get_expr(quo)
-  name <- if (is.character(expr)) expr else rlang::as_name(quo)
+  if (is.character(expr)) {
+    name <- expr
+  } else {
+    name <- rlang::as_name(quo)
+    # If the symbol is not a column, it may be a variable holding a column name
+    if (!name %in% names(data)) {
+      val <- tryCatch(rlang::eval_tidy(quo), error = function(e) NULL)
+      if (is.character(val) && length(val) == 1 && val %in% names(data)) {
+        name <- val
+      }
+    }
+  }
   if (!name %in% names(data)) {
     stop("Column `", name, "` (argument `", arg, "`) not found in the data.",
          call. = FALSE)

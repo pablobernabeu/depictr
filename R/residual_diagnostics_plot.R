@@ -53,7 +53,7 @@ residual_diagnostics_plot <- function(model,
       ggplot2::stat_qq_line(colour = "#e23b3b", linetype = 2) +
       ggplot2::labs(x = "Theoretical quantiles", y = "Standardised residuals",
                     title = "Normal Q-Q") +
-      theme_modelviz()
+      theme_statviz()
   }
   if ("scale_location" %in% which) {
     panels$scale_location <- diag_scatter(
@@ -101,5 +101,5 @@ diag_scatter <- function(df, x, y, x_lab, y_lab, title, alpha, smooth,
       colour = "#e23b3b", linewidth = 0.7, na.rm = TRUE
     )
   }
-  p + ggplot2::labs(x = x_lab, y = y_lab, title = title) + theme_modelviz()
+  p + ggplot2::labs(x = x_lab, y = y_lab, title = title) + theme_statviz()
 }

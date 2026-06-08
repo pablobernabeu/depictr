@@ -23,7 +23,7 @@ A data frame with one row per term and the columns \code{term},
 \code{tidy_estimates()} turns the output of a model (or an existing data frame of
 results) into a single standardised table with the columns \code{term},
 \code{estimate}, \code{std.error}, \code{conf.low} and \code{conf.high}. It is the common
-currency used by \code{\link[=coef_plot]{coef_plot()}} and \code{\link[=compare_estimates_plot]{compare_estimates_plot()}}, but is useful
+currency used by \code{\link[=coefficient_plot]{coefficient_plot()}} and \code{\link[=compare_models]{compare_models()}}, but is useful
 on its own.
 }
 \details{

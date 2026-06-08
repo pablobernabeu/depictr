@@ -11,15 +11,15 @@ test_that("format_terms() can wrap long labels", {
   expect_true(grepl("\n", out))
 })
 
-test_that("modelviz_palette() returns the requested number of colours", {
-  expect_length(modelviz_palette(3), 3)
-  expect_length(modelviz_palette(20), 20)          # interpolates
-  expect_match(modelviz_palette(1), "^#")
-  expect_error(modelviz_palette(0), "positive")
+test_that("statviz_palette() returns the requested number of colours", {
+  expect_length(statviz_palette(3), 3)
+  expect_length(statviz_palette(20), 20)          # interpolates
+  expect_match(statviz_palette(1), "^#")
+  expect_error(statviz_palette(0), "positive")
 })
 
-test_that("theme_modelviz() and scales return the right objects", {
-  expect_s3_class(theme_modelviz(), "theme")
-  expect_s3_class(scale_colour_modelviz(), "Scale")
-  expect_s3_class(scale_fill_modelviz(), "Scale")
+test_that("theme_statviz() and scales return the right objects", {
+  expect_s3_class(theme_statviz(), "theme")
+  expect_s3_class(scale_colour_statviz(), "Scale")
+  expect_s3_class(scale_fill_statviz(), "Scale")
 })

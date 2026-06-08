@@ -27,7 +27,7 @@ frequentist_bayesian_plot(
 
 \item{conf_level}{Confidence/credible level for models.}
 
-\item{labels, interaction, intercept}{See \code{\link[=compare_estimates_plot]{compare_estimates_plot()}}.
+\item{labels, interaction, intercept}{See \code{\link[=compare_models]{compare_models()}}.
 \code{intercept} defaults to \code{TRUE} here, matching the original behaviour.}
 
 \item{note_frequentist_no_prior}{If \code{TRUE}, append "(no prior)" to the
@@ -37,7 +37,7 @@ frequentist legend label -- useful when the title names the Bayesian prior.}
 
 \item{title, subtitle, x_lab}{Title, subtitle and x-axis label.}
 
-\item{...}{Further arguments passed to \code{\link[=compare_estimates_plot]{compare_estimates_plot()}}.}
+\item{...}{Further arguments passed to \code{\link[=compare_models]{compare_models()}}.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
@@ -46,7 +46,7 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 Presents the estimates from a frequentist model and a Bayesian model side by
 side on one forest plot, in the familiar red (frequentist) and blue
 (Bayesian) styling. This is a convenience wrapper around
-\code{\link[=compare_estimates_plot]{compare_estimates_plot()}}.
+\code{\link[=compare_models]{compare_models()}}.
 }
 \details{
 This is a modernised, self-contained successor to the original

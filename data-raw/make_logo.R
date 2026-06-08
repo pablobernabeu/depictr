@@ -32,7 +32,7 @@ p <- ggplot() +
                  height = 0.06, colour = "#ff7474", linewidth = 0.7) +
   geom_point(data = motif, aes(x = est, y = y),
              colour = "white", size = 1.7) +
-  annotate("text", x = 0, y = -0.55, label = "modelviz",
+  annotate("text", x = 0, y = -0.55, label = "statviz",
            colour = "white", fontface = "bold", size = 5.1) +
   coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1)) +
   theme_void()

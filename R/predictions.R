@@ -1,0 +1,220 @@
+# Predicted values from a model ----------------------------------------------
+
+#' Plot predicted values for one predictor
+#'
+#' Shows the values a model predicts as one focal predictor varies, holding the
+#' other predictors at typical values (the mean for numeric predictors, the most
+#' frequent level for factors). A confidence band (numeric predictor) or
+#' confidence intervals (factor predictor) convey uncertainty.
+#'
+#' Predictions and standard errors come from [stats::predict()]; `glm`
+#' predictions are formed on the link scale and back-transformed, so a binomial
+#' model shows predicted probabilities. Works with `lm` and `glm`; other model
+#' classes are attempted on a best-effort basis.
+#'
+#' @param model A fitted model (`lm`, `glm`, ...).
+#' @param predictor Name of the focal predictor (string).
+#' @param conf_level Confidence level for the interval.
+#' @param n Number of points across the range of a numeric predictor.
+#' @param rug Add a rug of the observed predictor values (numeric predictors)?
+#' @param colour Colour for the line/points and band.
+#' @param title,x_lab,y_lab Title and axis labels.
+#'
+#' @return A [ggplot2::ggplot] object.
+#' @export
+#' @examples
+#' fit <- lm(yield ~ rainfall + fertilizer + treatment, data = crop_yield)
+#' effects_plot(fit, "fertilizer")
+#' effects_plot(fit, "treatment")
+#'
+#' gfit <- glm(accuracy ~ word_frequency + condition,
+#'             data = lexical_decision, family = binomial)
+#' effects_plot(gfit, "word_frequency")        # predicted probability
+effects_plot <- function(model, predictor, conf_level = 0.95, n = 100,
+                         rug = TRUE, colour = "#005b96",
+                         title = NULL, x_lab = NULL, y_lab = NULL) {
+  mf <- stats::model.frame(model)
+  if (!predictor %in% names(mf)[-1]) {
+    stop("`predictor` must be one of the model's predictors: ",
+         paste(names(mf)[-1], collapse = ", "), ".", call. = FALSE)
+  }
+  focal <- mf[[predictor]]
+  is_factor <- !is.numeric(focal)
+  values <- if (is_factor) {
+    levels(as.factor(focal))
+  } else {
+    seq(min(focal, na.rm = TRUE), max(focal, na.rm = TRUE), length.out = n)
+  }
+
+  grid <- model_predict_grid(model, stats::setNames(list(values), predictor),
+                             conf_level)
+  resp <- attr(grid, "response")
+  x_lab <- x_lab %||% predictor
+  y_lab <- y_lab %||% if (isTRUE(attr(grid, "binomial"))) {
+    "Predicted probability"
+  } else {
+    paste("Predicted", resp)
+  }
+
+  if (is_factor) {
+    grid[[predictor]] <- factor(grid[[predictor]], levels = values)
+    p <- ggplot2::ggplot(grid, ggplot2::aes(x = .data[[predictor]],
+                                            y = .data$fit)) +
+      ggplot2::geom_pointrange(
+        ggplot2::aes(ymin = .data$lwr, ymax = .data$upr),
+        colour = colour, linewidth = 0.7, size = 0.5
+      )
+  } else {
+    p <- ggplot2::ggplot(grid, ggplot2::aes(x = .data[[predictor]],
+                                            y = .data$fit)) +
+      ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$lwr, ymax = .data$upr),
+                           fill = colour, alpha = 0.18) +
+      ggplot2::geom_line(colour = colour, linewidth = 0.9)
+    if (rug) {
+      p <- p + ggplot2::geom_rug(
+        data = mf, ggplot2::aes(x = .data[[predictor]]),
+        sides = "b", alpha = 0.3, inherit.aes = FALSE
+      )
+    }
+  }
+  p + ggplot2::labs(x = x_lab, y = y_lab, title = title) + theme_statviz()
+}
+
+#' Plot a two-way interaction of predicted values
+#'
+#' Shows how the predicted relationship between a focal predictor and the
+#' response changes across the levels (or representative values) of a second,
+#' moderating predictor. Other predictors are held at typical values.
+#'
+#' @param model A fitted model (`lm`, `glm`, ...).
+#' @param predictor Name of the focal predictor on the x-axis (string).
+#' @param moderator Name of the moderating predictor, mapped to colour (string).
+#' @param moderator_values For a numeric moderator, the values to show. Defaults
+#'   to the 10th, 50th and 90th percentiles.
+#' @param conf_level Confidence level for the bands/intervals.
+#' @param n Number of points across the range of a numeric focal predictor.
+#' @param band Draw confidence bands (numeric focal predictor)?
+#' @param palette Colours for the moderator; defaults to [statviz_palette()].
+#' @param title,x_lab,y_lab Title and axis labels.
+#'
+#' @return A [ggplot2::ggplot] object.
+#' @export
+#' @examples
+#' fit <- lm(yield ~ fertilizer * treatment + rainfall, data = crop_yield)
+#' interaction_plot(fit, "fertilizer", "treatment")
+interaction_plot <- function(model, predictor, moderator,
+                             moderator_values = NULL, conf_level = 0.95,
+                             n = 80, band = TRUE, palette = NULL,
+                             title = NULL, x_lab = NULL, y_lab = NULL) {
+  mf <- stats::model.frame(model)
+  preds <- names(mf)[-1]
+  for (v in c(predictor, moderator)) {
+    if (!v %in% preds) {
+      stop("`", v, "` is not a model predictor (", paste(preds, collapse = ", "),
+           ").", call. = FALSE)
+    }
+  }
+  focal <- mf[[predictor]]
+  focal_factor <- !is.numeric(focal)
+  focal_values <- if (focal_factor) {
+    levels(as.factor(focal))
+  } else {
+    seq(min(focal, na.rm = TRUE), max(focal, na.rm = TRUE), length.out = n)
+  }
+
+  modr <- mf[[moderator]]
+  mod_values <- if (!is.numeric(modr)) {
+    levels(as.factor(modr))
+  } else if (!is.null(moderator_values)) {
+    moderator_values
+  } else {
+    stats::quantile(modr, c(0.1, 0.5, 0.9), na.rm = TRUE, names = FALSE)
+  }
+
+  grid <- model_predict_grid(
+    model,
+    stats::setNames(list(focal_values, mod_values), c(predictor, moderator)),
+    conf_level
+  )
+  resp <- attr(grid, "response")
+  grid$.mod <- factor(format(grid[[moderator]]),
+                      levels = format(mod_values))
+  pal <- palette %||% statviz_palette(length(mod_values))
+  x_lab <- x_lab %||% predictor
+  y_lab <- y_lab %||% if (isTRUE(attr(grid, "binomial"))) {
+    "Predicted probability"
+  } else {
+    paste("Predicted", resp)
+  }
+
+  if (focal_factor) {
+    grid[[predictor]] <- factor(grid[[predictor]], levels = focal_values)
+    p <- ggplot2::ggplot(grid, ggplot2::aes(x = .data[[predictor]],
+                                            y = .data$fit, colour = .data$.mod)) +
+      ggplot2::geom_pointrange(
+        ggplot2::aes(ymin = .data$lwr, ymax = .data$upr),
+        position = ggplot2::position_dodge(width = 0.4), linewidth = 0.7
+      )
+  } else {
+    p <- ggplot2::ggplot(grid, ggplot2::aes(x = .data[[predictor]],
+                                            y = .data$fit, colour = .data$.mod))
+    if (band) {
+      p <- p + ggplot2::geom_ribbon(
+        ggplot2::aes(ymin = .data$lwr, ymax = .data$upr, fill = .data$.mod),
+        alpha = 0.15, colour = NA
+      ) + ggplot2::scale_fill_manual(values = pal, guide = "none")
+    }
+    p <- p + ggplot2::geom_line(linewidth = 0.9)
+  }
+
+  p +
+    ggplot2::scale_colour_manual(values = pal, name = moderator) +
+    ggplot2::labs(x = x_lab, y = y_lab, title = title) +
+    theme_statviz()
+}
+
+# ---- internal helper -------------------------------------------------------
+
+#' Build a prediction grid, holding non-varying predictors at typical values
+#' @noRd
+model_predict_grid <- function(model, vary, conf_level = 0.95) {
+  mf <- stats::model.frame(model)
+  resp <- names(mf)[1]
+  vars <- names(mf)[-1]
+
+  typical <- lapply(vars, function(v) {
+    col <- mf[[v]]
+    if (is.numeric(col)) {
+      mean(col, na.rm = TRUE)
+    } else {
+      f <- as.factor(col)
+      factor(names(which.max(table(f))), levels = levels(f))
+    }
+  })
+  names(typical) <- vars
+  for (nm in names(vary)) typical[[nm]] <- vary[[nm]]
+
+  nd <- expand.grid(typical, stringsAsFactors = FALSE)
+  for (v in vars) {
+    if (is.factor(mf[[v]])) nd[[v]] <- factor(nd[[v]], levels = levels(mf[[v]]))
+  }
+
+  z <- stats::qnorm(1 - (1 - conf_level) / 2)
+  is_glm <- inherits(model, "glm")
+  if (is_glm) {
+    pr <- stats::predict(model, newdata = nd, type = "link", se.fit = TRUE)
+    inv <- stats::family(model)$linkinv
+    nd$fit <- inv(pr$fit)
+    nd$lwr <- inv(pr$fit - z * pr$se.fit)
+    nd$upr <- inv(pr$fit + z * pr$se.fit)
+    attr(nd, "binomial") <- stats::family(model)$family == "binomial"
+  } else {
+    pr <- stats::predict(model, newdata = nd, se.fit = TRUE)
+    nd$fit <- pr$fit
+    nd$lwr <- pr$fit - z * pr$se.fit
+    nd$upr <- pr$fit + z * pr$se.fit
+    attr(nd, "binomial") <- FALSE
+  }
+  attr(nd, "response") <- resp
+  nd
+}
