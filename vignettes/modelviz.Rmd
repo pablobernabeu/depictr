@@ -1,0 +1,98 @@
+---
+title: "Getting started with modelviz"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with modelviz}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4.5,
+  dpi = 96
+)
+```
+
+## Overview
+
+**modelviz** turns the output of common statistical analyses into clear,
+publication-ready graphics, and adds a family of exploratory plots for the data
+behind those analyses. Every function returns a `ggplot2` object (or, for the
+diagnostics panel, a `patchwork` object), so you can keep customising with the
+usual `+` syntax.
+
+The package groups its functions into three families:
+
+* **Model-result plots** -- `coef_plot()`, `compare_estimates_plot()`,
+  `frequentist_bayesian_plot()`, `optimizer_fixef_plot()`,
+  `power_curve_plot()` and `residual_diagnostics_plot()`.
+* **Data-exploration plots** -- `distribution_plot()`, `scatter_trend_plot()`,
+  `correlation_matrix_plot()` and `missingness_plot()`.
+* **Shared building blocks** -- `tidy_estimates()`, `theme_modelviz()`,
+  `modelviz_palette()` and `format_terms()`.
+
+```{r}
+library(modelviz)
+```
+
+The package ships with three reproducibly simulated datasets used throughout
+the documentation: `lexical_decision`, `wellbeing_survey` and `crop_yield`.
+
+```{r}
+head(crop_yield)
+```
+
+## A first plot
+
+Fit a model and visualise its coefficients as a forest plot. The intercept is
+dropped by default, terms keep their model order unless you ask otherwise, and
+a dashed reference line marks zero.
+
+```{r}
+fit <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment,
+          data = crop_yield)
+
+coef_plot(fit, order = "descending", title = "Drivers of crop yield")
+```
+
+## The shared currency: `tidy_estimates()`
+
+Most model-result functions are built on `tidy_estimates()`, which turns a
+model -- or a data frame of pre-computed estimates -- into one standard table.
+
+```{r}
+tidy_estimates(fit)
+```
+
+Because the plotting functions also accept that table directly, you can plug in
+estimates from sources modelviz does not natively understand (Bayesian
+posteriors, bootstrapped intervals, results copied from a paper) just by
+shaping them into a data frame with `term`, `estimate`, `conf.low` and
+`conf.high` columns.
+
+## A consistent look
+
+`theme_modelviz()`, `modelviz_palette()` and `scale_colour_modelviz()` give
+every plot -- including your own -- a consistent appearance.
+
+```{r}
+library(ggplot2)
+
+ggplot(crop_yield, aes(fertilizer, yield, colour = treatment)) +
+  geom_point(alpha = 0.7) +
+  scale_colour_modelviz() +
+  theme_modelviz() +
+  labs(title = "Yield against fertiliser")
+```
+
+## Where to next
+
+* `vignette("model-estimates", package = "modelviz")` -- comparing models,
+  frequentist vs. Bayesian estimates, optimiser checks, power curves and
+  regression diagnostics.
+* `vignette("data-exploration", package = "modelviz")` -- distributions,
+  correlations, missing-data maps and scatter plots with trends.

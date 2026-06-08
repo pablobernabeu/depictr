@@ -1,0 +1,141 @@
+---
+title: "Visualising model estimates"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Visualising model estimates}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4.5,
+  dpi = 96
+)
+library(modelviz)
+```
+
+This vignette covers the model-result plots: coefficient plots, comparisons of
+several models, the frequentist/Bayesian overlay, optimiser checks, power
+curves and regression diagnostics.
+
+## Coefficient (forest) plots
+
+`coef_plot()` accepts any model `tidy_estimates()` understands, or a tidy data
+frame. Customise the term order, the labels, and the reference line.
+
+```{r}
+fit <- lm(life_satisfaction ~ stress + sleep_hours + exercise_days,
+          data = wellbeing_survey)
+
+coef_plot(
+  fit,
+  order = "ascending",
+  labels = c(stress = "Stress", sleep_hours = "Sleep (h)",
+             exercise_days = "Exercise (days)"),
+  title = "Predictors of life satisfaction"
+)
+```
+
+For odds or risk ratios, set the reference line to 1 and label the axis
+accordingly.
+
+```{r}
+gfit <- glm(accuracy ~ word_frequency + condition, data = lexical_decision,
+            family = binomial)
+
+coef_plot(gfit, reference_line = 0, x_lab = "Log-odds estimate",
+          title = "Log-odds of a correct response")
+```
+
+## Comparing several models
+
+`compare_estimates_plot()` overlays the estimates from two or more sources,
+one colour per source. Name the arguments to label the sources.
+
+```{r}
+m_all   <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+m_std   <- lm(yield ~ rainfall + fertilizer + soil_ph,
+              data = crop_yield[crop_yield$treatment == "standard", ])
+m_enh   <- lm(yield ~ rainfall + fertilizer + soil_ph,
+              data = crop_yield[crop_yield$treatment == "enhanced", ])
+
+compare_estimates_plot(
+  `All fields` = m_all, Standard = m_std, Enhanced = m_enh,
+  order = "descending", title = "Estimates by management treatment"
+)
+```
+
+## Frequentist and Bayesian estimates together
+
+`frequentist_bayesian_plot()` is a focused wrapper for the common case of
+showing a frequentist and a Bayesian fit side by side, in the familiar red and
+blue styling. The Bayesian summary is usually supplied as a tidy data frame
+(for example from `brms::fixef()` or `posterior::summarise_draws()`); here we
+build a stand-in so the example is self-contained.
+
+```{r}
+freq  <- lm(life_satisfaction ~ stress + sleep_hours + exercise_days,
+            data = wellbeing_survey)
+
+bayes <- tidy_estimates(freq)
+bayes$estimate  <- bayes$estimate * 0.92          # pretend posterior means
+bayes$conf.low  <- bayes$conf.low * 0.92
+bayes$conf.high <- bayes$conf.high * 0.92
+
+frequentist_bayesian_plot(
+  freq, bayes,
+  title = "Frequentist and Bayesian estimates",
+  note_frequentist_no_prior = TRUE
+)
+```
+
+## Checking optimiser stability
+
+`optimizer_fixef_plot()` shows how the fixed-effect estimates of a mixed model
+vary across the optimisers tried by `lme4::allFit()`. Tight clusters indicate
+agreement; scatter flags a fragile fit. Without lme4 you can build the input
+frame directly:
+
+```{r}
+opt <- expand.grid(
+  optimizer = c("bobyqa", "Nelder_Mead", "nlminbwrap", "nmkbw"),
+  term = c("(Intercept)", "stress", "sleep_hours")
+)
+set.seed(1)
+opt$value <- c(4.5, 4.51, 4.49, 4.50,
+               -0.45, -0.44, -0.46, -0.45,
+               0.25, 0.24, 0.26, 0.25) + rnorm(12, 0, 0.005)
+
+optimizer_fixef_plot(opt, title = "Fixed effects across optimisers")
+```
+
+## Power analysis curves
+
+`power_curve_plot()` plots power against sample size with a target line. It
+reads a `simr::powerCurve()` object, or a tidy data frame so the (often slow)
+simulation does not have to be re-run.
+
+```{r}
+pc <- data.frame(
+  nlevels = seq(10, 70, by = 10),
+  mean  = c(0.16, 0.31, 0.48, 0.63, 0.78, 0.88, 0.94),
+  lower = c(0.09, 0.23, 0.39, 0.54, 0.70, 0.82, 0.89),
+  upper = c(0.25, 0.40, 0.57, 0.71, 0.85, 0.93, 0.97)
+)
+
+power_curve_plot(pc, x_lab = "Number of participants",
+                 title = "Power for the condition effect")
+```
+
+## Regression diagnostics
+
+`residual_diagnostics_plot()` assembles the classic diagnostic plots into one
+panel.
+
+```{r, fig.height = 6}
+residual_diagnostics_plot(m_all, title = "Diagnostics: crop-yield model")
+```

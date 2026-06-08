@@ -1,0 +1,43 @@
+Package: modelviz
+Type: Package
+Title: Publication-Ready Visualisation of Statistical Models and Data
+Version: 0.1.0
+Authors@R: person(given = "Pablo",
+                  family = "Bernabeu",
+                  email = "pcbernabeu@gmail.com",
+                  role = c("aut", "cre"))
+Description: A cohesive toolkit for creating publication-ready plots of
+    statistical results and exploratory data summaries. It provides forest
+    (coefficient) plots from fitted models or tidy estimate tables, side-by-side
+    comparison of estimates from several models (for example frequentist and
+    Bayesian fits, or the same model fitted by different optimisers), power
+    analysis curves, regression-diagnostic panels, and a family of descriptive
+    plots (distributions, correlation heatmaps, missing-data maps and scatter
+    plots with fitted trends). A shared theme and helper functions give every
+    plot a consistent look, and the package ships with reproducibly simulated
+    datasets so that every example and vignette runs out of the box.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Depends: R (>= 4.1.0)
+Imports:
+    ggplot2 (>= 3.4.0),
+    stringr,
+    scales,
+    patchwork,
+    rlang,
+    stats,
+    grDevices
+Suggests:
+    lme4,
+    broom,
+    simr,
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+RoxygenNote: 7.3.1
+Roxygen: list(markdown = TRUE)
+Config/testthat/edition: 3
+URL: https://github.com/pablobernabeu/modelviz
+BugReports: https://github.com/pablobernabeu/modelviz/issues
