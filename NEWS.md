@@ -9,7 +9,13 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
 
 * `explore_distribution()`, `explore_categorical()`, `explore_bivariate()`,
   `explore_pairs()`, `correlation_heatmap()`, `missingness_map()`,
-  `outlier_plot()`, `scatter_trend()` and `summary_table()`.
+  `outlier_plot()`, `raincloud_plot()`, `group_comparison_plot()`,
+  `scatter_trend()` and `summary_table()`.
+
+## Multivariate and survival
+
+* `pca_plot()` and `scree_plot()` (principal component analysis) and
+  `survival_plot()` (Kaplan-Meier curves, computed in base R).
 
 ## Model estimates and inference
 
@@ -22,7 +28,8 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
 ## Diagnostics and classification
 
 * `residual_diagnostics_plot()`, `influence_plot()`, `qq_plot()`,
-  `roc_curve_plot()`, `calibration_plot()` and `confusion_matrix_plot()`.
+  `vif_plot()`, `roc_curve_plot()`, `pr_curve_plot()`, `calibration_plot()`
+  and `confusion_matrix_plot()`.
 
 ## Uncertainty and power
 

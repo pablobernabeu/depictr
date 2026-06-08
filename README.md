@@ -32,7 +32,10 @@ remotes::install_github("pablobernabeu/statviz")
 
 **Explore data** — `explore_distribution()`, `explore_categorical()`,
 `explore_bivariate()`, `explore_pairs()`, `correlation_heatmap()`,
-`missingness_map()`, `outlier_plot()`, `scatter_trend()`, `summary_table()`.
+`missingness_map()`, `outlier_plot()`, `raincloud_plot()`,
+`group_comparison_plot()`, `scatter_trend()`, `summary_table()`.
+
+**Multivariate & survival** — `pca_plot()`, `scree_plot()`, `survival_plot()`.
 
 **Model estimates & inference** — `tidy_estimates()`, `coefficient_plot()`,
 `compare_models()`, `frequentist_bayesian_plot()`, `effects_plot()`,
@@ -40,8 +43,8 @@ remotes::install_github("pablobernabeu/statviz")
 `model_fit_table()`.
 
 **Diagnostics & classification** — `residual_diagnostics_plot()`,
-`influence_plot()`, `qq_plot()`, `roc_curve_plot()`, `calibration_plot()`,
-`confusion_matrix_plot()`.
+`influence_plot()`, `qq_plot()`, `vif_plot()`, `roc_curve_plot()`,
+`pr_curve_plot()`, `calibration_plot()`, `confusion_matrix_plot()`.
 
 **Uncertainty & power** — `posterior_plot()`, `power_curve_plot()`.
 
@@ -103,10 +106,13 @@ details on plots), [`sjPlot`](https://strengejacke.github.io/sjPlot/) and the
 [easystats](https://easystats.github.io/easystats/) family (`see`, `parameters`,
 `performance`), [`marginaleffects`](https://marginaleffects.com) /
 [`ggeffects`](https://strengejacke.github.io/ggeffects/) (predictions),
-[`GGally`](https://ggobi.github.io/ggally/) (pairs) and
-[`bayesplot`](https://mc-stan.org/bayesplot/) / `tidybayes` (Bayesian). statviz
-gives you a consistent, good-looking default across all of these tasks from one
-package.
+[`GGally`](https://ggobi.github.io/ggally/) (pairs),
+[`factoextra`](https://rpkgs.datanovia.com/factoextra/) (PCA),
+[`survminer`](https://rpkgs.datanovia.com/survminer/) (survival),
+[`ggdist`](https://mjskay.github.io/ggdist/) / `dabestr` (distributions and
+estimation) and [`bayesplot`](https://mc-stan.org/bayesplot/) / `tidybayes`
+(Bayesian). statviz gives you a consistent, good-looking default across all of
+these tasks from one package.
 
 ## License
 

@@ -17,8 +17,17 @@
 #'   \item [correlation_heatmap()] -- correlations as a heatmap.
 #'   \item [missingness_map()] -- a map of missing values.
 #'   \item [outlier_plot()] -- box / violin plots flagging outliers.
+#'   \item [raincloud_plot()] -- half-violin, box and raw points together.
+#'   \item [group_comparison_plot()] -- group means with confidence intervals.
 #'   \item [scatter_trend()] -- scatter plot with a fitted trend.
 #'   \item [summary_table()] -- a "Table 1" style descriptive summary.
+#' }
+#'
+#' @section Multivariate and survival:
+#' \itemize{
+#'   \item [pca_plot()] -- principal-component biplot.
+#'   \item [scree_plot()] -- variance explained by each component.
+#'   \item [survival_plot()] -- Kaplan-Meier survival curves.
 #' }
 #'
 #' @section Model estimates and inference:
@@ -39,7 +48,9 @@
 #'   \item [residual_diagnostics_plot()] -- residual-diagnostic panel.
 #'   \item [influence_plot()] -- influence and leverage.
 #'   \item [qq_plot()] -- normal quantile-quantile plot.
+#'   \item [vif_plot()] -- multicollinearity (variance inflation factors).
 #'   \item [roc_curve_plot()] -- ROC curve(s) with AUC.
+#'   \item [pr_curve_plot()] -- precision-recall curve with average precision.
 #'   \item [calibration_plot()] -- calibration of predicted probabilities.
 #'   \item [confusion_matrix_plot()] -- confusion matrix as a heatmap.
 #' }

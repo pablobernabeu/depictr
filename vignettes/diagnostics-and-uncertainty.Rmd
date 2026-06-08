@@ -30,6 +30,12 @@ residual_diagnostics_plot(fit, title = "Crop-yield model")
 influence_plot(fit)
 ```
 
+`vif_plot()` checks for multicollinearity among the predictors:
+
+```{r, fig.height = 3.2}
+vif_plot(fit)
+```
+
 ## Classification
 
 For binary classifiers, statviz provides an ROC curve (with AUC), a calibration
@@ -43,6 +49,13 @@ gfit <- glm(accuracy ~ word_frequency + RT + condition,
 
 ```{r, fig.width = 5, fig.height = 5}
 roc_curve_plot(gfit)
+```
+
+When the positive class is rare, the precision-recall curve is more informative
+than the ROC curve:
+
+```{r, fig.width = 5, fig.height = 5}
+pr_curve_plot(gfit)
 ```
 
 ```{r, fig.width = 5, fig.height = 5}

@@ -60,6 +60,21 @@ explore_pairs(crop_yield, cols = c("rainfall", "fertilizer", "soil_ph", "yield")
 correlation_heatmap(wellbeing_survey)
 ```
 
+## Distributions across groups
+
+`raincloud_plot()` shows the density, the box summary and the raw points
+together, and `group_comparison_plot()` adds the group means with confidence
+intervals over the raw data -- a clearer answer to "do these groups differ?"
+than a bar chart.
+
+```{r}
+raincloud_plot(lexical_decision, RT, group = condition)
+```
+
+```{r}
+group_comparison_plot(lexical_decision, RT, condition)
+```
+
 ## Data quality: outliers and missingness
 
 ```{r}

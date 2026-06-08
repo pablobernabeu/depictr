@@ -24,8 +24,19 @@ label conventions.
 \item \code{\link[=correlation_heatmap]{correlation_heatmap()}} -- correlations as a heatmap.
 \item \code{\link[=missingness_map]{missingness_map()}} -- a map of missing values.
 \item \code{\link[=outlier_plot]{outlier_plot()}} -- box / violin plots flagging outliers.
+\item \code{\link[=raincloud_plot]{raincloud_plot()}} -- half-violin, box and raw points together.
+\item \code{\link[=group_comparison_plot]{group_comparison_plot()}} -- group means with confidence intervals.
 \item \code{\link[=scatter_trend]{scatter_trend()}} -- scatter plot with a fitted trend.
 \item \code{\link[=summary_table]{summary_table()}} -- a "Table 1" style descriptive summary.
+}
+}
+
+\section{Multivariate and survival}{
+
+\itemize{
+\item \code{\link[=pca_plot]{pca_plot()}} -- principal-component biplot.
+\item \code{\link[=scree_plot]{scree_plot()}} -- variance explained by each component.
+\item \code{\link[=survival_plot]{survival_plot()}} -- Kaplan-Meier survival curves.
 }
 }
 
@@ -50,7 +61,9 @@ label conventions.
 \item \code{\link[=residual_diagnostics_plot]{residual_diagnostics_plot()}} -- residual-diagnostic panel.
 \item \code{\link[=influence_plot]{influence_plot()}} -- influence and leverage.
 \item \code{\link[=qq_plot]{qq_plot()}} -- normal quantile-quantile plot.
+\item \code{\link[=vif_plot]{vif_plot()}} -- multicollinearity (variance inflation factors).
 \item \code{\link[=roc_curve_plot]{roc_curve_plot()}} -- ROC curve(s) with AUC.
+\item \code{\link[=pr_curve_plot]{pr_curve_plot()}} -- precision-recall curve with average precision.
 \item \code{\link[=calibration_plot]{calibration_plot()}} -- calibration of predicted probabilities.
 \item \code{\link[=confusion_matrix_plot]{confusion_matrix_plot()}} -- confusion matrix as a heatmap.
 }
