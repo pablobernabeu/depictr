@@ -53,7 +53,7 @@ explore_pairs <- function(data, cols = NULL, group = NULL, max_cols = 8,
   pos <- 1L
   for (i in seq_len(k)) {       # row
     for (j in seq_len(k)) {     # column
-      panels[[pos]] <- pairs_panel(d, cols[j], cols[i], i, j, group, pal,
+      panels[[pos]] <- pairs_panel(d, cols[j], cols[i], i, j, k, group, pal,
                                    point_alpha)
       pos <- pos + 1L
     }
@@ -78,15 +78,27 @@ explore_pairs <- function(data, cols = NULL, group = NULL, max_cols = 8,
 
 #' Build one panel of the scatter-plot matrix
 #' @noRd
-pairs_panel <- function(d, xvar, yvar, i, j, group, pal, point_alpha) {
+pairs_panel <- function(d, xvar, yvar, i, j, k, group, pal, point_alpha) {
+  # Keep axis text only on the outer edge (bottom row / left column) so the
+  # matrix stays clean; variable names live on the diagonal.
+  show_x <- i == k
+  show_y <- j == 1 && i != j
   base <- theme_statviz(grid = "none") +
     ggplot2::theme(
-      axis.title = ggplot2::element_blank(),
-      plot.margin = ggplot2::margin(2, 2, 2, 2)
+      axis.title.x = ggplot2::element_blank(),
+      axis.title.y = ggplot2::element_blank(),
+      panel.grid = ggplot2::element_blank(),
+      plot.margin = ggplot2::margin(2, 2, 2, 2),
+      axis.text.x = if (show_x) ggplot2::element_text(size = 7) else
+        ggplot2::element_blank(),
+      axis.text.y = if (show_y) ggplot2::element_text(size = 7) else
+        ggplot2::element_blank(),
+      axis.ticks = if (show_x || show_y) ggplot2::element_line(colour = "grey70")
+        else ggplot2::element_blank()
     )
 
   if (i == j) {
-    # Diagonal: density (with a small label of the variable name)
+    # Diagonal: density, labelled with the variable name
     p <- ggplot2::ggplot(d, ggplot2::aes(x = .data[[xvar]]))
     if (is.null(group)) {
       p <- p + ggplot2::geom_density(fill = "#005b96", alpha = 0.5,
@@ -95,13 +107,17 @@ pairs_panel <- function(d, xvar, yvar, i, j, group, pal, point_alpha) {
       p <- p + ggplot2::geom_density(
         ggplot2::aes(fill = .data[[group]], colour = .data[[group]]),
         alpha = 0.35, na.rm = TRUE) +
-        ggplot2::scale_fill_manual(values = pal) +
-        ggplot2::scale_colour_manual(values = pal)
+        ggplot2::scale_fill_manual(values = pal, guide = "none") +
+        ggplot2::scale_colour_manual(values = pal, guide = "none")
     }
-    p <- p + ggplot2::annotate("text", x = Inf, y = Inf, label = xvar,
-                               hjust = 1.1, vjust = 1.4, fontface = "bold",
-                               colour = "#0a3d62", size = 3)
-    return(p + base + ggplot2::labs(y = NULL))
+    p <- p +
+      ggplot2::annotate("text", x = -Inf, y = Inf, label = xvar, hjust = -0.1,
+                        vjust = 1.4, fontface = "bold", colour = "#0a3d62",
+                        size = 3.2) +
+      base +
+      ggplot2::theme(axis.text.y = ggplot2::element_blank(),
+                     axis.ticks.y = ggplot2::element_blank())
+    return(p)
   }
 
   if (i > j) {
@@ -119,14 +135,14 @@ pairs_panel <- function(d, xvar, yvar, i, j, group, pal, point_alpha) {
     return(p + base)
   }
 
-  # Upper triangle: correlation coefficient(s)
+  # Upper triangle: correlation coefficient(s), no clipping
   if (is.null(group)) {
     r <- stats::cor(d[[xvar]], d[[yvar]], use = "pairwise.complete.obs")
     lab <- data.frame(x = 0.5, y = 0.5,
                       label = paste0("r = ", formatC(r, format = "f", digits = 2)))
     p <- ggplot2::ggplot(lab, ggplot2::aes(x = .data$x, y = .data$y)) +
       ggplot2::geom_text(ggplot2::aes(label = .data$label),
-                         size = 3.4, colour = "#0a3d62")
+                         size = 3.6, colour = "#0a3d62")
   } else {
     grp <- d[[group]]
     parts <- tapply(seq_len(nrow(d)), grp, function(idx) {
@@ -134,20 +150,19 @@ pairs_panel <- function(d, xvar, yvar, i, j, group, pal, point_alpha) {
     })
     lab <- data.frame(
       x = 0.5,
-      y = seq(0.85, 0.15, length.out = length(parts)),
+      y = seq(0.8, 0.2, length.out = length(parts)),
       label = paste0(names(parts), ": ",
                      formatC(unlist(parts), format = "f", digits = 2)),
       grp = factor(names(parts), levels = levels(grp))
     )
     p <- ggplot2::ggplot(lab, ggplot2::aes(x = .data$x, y = .data$y)) +
       ggplot2::geom_text(ggplot2::aes(label = .data$label, colour = .data$grp),
-                         size = 3) +
+                         size = 2.9) +
       ggplot2::scale_colour_manual(values = pal, guide = "none")
   }
   p +
-    ggplot2::scale_x_continuous(limits = c(0, 1)) +
-    ggplot2::scale_y_continuous(limits = c(0, 1)) +
+    ggplot2::coord_cartesian(xlim = c(0, 1), ylim = c(0, 1), clip = "off") +
     base +
     ggplot2::theme(axis.text = ggplot2::element_blank(),
-                   panel.grid = ggplot2::element_blank())
+                   axis.ticks = ggplot2::element_blank())
 }
