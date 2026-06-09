@@ -36,8 +36,8 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
 ## Diagnostics and classification
 
 * `residual_diagnostics_plot()`, `influence_plot()`, `qq_plot()`,
-  `vif_plot()`, `roc_curve_plot()`, `pr_curve_plot()`, `calibration_plot()`
-  and `confusion_matrix_plot()`.
+  `vif_plot()`, `roc_curve_plot()`, `pr_curve_plot()`, `gain_plot()`,
+  `lift_plot()`, `calibration_plot()` and `confusion_matrix_plot()`.
 
 ## Uncertainty and power
 
@@ -47,7 +47,8 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
 
 * `theme_statviz()`, `statviz_palette()`, `scale_colour_statviz()` (and
   `scale_color_statviz()`, `scale_fill_statviz()`), `palette_preview()`,
-  `format_terms()`, `arrange_plots()` and `save_plot()`.
+  `format_terms()`, `model_report()` (a one-figure model overview),
+  `arrange_plots()` and `save_plot()`.
 
 ## Data
 

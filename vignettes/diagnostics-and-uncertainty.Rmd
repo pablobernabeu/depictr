@@ -58,6 +58,18 @@ than the ROC curve:
 pr_curve_plot(gfit)
 ```
 
+For ranking and targeting tasks, the cumulative gains and lift charts show how
+many positive cases are captured as more of the score-ordered population is
+targeted:
+
+```{r, fig.width = 5, fig.height = 5}
+gain_plot(gfit)
+```
+
+```{r, fig.height = 3.6}
+lift_plot(gfit)
+```
+
 ```{r, fig.width = 5, fig.height = 5}
 calibration_plot(gfit, bins = 8)
 ```

@@ -60,6 +60,8 @@
 #'   \item [vif_plot()] -- multicollinearity (variance inflation factors).
 #'   \item [roc_curve_plot()] -- ROC curve(s) with AUC.
 #'   \item [pr_curve_plot()] -- precision-recall curve with average precision.
+#'   \item [gain_plot()] -- cumulative gains chart.
+#'   \item [lift_plot()] -- cumulative lift chart.
 #'   \item [calibration_plot()] -- calibration of predicted probabilities.
 #'   \item [confusion_matrix_plot()] -- confusion matrix as a heatmap.
 #' }
@@ -76,6 +78,7 @@
 #'   \item [statviz_palette()], [scale_colour_statviz()] -- the shared palette.
 #'   \item [palette_preview()] -- preview the palettes.
 #'   \item [format_terms()] -- tidy raw coefficient names for display.
+#'   \item [model_report()] -- a one-figure overview of a fitted model.
 #'   \item [arrange_plots()] -- compose plots with a shared legend and title.
 #'   \item [save_plot()] -- save a plot with publication-ready defaults.
 #' }

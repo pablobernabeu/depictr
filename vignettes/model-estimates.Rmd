@@ -108,3 +108,15 @@ opt <- expand.grid(optimizer = c("bobyqa", "Nelder_Mead", "nlminbwrap"),
 opt$value <- c(4.5, 4.51, 4.49, -0.45, -0.44, -0.46, 0.25, 0.24, 0.26)
 optimizer_fixef_plot(opt)
 ```
+
+## A one-figure model report
+
+`model_report()` composes several of these views -- coefficients, the effect of
+a focal predictor, residuals-vs-fitted and a Q-Q plot, with a fit-statistics
+subtitle -- into a single figure for a quick review or a report appendix.
+
+```{r, fig.width = 9, fig.height = 7}
+full <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment,
+           data = crop_yield)
+model_report(full, title = "Crop-yield model")
+```

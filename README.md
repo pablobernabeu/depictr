@@ -47,13 +47,14 @@ remotes::install_github("pablobernabeu/statviz")
 
 **Diagnostics & classification** — `residual_diagnostics_plot()`,
 `influence_plot()`, `qq_plot()`, `vif_plot()`, `roc_curve_plot()`,
-`pr_curve_plot()`, `calibration_plot()`, `confusion_matrix_plot()`.
+`pr_curve_plot()`, `gain_plot()`, `lift_plot()`, `calibration_plot()`,
+`confusion_matrix_plot()`.
 
 **Uncertainty & power** — `posterior_plot()`, `power_curve_plot()`.
 
 **Theming & reporting** — `theme_statviz()`, `statviz_palette()` /
 `scale_colour_statviz()`, `palette_preview()`, `format_terms()`,
-`arrange_plots()`, `save_plot()`.
+`model_report()`, `arrange_plots()`, `save_plot()`.
 
 Heavier modelling back-ends (`lme4`, `broom`, `simr`) are optional (in
 `Suggests`) and used only when present; the core functions, examples, tests and

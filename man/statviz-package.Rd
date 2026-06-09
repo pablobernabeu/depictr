@@ -75,6 +75,8 @@ label conventions.
 \item \code{\link[=vif_plot]{vif_plot()}} -- multicollinearity (variance inflation factors).
 \item \code{\link[=roc_curve_plot]{roc_curve_plot()}} -- ROC curve(s) with AUC.
 \item \code{\link[=pr_curve_plot]{pr_curve_plot()}} -- precision-recall curve with average precision.
+\item \code{\link[=gain_plot]{gain_plot()}} -- cumulative gains chart.
+\item \code{\link[=lift_plot]{lift_plot()}} -- cumulative lift chart.
 \item \code{\link[=calibration_plot]{calibration_plot()}} -- calibration of predicted probabilities.
 \item \code{\link[=confusion_matrix_plot]{confusion_matrix_plot()}} -- confusion matrix as a heatmap.
 }
@@ -95,6 +97,7 @@ label conventions.
 \item \code{\link[=statviz_palette]{statviz_palette()}}, \code{\link[=scale_colour_statviz]{scale_colour_statviz()}} -- the shared palette.
 \item \code{\link[=palette_preview]{palette_preview()}} -- preview the palettes.
 \item \code{\link[=format_terms]{format_terms()}} -- tidy raw coefficient names for display.
+\item \code{\link[=model_report]{model_report()}} -- a one-figure overview of a fitted model.
 \item \code{\link[=arrange_plots]{arrange_plots()}} -- compose plots with a shared legend and title.
 \item \code{\link[=save_plot]{save_plot()}} -- save a plot with publication-ready defaults.
 }
