@@ -1,0 +1,51 @@
+---
+title: "Time series"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Time series}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+                      fig.width = 7, fig.height = 4, dpi = 96)
+library(statviz)
+```
+
+statviz provides a small, consistent set of time-series plots. The examples use
+`AirPassengers`, a classic monthly series that ships with base R.
+
+## Plotting a series
+
+`timeseries_plot()` accepts a `ts` object, a numeric vector, or a data frame
+with time, value and (optionally) group columns. A moving-average overlay is one
+argument away.
+
+```{r}
+timeseries_plot(AirPassengers, rolling = 12,
+                title = "Air passengers", y_lab = "Passengers (thousands)")
+```
+
+## Autocorrelation
+
+`acf_plot()` draws the autocorrelation (or, with `type = "partial"`, the partial
+autocorrelation) function, with approximate significance bounds.
+
+```{r, fig.height = 3.4}
+acf_plot(AirPassengers)
+```
+
+```{r, fig.height = 3.4}
+acf_plot(AirPassengers, type = "partial")
+```
+
+## Decomposition
+
+`decompose_plot()` separates a seasonal series into trend, seasonal and
+remainder components. Use `method = "stl"` (the default, loess-based) or
+`method = "classical"`.
+
+```{r, fig.height = 6}
+decompose_plot(AirPassengers, title = "Air passengers, decomposed")
+```

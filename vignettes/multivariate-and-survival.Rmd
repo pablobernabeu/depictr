@@ -41,6 +41,26 @@ pc <- prcomp(crop_yield[num], scale. = TRUE)
 pca_plot(pc, components = c(1, 3))
 ```
 
+## Clustering
+
+`cluster_plot()` runs k-means and shows the clusters on the first two principal
+components (so it works for any number of variables), with convex hulls and
+labelled centroids. `dendrogram_plot()` draws a hierarchical-clustering tree and
+can cut it into `k` groups.
+
+```{r}
+cluster_plot(crop_yield, cols = num, k = 3, title = "Crop-yield clusters")
+```
+
+```{r, fig.height = 4}
+region_means <- aggregate(
+  cbind(stress, sleep_hours, life_satisfaction, age, income) ~ region,
+  data = wellbeing_survey, FUN = mean
+)
+rownames(region_means) <- region_means$region
+dendrogram_plot(region_means[-1], k = 2, title = "Regions clustered")
+```
+
 ## Survival curves
 
 `survival_plot()` draws Kaplan-Meier curves with stepwise confidence limits and

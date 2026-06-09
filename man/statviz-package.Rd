@@ -36,7 +36,18 @@ label conventions.
 \itemize{
 \item \code{\link[=pca_plot]{pca_plot()}} -- principal-component biplot.
 \item \code{\link[=scree_plot]{scree_plot()}} -- variance explained by each component.
+\item \code{\link[=cluster_plot]{cluster_plot()}} -- k-means clusters on principal-component axes.
+\item \code{\link[=dendrogram_plot]{dendrogram_plot()}} -- hierarchical-clustering dendrogram.
 \item \code{\link[=survival_plot]{survival_plot()}} -- Kaplan-Meier survival curves.
+}
+}
+
+\section{Time series}{
+
+\itemize{
+\item \code{\link[=timeseries_plot]{timeseries_plot()}} -- one or more series over time.
+\item \code{\link[=acf_plot]{acf_plot()}} -- autocorrelation / partial autocorrelation.
+\item \code{\link[=decompose_plot]{decompose_plot()}} -- trend / seasonal / remainder decomposition.
 }
 }
 

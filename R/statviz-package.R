@@ -27,7 +27,16 @@
 #' \itemize{
 #'   \item [pca_plot()] -- principal-component biplot.
 #'   \item [scree_plot()] -- variance explained by each component.
+#'   \item [cluster_plot()] -- k-means clusters on principal-component axes.
+#'   \item [dendrogram_plot()] -- hierarchical-clustering dendrogram.
 #'   \item [survival_plot()] -- Kaplan-Meier survival curves.
+#' }
+#'
+#' @section Time series:
+#' \itemize{
+#'   \item [timeseries_plot()] -- one or more series over time.
+#'   \item [acf_plot()] -- autocorrelation / partial autocorrelation.
+#'   \item [decompose_plot()] -- trend / seasonal / remainder decomposition.
 #' }
 #'
 #' @section Model estimates and inference:

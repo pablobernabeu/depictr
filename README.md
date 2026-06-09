@@ -35,7 +35,10 @@ remotes::install_github("pablobernabeu/statviz")
 `missingness_map()`, `outlier_plot()`, `raincloud_plot()`,
 `group_comparison_plot()`, `scatter_trend()`, `summary_table()`.
 
-**Multivariate & survival** — `pca_plot()`, `scree_plot()`, `survival_plot()`.
+**Multivariate, clustering & survival** — `pca_plot()`, `scree_plot()`,
+`cluster_plot()`, `dendrogram_plot()`, `survival_plot()`.
+
+**Time series** — `timeseries_plot()`, `acf_plot()`, `decompose_plot()`.
 
 **Model estimates & inference** — `tidy_estimates()`, `coefficient_plot()`,
 `compare_models()`, `frequentist_bayesian_plot()`, `effects_plot()`,
@@ -107,8 +110,9 @@ details on plots), [`sjPlot`](https://strengejacke.github.io/sjPlot/) and the
 `performance`), [`marginaleffects`](https://marginaleffects.com) /
 [`ggeffects`](https://strengejacke.github.io/ggeffects/) (predictions),
 [`GGally`](https://ggobi.github.io/ggally/) (pairs),
-[`factoextra`](https://rpkgs.datanovia.com/factoextra/) (PCA),
+[`factoextra`](https://rpkgs.datanovia.com/factoextra/) (PCA and clustering),
 [`survminer`](https://rpkgs.datanovia.com/survminer/) (survival),
+[`feasts`](https://feasts.tidyverts.org) / `ggfortify` (time series),
 [`ggdist`](https://mjskay.github.io/ggdist/) / `dabestr` (distributions and
 estimation) and [`bayesplot`](https://mc-stan.org/bayesplot/) / `tidybayes`
 (Bayesian). statviz gives you a consistent, good-looking default across all of

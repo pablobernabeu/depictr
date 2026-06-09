@@ -12,10 +12,18 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
   `outlier_plot()`, `raincloud_plot()`, `group_comparison_plot()`,
   `scatter_trend()` and `summary_table()`.
 
-## Multivariate and survival
+## Multivariate, clustering and survival
 
-* `pca_plot()` and `scree_plot()` (principal component analysis) and
-  `survival_plot()` (Kaplan-Meier curves, computed in base R).
+* `pca_plot()` and `scree_plot()` (principal component analysis),
+  `cluster_plot()` (k-means on principal-component axes) and
+  `dendrogram_plot()` (hierarchical clustering), and `survival_plot()`
+  (Kaplan-Meier curves, computed in base R).
+
+## Time series
+
+* `timeseries_plot()` (series with an optional moving average), `acf_plot()`
+  (autocorrelation / partial autocorrelation) and `decompose_plot()`
+  (trend / seasonal / remainder decomposition).
 
 ## Model estimates and inference
 
