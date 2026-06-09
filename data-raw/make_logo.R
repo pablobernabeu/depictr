@@ -23,7 +23,7 @@ motif <- data.frame(
 
 # Position the forest-plot motif: down and to the left, leaving room for the
 # wordmark, which sits higher.
-motif$y   <- motif$y * 0.7 + 0.12   # move the motif down
+motif$y   <- motif$y * 0.7 + 0.20   # move the motif down
 motif$est <- motif$est - 0.10       # move the motif left
 motif$lo  <- motif$lo  - 0.10
 motif$hi  <- motif$hi  - 0.10
@@ -31,13 +31,13 @@ motif$hi  <- motif$hi  - 0.10
 p <- ggplot() +
   geom_polygon(data = h,  aes(x, y), fill = "#0a3d62", colour = NA) +
   geom_polygon(data = hi, aes(x, y), fill = "#005b96", colour = NA) +
-  annotate("segment", x = -0.10, xend = -0.10, y = -0.27, yend = 0.50,
+  annotate("segment", x = -0.10, xend = -0.10, y = -0.19, yend = 0.58,
            colour = "#9fc3df", linewidth = 0.3) +
   geom_errorbarh(data = motif, aes(y = y, xmin = lo, xmax = hi),
                  height = 0.06, colour = "#ff7474", linewidth = 0.7) +
   geom_point(data = motif, aes(x = est, y = y),
              colour = "white", size = 1.7) +
-  annotate("text", x = 0, y = -0.49, label = "depictr",
+  annotate("text", x = 0, y = -0.41, label = "depictr",
            colour = "white", fontface = "bold", size = 5.1) +
   coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1)) +
   theme_void()
