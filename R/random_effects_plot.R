@@ -54,7 +54,7 @@ random_effects_plot <- function(x, conf_level = 0.95, sort = TRUE,
     ) +
     ggplot2::geom_point(size = 1.6, colour = point_colour) +
     ggplot2::labs(x = x_lab, y = NULL, title = title) +
-    theme_statviz(grid = "x")
+    theme_depictr(grid = "x")
 
   if (facets) {
     p <- p + ggplot2::facet_wrap(~ facet, scales = "free_y")

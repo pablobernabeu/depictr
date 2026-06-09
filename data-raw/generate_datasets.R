@@ -1,6 +1,6 @@
 # data-raw/generate_datasets.R
 #
-# Reproducibly simulate the datasets bundled with statviz. These are
+# Reproducibly simulate the datasets bundled with depictr. These are
 # synthetic (no personal or proprietary data), so they can be shipped freely
 # and every example/vignette runs out of the box. Run this script from the
 # package root to regenerate data/*.rda:

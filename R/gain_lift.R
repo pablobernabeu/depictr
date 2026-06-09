@@ -40,7 +40,7 @@ gain_plot <- function(x, score = NULL, colour = "#005b96", title = NULL) {
     ggplot2::coord_equal() +
     ggplot2::labs(x = "Population targeted", y = "Positive cases captured",
                   title = title) +
-    theme_statviz()
+    theme_depictr()
 }
 
 #' Cumulative lift chart
@@ -71,7 +71,7 @@ lift_plot <- function(x, score = NULL, colour = "#005b96", title = NULL) {
     ggplot2::expand_limits(y = 1) +
     ggplot2::labs(x = "Population targeted", y = "Cumulative lift",
                   title = title) +
-    theme_statviz()
+    theme_depictr()
 }
 
 # ---- internal helper -------------------------------------------------------

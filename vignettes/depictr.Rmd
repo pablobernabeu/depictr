@@ -1,8 +1,8 @@
 ---
-title: "Getting started with statviz"
+title: "Getting started with depictr"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting started with statviz}
+  %\VignetteIndexEntry{Getting started with depictr}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -12,7 +12,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
                       fig.width = 7, fig.height = 4.5, dpi = 96)
 ```
 
-**statviz** is a single, consistent toolkit of plots that span the whole
+**depictr** is a single, consistent toolkit of plots that span the whole
 analysis workflow -- from a first look at the data, through model estimates and
 predictions, to diagnostics, uncertainty and reporting. Every plotting function
 returns a `ggplot2` object (or a `patchwork` for composite panels), so you can
@@ -20,7 +20,7 @@ keep customising with the usual `+` syntax, and every plot shares one theme, one
 palette and one set of label conventions.
 
 ```{r}
-library(statviz)
+library(depictr)
 ```
 
 The package ships with three reproducibly simulated datasets used throughout the
@@ -76,15 +76,15 @@ tidy_estimates(fit)
 
 ## A consistent, accessible look
 
-`theme_statviz()`, `statviz_palette()` and `scale_colour_statviz()` style your
+`theme_depictr()`, `depictr_palette()` and `scale_colour_depictr()` style your
 own plots too:
 
 ```{r}
 library(ggplot2)
 ggplot(crop_yield, aes(fertilizer, yield, colour = treatment)) +
   geom_point(alpha = 0.7) +
-  scale_colour_statviz() +
-  theme_statviz()
+  scale_colour_depictr() +
+  theme_depictr()
 ```
 
 The qualitative palette is based on the Okabe-Ito set, which stays

@@ -13,7 +13,7 @@
 #' @param group When `x` is a data frame, an optional grouping column mapped to
 #'   colour.
 #' @param rolling Optional integer window for a centred moving-average overlay.
-#' @param palette Colours for the groups; defaults to [statviz_palette()].
+#' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param point Add points as well as the line?
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
@@ -51,7 +51,7 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
   y_lab <- y_lab %||% "Value"
   df$series <- factor(df$series, levels = unique(df$series))
   multi <- nlevels(df$series) > 1
-  pal <- palette %||% statviz_palette(nlevels(df$series))
+  pal <- palette %||% depictr_palette(nlevels(df$series))
 
   mapping <- if (multi) {
     ggplot2::aes(x = .data$time, y = .data$value, colour = .data$series)
@@ -87,7 +87,7 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
   }
 
   if (multi) p <- p + ggplot2::scale_colour_manual(values = pal, name = NULL)
-  p + ggplot2::labs(x = x_lab, y = y_lab, title = title) + theme_statviz()
+  p + ggplot2::labs(x = x_lab, y = y_lab, title = title) + theme_depictr()
 }
 
 #' Autocorrelation plot
@@ -131,7 +131,7 @@ acf_plot <- function(x, lag_max = NULL, type = c("correlation", "partial"),
                           colour = "#005b96", linewidth = 0.6) +
     ggplot2::geom_point(colour = "#005b96", size = 1.6) +
     ggplot2::labs(x = x_lab, y = y_lab, title = title) +
-    theme_statviz()
+    theme_depictr()
 }
 
 #' Time-series decomposition plot
@@ -188,7 +188,7 @@ decompose_plot <- function(x, frequency = NULL,
                     ggplot2::aes(x = .data$t, y = .data$y)) +
       ggplot2::geom_line(colour = colour, linewidth = 0.6, na.rm = TRUE) +
       ggplot2::labs(x = NULL, y = lab) +
-      theme_statviz(grid = "y") +
+      theme_depictr(grid = "y") +
       ggplot2::theme(plot.margin = ggplot2::margin(2, 6, 2, 6))
   }
 

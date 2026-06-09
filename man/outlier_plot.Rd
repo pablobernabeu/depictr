@@ -29,7 +29,7 @@ outlier_plot(
 
 \item{outlier_colour}{Colour for highlighted outliers.}
 
-\item{palette}{Colours for the groups; defaults to \code{\link[=statviz_palette]{statviz_palette()}}.}
+\item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title, y_lab}{Plot title and value-axis label.}
 }

@@ -37,7 +37,7 @@ roc_curve_plot <- function(x, score = NULL, colour = "#005b96", title = NULL) {
     ggplot2::coord_equal() +
     ggplot2::labs(x = "False positive rate", y = "True positive rate",
                   title = title) +
-    theme_statviz()
+    theme_depictr()
   attr(p, "auc") <- auc
   p
 }
@@ -89,7 +89,7 @@ calibration_plot <- function(x, score = NULL, bins = 10, colour = "#005b96",
     ggplot2::coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
     ggplot2::labs(x = "Mean predicted probability",
                   y = "Observed frequency", title = title) +
-    theme_statviz()
+    theme_depictr()
 }
 
 #' Confusion matrix heatmap
@@ -160,7 +160,7 @@ confusion_matrix_plot <- function(x, predicted = NULL, threshold = 0.5,
                                  guide = "none") +
     ggplot2::coord_equal() +
     ggplot2::labs(x = "Predicted", y = "Actual", title = title) +
-    theme_statviz(grid = "none")
+    theme_depictr(grid = "none")
 }
 
 # ---- internal helpers ------------------------------------------------------

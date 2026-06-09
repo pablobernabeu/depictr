@@ -14,7 +14,7 @@
 #'   `"fill"`.
 #' @param sort Order the bars from most to least frequent?
 #' @param horizontal Draw horizontal bars (helpful with many or long labels)?
-#' @param palette Colours for the groups; defaults to [statviz_palette()].
+#' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title,x_lab Plot title and category-axis label (defaults to the
 #'   variable name).
 #'
@@ -71,12 +71,12 @@ explore_categorical <- function(data, x, group = NULL, proportion = FALSE,
     p <- p + ggplot2::geom_col(fill = "#005b96", width = 0.75)
   } else {
     p <- p + ggplot2::geom_col(position = position, width = 0.75)
-    pal <- palette %||% statviz_palette(nlevels(factor(tab$grp)))
+    pal <- palette %||% depictr_palette(nlevels(factor(tab$grp)))
     p <- p + ggplot2::scale_fill_manual(values = pal, name = group)
   }
 
   p <- p + ggplot2::labs(x = x_lab, y = y_lab, title = title) +
-    theme_statviz(grid = if (horizontal) "x" else "y")
+    theme_depictr(grid = if (horizontal) "x" else "y")
   if (horizontal) {
     p <- p + ggplot2::coord_flip()
   } else {

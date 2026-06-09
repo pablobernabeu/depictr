@@ -31,7 +31,7 @@ dendrogram_plot(
 
 \item{horizontal}{Draw the tree horizontally?}
 
-\item{palette}{Colours for the \code{k} clusters; defaults to \code{\link[=statviz_palette]{statviz_palette()}}.}
+\item{palette}{Colours for the \code{k} clusters; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title}{Plot title.}
 }

@@ -24,7 +24,7 @@ explore_bivariate(
 \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}); \code{NULL} for no trend.}
 
 \item{palette}{Colours used when a fill/colour is needed; defaults to
-\code{\link[=statviz_palette]{statviz_palette()}}.}
+\code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title, x_lab, y_lab}{Title and axis labels (default to variable names).}
 }

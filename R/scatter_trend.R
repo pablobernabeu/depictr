@@ -13,7 +13,7 @@
 #'   `"lm"`, `"loess"`, or `NULL` for no trend line.
 #' @param se Draw the confidence band around the trend?
 #' @param point_alpha Point transparency.
-#' @param palette Colours for the groups; defaults to [statviz_palette()].
+#' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title,x_lab,y_lab Title and axis labels (default to variable names).
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -60,10 +60,10 @@ scatter_trend <- function(data, x, y, group = NULL, method = "lm",
   }
 
   p <- p + ggplot2::labs(x = x_lab, y = y_lab, title = title) +
-    theme_statviz()
+    theme_depictr()
 
   if (!is.null(group)) {
-    pal <- palette %||% statviz_palette(length(unique(data[[group]])))
+    pal <- palette %||% depictr_palette(length(unique(data[[group]])))
     p <- p +
       ggplot2::scale_colour_manual(values = pal) +
       ggplot2::scale_fill_manual(values = pal)

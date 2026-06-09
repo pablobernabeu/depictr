@@ -21,7 +21,7 @@
 #' @param interaction Passed to [format_terms()].
 #' @param dodge_width Vertical spacing between sources sharing a term.
 #' @param reference_line Position of a vertical reference line (`NA` to omit).
-#' @param palette Colours for the sources; defaults to [statviz_palette()].
+#' @param palette Colours for the sources; defaults to [depictr_palette()].
 #' @param point_size,line_size Point and interval-line sizes.
 #' @param legend_title,legend_ncol Legend title and number of columns.
 #' @param title,subtitle,x_lab Title, subtitle and x-axis label.
@@ -95,7 +95,7 @@ compare_models <- function(...,
   est$label <- factor(est$label, levels = label_levels)
   est$source <- factor(est$source, levels = src_names)
 
-  pal <- palette %||% statviz_palette(length(src_names))
+  pal <- palette %||% depictr_palette(length(src_names))
   dodge <- ggplot2::position_dodge(width = dodge_width)
 
   p <- ggplot2::ggplot(
@@ -121,5 +121,5 @@ compare_models <- function(...,
                                     reverse = FALSE)
     ) +
     ggplot2::labs(x = x_lab, y = NULL, title = title, subtitle = subtitle) +
-    theme_statviz(grid = "x")
+    theme_depictr(grid = "x")
 }

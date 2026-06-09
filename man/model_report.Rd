@@ -24,7 +24,7 @@ A 'patchwork' object (printable like a \link[ggplot2:ggplot]{ggplot2::ggplot}).
 Assembles a compact, consistent overview of a fitted model in a single
 figure: the coefficient estimates, the predicted effect of a focal predictor,
 a residuals-vs-fitted plot and a normal Q-Q plot, with a subtitle of key
-fit statistics. It is a convenience wrapper that composes several statviz
+fit statistics. It is a convenience wrapper that composes several depictr
 plots with \code{\link[=arrange_plots]{arrange_plots()}}, and is handy for a quick model review or a
 report appendix.
 }

@@ -12,7 +12,7 @@
 #' @param type One of `"box"`, `"violin"` or `"both"`.
 #' @param flag Highlight outliers (points beyond 1.5 * IQR)?
 #' @param outlier_colour Colour for highlighted outliers.
-#' @param palette Colours for the groups; defaults to [statviz_palette()].
+#' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title,y_lab Plot title and value-axis label.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -68,13 +68,13 @@ outlier_plot <- function(data, y, group = NULL,
   }
 
   p <- p + ggplot2::labs(x = group %||% NULL, y = y_lab, title = title) +
-    theme_statviz(grid = "y") +
+    theme_depictr(grid = "y") +
     ggplot2::theme(legend.position = "none")
   if (is.null(group)) {
     p <- p + ggplot2::theme(axis.text.x = ggplot2::element_blank(),
                             axis.ticks.x = ggplot2::element_blank())
   } else {
-    pal <- palette %||% statviz_palette(nlevels(d$.x))
+    pal <- palette %||% depictr_palette(nlevels(d$.x))
     p <- p + ggplot2::scale_fill_manual(values = pal)
   }
   p

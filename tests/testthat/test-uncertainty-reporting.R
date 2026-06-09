@@ -19,7 +19,7 @@ test_that("palette_preview() and arrange_plots() return objects", {
 
 test_that("save_plot() writes a file", {
   p <- scatter_trend(crop_yield, fertilizer, yield)
-  f <- file.path(tempdir(), "statviz-test.png")
+  f <- file.path(tempdir(), "depictr-test.png")
   if (file.exists(f)) unlink(f)
   save_plot(f, p, width = 4, height = 3)
   expect_true(file.exists(f))

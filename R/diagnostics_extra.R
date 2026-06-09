@@ -51,7 +51,7 @@ influence_plot <- function(model, n_label = 3, colour = "#005b96",
     ) +
     ggplot2::scale_size_area(name = "Cook's D", max_size = 9) +
     ggplot2::labs(x = "Leverage", y = "Studentised residual", title = title) +
-    theme_statviz()
+    theme_depictr()
 }
 
 #' Normal quantile-quantile plot
@@ -86,5 +86,5 @@ qq_plot <- function(x, colour = "#005b96", title = NULL,
     ggplot2::stat_qq(colour = colour, alpha = 0.6) +
     ggplot2::stat_qq_line(colour = "#e23b3b", linetype = 2) +
     ggplot2::labs(x = x_lab, y = y_lab, title = title) +
-    theme_statviz()
+    theme_depictr()
 }

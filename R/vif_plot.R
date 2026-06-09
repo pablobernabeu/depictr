@@ -56,5 +56,5 @@ vif_plot <- function(model, threshold = 5,
       values = c(`FALSE` = palette[1], `TRUE` = palette[2]), guide = "none"
     ) +
     ggplot2::labs(x = "Variance inflation factor", y = NULL, title = title) +
-    theme_statviz(grid = "x")
+    theme_depictr(grid = "x")
 }

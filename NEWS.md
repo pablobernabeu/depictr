@@ -1,6 +1,6 @@
-# statviz 0.1.0
+# depictr 0.1.0
 
-First release. statviz is a unified, consistent toolkit of publication-ready
+First release. depictr is a unified, consistent toolkit of publication-ready
 plots spanning the whole analysis workflow. It grew out of, and generalises,
 three earlier plotting functions (`frequentist_bayesian_plot`,
 `plot.fixef.allFit` and `powercurvePlot`).
@@ -45,8 +45,8 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
 
 ## Theming and reporting
 
-* `theme_statviz()`, `statviz_palette()`, `scale_colour_statviz()` (and
-  `scale_color_statviz()`, `scale_fill_statviz()`), `palette_preview()`,
+* `theme_depictr()`, `depictr_palette()`, `scale_colour_depictr()` (and
+  `scale_color_depictr()`, `scale_fill_depictr()`), `palette_preview()`,
   `format_terms()`, `model_report()` (a one-figure model overview),
   `arrange_plots()` and `save_plot()`.
 
@@ -58,7 +58,7 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
 ## Accessibility
 
 * The qualitative palette is now based on the colourblind-safe Okabe-Ito set
-  (led by the statviz brand blue), and `statviz_palette()` gains `sequential`
+  (led by the depictr brand blue), and `depictr_palette()` gains `sequential`
   and `diverging` variants. `palette_preview()` can show any one, or all three.
 
 ## Notes

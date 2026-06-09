@@ -1,8 +1,8 @@
 # Reporting helpers: palette preview, composition, saving --------------------
 
-#' Preview the statviz palettes
+#' Preview the depictr palettes
 #'
-#' Displays the colours returned by [statviz_palette()] as labelled swatches --
+#' Displays the colours returned by [depictr_palette()] as labelled swatches --
 #' handy when choosing how many groups to show, picking a palette type, or
 #' documenting a figure.
 #'
@@ -25,7 +25,7 @@ palette_preview <- function(n = 8, type = c("qualitative", "sequential",
     type
   }
   df <- do.call(rbind, lapply(types, function(tp) {
-    cols <- statviz_palette(n, type = tp)
+    cols <- depictr_palette(n, type = tp)
     data.frame(type = tp, i = seq_along(cols), col = cols,
                stringsAsFactors = FALSE)
   }))
@@ -36,9 +36,9 @@ palette_preview <- function(n = 8, type = c("qualitative", "sequential",
     ggplot2::geom_tile(width = 0.95, height = 0.95) +
     ggplot2::scale_fill_identity() +
     ggplot2::labs(x = NULL, y = NULL,
-                  title = if (type == "all") "statviz palettes" else
-                    paste0("statviz palette (", type, ")")) +
-    theme_statviz(grid = "none") +
+                  title = if (type == "all") "depictr palettes" else
+                    paste0("depictr palette (", type, ")")) +
+    theme_depictr(grid = "none") +
     ggplot2::theme(
       axis.text = ggplot2::element_blank(),
       axis.ticks = ggplot2::element_blank(),

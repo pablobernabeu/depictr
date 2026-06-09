@@ -1,4 +1,4 @@
-Package: statviz
+Package: depictr
 Type: Package
 Title: A Unified Toolkit for Visualising Statistical Models and Data
 Version: 0.1.0
@@ -44,5 +44,5 @@ VignetteBuilder: knitr
 RoxygenNote: 7.3.1
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
-URL: https://github.com/pablobernabeu/statviz
-BugReports: https://github.com/pablobernabeu/statviz/issues
+URL: https://github.com/pablobernabeu/depictr
+BugReports: https://github.com/pablobernabeu/depictr/issues

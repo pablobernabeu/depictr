@@ -1,6 +1,6 @@
-#' statviz: A Unified Toolkit for Visualising Statistical Models and Data
+#' depictr: A Unified Toolkit for Visualising Statistical Models and Data
 #'
-#' statviz provides a consistent, publication-ready set of plots that span the
+#' depictr provides a consistent, publication-ready set of plots that span the
 #' whole analysis workflow -- from a first look at the data, through model
 #' estimates and predictions, to diagnostics, uncertainty and reporting. Every
 #' plotting function returns a [ggplot2::ggplot] object (or a 'patchwork' for
@@ -74,8 +74,8 @@
 #'
 #' @section Theming and reporting:
 #' \itemize{
-#'   \item [theme_statviz()] -- the shared theme.
-#'   \item [statviz_palette()], [scale_colour_statviz()] -- the shared palette.
+#'   \item [theme_depictr()] -- the shared theme.
+#'   \item [depictr_palette()], [scale_colour_depictr()] -- the shared palette.
 #'   \item [palette_preview()] -- preview the palettes.
 #'   \item [format_terms()] -- tidy raw coefficient names for display.
 #'   \item [model_report()] -- a one-figure overview of a fitted model.

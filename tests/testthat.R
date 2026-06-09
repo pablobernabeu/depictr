@@ -1,4 +1,4 @@
 library(testthat)
-library(statviz)
+library(depictr)
 
-test_check("statviz")
+test_check("depictr")

@@ -15,7 +15,7 @@
 #'   `time` is a data frame).
 #' @param conf_level Confidence level for the limits (`NA` to omit them).
 #' @param censor_marks Mark censoring times with a `+`?
-#' @param palette Colours for the groups; defaults to [statviz_palette()].
+#' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -35,7 +35,7 @@ survival_plot <- function(time, status = NULL, group = NULL, conf_level = 0.95,
   km <- km_input(time, status, group, conf_level)
   has_ci <- !is.na(conf_level) && all(c("lower", "upper") %in% names(km$curve))
   multi <- length(unique(km$curve$group)) > 1
-  pal <- palette %||% statviz_palette(length(unique(km$curve$group)))
+  pal <- palette %||% depictr_palette(length(unique(km$curve$group)))
 
   aes_main <- if (multi) {
     ggplot2::aes(x = .data$time, y = .data$surv, colour = .data$group)
@@ -71,7 +71,7 @@ survival_plot <- function(time, status = NULL, group = NULL, conf_level = 0.95,
     ggplot2::scale_y_continuous(limits = c(0, 1),
                                 labels = scales::percent_format(accuracy = 1)) +
     ggplot2::labs(x = x_lab, y = y_lab, title = title) +
-    theme_statviz()
+    theme_depictr()
 }
 
 # ---- internal helpers ------------------------------------------------------

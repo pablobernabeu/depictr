@@ -18,7 +18,7 @@
 #' @param hulls Draw a shaded convex hull around each cluster?
 #' @param label_centers Label the cluster centroids?
 #' @param point_alpha Point transparency.
-#' @param palette Colours for the clusters; defaults to [statviz_palette()].
+#' @param palette Colours for the clusters; defaults to [depictr_palette()].
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -52,7 +52,7 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
   ve <- (pca$sdev^2) / sum(pca$sdev^2)
   df <- data.frame(PCx = pca$x[, 1], PCy = pca$x[, 2],
                    cluster = factor(cl))
-  pal <- palette %||% statviz_palette(nlevels(df$cluster))
+  pal <- palette %||% depictr_palette(nlevels(df$cluster))
 
   p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$PCx, y = .data$PCy,
                                         colour = .data$cluster))
@@ -87,7 +87,7 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
       y = sprintf("PC2 (%.1f%%)", 100 * ve[2]),
       title = title
     ) +
-    theme_statviz()
+    theme_depictr()
 }
 
 #' Dendrogram
@@ -105,7 +105,7 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
 #' @param scale Scale variables before computing distances (data frame input)?
 #' @param k Optional number of clusters to highlight.
 #' @param horizontal Draw the tree horizontally?
-#' @param palette Colours for the `k` clusters; defaults to [statviz_palette()].
+#' @param palette Colours for the `k` clusters; defaults to [depictr_palette()].
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -142,7 +142,7 @@ dendrogram_plot <- function(x, cols = NULL, distance = "euclidean",
     )
 
   if (!is.null(k)) {
-    pal <- palette %||% statviz_palette(nlevels(leaves$cluster))
+    pal <- palette %||% depictr_palette(nlevels(leaves$cluster))
     p <- p +
       ggplot2::geom_hline(yintercept = cut_h, linetype = 2,
                           colour = "grey70") +
@@ -166,7 +166,7 @@ dendrogram_plot <- function(x, cols = NULL, distance = "euclidean",
   p <- p +
     ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0.12, 0.04))) +
     ggplot2::labs(x = NULL, y = "Height", title = title) +
-    theme_statviz(grid = "none") +
+    theme_depictr(grid = "none") +
     ggplot2::theme(axis.text.x = ggplot2::element_blank(),
                    axis.ticks.x = ggplot2::element_blank())
   if (horizontal) p <- p + ggplot2::coord_flip()

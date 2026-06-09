@@ -1,4 +1,4 @@
-url: https://pablobernabeu.github.io/statviz
+url: https://pablobernabeu.github.io/depictr
 
 template:
   bootstrap: 5
@@ -72,9 +72,9 @@ reference:
 
 - title: Theming and reporting
   contents:
-  - theme_statviz
-  - statviz_palette
-  - scale_colour_statviz
+  - theme_depictr
+  - depictr_palette
+  - scale_colour_depictr
   - palette_preview
   - format_terms
   - model_report
@@ -91,7 +91,7 @@ articles:
 - title: Articles
   navbar: ~
   contents:
-  - statviz
+  - depictr
   - exploring-data
   - model-estimates
   - diagnostics-and-uncertainty

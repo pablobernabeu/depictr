@@ -91,7 +91,7 @@ coefficient_plot <- function(x,
     ) +
     ggplot2::geom_point(size = point_size, colour = point_colour) +
     ggplot2::labs(x = x_lab, y = NULL, title = title, subtitle = subtitle) +
-    theme_statviz(grid = "x")
+    theme_depictr(grid = "x")
 
   p
 }

@@ -79,7 +79,7 @@ posterior_plot <- function(draws, point = c("median", "mean"),
     ggplot2::geom_point(ggplot2::aes(x = .data$centre), size = 1.4,
                         colour = colour) +
     ggplot2::labs(x = x_lab, y = NULL, title = title) +
-    theme_statviz(grid = "x")
+    theme_depictr(grid = "x")
 }
 
 # ---- internal helper -------------------------------------------------------

@@ -10,10 +10,10 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
                       fig.width = 7, fig.height = 4.5, dpi = 96)
-library(statviz)
+library(depictr)
 ```
 
-Beyond regression, statviz covers two staples of applied data analysis:
+Beyond regression, depictr covers two staples of applied data analysis:
 principal component analysis and survival curves.
 
 ## Principal component analysis

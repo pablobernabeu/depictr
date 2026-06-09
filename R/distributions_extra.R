@@ -13,7 +13,7 @@
 #' @param group Optional grouping variable on the x-axis.
 #' @param width Maximum width of the half-violin.
 #' @param point_alpha Transparency of the rain points.
-#' @param palette Colours for the groups; defaults to [statviz_palette()].
+#' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -52,7 +52,7 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
   d$.x <- pos[as.character(d$.g)] - 0.22 +
     stats::runif(nrow(d), -0.06, 0.06)
 
-  pal <- palette %||% statviz_palette(length(groups))
+  pal <- palette %||% depictr_palette(length(groups))
 
   p <- ggplot2::ggplot() +
     ggplot2::geom_polygon(
@@ -76,7 +76,7 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
     ggplot2::scale_colour_manual(values = pal) +
     ggplot2::scale_x_continuous(breaks = pos, labels = groups) +
     ggplot2::labs(x = x_lab %||% (group %||% NULL), y = y_lab, title = title) +
-    theme_statviz(grid = "y") +
+    theme_depictr(grid = "y") +
     ggplot2::theme(legend.position = "none")
 
   if (is.null(group)) {
@@ -99,7 +99,7 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
 #' @param conf_level Confidence level for the intervals (t-based).
 #' @param show_points Draw the raw data behind the means?
 #' @param point_alpha Transparency of the raw points.
-#' @param palette Colours for the groups; defaults to [statviz_palette()].
+#' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -130,7 +130,7 @@ group_comparison_plot <- function(data, y, group, conf_level = 0.95,
                upper = mean(v) + tc * se, stringsAsFactors = FALSE)
   }))
   summ$group <- factor(summ$group, levels = groups)
-  pal <- palette %||% statviz_palette(length(groups))
+  pal <- palette %||% depictr_palette(length(groups))
 
   p <- ggplot2::ggplot(summ, ggplot2::aes(x = .data$group, colour = .data$group))
   if (show_points) {
@@ -147,6 +147,6 @@ group_comparison_plot <- function(data, y, group, conf_level = 0.95,
     ) +
     ggplot2::scale_colour_manual(values = pal) +
     ggplot2::labs(x = x_lab, y = y_lab, title = title) +
-    theme_statviz(grid = "y") +
+    theme_depictr(grid = "y") +
     ggplot2::theme(legend.position = "none")
 }

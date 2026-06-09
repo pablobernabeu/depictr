@@ -10,7 +10,7 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
                       fig.width = 7, fig.height = 4.5, dpi = 96)
-library(statviz)
+library(depictr)
 ```
 
 ## Regression diagnostics
@@ -38,7 +38,7 @@ vif_plot(fit)
 
 ## Classification
 
-For binary classifiers, statviz provides an ROC curve (with AUC), a calibration
+For binary classifiers, depictr provides an ROC curve (with AUC), a calibration
 plot and a confusion-matrix heatmap. Each reads a binomial `glm` directly, or a
 pair of vectors.
 

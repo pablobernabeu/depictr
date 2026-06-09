@@ -40,7 +40,7 @@ intercept and slopes are usually on very different scales.}
 
 \item{point_size}{Point size.}
 
-\item{palette}{Colours for the optimisers; defaults to \code{\link[=statviz_palette]{statviz_palette()}}.}
+\item{palette}{Colours for the optimisers; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{y_lab, title}{Axis label and plot title.}
 }

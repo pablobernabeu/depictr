@@ -1,6 +1,6 @@
 ## Submission
 
-This is a new submission of statviz, a unified toolkit of publication-ready
+This is a new submission of depictr, a unified toolkit of publication-ready
 plots that span the analysis workflow (exploratory data analysis, model
 estimates, predictions, diagnostics, classification, multivariate and survival
 methods, time series, uncertainty and reporting).

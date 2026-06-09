@@ -35,7 +35,7 @@ colour/fill.}
 \item{position}{Histogram position adjustment, e.g. \code{"identity"},
 \code{"stack"} or \code{"dodge"}.}
 
-\item{palette}{Colours for the groups; defaults to \code{\link[=statviz_palette]{statviz_palette()}}.}
+\item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title, x_lab}{Plot title and x-axis label (defaults to the variable
 name).}

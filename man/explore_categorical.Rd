@@ -34,7 +34,7 @@ proportions are computed within each group.}
 
 \item{horizontal}{Draw horizontal bars (helpful with many or long labels)?}
 
-\item{palette}{Colours for the groups; defaults to \code{\link[=statviz_palette]{statviz_palette()}}.}
+\item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title, x_lab}{Plot title and category-axis label (defaults to the
 variable name).}

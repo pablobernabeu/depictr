@@ -28,7 +28,7 @@ test_that("dendrogram_plot() works from data frames, dist and hclust", {
 
 test_that("dendro_segments() produces the right number of segments", {
   hc <- hclust(dist(scale(crop_yield[1:10, c("rainfall", "yield")])))
-  segs <- statviz:::dendro_segments(hc)
+  segs <- depictr:::dendro_segments(hc)
   # Three segments per internal node (n - 1 nodes)
   expect_equal(nrow(segs), 3 * (10 - 1))
 })

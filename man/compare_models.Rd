@@ -47,7 +47,7 @@ names of \code{...}.}
 
 \item{reference_line}{Position of a vertical reference line (\code{NA} to omit).}
 
-\item{palette}{Colours for the sources; defaults to \code{\link[=statviz_palette]{statviz_palette()}}.}
+\item{palette}{Colours for the sources; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{point_size, line_size}{Point and interval-line sizes.}
 

@@ -9,7 +9,7 @@ test_that("gain_plot() and lift_plot() work from glm and vectors", {
 })
 
 test_that("gain_table() captures all positives at full depth", {
-  g <- statviz:::gain_table(c(0, 1, 0, 1), c(0.1, 0.9, 0.2, 0.8))
+  g <- depictr:::gain_table(c(0, 1, 0, 1), c(0.1, 0.9, 0.2, 0.8))
   expect_equal(g$population[1], 0)
   expect_equal(g$captured[1], 0)
   expect_equal(g$population[nrow(g)], 1)

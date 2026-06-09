@@ -60,7 +60,7 @@ correlation_heatmap <- function(data, cols = NULL, method = "pearson",
     ) +
     ggplot2::coord_fixed() +
     ggplot2::labs(x = NULL, y = NULL, title = title) +
-    theme_statviz(grid = "none") +
+    theme_depictr(grid = "none") +
     ggplot2::theme(
       axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
       panel.grid.major = ggplot2::element_blank()

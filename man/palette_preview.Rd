@@ -2,7 +2,7 @@
 % Please edit documentation in R/reporting.R
 \name{palette_preview}
 \alias{palette_preview}
-\title{Preview the statviz palettes}
+\title{Preview the depictr palettes}
 \usage{
 palette_preview(
   n = 8,
@@ -19,7 +19,7 @@ palette_preview(
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Displays the colours returned by \code{\link[=statviz_palette]{statviz_palette()}} as labelled swatches --
+Displays the colours returned by \code{\link[=depictr_palette]{depictr_palette()}} as labelled swatches --
 handy when choosing how many groups to show, picking a palette type, or
 documenting a figure.
 }

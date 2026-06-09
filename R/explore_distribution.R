@@ -15,7 +15,7 @@
 #' @param alpha Fill transparency (useful when groups overlap).
 #' @param position Histogram position adjustment, e.g. `"identity"`,
 #'   `"stack"` or `"dodge"`.
-#' @param palette Colours for the groups; defaults to [statviz_palette()].
+#' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title,x_lab Plot title and x-axis label (defaults to the variable
 #'   name).
 #'
@@ -58,10 +58,10 @@ explore_distribution <- function(data, x, group = NULL,
 
   y_lab <- if (type == "histogram") "Count" else "Density"
   p <- p + ggplot2::labs(x = x_lab, y = y_lab, title = title) +
-    theme_statviz()
+    theme_depictr()
 
   if (!is.null(group)) {
-    pal <- palette %||% statviz_palette(length(unique(data[[group]])))
+    pal <- palette %||% depictr_palette(length(unique(data[[group]])))
     p <- p +
       ggplot2::scale_fill_manual(values = pal) +
       ggplot2::scale_colour_manual(values = pal)

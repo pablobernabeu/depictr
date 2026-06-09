@@ -85,7 +85,7 @@ power_curve_plot <- function(x,
     ) +
     ggplot2::scale_x_continuous(n.breaks = x_breaks) +
     ggplot2::labs(x = x_lab, title = title) +
-    theme_statviz()
+    theme_depictr()
 
   if (!is.null(x_expand)) {
     p <- p + ggplot2::expand_limits(x = x_expand)

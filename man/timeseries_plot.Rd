@@ -30,7 +30,7 @@ colour.}
 
 \item{rolling}{Optional integer window for a centred moving-average overlay.}
 
-\item{palette}{Colours for the groups; defaults to \code{\link[=statviz_palette]{statviz_palette()}}.}
+\item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{point}{Add points as well as the line?}
 

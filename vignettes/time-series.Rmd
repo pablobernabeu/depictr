@@ -10,10 +10,10 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
                       fig.width = 7, fig.height = 4, dpi = 96)
-library(statviz)
+library(depictr)
 ```
 
-statviz provides a small, consistent set of time-series plots. The examples use
+depictr provides a small, consistent set of time-series plots. The examples use
 `AirPassengers`, a classic monthly series that ships with base R.
 
 ## Plotting a series

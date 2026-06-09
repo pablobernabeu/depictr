@@ -10,7 +10,7 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
                       fig.width = 7, fig.height = 4.5, dpi = 96)
-library(statviz)
+library(depictr)
 ```
 
 This vignette covers the model-result plots: coefficients, model comparison,

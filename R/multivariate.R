@@ -17,7 +17,7 @@
 #'   when variables are on different scales.
 #' @param loadings Draw variable-loading arrows?
 #' @param point_alpha Point transparency.
-#' @param palette Colours for the groups; defaults to [statviz_palette()].
+#' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -64,7 +64,7 @@ pca_plot <- function(x, cols = NULL, group = NULL, components = c(1, 2),
     p <- ggplot2::ggplot(scores, ggplot2::aes(x = .data$PCx, y = .data$PCy)) +
       ggplot2::geom_point(alpha = point_alpha, colour = "#005b96")
   } else {
-    pal <- palette %||% statviz_palette(nlevels(grp))
+    pal <- palette %||% depictr_palette(nlevels(grp))
     p <- ggplot2::ggplot(scores, ggplot2::aes(x = .data$PCx, y = .data$PCy,
                                               colour = .data$group)) +
       ggplot2::geom_point(alpha = point_alpha) +
@@ -101,7 +101,7 @@ pca_plot <- function(x, cols = NULL, group = NULL, components = c(1, 2),
       y = sprintf("PC%d (%.1f%%)", ci[2], 100 * ve[ci[2]]),
       title = title
     ) +
-    theme_statviz()
+    theme_depictr()
 }
 
 #' Scree plot
@@ -152,5 +152,5 @@ scree_plot <- function(x, cols = NULL, scale = TRUE, n = NULL, title = NULL) {
       sec.axis = ggplot2::dup_axis(name = "Cumulative")
     ) +
     ggplot2::labs(x = NULL, y = "Variance explained", title = title) +
-    theme_statviz(grid = "y")
+    theme_depictr(grid = "y")
 }

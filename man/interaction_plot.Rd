@@ -34,7 +34,7 @@ to the 10th, 50th and 90th percentiles.}
 
 \item{band}{Draw confidence bands (numeric focal predictor)?}
 
-\item{palette}{Colours for the moderator; defaults to \code{\link[=statviz_palette]{statviz_palette()}}.}
+\item{palette}{Colours for the moderator; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title, x_lab, y_lab}{Title and axis labels.}
 }

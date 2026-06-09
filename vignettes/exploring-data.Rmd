@@ -10,10 +10,10 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
                       fig.width = 7, fig.height = 4.5, dpi = 96)
-library(statviz)
+library(depictr)
 ```
 
-statviz provides a coherent set of exploratory plots and a descriptive table,
+depictr provides a coherent set of exploratory plots and a descriptive table,
 all sharing the package theme and palette. Column names can be given quoted or
 unquoted.
 

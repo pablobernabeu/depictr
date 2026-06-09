@@ -30,7 +30,7 @@ group_comparison_plot(
 
 \item{point_alpha}{Transparency of the raw points.}
 
-\item{palette}{Colours for the groups; defaults to \code{\link[=statviz_palette]{statviz_palette()}}.}
+\item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title, x_lab, y_lab}{Title and axis labels.}
 }

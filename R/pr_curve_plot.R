@@ -38,7 +38,7 @@ pr_curve_plot <- function(x, score = NULL, colour = "#005b96", title = NULL) {
                       colour = "#0a3d62", fontface = "bold") +
     ggplot2::coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
     ggplot2::labs(x = "Recall", y = "Precision", title = title) +
-    theme_statviz()
+    theme_depictr()
   attr(p, "average_precision") <- ap
   p
 }

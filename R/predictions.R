@@ -77,7 +77,7 @@ effects_plot <- function(model, predictor, conf_level = 0.95, n = 100,
       )
     }
   }
-  p + ggplot2::labs(x = x_lab, y = y_lab, title = title) + theme_statviz()
+  p + ggplot2::labs(x = x_lab, y = y_lab, title = title) + theme_depictr()
 }
 
 #' Plot a two-way interaction of predicted values
@@ -94,7 +94,7 @@ effects_plot <- function(model, predictor, conf_level = 0.95, n = 100,
 #' @param conf_level Confidence level for the bands/intervals.
 #' @param n Number of points across the range of a numeric focal predictor.
 #' @param band Draw confidence bands (numeric focal predictor)?
-#' @param palette Colours for the moderator; defaults to [statviz_palette()].
+#' @param palette Colours for the moderator; defaults to [depictr_palette()].
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -139,7 +139,7 @@ interaction_plot <- function(model, predictor, moderator,
   resp <- attr(grid, "response")
   grid$.mod <- factor(format(grid[[moderator]]),
                       levels = format(mod_values))
-  pal <- palette %||% statviz_palette(length(mod_values))
+  pal <- palette %||% depictr_palette(length(mod_values))
   x_lab <- x_lab %||% predictor
   y_lab <- y_lab %||% if (isTRUE(attr(grid, "binomial"))) {
     "Predicted probability"
@@ -170,7 +170,7 @@ interaction_plot <- function(model, predictor, moderator,
   p +
     ggplot2::scale_colour_manual(values = pal, name = moderator) +
     ggplot2::labs(x = x_lab, y = y_lab, title = title) +
-    theme_statviz()
+    theme_depictr()
 }
 
 # ---- internal helper -------------------------------------------------------

@@ -58,7 +58,7 @@ missingness_map <- function(data, cols = NULL, sort = TRUE, show_pct = TRUE,
     ggplot2::scale_y_reverse(expand = c(0, 0)) +
     ggplot2::labs(x = NULL, y = "Observation", title = title,
                   subtitle = subtitle) +
-    theme_statviz(grid = "none") +
+    theme_depictr(grid = "none") +
     ggplot2::theme(
       axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
       panel.grid.major = ggplot2::element_blank()

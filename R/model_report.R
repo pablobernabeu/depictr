@@ -5,7 +5,7 @@
 #' Assembles a compact, consistent overview of a fitted model in a single
 #' figure: the coefficient estimates, the predicted effect of a focal predictor,
 #' a residuals-vs-fitted plot and a normal Q-Q plot, with a subtitle of key
-#' fit statistics. It is a convenience wrapper that composes several statviz
+#' fit statistics. It is a convenience wrapper that composes several depictr
 #' plots with [arrange_plots()], and is handy for a quick model review or a
 #' report appendix.
 #'

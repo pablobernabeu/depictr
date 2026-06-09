@@ -1,4 +1,4 @@
-# CRAN release checklist for statviz
+# CRAN release checklist for depictr
 
 A short, practical checklist for the first CRAN submission. Items marked
 **[done]** are already in place in this repository; the rest need a networked
@@ -14,10 +14,10 @@ machine with a full R toolchain.
 - [done] Tests (testthat, edition 3) and six vignettes build offline.
 - [done] `cran-comments.md` drafted.
 - [ ] **Confirm the name is free**: run `available.packages()` / check
-  <https://cran.r-project.org/package=statviz>. (No conflict found at the time
+  <https://cran.r-project.org/package=depictr>. (No conflict found at the time
   of writing; `statVisual` is archived.)
 - [ ] Run `urlchecker::url_check()` to validate URLs (the GitHub URLs resolve
-  only once the repository is named `statviz`).
+  only once the repository is named `depictr`).
 - [ ] Run `devtools::check(remote = TRUE, manual = TRUE)` — exercises the
   CRAN incoming checks and the PDF manual that were skipped in the offline
   build here. Expect 0 errors / 0 warnings; the only local note (`simr` not
@@ -41,6 +41,6 @@ machine with a full R toolchain.
 ## Repository note
 
 This package currently lives in the `frequentist_bayesian_plot` repository for
-historical reasons. Rename it to `statviz` on GitHub (Settings -> rename) so the
-package URLs (`https://github.com/pablobernabeu/statviz`) resolve; renaming
+historical reasons. Rename it to `depictr` on GitHub (Settings -> rename) so the
+package URLs (`https://github.com/pablobernabeu/depictr`) resolve; renaming
 preserves history and stars.

@@ -36,7 +36,7 @@ computed yourself.}
 
 \item{point_alpha}{Point transparency.}
 
-\item{palette}{Colours for the clusters; defaults to \code{\link[=statviz_palette]{statviz_palette()}}.}
+\item{palette}{Colours for the clusters; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title}{Plot title.}
 }

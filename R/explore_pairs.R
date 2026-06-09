@@ -14,7 +14,7 @@
 #' @param max_cols Safety cap on the number of variables (a k-by-k matrix grows
 #'   quickly).
 #' @param point_alpha Point transparency in the scatter panels.
-#' @param palette Colours for the groups; defaults to [statviz_palette()].
+#' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title Overall title for the matrix.
 #'
 #' @return A 'patchwork' object (printable like a [ggplot2::ggplot]).
@@ -46,7 +46,7 @@ explore_pairs <- function(data, cols = NULL, group = NULL, max_cols = 8,
 
   d <- data
   if (!is.null(group)) d[[group]] <- as.factor(d[[group]])
-  pal <- palette %||% (if (!is.null(group)) statviz_palette(nlevels(d[[group]])))
+  pal <- palette %||% (if (!is.null(group)) depictr_palette(nlevels(d[[group]])))
 
   k <- length(cols)
   panels <- vector("list", k * k)
@@ -83,7 +83,7 @@ pairs_panel <- function(d, xvar, yvar, i, j, k, group, pal, point_alpha) {
   # matrix stays clean; variable names live on the diagonal.
   show_x <- i == k
   show_y <- j == 1 && i != j
-  base <- theme_statviz(grid = "none") +
+  base <- theme_depictr(grid = "none") +
     ggplot2::theme(
       axis.title.x = ggplot2::element_blank(),
       axis.title.y = ggplot2::element_blank(),

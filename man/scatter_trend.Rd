@@ -33,7 +33,7 @@ unquoted column name).}
 
 \item{point_alpha}{Point transparency.}
 
-\item{palette}{Colours for the groups; defaults to \code{\link[=statviz_palette]{statviz_palette()}}.}
+\item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title, x_lab, y_lab}{Title and axis labels (default to variable names).}
 }

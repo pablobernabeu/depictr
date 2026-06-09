@@ -1,11 +1,11 @@
 # Shared theme, palette and label helpers ------------------------------------
 
-#' The statviz colour palettes
+#' The depictr colour palettes
 #'
-#' Colourblind-aware palettes shared by every statviz plot. The qualitative
+#' Colourblind-aware palettes shared by every depictr plot. The qualitative
 #' palette is based on the Okabe-Ito set (Okabe & Ito, 2008), a widely
 #' recommended categorical palette that stays distinguishable under the common
-#' forms of colour-vision deficiency, with the statviz brand blue leading. The
+#' forms of colour-vision deficiency, with the depictr brand blue leading. The
 #' sequential and diverging palettes are perceptually ordered single-hue and
 #' red-blue ramps.
 #'
@@ -22,10 +22,10 @@
 #'   make figures and presentations that are friendly to colorblind people.
 #' @export
 #' @examples
-#' statviz_palette(3)
-#' statviz_palette(7, type = "sequential")
-#' scales::show_col(statviz_palette())
-statviz_palette <- function(n = NULL, type = c("qualitative", "sequential",
+#' depictr_palette(3)
+#' depictr_palette(7, type = "sequential")
+#' scales::show_col(depictr_palette())
+depictr_palette <- function(n = NULL, type = c("qualitative", "sequential",
                                                "diverging")) {
   type <- match.arg(type)
   if (!is.null(n) && (!is.numeric(n) || length(n) != 1 || n < 1)) {
@@ -44,7 +44,7 @@ statviz_palette <- function(n = NULL, type = c("qualitative", "sequential",
     return(ramp(n %||% 7))
   }
 
-  # Qualitative: Okabe-Ito, led by the statviz brand blue
+  # Qualitative: Okabe-Ito, led by the depictr brand blue
   base <- c(
     blue          = "#005b96",
     orange        = "#e69f00",
@@ -60,9 +60,9 @@ statviz_palette <- function(n = NULL, type = c("qualitative", "sequential",
   grDevices::colorRampPalette(unname(base))(n)
 }
 
-#' statviz colour and fill scales
+#' depictr colour and fill scales
 #'
-#' Discrete ggplot2 scales using [statviz_palette()].
+#' Discrete ggplot2 scales using [depictr_palette()].
 #'
 #' @param ... Passed to [ggplot2::discrete_scale()].
 #' @return A ggplot2 scale that can be added to a plot.
@@ -71,31 +71,31 @@ statviz_palette <- function(n = NULL, type = c("qualitative", "sequential",
 #' library(ggplot2)
 #' ggplot(crop_yield, aes(rainfall, yield, colour = treatment)) +
 #'   geom_point() +
-#'   scale_colour_statviz() +
-#'   theme_statviz()
-scale_colour_statviz <- function(...) {
+#'   scale_colour_depictr() +
+#'   theme_depictr()
+scale_colour_depictr <- function(...) {
   ggplot2::discrete_scale(
-    "colour", "statviz",
-    palette = function(n) statviz_palette(n),
+    "colour", "depictr",
+    palette = function(n) depictr_palette(n),
     ...
   )
 }
 
-#' @rdname scale_colour_statviz
+#' @rdname scale_colour_depictr
 #' @export
-scale_color_statviz <- scale_colour_statviz
+scale_color_depictr <- scale_colour_depictr
 
-#' @rdname scale_colour_statviz
+#' @rdname scale_colour_depictr
 #' @export
-scale_fill_statviz <- function(...) {
+scale_fill_depictr <- function(...) {
   ggplot2::discrete_scale(
-    "fill", "statviz",
-    palette = function(n) statviz_palette(n),
+    "fill", "depictr",
+    palette = function(n) depictr_palette(n),
     ...
   )
 }
 
-#' The statviz ggplot2 theme
+#' The depictr ggplot2 theme
 #'
 #' A clean, minimal theme used by every plotting function in the package. It is
 #' a light modification of [ggplot2::theme_minimal()] with subtle gridlines,
@@ -111,8 +111,8 @@ scale_fill_statviz <- function(...) {
 #' library(ggplot2)
 #' ggplot(crop_yield, aes(fertilizer, yield)) +
 #'   geom_point() +
-#'   theme_statviz()
-theme_statviz <- function(base_size = 11, base_family = "", grid = "xy") {
+#'   theme_depictr()
+theme_depictr <- function(base_size = 11, base_family = "", grid = "xy") {
   grid <- match.arg(grid, c("xy", "x", "y", "none"))
   th <- ggplot2::theme_minimal(base_size = base_size, base_family = base_family) +
     ggplot2::theme(
