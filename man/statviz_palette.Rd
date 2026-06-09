@@ -2,24 +2,37 @@
 % Please edit documentation in R/theme_statviz.R
 \name{statviz_palette}
 \alias{statviz_palette}
-\title{The statviz colour palette}
+\title{The statviz colour palettes}
 \usage{
-statviz_palette(n = NULL)
+statviz_palette(n = NULL, type = c("qualitative", "sequential", "diverging"))
 }
 \arguments{
 \item{n}{Number of colours to return. If \code{NULL} (the default) the full
-palette is returned. When \code{n} is larger than the palette,
-\code{\link[grDevices:colorRamp]{grDevices::colorRampPalette()}} is used to interpolate.}
+qualitative palette is returned. For the qualitative palette an \code{n} larger
+than the eight base colours is interpolated; the sequential and diverging
+palettes are ramps and accept any \code{n}.}
+
+\item{type}{Palette type: \code{"qualitative"} (categorical groups),
+\code{"sequential"} (ordered low-to-high) or \code{"diverging"} (a midpoint with two
+directions).}
 }
 \value{
 A character vector of hex colour codes.
 }
 \description{
-A qualitative palette built around the blue/red pairing used for
-Bayesian/frequentist comparisons, extended with complementary hues so that
-it also works for several groups.
+Colourblind-aware palettes shared by every statviz plot. The qualitative
+palette is based on the Okabe-Ito set (Okabe & Ito, 2008), a widely
+recommended categorical palette that stays distinguishable under the common
+forms of colour-vision deficiency, with the statviz brand blue leading. The
+sequential and diverging palettes are perceptually ordered single-hue and
+red-blue ramps.
 }
 \examples{
-statviz_palette(2)
+statviz_palette(3)
+statviz_palette(7, type = "sequential")
 scales::show_col(statviz_palette())
+}
+\references{
+Okabe, M. & Ito, K. (2008). Color Universal Design (CUD): How to
+make figures and presentations that are friendly to colorblind people.
 }

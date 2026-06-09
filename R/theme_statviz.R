@@ -1,36 +1,61 @@
 # Shared theme, palette and label helpers ------------------------------------
 
-#' The statviz colour palette
+#' The statviz colour palettes
 #'
-#' A qualitative palette built around the blue/red pairing used for
-#' Bayesian/frequentist comparisons, extended with complementary hues so that
-#' it also works for several groups.
+#' Colourblind-aware palettes shared by every statviz plot. The qualitative
+#' palette is based on the Okabe-Ito set (Okabe & Ito, 2008), a widely
+#' recommended categorical palette that stays distinguishable under the common
+#' forms of colour-vision deficiency, with the statviz brand blue leading. The
+#' sequential and diverging palettes are perceptually ordered single-hue and
+#' red-blue ramps.
 #'
 #' @param n Number of colours to return. If `NULL` (the default) the full
-#'   palette is returned. When `n` is larger than the palette,
-#'   [grDevices::colorRampPalette()] is used to interpolate.
+#'   qualitative palette is returned. For the qualitative palette an `n` larger
+#'   than the eight base colours is interpolated; the sequential and diverging
+#'   palettes are ramps and accept any `n`.
+#' @param type Palette type: `"qualitative"` (categorical groups),
+#'   `"sequential"` (ordered low-to-high) or `"diverging"` (a midpoint with two
+#'   directions).
 #'
 #' @return A character vector of hex colour codes.
+#' @references Okabe, M. & Ito, K. (2008). Color Universal Design (CUD): How to
+#'   make figures and presentations that are friendly to colorblind people.
 #' @export
 #' @examples
-#' statviz_palette(2)
+#' statviz_palette(3)
+#' statviz_palette(7, type = "sequential")
 #' scales::show_col(statviz_palette())
-statviz_palette <- function(n = NULL) {
-  base <- c(
-    blue   = "#005b96",
-    red    = "#e23b3b",
-    green  = "#2e8b57",
-    orange = "#e08a1e",
-    purple = "#7b539e",
-    teal   = "#1c9aa8",
-    pink   = "#cc5b8e",
-    grey   = "#5a5a5a"
-  )
-  if (is.null(n)) return(unname(base))
-  if (!is.numeric(n) || length(n) != 1 || n < 1) {
+statviz_palette <- function(n = NULL, type = c("qualitative", "sequential",
+                                               "diverging")) {
+  type <- match.arg(type)
+  if (!is.null(n) && (!is.numeric(n) || length(n) != 1 || n < 1)) {
     stop("`n` must be a single positive number.", call. = FALSE)
   }
-  n <- as.integer(n)
+  if (!is.null(n)) n <- as.integer(n)
+
+  if (type == "sequential") {
+    ramp <- grDevices::colorRampPalette(c("#e6eff5", "#4a8fc0", "#005b96",
+                                          "#08315a"))
+    return(ramp(n %||% 7))
+  }
+  if (type == "diverging") {
+    ramp <- grDevices::colorRampPalette(c("#b2182b", "#ef8a62", "#f7f7f7",
+                                          "#67a9cf", "#005b96"))
+    return(ramp(n %||% 7))
+  }
+
+  # Qualitative: Okabe-Ito, led by the statviz brand blue
+  base <- c(
+    blue          = "#005b96",
+    orange        = "#e69f00",
+    bluish_green  = "#009e73",
+    vermillion    = "#d55e00",
+    reddish_purple = "#cc79a7",
+    sky_blue      = "#56b4e9",
+    yellow        = "#f0e442",
+    grey          = "#999999"
+  )
+  if (is.null(n)) return(unname(base))
   if (n <= length(base)) return(unname(base[seq_len(n)]))
   grDevices::colorRampPalette(unname(base))(n)
 }

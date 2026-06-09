@@ -21,6 +21,7 @@ Description: A cohesive, publication-ready toolkit of plots that span the whole
     every example and vignette runs out of the box.
 License: MIT + file LICENSE
 Encoding: UTF-8
+Language: en-GB
 LazyData: true
 Depends: R (>= 4.1.0)
 Imports:

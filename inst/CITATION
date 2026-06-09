@@ -1,0 +1,15 @@
+citHeader("To cite statviz in publications, use:")
+
+bibentry(
+  bibtype  = "Manual",
+  title    = "{statviz}: A Unified Toolkit for Visualising Statistical Models and Data",
+  author   = person("Pablo", "Bernabeu"),
+  year     = "2026",
+  note     = sprintf("R package version %s", meta$Version),
+  url      = "https://github.com/pablobernabeu/statviz",
+  textVersion = paste0(
+    "Bernabeu, P. (2026). statviz: A Unified Toolkit for Visualising ",
+    "Statistical Models and Data. R package version ", meta$Version, ". ",
+    "https://github.com/pablobernabeu/statviz"
+  )
+)

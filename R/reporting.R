@@ -1,32 +1,57 @@
 # Reporting helpers: palette preview, composition, saving --------------------
 
-#' Preview the statviz palette
+#' Preview the statviz palettes
 #'
 #' Displays the colours returned by [statviz_palette()] as labelled swatches --
-#' handy when choosing how many groups to show or when documenting a figure.
+#' handy when choosing how many groups to show, picking a palette type, or
+#' documenting a figure.
 #'
 #' @param n Number of colours to preview.
+#' @param type Palette type to preview: `"qualitative"`, `"sequential"`,
+#'   `"diverging"`, or `"all"` to show all three.
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export
 #' @examples
 #' palette_preview()
-#' palette_preview(4)
-palette_preview <- function(n = 8) {
-  cols <- statviz_palette(n)
-  df <- data.frame(i = seq_along(cols), col = cols, stringsAsFactors = FALSE)
-  ggplot2::ggplot(df, ggplot2::aes(x = .data$i, y = 1, fill = .data$col)) +
+#' palette_preview(7, type = "sequential")
+#' palette_preview(type = "all")
+palette_preview <- function(n = 8, type = c("qualitative", "sequential",
+                                            "diverging", "all")) {
+  type <- match.arg(type)
+  types <- if (type == "all") {
+    c("qualitative", "sequential", "diverging")
+  } else {
+    type
+  }
+  df <- do.call(rbind, lapply(types, function(tp) {
+    cols <- statviz_palette(n, type = tp)
+    data.frame(type = tp, i = seq_along(cols), col = cols,
+               stringsAsFactors = FALSE)
+  }))
+  df$type <- factor(df$type, levels = types)
+  show_labels <- type != "all"
+
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$i, y = 1, fill = .data$col)) +
     ggplot2::geom_tile(width = 0.95, height = 0.95) +
-    ggplot2::geom_text(ggplot2::aes(label = .data$col), angle = 90,
-                       colour = "white", fontface = "bold", size = 3) +
     ggplot2::scale_fill_identity() +
-    ggplot2::labs(x = NULL, y = NULL, title = "statviz palette") +
+    ggplot2::labs(x = NULL, y = NULL,
+                  title = if (type == "all") "statviz palettes" else
+                    paste0("statviz palette (", type, ")")) +
     theme_statviz(grid = "none") +
     ggplot2::theme(
       axis.text = ggplot2::element_blank(),
       axis.ticks = ggplot2::element_blank(),
       panel.grid = ggplot2::element_blank()
     )
+  if (length(types) > 1) {
+    p <- p + ggplot2::facet_wrap(~ type, ncol = 1)
+  }
+  if (show_labels) {
+    p <- p + ggplot2::geom_text(ggplot2::aes(label = .data$col), angle = 90,
+                                colour = "white", fontface = "bold", size = 3)
+  }
+  p
 }
 
 #' Compose several plots into one figure

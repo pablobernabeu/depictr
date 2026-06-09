@@ -55,6 +55,12 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
 * Three reproducibly simulated datasets: `lexical_decision`,
   `wellbeing_survey` and `crop_yield`.
 
+## Accessibility
+
+* The qualitative palette is now based on the colourblind-safe Okabe-Ito set
+  (led by the statviz brand blue), and `statviz_palette()` gains `sequential`
+  and `diverging` variants. `palette_preview()` can show any one, or all three.
+
 ## Notes
 
 * Heavier modelling back-ends (`lme4`, `broom`, `simr`) are in `Suggests` and

@@ -2,21 +2,29 @@
 % Please edit documentation in R/reporting.R
 \name{palette_preview}
 \alias{palette_preview}
-\title{Preview the statviz palette}
+\title{Preview the statviz palettes}
 \usage{
-palette_preview(n = 8)
+palette_preview(
+  n = 8,
+  type = c("qualitative", "sequential", "diverging", "all")
+)
 }
 \arguments{
 \item{n}{Number of colours to preview.}
+
+\item{type}{Palette type to preview: \code{"qualitative"}, \code{"sequential"},
+\code{"diverging"}, or \code{"all"} to show all three.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 Displays the colours returned by \code{\link[=statviz_palette]{statviz_palette()}} as labelled swatches --
-handy when choosing how many groups to show or when documenting a figure.
+handy when choosing how many groups to show, picking a palette type, or
+documenting a figure.
 }
 \examples{
 palette_preview()
-palette_preview(4)
+palette_preview(7, type = "sequential")
+palette_preview(type = "all")
 }

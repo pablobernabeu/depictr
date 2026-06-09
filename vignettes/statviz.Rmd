@@ -74,7 +74,7 @@ source (Bayesian posteriors, bootstrap intervals, numbers from a paper).
 tidy_estimates(fit)
 ```
 
-## A consistent, reusable look
+## A consistent, accessible look
 
 `theme_statviz()`, `statviz_palette()` and `scale_colour_statviz()` style your
 own plots too:
@@ -85,6 +85,14 @@ ggplot(crop_yield, aes(fertilizer, yield, colour = treatment)) +
   geom_point(alpha = 0.7) +
   scale_colour_statviz() +
   theme_statviz()
+```
+
+The qualitative palette is based on the Okabe-Ito set, which stays
+distinguishable under the common forms of colour-vision deficiency; sequential
+and diverging variants are available too. Preview them with:
+
+```{r, fig.height = 5}
+palette_preview(type = "all")
 ```
 
 ## Where to next
