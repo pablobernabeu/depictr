@@ -58,7 +58,7 @@ residual_diagnostics_plot <- function(model,
   if ("scale_location" %in% which) {
     panels$scale_location <- diag_scatter(
       df, "fitted", "sqrt_abs", "Fitted values",
-      expression(sqrt(abs("Std. residuals"))),
+      expression(sqrt(group("|", "Std. residuals", "|"))),
       "Scale-location", point_alpha, smooth
     )
   }

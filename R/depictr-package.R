@@ -94,3 +94,6 @@
 #' @importFrom rlang .data
 ## usethis namespace: end
 NULL
+
+# ggplot2 computed-stat variables referenced inside after_stat().
+utils::globalVariables(c("density", "count"))

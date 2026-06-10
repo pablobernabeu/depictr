@@ -59,7 +59,9 @@ compare_models <- function(...,
   if (length(sources) < 2) {
     stop("Supply at least two models or data frames to compare.", call. = FALSE)
   }
-  src_names <- names %||% names(sources)
+  # `names` is also an argument here, so call base::names() explicitly to make
+  # the function call unambiguous to readers (R already resolves it correctly).
+  src_names <- names %||% base::names(sources)
   if (is.null(src_names) || any(!nzchar(src_names))) {
     auto <- paste("Source", seq_along(sources))
     if (is.null(src_names)) src_names <- auto
@@ -85,7 +87,7 @@ compare_models <- function(...,
   term_levels <- unique(est$term)
   if (order != "none") {
     avg <- tapply(est$estimate, est$term, mean, na.rm = TRUE)
-    term_levels <- names(sort(avg, decreasing = (order == "descending")))
+    term_levels <- base::names(sort(avg, decreasing = (order == "descending")))
   } else {
     term_levels <- rev(term_levels)
   }

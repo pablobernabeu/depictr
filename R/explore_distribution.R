@@ -45,8 +45,8 @@ explore_distribution <- function(data, x, group = NULL,
 
   if (type %in% c("histogram", "both")) {
     p <- p + ggplot2::geom_histogram(
-      ggplot2::aes(y = if (type == "both") ggplot2::after_stat(.data$density) else
-        ggplot2::after_stat(.data$count)),
+      ggplot2::aes(y = if (type == "both") ggplot2::after_stat(density) else
+        ggplot2::after_stat(count)),
       bins = bins, alpha = alpha, position = position,
       colour = if (is.null(group)) "white" else NA
     )
