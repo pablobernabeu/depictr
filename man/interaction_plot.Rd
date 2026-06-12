@@ -32,7 +32,7 @@ to the 10th, 50th and 90th percentiles.}
 
 \item{n}{Number of points across the range of a numeric focal predictor.}
 
-\item{band}{Draw confidence bands (numeric focal predictor)?}
+\item{band}{Whether to draw confidence bands (numeric focal predictor).}
 
 \item{palette}{Colours for the moderator; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 

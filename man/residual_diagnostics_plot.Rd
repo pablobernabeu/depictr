@@ -23,7 +23,7 @@ residual_diagnostics_plot(
 
 \item{point_alpha}{Point transparency.}
 
-\item{smooth}{Add a loess guide line to the residual panels?}
+\item{smooth}{Whether to add a loess guide line to the residual panels.}
 
 \item{title}{Overall title for the panel.}
 }
@@ -31,10 +31,10 @@ residual_diagnostics_plot(
 A 'patchwork' object (printable like a \link[ggplot2:ggplot]{ggplot2::ggplot}).
 }
 \description{
-Combines the classic regression diagnostic plots -- residuals vs. fitted, a
-normal Q-Q plot of the standardised residuals, a scale-location plot, and
-residuals vs. leverage -- into a single panel using 'patchwork'. Works with
-\code{lm} and \code{glm} objects.
+Combines the classic regression diagnostic plots (residuals against fitted
+values, a normal Q-Q plot of the standardised residuals, a scale-location
+plot, and residuals against leverage) into a single panel using 'patchwork'.
+The function works with \code{lm} and \code{glm} objects.
 }
 \examples{
 fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)

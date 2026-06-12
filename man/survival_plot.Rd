@@ -28,7 +28,7 @@ vector.}
 
 \item{conf_level}{Confidence level for the limits (\code{NA} to omit them).}
 
-\item{censor_marks}{Mark censoring times with a \code{+}?}
+\item{censor_marks}{Whether to mark censoring times with a \code{+}.}
 
 \item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 

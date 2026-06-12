@@ -2,9 +2,9 @@
 
 #' Preview the depictr palettes
 #'
-#' Displays the colours returned by [depictr_palette()] as labelled swatches --
-#' handy when choosing how many groups to show, picking a palette type, or
-#' documenting a figure.
+#' Displays the colours returned by [depictr_palette()] as labelled swatches.
+#' It is useful when choosing how many groups to show, selecting a palette type,
+#' or documenting a figure.
 #'
 #' @param n Number of colours to preview.
 #' @param type Palette type to preview: `"qualitative"`, `"sequential"`,

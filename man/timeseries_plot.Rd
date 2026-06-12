@@ -32,7 +32,7 @@ colour.}
 
 \item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
-\item{point}{Add points as well as the line?}
+\item{point}{Whether to add points as well as the line.}
 
 \item{title, x_lab, y_lab}{Title and axis labels.}
 }

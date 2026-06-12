@@ -19,7 +19,7 @@ principal component analysis and survival curves.
 ## Principal component analysis
 
 `pca_plot()` runs a PCA on the numeric columns of a data frame and draws a
-biplot -- the observations projected onto two components, with the variable
+biplot: the observations projected onto two components, with the variable
 loadings as arrows. `scree_plot()` shows how much variance each component
 explains.
 

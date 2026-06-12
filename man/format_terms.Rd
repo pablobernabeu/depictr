@@ -19,9 +19,9 @@ format_terms(
 a Unicode multiplication sign), \code{"asterisk"}, \code{"colon"} (unchanged) or
 \code{"space"}.}
 
-\item{strip_prefix}{Remove a leading \code{b_} or \code{bs_} (as added by 'brms')?}
+\item{strip_prefix}{Whether to remove a leading \code{b_} or \code{bs_} (as added by 'brms').}
 
-\item{tidy_intercept}{Replace \code{(Intercept)} with \code{"Intercept"}?}
+\item{tidy_intercept}{Whether to replace \code{(Intercept)} with \code{"Intercept"}.}
 
 \item{wrap}{Optional integer width at which to wrap long labels onto new
 lines (see \code{\link[base:strwrap]{base::strwrap()}}). \code{NULL} (default) leaves labels unwrapped.}

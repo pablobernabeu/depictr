@@ -24,15 +24,16 @@ explore_categorical(
 
 \item{group}{Optional grouping variable mapped to fill.}
 
-\item{proportion}{Show proportions instead of counts? When \code{group} is set,
-proportions are computed within each group.}
+\item{proportion}{Whether to show proportions instead of counts. When
+\code{group} is set, proportions are computed within each group.}
 
 \item{position}{Bar position when \code{group} is set: \code{"dodge"}, \code{"stack"} or
 \code{"fill"}.}
 
-\item{sort}{Order the bars from most to least frequent?}
+\item{sort}{Whether to order the bars from most to least frequent.}
 
-\item{horizontal}{Draw horizontal bars (helpful with many or long labels)?}
+\item{horizontal}{Whether to draw horizontal bars, which helps when there
+are many levels or long labels.}
 
 \item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 

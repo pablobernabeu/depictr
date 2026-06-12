@@ -13,9 +13,9 @@
 #' @param group Optional grouping variable (a column name when `x` is a data
 #'   frame, or a vector the length of the data) mapped to colour.
 #' @param components Length-2 integer vector: which components to plot.
-#' @param scale Scale variables to unit variance before the PCA? Recommended
-#'   when variables are on different scales.
-#' @param loadings Draw variable-loading arrows?
+#' @param scale Whether to scale the variables to unit variance before the PCA.
+#'   This is advisable when the variables are on different scales.
+#' @param loadings Whether to draw variable-loading arrows.
 #' @param point_alpha Point transparency.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title Plot title.
@@ -107,12 +107,12 @@ pca_plot <- function(x, cols = NULL, group = NULL, components = c(1, 2),
 #' Scree plot
 #'
 #' Shows the proportion of variance explained by each principal component, as
-#' bars with a cumulative line -- the standard aid for deciding how many
-#' components to keep.
+#' bars with a cumulative line. It is the customary aid for deciding how many
+#' components to retain.
 #'
 #' @param x A data frame, or a [stats::prcomp()] object.
 #' @param cols When `x` is a data frame, the numeric columns to analyse.
-#' @param scale Scale variables to unit variance before the PCA?
+#' @param scale Whether to scale variables to unit variance before the PCA.
 #' @param n Maximum number of components to display.
 #' @param title Plot title.
 #'

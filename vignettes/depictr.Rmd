@@ -13,7 +13,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
 ```
 
 **depictr** is a single, consistent toolkit of plots that span the whole
-analysis workflow -- from a first look at the data, through model estimates and
+analysis workflow, from a first look at the data, through model estimates and
 predictions, to diagnostics, uncertainty and reporting. Every plotting function
 returns a `ggplot2` object (or a `patchwork` for composite panels), so you can
 keep customising with the usual `+` syntax, and every plot shares one theme, one
@@ -26,34 +26,39 @@ library(depictr)
 The package ships with three reproducibly simulated datasets used throughout the
 documentation: `lexical_decision`, `wellbeing_survey` and `crop_yield`.
 
-## One example per family
+## A tour by task
 
-**Explore the data.** Pick the right plot for any pair of variables:
+Begin with the data. `explore_bivariate()` chooses a suitable plot for any pair
+of variables.
 
 ```{r}
 explore_bivariate(crop_yield, fertilizer, yield)
 ```
 
-**Look at model estimates.** Fit a model and draw a forest plot:
+Turn next to the model. After fitting it, `coefficient_plot()` draws a forest
+plot of the estimates.
 
 ```{r}
 fit <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment, data = crop_yield)
 coefficient_plot(fit, order = "descending", title = "Drivers of crop yield")
 ```
 
-**Show predictions.** What does the model predict as one predictor varies?
+To see what the model implies, `effects_plot()` traces the predicted response as
+one predictor varies.
 
 ```{r}
 effects_plot(fit, "fertilizer")
 ```
 
-**Check the fit.** A residual-diagnostics panel:
+`residual_diagnostics_plot()` gathers the usual checks of the fit into one
+panel.
 
 ```{r, fig.height = 6}
 residual_diagnostics_plot(fit)
 ```
 
-**Convey uncertainty.** Summarise posterior or simulation draws:
+Finally, `posterior_plot()` summarises posterior or simulation draws as a point
+with nested intervals.
 
 ```{r}
 set.seed(1)
@@ -65,10 +70,11 @@ posterior_plot(draws)
 
 ## The shared spine: `tidy_estimates()`
 
-Most model functions are built on `tidy_estimates()`, which turns a model -- or
-a data frame of pre-computed estimates -- into one standard table. Because the
-plotting functions also accept that table, you can plug in estimates from any
-source (Bayesian posteriors, bootstrap intervals, numbers from a paper).
+Most of the model functions rest on `tidy_estimates()`, which turns a model, or
+a data frame of pre-computed estimates, into one standard table. Because the
+plotting functions also accept that table, estimates from any source (Bayesian
+posteriors, bootstrap intervals, or figures taken from a paper) can be supplied
+directly.
 
 ```{r}
 tidy_estimates(fit)
@@ -97,9 +103,12 @@ palette_preview(type = "all")
 
 ## Where to next
 
-* `vignette("exploring-data")` -- distributions, categories, bivariate plots,
-  scatter-plot matrices, correlations, missingness, outliers and summary tables.
-* `vignette("model-estimates")` -- forest plots, model comparison, predicted
-  values, interactions, random effects and goodness-of-fit.
-* `vignette("diagnostics-and-uncertainty")` -- residuals, influence, Q-Q, ROC,
-  calibration, confusion matrices, posteriors and power curves.
+The remaining articles go into each area in turn.
+`vignette("exploring-data")` covers distributions, categories, bivariate plots,
+scatter-plot matrices, correlations, missingness, outliers and summary tables.
+`vignette("model-estimates")` covers forest plots, model comparison, predicted
+values, interactions, random effects and goodness-of-fit.
+`vignette("diagnostics-and-uncertainty")` covers residuals, influence, Q-Q, ROC,
+calibration, confusion matrices, posteriors and power curves. Two further
+articles, `vignette("multivariate-and-survival")` and `vignette("time-series")`,
+cover the remaining methods.

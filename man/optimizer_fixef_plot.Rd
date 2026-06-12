@@ -23,18 +23,19 @@ optimizer_fixef_plot(
 one row per optimiser-by-term combination (columns such as \code{optimizer},
 \code{term} and \code{value}/\code{estimate}).}
 
-\item{intercept}{Keep the intercept panel? Defaults to \code{TRUE}.}
+\item{intercept}{Whether to keep the intercept panel. Defaults to \code{TRUE}.}
 
 \item{select_terms}{Optional character vector of terms to display (the
 intercept is always kept when \code{intercept = TRUE}).}
 
 \item{interaction}{Passed to \code{\link[=format_terms]{format_terms()}} for the panel titles.}
 
-\item{number_optimizers}{Prefix each optimiser name with a number, so the
-legend doubles as an index?}
+\item{number_optimizers}{Whether to prefix each optimiser name with a
+number, so that the legend doubles as an index.}
 
-\item{free_y}{Give each panel its own y-axis range? Recommended, because the
-intercept and slopes are usually on very different scales.}
+\item{free_y}{Whether to give each panel its own y-axis range. This is
+advisable, because the intercept and the slopes usually occupy very
+different scales.}
 
 \item{ncol}{Number of facet columns. If \code{NULL}, chosen automatically.}
 
@@ -49,15 +50,15 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 Visualises how the fixed-effect estimates of a mixed model vary across the
-optimisers tried by \code{\link[lme4:allFit]{lme4::allFit()}}. This is a quick way to check that a
-model has converged to a stable solution: tight clusters of points indicate
-agreement between optimisers, while scatter flags a fragile fit.
+optimisers tried by \code{\link[lme4:allFit]{lme4::allFit()}}. It offers a quick check that a model
+has settled on a stable solution: tight clusters of points indicate
+agreement between optimisers, whereas scatter signals a fragile fit.
 }
 \details{
-This refactors the original \code{plot.fixef.allFit()} gist. The brittle manual
-layout has been replaced by faceting (one panel per fixed effect, each with
-its own y-axis), and the function now also accepts a plain data frame so it
-can be used without 'lme4'.
+The function refactors the original \code{plot.fixef.allFit()} gist, using
+faceting (one panel per fixed effect, each with its own y-axis) in place of
+the earlier hand-built layout. It also accepts a plain data frame, so it can
+be used without 'lme4'.
 }
 \examples{
 # Without lme4, build the input data frame directly:

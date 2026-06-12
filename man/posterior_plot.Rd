@@ -36,11 +36,11 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 Summarises posterior (or, more generally, bootstrap or simulation) draws as a
-point with two nested credible intervals -- the classic "half-eye" style of
-uncertainty display. It accepts a data frame of draws in either long form (a
-parameter column and a value column) or wide form (one column of draws per
-parameter), so it works with output from any sampler without depending on a
-particular modelling package.
+point with two nested credible intervals, in the classic "half-eye" style of
+uncertainty display. Draws may be supplied in long form (a parameter column
+and a value column) or wide form (one column of draws per parameter), so the
+function works with the output of any sampler and depends on no particular
+modelling package.
 }
 \examples{
 # Wide draws: one column per parameter

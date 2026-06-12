@@ -28,11 +28,11 @@ cluster_plot(
 \code{\link[stats:kmeans]{stats::kmeans()}} or \code{\link[stats:cutree]{stats::cutree()}}); use this to plot a clustering you
 computed yourself.}
 
-\item{scale}{Scale variables to unit variance before clustering and the PCA?}
+\item{scale}{Whether to scale variables to unit variance before clustering and the PCA.}
 
-\item{hulls}{Draw a shaded convex hull around each cluster?}
+\item{hulls}{Whether to draw a shaded convex hull around each cluster.}
 
-\item{label_centers}{Label the cluster centroids?}
+\item{label_centers}{Whether to label the cluster centroids.}
 
 \item{point_alpha}{Point transparency.}
 

@@ -27,9 +27,9 @@ coefficient_plot(
 \item{conf_level}{Confidence/credible level, passed to \code{\link[=tidy_estimates]{tidy_estimates()}}
 when \code{x} is a model.}
 
-\item{intercept}{Keep the intercept term? Defaults to \code{FALSE}, as the
-intercept is rarely of interest on a forest plot and its scale often
-dwarfs the other terms.}
+\item{intercept}{Whether to keep the intercept term. Defaults to \code{FALSE},
+since the intercept is seldom of interest on a forest plot and its scale
+often overwhelms the other terms.}
 
 \item{order}{Order the terms by estimate: \code{"none"} (keep input order),
 \code{"ascending"} or \code{"descending"}.}

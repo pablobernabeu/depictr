@@ -3,26 +3,27 @@
 #' Plot fixed effects across optimisers
 #'
 #' Visualises how the fixed-effect estimates of a mixed model vary across the
-#' optimisers tried by [lme4::allFit()]. This is a quick way to check that a
-#' model has converged to a stable solution: tight clusters of points indicate
-#' agreement between optimisers, while scatter flags a fragile fit.
+#' optimisers tried by [lme4::allFit()]. It offers a quick check that a model
+#' has settled on a stable solution: tight clusters of points indicate
+#' agreement between optimisers, whereas scatter signals a fragile fit.
 #'
-#' This refactors the original `plot.fixef.allFit()` gist. The brittle manual
-#' layout has been replaced by faceting (one panel per fixed effect, each with
-#' its own y-axis), and the function now also accepts a plain data frame so it
-#' can be used without 'lme4'.
+#' The function refactors the original `plot.fixef.allFit()` gist, using
+#' faceting (one panel per fixed effect, each with its own y-axis) in place of
+#' the earlier hand-built layout. It also accepts a plain data frame, so it can
+#' be used without 'lme4'.
 #'
 #' @param x Either the object returned by [lme4::allFit()], or a data frame with
 #'   one row per optimiser-by-term combination (columns such as `optimizer`,
 #'   `term` and `value`/`estimate`).
-#' @param intercept Keep the intercept panel? Defaults to `TRUE`.
+#' @param intercept Whether to keep the intercept panel. Defaults to `TRUE`.
 #' @param select_terms Optional character vector of terms to display (the
 #'   intercept is always kept when `intercept = TRUE`).
 #' @param interaction Passed to [format_terms()] for the panel titles.
-#' @param number_optimizers Prefix each optimiser name with a number, so the
-#'   legend doubles as an index?
-#' @param free_y Give each panel its own y-axis range? Recommended, because the
-#'   intercept and slopes are usually on very different scales.
+#' @param number_optimizers Whether to prefix each optimiser name with a
+#'   number, so that the legend doubles as an index.
+#' @param free_y Whether to give each panel its own y-axis range. This is
+#'   advisable, because the intercept and the slopes usually occupy very
+#'   different scales.
 #' @param ncol Number of facet columns. If `NULL`, chosen automatically.
 #' @param point_size Point size.
 #' @param palette Colours for the optimisers; defaults to [depictr_palette()].

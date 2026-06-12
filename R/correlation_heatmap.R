@@ -11,7 +11,7 @@
 #'   numeric columns are used.
 #' @param method Correlation method: `"pearson"`, `"spearman"` or `"kendall"`.
 #' @param use Missing-value handling passed to [stats::cor()].
-#' @param show_values Annotate each cell with its correlation?
+#' @param show_values Whether to annotate each cell with its correlation.
 #' @param digits Number of decimal places for the annotations.
 #' @param palette Length-3 vector of colours for the lowest, mid (zero) and
 #'   highest correlations.

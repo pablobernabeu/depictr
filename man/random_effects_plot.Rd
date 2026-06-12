@@ -22,7 +22,7 @@ with one row per group level and columns such as \code{level}/\code{group},
 \item{conf_level}{Confidence level when intervals are derived from standard
 errors.}
 
-\item{sort}{Order the levels by their estimate?}
+\item{sort}{Whether to order the levels by their estimate.}
 
 \item{point_colour}{Colour for the points and intervals.}
 
@@ -33,8 +33,8 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 Displays the conditional modes ("BLUPs") of a mixed model's random effects as
-a sorted point-and-interval ("caterpillar") plot -- the standard way to
-inspect by-group departures from the average, and to spot unusual groups.
+a sorted point-and-interval ("caterpillar") plot. It is the usual way to
+inspect by-group departures from the average, and to identify unusual groups.
 }
 \examples{
 # From a data frame of by-group estimates:

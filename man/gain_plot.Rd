@@ -21,11 +21,11 @@ probabilities.}
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Shows how many of the positive cases are captured as more of the
-population is targeted in order of predicted score -- the standard chart for
-judging a classifier's value for ranking and targeting (marketing, triage,
-fraud). The diagonal is the no-model baseline; the upper envelope is a
-perfect model.
+Shows how many of the positive cases are captured as a growing share of the
+population is targeted in order of predicted score. It is the customary chart
+for judging a classifier's value for ranking and targeting, as in marketing,
+triage and fraud detection. The diagonal marks the no-model baseline and the
+upper envelope a perfect model.
 }
 \examples{
 gfit <- glm(accuracy ~ word_frequency + RT + condition,

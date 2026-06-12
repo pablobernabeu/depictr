@@ -26,7 +26,7 @@ group_comparison_plot(
 
 \item{conf_level}{Confidence level for the intervals (t-based).}
 
-\item{show_points}{Draw the raw data behind the means?}
+\item{show_points}{Whether to draw the raw data behind the means.}
 
 \item{point_alpha}{Transparency of the raw points.}
 
@@ -40,8 +40,8 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 \description{
 An estimation-style plot of a numeric outcome across the levels of a grouping
 variable: each group's mean with a confidence interval, over a backdrop of
-the raw (jittered) data. A clearer answer to "do these groups differ?" than a
-bar chart, because it shows both the estimate and its uncertainty.
+the raw (jittered) data. By showing both the estimate and its uncertainty, it
+conveys whether the groups differ more faithfully than a bar chart does.
 }
 \examples{
 group_comparison_plot(lexical_decision, RT, condition)

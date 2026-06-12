@@ -31,7 +31,8 @@ frequentist_bayesian_plot(
 \code{intercept} defaults to \code{TRUE} here, matching the original behaviour.}
 
 \item{note_frequentist_no_prior}{If \code{TRUE}, append "(no prior)" to the
-frequentist legend label -- useful when the title names the Bayesian prior.}
+frequentist legend label, which is helpful when the title names the
+Bayesian prior.}
 
 \item{vertical_line_at_x}{Position of the vertical reference line.}
 
@@ -45,18 +46,18 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 \description{
 Presents the estimates from a frequentist model and a Bayesian model side by
 side on one forest plot, in the familiar red (frequentist) and blue
-(Bayesian) styling. This is a convenience wrapper around
+(Bayesian) styling. The function is a convenience wrapper around
 \code{\link[=compare_models]{compare_models()}}.
 }
 \details{
-This is a modernised, self-contained successor to the original
-\code{frequentist_bayesian_plot()} gist. Rather than requiring a pre-built
-\code{brms::mcmc_plot()} object, it accepts either fitted models or, more
-commonly for Bayesian fits, a tidy data frame of posterior summaries (with
-columns such as \code{term}, \code{estimate}, \code{conf.low}/\code{conf.high}, or the
-\code{Estimate}, \verb{l-95\% CI}, \verb{u-95\% CI} produced by \code{brms::fixef()}). The
-function aligns terms by name, so small differences in naming between the
-two sources only need to be reconciled in the term labels.
+It is a modernised, self-contained successor to the original
+\code{frequentist_bayesian_plot()} gist. The Bayesian estimates may be supplied
+as a fitted model or, more commonly, as a tidy data frame of posterior
+summaries (with columns such as \code{term}, \code{estimate} and
+\code{conf.low}/\code{conf.high}, or the \code{Estimate}, \verb{l-95\% CI} and \verb{u-95\% CI}
+produced by \code{brms::fixef()}). Terms are aligned by name, so any small
+differences in naming between the two sources need only be reconciled in the
+term labels.
 }
 \examples{
 # Same model fitted two ways here purely so the example is self-contained;

@@ -14,7 +14,7 @@
 #'   colour.
 #' @param rolling Optional integer window for a centred moving-average overlay.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
-#' @param point Add points as well as the line?
+#' @param point Whether to add points as well as the line.
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.

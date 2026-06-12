@@ -25,7 +25,7 @@ effects_plot(
 
 \item{n}{Number of points across the range of a numeric predictor.}
 
-\item{rug}{Add a rug of the observed predictor values (numeric predictors)?}
+\item{rug}{Whether to add a rug of the observed predictor values (numeric predictors).}
 
 \item{colour}{Colour for the line/points and band.}
 

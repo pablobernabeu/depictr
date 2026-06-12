@@ -4,9 +4,9 @@
 #'
 #' A "raincloud" combines three views of a distribution: a half-violin density
 #' (the cloud), a narrow boxplot, and the raw jittered points (the rain). It
-#' shows the shape, the summary and the individual data at once, and is a
-#' popular, transparent alternative to the bare boxplot. Implemented with base
-#' graphics primitives, so it needs no extra packages.
+#' conveys the shape, the summary and the individual observations together,
+#' giving a fuller and more transparent picture than a boxplot alone. The plot
+#' is built from base graphics primitives and so needs no extra packages.
 #'
 #' @param data A data frame.
 #' @param y The numeric variable (string or unquoted name).
@@ -90,14 +90,14 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
 #'
 #' An estimation-style plot of a numeric outcome across the levels of a grouping
 #' variable: each group's mean with a confidence interval, over a backdrop of
-#' the raw (jittered) data. A clearer answer to "do these groups differ?" than a
-#' bar chart, because it shows both the estimate and its uncertainty.
+#' the raw (jittered) data. By showing both the estimate and its uncertainty, it
+#' conveys whether the groups differ more faithfully than a bar chart does.
 #'
 #' @param data A data frame.
 #' @param y The numeric outcome (string or unquoted name).
 #' @param group The grouping variable (string or unquoted name).
 #' @param conf_level Confidence level for the intervals (t-based).
-#' @param show_points Draw the raw data behind the means?
+#' @param show_points Whether to draw the raw data behind the means.
 #' @param point_alpha Transparency of the raw points.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title,x_lab,y_lab Title and axis labels.

@@ -34,7 +34,7 @@ names of \code{...}.}
 
 \item{conf_level}{Confidence/credible level for models.}
 
-\item{intercept}{Keep the intercept term? Defaults to \code{FALSE}.}
+\item{intercept}{Whether to keep the intercept term. Defaults to \code{FALSE}.}
 
 \item{order}{Order terms by their average estimate across sources:
 \code{"none"}, \code{"ascending"} or \code{"descending"}.}
@@ -60,10 +60,10 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 Overlays the estimates from two or more models (or tidy estimate tables) on a
-single forest plot, with one colour per source. This is the general engine
-behind \code{\link[=frequentist_bayesian_plot]{frequentist_bayesian_plot()}} (frequentist vs. Bayesian) and is also
-handy for comparing nested models, several optimisers, or estimates before
-and after a transformation.
+single forest plot, with one colour per source. It is the general engine
+behind \code{\link[=frequentist_bayesian_plot]{frequentist_bayesian_plot()}} (frequentist against Bayesian), and
+serves equally well for comparing nested models, several optimisers, or
+estimates before and after a transformation.
 }
 \examples{
 m1 <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)

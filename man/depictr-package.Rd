@@ -6,100 +6,100 @@
 \alias{depictr-package}
 \title{depictr: A Unified Toolkit for Visualising Statistical Models and Data}
 \description{
-depictr provides a consistent, publication-ready set of plots that span the
-whole analysis workflow -- from a first look at the data, through model
-estimates and predictions, to diagnostics, uncertainty and reporting. Every
-plotting function returns a \link[ggplot2:ggplot]{ggplot2::ggplot} object (or a 'patchwork' for
-composite panels), so results can be customised with the usual \code{+} syntax,
-and every plot shares one theme, one colourblind-aware palette and one set of
-label conventions.
+depictr provides a consistent set of plots that span the whole analysis
+workflow, from a first look at the data, through model estimates and
+predictions, to diagnostics, uncertainty and reporting. Every plotting
+function returns a \link[ggplot2:ggplot]{ggplot2::ggplot} object (or a 'patchwork' for composite
+panels), so results can be customised with the usual \code{+} syntax, and every
+plot shares one theme, one colourblind-aware palette and one set of label
+conventions.
 }
 \section{Exploring data}{
 
 \itemize{
-\item \code{\link[=explore_distribution]{explore_distribution()}} -- histograms / densities of one variable.
-\item \code{\link[=explore_categorical]{explore_categorical()}} -- bar charts of a categorical variable.
-\item \code{\link[=explore_bivariate]{explore_bivariate()}} -- the right plot for any pair of variables.
-\item \code{\link[=explore_pairs]{explore_pairs()}} -- a scatter-plot matrix.
-\item \code{\link[=correlation_heatmap]{correlation_heatmap()}} -- correlations as a heatmap.
-\item \code{\link[=missingness_map]{missingness_map()}} -- a map of missing values.
-\item \code{\link[=outlier_plot]{outlier_plot()}} -- box / violin plots flagging outliers.
-\item \code{\link[=raincloud_plot]{raincloud_plot()}} -- half-violin, box and raw points together.
-\item \code{\link[=group_comparison_plot]{group_comparison_plot()}} -- group means with confidence intervals.
-\item \code{\link[=scatter_trend]{scatter_trend()}} -- scatter plot with a fitted trend.
-\item \code{\link[=summary_table]{summary_table()}} -- a "Table 1" style descriptive summary.
+\item \code{\link[=explore_distribution]{explore_distribution()}}: histograms / densities of one variable.
+\item \code{\link[=explore_categorical]{explore_categorical()}}: bar charts of a categorical variable.
+\item \code{\link[=explore_bivariate]{explore_bivariate()}}: a suitable plot for any pair of variables.
+\item \code{\link[=explore_pairs]{explore_pairs()}}: a scatter-plot matrix.
+\item \code{\link[=correlation_heatmap]{correlation_heatmap()}}: correlations as a heatmap.
+\item \code{\link[=missingness_map]{missingness_map()}}: a map of missing values.
+\item \code{\link[=outlier_plot]{outlier_plot()}}: box / violin plots flagging outliers.
+\item \code{\link[=raincloud_plot]{raincloud_plot()}}: half-violin, box and raw points together.
+\item \code{\link[=group_comparison_plot]{group_comparison_plot()}}: group means with confidence intervals.
+\item \code{\link[=scatter_trend]{scatter_trend()}}: scatter plot with a fitted trend.
+\item \code{\link[=summary_table]{summary_table()}}: a "Table 1" style descriptive summary.
 }
 }
 
 \section{Multivariate and survival}{
 
 \itemize{
-\item \code{\link[=pca_plot]{pca_plot()}} -- principal-component biplot.
-\item \code{\link[=scree_plot]{scree_plot()}} -- variance explained by each component.
-\item \code{\link[=cluster_plot]{cluster_plot()}} -- k-means clusters on principal-component axes.
-\item \code{\link[=dendrogram_plot]{dendrogram_plot()}} -- hierarchical-clustering dendrogram.
-\item \code{\link[=survival_plot]{survival_plot()}} -- Kaplan-Meier survival curves.
+\item \code{\link[=pca_plot]{pca_plot()}}: principal-component biplot.
+\item \code{\link[=scree_plot]{scree_plot()}}: variance explained by each component.
+\item \code{\link[=cluster_plot]{cluster_plot()}}: k-means clusters on principal-component axes.
+\item \code{\link[=dendrogram_plot]{dendrogram_plot()}}: hierarchical-clustering dendrogram.
+\item \code{\link[=survival_plot]{survival_plot()}}: Kaplan-Meier survival curves.
 }
 }
 
 \section{Time series}{
 
 \itemize{
-\item \code{\link[=timeseries_plot]{timeseries_plot()}} -- one or more series over time.
-\item \code{\link[=acf_plot]{acf_plot()}} -- autocorrelation / partial autocorrelation.
-\item \code{\link[=decompose_plot]{decompose_plot()}} -- trend / seasonal / remainder decomposition.
+\item \code{\link[=timeseries_plot]{timeseries_plot()}}: one or more series over time.
+\item \code{\link[=acf_plot]{acf_plot()}}: autocorrelation / partial autocorrelation.
+\item \code{\link[=decompose_plot]{decompose_plot()}}: trend / seasonal / remainder decomposition.
 }
 }
 
 \section{Model estimates and inference}{
 
 \itemize{
-\item \code{\link[=tidy_estimates]{tidy_estimates()}} -- the shared tidy estimate table.
-\item \code{\link[=coefficient_plot]{coefficient_plot()}} -- forest / coefficient plot.
-\item \code{\link[=compare_models]{compare_models()}} -- estimates from several models, side by side.
-\item \code{\link[=frequentist_bayesian_plot]{frequentist_bayesian_plot()}} -- frequentist vs. Bayesian estimates.
-\item \code{\link[=effects_plot]{effects_plot()}} -- predicted values for one predictor.
-\item \code{\link[=interaction_plot]{interaction_plot()}} -- predicted values across two predictors.
-\item \code{\link[=random_effects_plot]{random_effects_plot()}} -- caterpillar plot of random effects.
-\item \code{\link[=optimizer_fixef_plot]{optimizer_fixef_plot()}} -- fixed effects across optimisers.
-\item \code{\link[=model_fit_table]{model_fit_table()}} -- goodness-of-fit statistics across models.
+\item \code{\link[=tidy_estimates]{tidy_estimates()}}: the shared tidy estimate table.
+\item \code{\link[=coefficient_plot]{coefficient_plot()}}: forest / coefficient plot.
+\item \code{\link[=compare_models]{compare_models()}}: estimates from several models, side by side.
+\item \code{\link[=frequentist_bayesian_plot]{frequentist_bayesian_plot()}}: frequentist vs. Bayesian estimates.
+\item \code{\link[=effects_plot]{effects_plot()}}: predicted values for one predictor.
+\item \code{\link[=interaction_plot]{interaction_plot()}}: predicted values across two predictors.
+\item \code{\link[=random_effects_plot]{random_effects_plot()}}: caterpillar plot of random effects.
+\item \code{\link[=optimizer_fixef_plot]{optimizer_fixef_plot()}}: fixed effects across optimisers.
+\item \code{\link[=model_fit_table]{model_fit_table()}}: goodness-of-fit statistics across models.
 }
 }
 
 \section{Diagnostics and classification}{
 
 \itemize{
-\item \code{\link[=residual_diagnostics_plot]{residual_diagnostics_plot()}} -- residual-diagnostic panel.
-\item \code{\link[=influence_plot]{influence_plot()}} -- influence and leverage.
-\item \code{\link[=qq_plot]{qq_plot()}} -- normal quantile-quantile plot.
-\item \code{\link[=vif_plot]{vif_plot()}} -- multicollinearity (variance inflation factors).
-\item \code{\link[=roc_curve_plot]{roc_curve_plot()}} -- ROC curve(s) with AUC.
-\item \code{\link[=pr_curve_plot]{pr_curve_plot()}} -- precision-recall curve with average precision.
-\item \code{\link[=gain_plot]{gain_plot()}} -- cumulative gains chart.
-\item \code{\link[=lift_plot]{lift_plot()}} -- cumulative lift chart.
-\item \code{\link[=calibration_plot]{calibration_plot()}} -- calibration of predicted probabilities.
-\item \code{\link[=confusion_matrix_plot]{confusion_matrix_plot()}} -- confusion matrix as a heatmap.
+\item \code{\link[=residual_diagnostics_plot]{residual_diagnostics_plot()}}: residual-diagnostic panel.
+\item \code{\link[=influence_plot]{influence_plot()}}: influence and leverage.
+\item \code{\link[=qq_plot]{qq_plot()}}: normal quantile-quantile plot.
+\item \code{\link[=vif_plot]{vif_plot()}}: multicollinearity (variance inflation factors).
+\item \code{\link[=roc_curve_plot]{roc_curve_plot()}}: ROC curve(s) with AUC.
+\item \code{\link[=pr_curve_plot]{pr_curve_plot()}}: precision-recall curve with average precision.
+\item \code{\link[=gain_plot]{gain_plot()}}: cumulative gains chart.
+\item \code{\link[=lift_plot]{lift_plot()}}: cumulative lift chart.
+\item \code{\link[=calibration_plot]{calibration_plot()}}: calibration of predicted probabilities.
+\item \code{\link[=confusion_matrix_plot]{confusion_matrix_plot()}}: confusion matrix as a heatmap.
 }
 }
 
 \section{Uncertainty and power}{
 
 \itemize{
-\item \code{\link[=posterior_plot]{posterior_plot()}} -- posterior intervals and densities.
-\item \code{\link[=power_curve_plot]{power_curve_plot()}} -- power against sample size.
+\item \code{\link[=posterior_plot]{posterior_plot()}}: posterior intervals and densities.
+\item \code{\link[=power_curve_plot]{power_curve_plot()}}: power against sample size.
 }
 }
 
 \section{Theming and reporting}{
 
 \itemize{
-\item \code{\link[=theme_depictr]{theme_depictr()}} -- the shared theme.
-\item \code{\link[=depictr_palette]{depictr_palette()}}, \code{\link[=scale_colour_depictr]{scale_colour_depictr()}} -- the shared palette.
-\item \code{\link[=palette_preview]{palette_preview()}} -- preview the palettes.
-\item \code{\link[=format_terms]{format_terms()}} -- tidy raw coefficient names for display.
-\item \code{\link[=model_report]{model_report()}} -- a one-figure overview of a fitted model.
-\item \code{\link[=arrange_plots]{arrange_plots()}} -- compose plots with a shared legend and title.
-\item \code{\link[=save_plot]{save_plot()}} -- save a plot with publication-ready defaults.
+\item \code{\link[=theme_depictr]{theme_depictr()}}: the shared theme.
+\item \code{\link[=depictr_palette]{depictr_palette()}}, \code{\link[=scale_colour_depictr]{scale_colour_depictr()}}: the shared palette.
+\item \code{\link[=palette_preview]{palette_preview()}}: preview the palettes.
+\item \code{\link[=format_terms]{format_terms()}}: tidy raw coefficient names for display.
+\item \code{\link[=model_report]{model_report()}}: a one-figure overview of a fitted model.
+\item \code{\link[=arrange_plots]{arrange_plots()}}: compose plots with a shared legend and title.
+\item \code{\link[=save_plot]{save_plot()}}: save a plot with publication-ready defaults.
 }
 }
 

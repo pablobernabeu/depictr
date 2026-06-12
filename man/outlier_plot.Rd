@@ -25,7 +25,7 @@ outlier_plot(
 
 \item{type}{One of \code{"box"}, \code{"violin"} or \code{"both"}.}
 
-\item{flag}{Highlight outliers (points beyond 1.5 * IQR)?}
+\item{flag}{Whether to highlight outliers (points beyond 1.5 * IQR).}
 
 \item{outlier_colour}{Colour for highlighted outliers.}
 

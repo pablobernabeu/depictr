@@ -11,7 +11,7 @@
 #' @param group Optional grouping variable mapped to colour.
 #' @param method Smoothing method passed to [ggplot2::geom_smooth()], e.g.
 #'   `"lm"`, `"loess"`, or `NULL` for no trend line.
-#' @param se Draw the confidence band around the trend?
+#' @param se Whether to draw the confidence band around the trend.
 #' @param point_alpha Point transparency.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title,x_lab,y_lab Title and axis labels (default to variable names).

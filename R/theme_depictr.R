@@ -156,8 +156,8 @@ theme_depictr <- function(base_size = 11, base_family = "", grid = "xy") {
 #' @param interaction How to render interaction colons: `"times"` (the default,
 #'   a Unicode multiplication sign), `"asterisk"`, `"colon"` (unchanged) or
 #'   `"space"`.
-#' @param strip_prefix Remove a leading `b_` or `bs_` (as added by 'brms')?
-#' @param tidy_intercept Replace `(Intercept)` with `"Intercept"`?
+#' @param strip_prefix Whether to remove a leading `b_` or `bs_` (as added by 'brms').
+#' @param tidy_intercept Whether to replace `(Intercept)` with `"Intercept"`.
 #' @param wrap Optional integer width at which to wrap long labels onto new
 #'   lines (see [base::strwrap()]). `NULL` (default) leaves labels unwrapped.
 #'

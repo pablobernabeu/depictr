@@ -10,8 +10,8 @@
 #'
 #' @param data A data frame.
 #' @param cols Optional character vector of columns to include (default: all).
-#' @param sort Order variables by their proportion of missing values?
-#' @param show_pct Append the percentage missing to each variable label?
+#' @param sort Whether to order variables by their proportion of missing values.
+#' @param show_pct Whether to append the percentage missing to each variable label.
 #' @param colours Length-2 vector: colours for present and missing cells.
 #' @param title Plot title.
 #'

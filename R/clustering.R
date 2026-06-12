@@ -14,9 +14,9 @@
 #' @param clusters Optional vector of cluster assignments (e.g. from
 #'   [stats::kmeans()] or [stats::cutree()]); use this to plot a clustering you
 #'   computed yourself.
-#' @param scale Scale variables to unit variance before clustering and the PCA?
-#' @param hulls Draw a shaded convex hull around each cluster?
-#' @param label_centers Label the cluster centroids?
+#' @param scale Whether to scale variables to unit variance before clustering and the PCA.
+#' @param hulls Whether to draw a shaded convex hull around each cluster.
+#' @param label_centers Whether to label the cluster centroids.
 #' @param point_alpha Point transparency.
 #' @param palette Colours for the clusters; defaults to [depictr_palette()].
 #' @param title Plot title.
@@ -102,9 +102,9 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
 #' @param cols When `x` is a data frame, the numeric columns to use.
 #' @param distance Distance measure passed to [stats::dist()].
 #' @param method Linkage method passed to [stats::hclust()].
-#' @param scale Scale variables before computing distances (data frame input)?
+#' @param scale Whether to scale variables before computing distances (data frame input).
 #' @param k Optional number of clusters to highlight.
-#' @param horizontal Draw the tree horizontally?
+#' @param horizontal Whether to draw the tree horizontally.
 #' @param palette Colours for the `k` clusters; defaults to [depictr_palette()].
 #' @param title Plot title.
 #'

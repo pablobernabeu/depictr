@@ -4,17 +4,17 @@
 #'
 #' Presents the estimates from a frequentist model and a Bayesian model side by
 #' side on one forest plot, in the familiar red (frequentist) and blue
-#' (Bayesian) styling. This is a convenience wrapper around
+#' (Bayesian) styling. The function is a convenience wrapper around
 #' [compare_models()].
 #'
-#' This is a modernised, self-contained successor to the original
-#' `frequentist_bayesian_plot()` gist. Rather than requiring a pre-built
-#' `brms::mcmc_plot()` object, it accepts either fitted models or, more
-#' commonly for Bayesian fits, a tidy data frame of posterior summaries (with
-#' columns such as `term`, `estimate`, `conf.low`/`conf.high`, or the
-#' `Estimate`, `l-95% CI`, `u-95% CI` produced by `brms::fixef()`). The
-#' function aligns terms by name, so small differences in naming between the
-#' two sources only need to be reconciled in the term labels.
+#' It is a modernised, self-contained successor to the original
+#' `frequentist_bayesian_plot()` gist. The Bayesian estimates may be supplied
+#' as a fitted model or, more commonly, as a tidy data frame of posterior
+#' summaries (with columns such as `term`, `estimate` and
+#' `conf.low`/`conf.high`, or the `Estimate`, `l-95% CI` and `u-95% CI`
+#' produced by `brms::fixef()`). Terms are aligned by name, so any small
+#' differences in naming between the two sources need only be reconciled in the
+#' term labels.
 #'
 #' @param frequentist A frequentist model (e.g. from `lm`, `glm` or
 #'   `lmerTest::lmer`) or a tidy data frame of estimates.
@@ -23,7 +23,8 @@
 #' @param labels,interaction,intercept See [compare_models()].
 #'   `intercept` defaults to `TRUE` here, matching the original behaviour.
 #' @param note_frequentist_no_prior If `TRUE`, append "(no prior)" to the
-#'   frequentist legend label -- useful when the title names the Bayesian prior.
+#'   frequentist legend label, which is helpful when the title names the
+#'   Bayesian prior.
 #' @param vertical_line_at_x Position of the vertical reference line.
 #' @param title,subtitle,x_lab Title, subtitle and x-axis label.
 #' @param ... Further arguments passed to [compare_models()].

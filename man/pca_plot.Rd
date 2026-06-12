@@ -27,10 +27,10 @@ frame, or a vector the length of the data) mapped to colour.}
 
 \item{components}{Length-2 integer vector: which components to plot.}
 
-\item{scale}{Scale variables to unit variance before the PCA? Recommended
-when variables are on different scales.}
+\item{scale}{Whether to scale the variables to unit variance before the PCA.
+This is advisable when the variables are on different scales.}
 
-\item{loadings}{Draw variable-loading arrows?}
+\item{loadings}{Whether to draw variable-loading arrows.}
 
 \item{point_alpha}{Point transparency.}
 

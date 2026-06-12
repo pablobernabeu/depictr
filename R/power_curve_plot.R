@@ -4,10 +4,11 @@
 #'
 #' Draws statistical power against sample size, with a dashed line at a target
 #' power (80% by default). The input is usually a power curve produced by
-#' `simr::powerCurve()`, but a tidy data frame works too, so the plot can be
-#' redrawn without re-running a (often slow) power simulation.
+#' `simr::powerCurve()`, though a tidy data frame works equally well, allowing
+#' the plot to be redrawn without repeating a power simulation that is often
+#' slow to run.
 #'
-#' This refactors the original `powercurvePlot()` gist.
+#' The function refactors the original `powercurvePlot()` gist.
 #'
 #' @param x A `powerCurve` object from 'simr', or a data frame with a sample
 #'   size column (`nlevels`, `n` or `x`), a power column (`mean` or `power`),
@@ -17,8 +18,8 @@
 #' @param x_lab X-axis label.
 #' @param x_breaks Approximate number of x-axis breaks.
 #' @param x_expand Optional value(s) to extend the x-axis to.
-#' @param ribbon Draw the confidence band as a shaded ribbon (`TRUE`) or as
-#'   error bars (`FALSE`)?
+#' @param ribbon Whether to draw the confidence band as a shaded ribbon
+#'   (`TRUE`) or as error bars (`FALSE`).
 #' @param title Plot title. If `NULL` and `x` is a 'simr' power curve, the
 #'   predictor name stored in the object is used.
 #' @param interaction Passed to [format_terms()] when deriving the title from a

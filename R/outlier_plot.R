@@ -10,7 +10,7 @@
 #' @param y The numeric variable (string or unquoted name).
 #' @param group Optional grouping variable on the x-axis.
 #' @param type One of `"box"`, `"violin"` or `"both"`.
-#' @param flag Highlight outliers (points beyond 1.5 * IQR)?
+#' @param flag Whether to highlight outliers (points beyond 1.5 * IQR).
 #' @param outlier_colour Colour for highlighted outliers.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title,y_lab Plot title and value-axis label.

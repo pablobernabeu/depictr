@@ -2,7 +2,7 @@
 % Please edit documentation in R/explore_bivariate.R
 \name{explore_bivariate}
 \alias{explore_bivariate}
-\title{The right plot for any pair of variables}
+\title{Plot any pair of variables}
 \usage{
 explore_bivariate(
   data,
@@ -32,13 +32,11 @@ explore_bivariate(
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Picks an appropriate plot for the relationship between two variables based on
-their types:
-\itemize{
-\item numeric vs numeric -- scatter plot with a fitted trend;
-\item numeric vs categorical -- box plots of the numeric variable by level;
-\item categorical vs categorical -- a filled bar chart of proportions.
-}
+Chooses an appropriate plot for the relationship between two variables
+according to their types. Two numeric variables are shown as a scatter plot
+with a fitted trend; a numeric and a categorical variable as box plots of the
+numeric variable by level; and two categorical variables as a filled bar
+chart of proportions.
 }
 \examples{
 explore_bivariate(crop_yield, fertilizer, yield)        # numeric ~ numeric

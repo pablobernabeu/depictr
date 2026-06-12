@@ -25,11 +25,11 @@ dendrogram_plot(
 
 \item{method}{Linkage method passed to \code{\link[stats:hclust]{stats::hclust()}}.}
 
-\item{scale}{Scale variables before computing distances (data frame input)?}
+\item{scale}{Whether to scale variables before computing distances (data frame input).}
 
 \item{k}{Optional number of clusters to highlight.}
 
-\item{horizontal}{Draw the tree horizontally?}
+\item{horizontal}{Whether to draw the tree horizontally.}
 
 \item{palette}{Colours for the \code{k} clusters; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 

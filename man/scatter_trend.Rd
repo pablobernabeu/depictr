@@ -29,7 +29,7 @@ unquoted column name).}
 \item{method}{Smoothing method passed to \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}, e.g.
 \code{"lm"}, \code{"loess"}, or \code{NULL} for no trend line.}
 
-\item{se}{Draw the confidence band around the trend?}
+\item{se}{Whether to draw the confidence band around the trend.}
 
 \item{point_alpha}{Point transparency.}
 

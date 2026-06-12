@@ -9,9 +9,9 @@
 #' @param x A fitted model or a tidy data frame of estimates.
 #' @param conf_level Confidence/credible level, passed to [tidy_estimates()]
 #'   when `x` is a model.
-#' @param intercept Keep the intercept term? Defaults to `FALSE`, as the
-#'   intercept is rarely of interest on a forest plot and its scale often
-#'   dwarfs the other terms.
+#' @param intercept Whether to keep the intercept term. Defaults to `FALSE`,
+#'   since the intercept is seldom of interest on a forest plot and its scale
+#'   often overwhelms the other terms.
 #' @param order Order the terms by estimate: `"none"` (keep input order),
 #'   `"ascending"` or `"descending"`.
 #' @param labels Optional display labels for the terms. Either a character

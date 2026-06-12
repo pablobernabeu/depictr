@@ -18,9 +18,9 @@ missingness_map(
 
 \item{cols}{Optional character vector of columns to include (default: all).}
 
-\item{sort}{Order variables by their proportion of missing values?}
+\item{sort}{Whether to order variables by their proportion of missing values.}
 
-\item{show_pct}{Append the percentage missing to each variable label?}
+\item{show_pct}{Whether to append the percentage missing to each variable label.}
 
 \item{colours}{Length-2 vector: colours for present and missing cells.}
 

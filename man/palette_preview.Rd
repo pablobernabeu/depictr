@@ -19,9 +19,9 @@ palette_preview(
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Displays the colours returned by \code{\link[=depictr_palette]{depictr_palette()}} as labelled swatches --
-handy when choosing how many groups to show, picking a palette type, or
-documenting a figure.
+Displays the colours returned by \code{\link[=depictr_palette]{depictr_palette()}} as labelled swatches.
+It is useful when choosing how many groups to show, selecting a palette type,
+or documenting a figure.
 }
 \examples{
 palette_preview()

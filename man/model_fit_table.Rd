@@ -16,10 +16,10 @@ A data frame with one row per model and columns \code{model}, \code{n}, \code{df
 \code{AIC}, \code{BIC}, \code{logLik}, \code{R2} and \code{RMSE}.
 }
 \description{
-Collects the usual model-comparison statistics -- number of observations,
-degrees of freedom, AIC, BIC, log-likelihood, an R-squared (ordinary for
-\code{lm}, McFadden's pseudo-R-squared for \code{glm}) and the root-mean-square error
--- into one tidy data frame, one row per model.
+Collects the usual model-comparison statistics into one tidy data frame, one
+row per model. These comprise the number of observations, the degrees of
+freedom, AIC, BIC, the log-likelihood, an R-squared (ordinary for \code{lm} and
+McFadden's pseudo-R-squared for \code{glm}) and the root-mean-square error.
 }
 \examples{
 m1 <- lm(yield ~ rainfall, data = crop_yield)

@@ -16,7 +16,7 @@
 #' @param predictor Name of the focal predictor (string).
 #' @param conf_level Confidence level for the interval.
 #' @param n Number of points across the range of a numeric predictor.
-#' @param rug Add a rug of the observed predictor values (numeric predictors)?
+#' @param rug Whether to add a rug of the observed predictor values (numeric predictors).
 #' @param colour Colour for the line/points and band.
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
@@ -93,7 +93,7 @@ effects_plot <- function(model, predictor, conf_level = 0.95, n = 100,
 #'   to the 10th, 50th and 90th percentiles.
 #' @param conf_level Confidence level for the bands/intervals.
 #' @param n Number of points across the range of a numeric focal predictor.
-#' @param band Draw confidence bands (numeric focal predictor)?
+#' @param band Whether to draw confidence bands (numeric focal predictor).
 #' @param palette Colours for the moderator; defaults to [depictr_palette()].
 #' @param title,x_lab,y_lab Title and axis labels.
 #'

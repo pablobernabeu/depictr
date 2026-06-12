@@ -14,7 +14,7 @@
 #' @param group Optional grouping variable (a vector, or a column name when
 #'   `time` is a data frame).
 #' @param conf_level Confidence level for the limits (`NA` to omit them).
-#' @param censor_marks Mark censoring times with a `+`?
+#' @param censor_marks Whether to mark censoring times with a `+`.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title,x_lab,y_lab Title and axis labels.
 #'

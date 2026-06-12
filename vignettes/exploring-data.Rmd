@@ -33,9 +33,9 @@ explore_categorical(wellbeing_survey, education, group = region,
 
 ## Two variables, any types
 
-`explore_bivariate()` picks the appropriate plot automatically -- scatter for
-two numerics, boxplots for numeric-by-categorical, a filled bar chart for two
-categoricals.
+`explore_bivariate()` selects the appropriate plot automatically: a scatter
+plot for two numeric variables, box plots for a numeric variable against a
+categorical one, and a filled bar chart for two categorical variables.
 
 ```{r}
 explore_bivariate(lexical_decision, condition, RT)
@@ -64,8 +64,8 @@ correlation_heatmap(wellbeing_survey)
 
 `raincloud_plot()` shows the density, the box summary and the raw points
 together, and `group_comparison_plot()` adds the group means with confidence
-intervals over the raw data -- a clearer answer to "do these groups differ?"
-than a bar chart.
+intervals over the raw data. By showing the estimate alongside its uncertainty,
+the latter conveys whether the groups differ more faithfully than a bar chart.
 
 ```{r}
 raincloud_plot(lexical_decision, RT, group = condition)

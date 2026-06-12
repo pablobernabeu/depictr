@@ -6,7 +6,7 @@
 #' @noRd
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
-#' Is a suggested package available?
+#' Check whether a suggested package is available
 #'
 #' Thin wrapper around [requireNamespace()] used to keep heavy dependencies in
 #' `Suggests`. Errors with an informative message when the package is needed

@@ -8,12 +8,13 @@
 #' @param data A data frame.
 #' @param x The categorical variable (string or unquoted name).
 #' @param group Optional grouping variable mapped to fill.
-#' @param proportion Show proportions instead of counts? When `group` is set,
-#'   proportions are computed within each group.
+#' @param proportion Whether to show proportions instead of counts. When
+#'   `group` is set, proportions are computed within each group.
 #' @param position Bar position when `group` is set: `"dodge"`, `"stack"` or
 #'   `"fill"`.
-#' @param sort Order the bars from most to least frequent?
-#' @param horizontal Draw horizontal bars (helpful with many or long labels)?
+#' @param sort Whether to order the bars from most to least frequent.
+#' @param horizontal Whether to draw horizontal bars, which helps when there
+#'   are many levels or long labels.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title,x_lab Plot title and category-axis label (defaults to the
 #'   variable name).

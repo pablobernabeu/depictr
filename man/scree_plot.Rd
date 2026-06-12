@@ -11,7 +11,7 @@ scree_plot(x, cols = NULL, scale = TRUE, n = NULL, title = NULL)
 
 \item{cols}{When \code{x} is a data frame, the numeric columns to analyse.}
 
-\item{scale}{Scale variables to unit variance before the PCA?}
+\item{scale}{Whether to scale variables to unit variance before the PCA.}
 
 \item{n}{Maximum number of components to display.}
 
@@ -22,8 +22,8 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 Shows the proportion of variance explained by each principal component, as
-bars with a cumulative line -- the standard aid for deciding how many
-components to keep.
+bars with a cumulative line. It is the customary aid for deciding how many
+components to retain.
 }
 \examples{
 scree_plot(wellbeing_survey,

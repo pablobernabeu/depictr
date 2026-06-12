@@ -2,10 +2,10 @@
 
 #' Goodness-of-fit statistics across models
 #'
-#' Collects the usual model-comparison statistics -- number of observations,
-#' degrees of freedom, AIC, BIC, log-likelihood, an R-squared (ordinary for
-#' `lm`, McFadden's pseudo-R-squared for `glm`) and the root-mean-square error
-#' -- into one tidy data frame, one row per model.
+#' Collects the usual model-comparison statistics into one tidy data frame, one
+#' row per model. These comprise the number of observations, the degrees of
+#' freedom, AIC, BIC, the log-likelihood, an R-squared (ordinary for `lm` and
+#' McFadden's pseudo-R-squared for `glm`) and the root-mean-square error.
 #'
 #' @param ... Two or more fitted models. Name the arguments to label the rows.
 #' @param digits Number of decimal places to round to.

@@ -3,10 +3,10 @@
 #' Compare estimates from several models or sources
 #'
 #' Overlays the estimates from two or more models (or tidy estimate tables) on a
-#' single forest plot, with one colour per source. This is the general engine
-#' behind [frequentist_bayesian_plot()] (frequentist vs. Bayesian) and is also
-#' handy for comparing nested models, several optimisers, or estimates before
-#' and after a transformation.
+#' single forest plot, with one colour per source. It is the general engine
+#' behind [frequentist_bayesian_plot()] (frequentist against Bayesian), and
+#' serves equally well for comparing nested models, several optimisers, or
+#' estimates before and after a transformation.
 #'
 #' @param ... Two or more fitted models and/or tidy data frames of estimates.
 #'   Name the arguments to label the sources (e.g.
@@ -14,7 +14,7 @@
 #' @param names Optional character vector of source labels, overriding the
 #'   names of `...`.
 #' @param conf_level Confidence/credible level for models.
-#' @param intercept Keep the intercept term? Defaults to `FALSE`.
+#' @param intercept Whether to keep the intercept term. Defaults to `FALSE`.
 #' @param order Order terms by their average estimate across sources:
 #'   `"none"`, `"ascending"` or `"descending"`.
 #' @param labels Optional display labels (see [coefficient_plot()]).
