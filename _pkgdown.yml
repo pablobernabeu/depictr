@@ -2,17 +2,31 @@ url: https://pablobernabeu.github.io/depictr
 
 template:
   bootstrap: 5
+  light-switch: true
   bslib:
     primary: "#005b96"
+
+development:
+  mode: auto
+
+authors:
+  Pablo Bernabeu:
+    href: https://github.com/pablobernabeu
 
 navbar:
   structure:
     left: [intro, reference, articles, news]
-    right: [search, github]
+    right: [search, github, lightswitch]
+
+figures:
+  dpi: 96
+  fig.width: 7
+  fig.height: 4.5
 
 reference:
 - title: Exploring data
-  desc: A first look at distributions, relationships, data quality and summaries.
+  desc: >
+    A first look at distributions, relationships, data quality and summaries.
   contents:
   - explore_distribution
   - explore_categorical
@@ -27,6 +41,9 @@ reference:
   - summary_table
 
 - title: Multivariate, clustering and survival
+  desc: >
+    Principal components, k-means and hierarchical clustering, and
+    Kaplan-Meier survival curves.
   contents:
   - pca_plot
   - scree_plot
@@ -35,12 +52,16 @@ reference:
   - survival_plot
 
 - title: Time series
+  desc: Series over time, autocorrelation and decomposition.
   contents:
   - timeseries_plot
   - acf_plot
   - decompose_plot
 
 - title: Model estimates and inference
+  desc: >
+    Forest plots, model comparison, predicted values, interactions, random
+    effects and goodness-of-fit, built on a shared tidy estimate table.
   contents:
   - tidy_estimates
   - coefficient_plot
@@ -53,6 +74,9 @@ reference:
   - model_fit_table
 
 - title: Diagnostics and classification
+  desc: >
+    Residual diagnostics, influence, and the standard classification curves
+    and tables.
   contents:
   - residual_diagnostics_plot
   - influence_plot
@@ -66,11 +90,15 @@ reference:
   - confusion_matrix_plot
 
 - title: Uncertainty and power
+  desc: Posterior summaries and power analysis curves.
   contents:
   - posterior_plot
   - power_curve_plot
 
 - title: Theming and reporting
+  desc: >
+    A shared theme and colourblind-aware palette, label helpers, plot
+    composition and saving, and a one-figure model report.
   contents:
   - theme_depictr
   - depictr_palette
@@ -82,6 +110,7 @@ reference:
   - save_plot
 
 - title: Data
+  desc: Reproducibly simulated datasets used throughout the documentation.
   contents:
   - lexical_decision
   - wellbeing_survey
