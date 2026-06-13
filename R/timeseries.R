@@ -70,8 +70,8 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
   }
 
   if (!is.null(rolling)) {
-    df$roll <- stats::ave(df$value, df$series, FUN = function(v)
-      moving_average(v, rolling))
+    df$roll <- stats::ave(df$value, df$series,
+                          FUN = function(v) moving_average(v, rolling))
     if (multi) {
       p <- p + ggplot2::geom_line(
         data = df, ggplot2::aes(x = .data$time, y = .data$roll,

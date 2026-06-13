@@ -89,16 +89,20 @@ km_input <- function(time, status, group, conf_level) {
     if (is.na(tcol) || is.na(scol)) {
       stop("A data frame needs `time` and `status` columns.", call. = FALSE)
     }
-    tv <- df[[tcol]]; sv <- df[[scol]]
+    tv <- df[[tcol]]
+    sv <- df[[scol]]
     gv <- if (!is.na(gcol)) df[[gcol]] else NULL
   } else {
     if (is.null(status)) stop("Supply `status` with the times.", call. = FALSE)
-    tv <- time; sv <- status; gv <- group
+    tv <- time
+    sv <- status
+    gv <- group
   }
   gv <- if (is.null(gv)) rep("all", length(tv)) else as.character(gv)
 
   groups <- unique(gv)
-  curves <- list(); censors <- list()
+  curves <- list()
+  censors <- list()
   for (g in groups) {
     sub <- gv == g
     out <- km_estimate(tv[sub], sv[sub], conf_level)
@@ -114,7 +118,8 @@ km_input <- function(time, status, group, conf_level) {
 #' @noRd
 km_estimate <- function(time, status, conf_level) {
   keep <- !is.na(time) & !is.na(status)
-  time <- time[keep]; status <- as.integer(status[keep])
+  time <- time[keep]
+  status <- as.integer(status[keep])
   ut <- sort(unique(time[status == 1]))
   if (length(ut) == 0) {
     curve <- data.frame(time = 0, surv = 1, lower = 1, upper = 1)

@@ -210,9 +210,12 @@ dendro_segments <- function(hc) {
     ry <- if (right < 0) 0 else height[right]
     h <- height[m]
     node_x[m] <- (lx + rx) / 2
-    segs[[s]] <- data.frame(x = lx, xend = lx, y = ly, yend = h); s <- s + 1L
-    segs[[s]] <- data.frame(x = rx, xend = rx, y = ry, yend = h); s <- s + 1L
-    segs[[s]] <- data.frame(x = lx, xend = rx, y = h, yend = h);  s <- s + 1L
+    segs[[s]] <- data.frame(x = lx, xend = lx, y = ly, yend = h)
+    s <- s + 1L
+    segs[[s]] <- data.frame(x = rx, xend = rx, y = ry, yend = h)
+    s <- s + 1L
+    segs[[s]] <- data.frame(x = lx, xend = rx, y = h, yend = h)
+    s <- s + 1L
   }
   do.call(rbind, segs)
 }
