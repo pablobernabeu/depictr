@@ -41,7 +41,7 @@ correlation_heatmap(
 
 - show_values:
 
-  Annotate each cell with its correlation?
+  Whether to annotate each cell with its correlation.
 
 - digits:
 

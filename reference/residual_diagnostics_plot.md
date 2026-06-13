@@ -1,9 +1,9 @@
 # Residual-diagnostics panel for a fitted model
 
-Combines the classic regression diagnostic plots – residuals vs. fitted,
-a normal Q-Q plot of the standardised residuals, a scale-location plot,
-and residuals vs. leverage – into a single panel using 'patchwork'.
-Works with `lm` and `glm` objects.
+Combines the classic regression diagnostic plots (residuals against
+fitted values, a normal Q-Q plot of the standardised residuals, a
+scale-location plot, and residuals against leverage) into a single panel
+using 'patchwork'. The function works with `lm` and `glm` objects.
 
 ## Usage
 
@@ -39,7 +39,7 @@ residual_diagnostics_plot(
 
 - smooth:
 
-  Add a loess guide line to the residual panels?
+  Whether to add a loess guide line to the residual panels.
 
 - title:
 

@@ -10,7 +10,7 @@ summaries.
 - [`explore_categorical()`](https://pablobernabeu.github.io/depictr/reference/explore_categorical.md)
   : Bar chart of a categorical variable
 - [`explore_bivariate()`](https://pablobernabeu.github.io/depictr/reference/explore_bivariate.md)
-  : The right plot for any pair of variables
+  : Plot any pair of variables
 - [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md)
   : Scatter-plot matrix
 - [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md)

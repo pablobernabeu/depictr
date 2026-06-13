@@ -1,8 +1,8 @@
 # Scree plot
 
 Shows the proportion of variance explained by each principal component,
-as bars with a cumulative line – the standard aid for deciding how many
-components to keep.
+as bars with a cumulative line. It is the customary aid for deciding how
+many components to retain.
 
 ## Usage
 
@@ -23,7 +23,7 @@ scree_plot(x, cols = NULL, scale = TRUE, n = NULL, title = NULL)
 
 - scale:
 
-  Scale variables to unit variance before the PCA?
+  Whether to scale variables to unit variance before the PCA.
 
 - n:
 

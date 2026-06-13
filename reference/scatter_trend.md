@@ -44,7 +44,7 @@ scatter_trend(
 
 - se:
 
-  Draw the confidence band around the trend?
+  Whether to draw the confidence band around the trend.
 
 - point_alpha:
 

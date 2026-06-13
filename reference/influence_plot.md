@@ -1,9 +1,9 @@
 # Influence plot
 
 A bubble plot of leverage against the studentised residuals, with bubble
-area proportional to Cook's distance – the standard one-picture summary
-of which observations most influence a fitted model. Reference lines
-mark large residuals and high-leverage points, and the most influential
+area proportional to Cook's distance. It summarises in a single picture
+which observations most influence a fitted model. Reference lines mark
+large residuals and high-leverage points, and the most influential
 observations are labelled.
 
 ## Usage

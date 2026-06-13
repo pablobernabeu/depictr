@@ -46,15 +46,16 @@ cluster_plot(
 
 - scale:
 
-  Scale variables to unit variance before clustering and the PCA?
+  Whether to scale variables to unit variance before clustering and the
+  PCA.
 
 - hulls:
 
-  Draw a shaded convex hull around each cluster?
+  Whether to draw a shaded convex hull around each cluster.
 
 - label_centers:
 
-  Label the cluster centroids?
+  Whether to label the cluster centroids.
 
 - point_alpha:
 

@@ -52,7 +52,7 @@ interaction_plot(
 
 - band:
 
-  Draw confidence bands (numeric focal predictor)?
+  Whether to draw confidence bands (numeric focal predictor).
 
 - palette:
 

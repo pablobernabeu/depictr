@@ -1,9 +1,9 @@
 # Caterpillar plot of random effects
 
 Displays the conditional modes ("BLUPs") of a mixed model's random
-effects as a sorted point-and-interval ("caterpillar") plot – the
-standard way to inspect by-group departures from the average, and to
-spot unusual groups.
+effects as a sorted point-and-interval ("caterpillar") plot. It is the
+usual way to inspect by-group departures from the average, and to
+identify unusual groups.
 
 ## Usage
 
@@ -33,7 +33,7 @@ random_effects_plot(
 
 - sort:
 
-  Order the levels by their estimate?
+  Whether to order the levels by their estimate.
 
 - point_colour:
 

@@ -1,13 +1,10 @@
-# The right plot for any pair of variables
+# Plot any pair of variables
 
-Picks an appropriate plot for the relationship between two variables
-based on their types:
-
-- numeric vs numeric – scatter plot with a fitted trend;
-
-- numeric vs categorical – box plots of the numeric variable by level;
-
-- categorical vs categorical – a filled bar chart of proportions.
+Chooses an appropriate plot for the relationship between two variables
+according to their types. Two numeric variables are shown as a scatter
+plot with a fitted trend; a numeric and a categorical variable as box
+plots of the numeric variable by level; and two categorical variables as
+a filled bar chart of proportions.
 
 ## Usage
 

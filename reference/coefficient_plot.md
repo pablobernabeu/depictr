@@ -40,9 +40,9 @@ coefficient_plot(
 
 - intercept:
 
-  Keep the intercept term? Defaults to `FALSE`, as the intercept is
-  rarely of interest on a forest plot and its scale often dwarfs the
-  other terms.
+  Whether to keep the intercept term. Defaults to `FALSE`, since the
+  intercept is seldom of interest on a forest plot and its scale often
+  overwhelms the other terms.
 
 - order:
 

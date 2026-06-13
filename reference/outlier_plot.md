@@ -40,7 +40,7 @@ outlier_plot(
 
 - flag:
 
-  Highlight outliers (points beyond 1.5 \* IQR)?
+  Whether to highlight outliers (points beyond 1.5 \* IQR).
 
 - outlier_colour:
 

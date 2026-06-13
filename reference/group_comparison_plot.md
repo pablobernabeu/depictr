@@ -2,9 +2,9 @@
 
 An estimation-style plot of a numeric outcome across the levels of a
 grouping variable: each group's mean with a confidence interval, over a
-backdrop of the raw (jittered) data. A clearer answer to "do these
-groups differ?" than a bar chart, because it shows both the estimate and
-its uncertainty.
+backdrop of the raw (jittered) data. By showing both the estimate and
+its uncertainty, it conveys whether the groups differ more faithfully
+than a bar chart does.
 
 ## Usage
 
@@ -43,7 +43,7 @@ group_comparison_plot(
 
 - show_points:
 
-  Draw the raw data behind the means?
+  Whether to draw the raw data behind the means.
 
 - point_alpha:
 

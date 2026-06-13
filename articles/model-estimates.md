@@ -143,9 +143,10 @@ optimizer_fixef_plot(opt)
 ## A one-figure model report
 
 [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
-composes several of these views – coefficients, the effect of a focal
-predictor, residuals-vs-fitted and a Q-Q plot, with a fit-statistics
-subtitle – into a single figure for a quick review or a report appendix.
+composes several of these views (the coefficients, the effect of a focal
+predictor, the residuals against fitted values and a Q-Q plot, with a
+fit-statistics subtitle) into a single figure for a rapid review or a
+report appendix.
 
 ``` r
 

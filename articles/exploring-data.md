@@ -29,9 +29,9 @@ explore_categorical(wellbeing_survey, education, group = region,
 ## Two variables, any types
 
 [`explore_bivariate()`](https://pablobernabeu.github.io/depictr/reference/explore_bivariate.md)
-picks the appropriate plot automatically – scatter for two numerics,
-boxplots for numeric-by-categorical, a filled bar chart for two
-categoricals.
+selects the appropriate plot automatically: a scatter plot for two
+numeric variables, box plots for a numeric variable against a
+categorical one, and a filled bar chart for two categorical variables.
 
 ``` r
 
@@ -76,8 +76,9 @@ correlation_heatmap(wellbeing_survey)
 [`raincloud_plot()`](https://pablobernabeu.github.io/depictr/reference/raincloud_plot.md)
 shows the density, the box summary and the raw points together, and
 [`group_comparison_plot()`](https://pablobernabeu.github.io/depictr/reference/group_comparison_plot.md)
-adds the group means with confidence intervals over the raw data – a
-clearer answer to “do these groups differ?” than a bar chart.
+adds the group means with confidence intervals over the raw data. By
+showing the estimate alongside its uncertainty, the latter conveys
+whether the groups differ more faithfully than a bar chart.
 
 ``` r
 

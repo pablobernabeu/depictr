@@ -4,8 +4,8 @@ Draws statistical power against sample size, with a dashed line at a
 target power (80% by default). The input is usually a power curve
 produced by
 [`simr::powerCurve()`](https://rdrr.io/pkg/simr/man/powerCurve.html),
-but a tidy data frame works too, so the plot can be redrawn without
-re-running a (often slow) power simulation.
+though a tidy data frame works equally well, allowing the plot to be
+redrawn without repeating a power simulation that is often slow to run.
 
 ## Usage
 
@@ -49,8 +49,8 @@ power_curve_plot(
 
 - ribbon:
 
-  Draw the confidence band as a shaded ribbon (`TRUE`) or as error bars
-  (`FALSE`)?
+  Whether to draw the confidence band as a shaded ribbon (`TRUE`) or as
+  error bars (`FALSE`).
 
 - title:
 
@@ -70,7 +70,7 @@ object.
 
 ## Details
 
-This refactors the original `powercurvePlot()` gist.
+The function refactors the original `powercurvePlot()` gist.
 
 ## Examples
 

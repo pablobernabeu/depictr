@@ -42,7 +42,8 @@ effects_plot(
 
 - rug:
 
-  Add a rug of the observed predictor values (numeric predictors)?
+  Whether to add a rug of the observed predictor values (numeric
+  predictors).
 
 - colour:
 

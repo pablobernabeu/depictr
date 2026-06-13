@@ -44,7 +44,7 @@ survival_plot(
 
 - censor_marks:
 
-  Mark censoring times with a `+`?
+  Whether to mark censoring times with a `+`.
 
 - palette:
 

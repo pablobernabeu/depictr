@@ -213,10 +213,10 @@ whether they agree. Without ‘lme4’ you can build the input directly:</p>
 <div class="section level2">
 <h2 id="a-one-figure-model-report">A one-figure model report<a class="anchor" aria-label="anchor" href="#a-one-figure-model-report"></a>
 </h2>
-<p><code><a href="../reference/model_report.html">model_report()</a></code> composes several of these views –
-coefficients, the effect of a focal predictor, residuals-vs-fitted and a
-Q-Q plot, with a fit-statistics subtitle – into a single figure for a
-quick review or a report appendix.</p>
+<p><code><a href="../reference/model_report.html">model_report()</a></code> composes several of these views (the
+coefficients, the effect of a focal predictor, the residuals against
+fitted values and a Q-Q plot, with a fit-statistics subtitle) into a
+single figure for a rapid review or a report appendix.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">full</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">rainfall</span> <span class="op">+</span> <span class="va">fertilizer</span> <span class="op">+</span> <span class="va">soil_ph</span> <span class="op">+</span> <span class="va">treatment</span>,</span>
 <span>           data <span class="op">=</span> <span class="va">crop_yield</span><span class="op">)</span></span>

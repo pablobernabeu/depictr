@@ -2,11 +2,11 @@
 
 Assembles a compact, consistent overview of a fitted model in a single
 figure: the coefficient estimates, the predicted effect of a focal
-predictor, a residuals-vs-fitted plot and a normal Q-Q plot, with a
+predictor, a residuals-against-fitted plot and a normal Q-Q plot, with a
 subtitle of key fit statistics. It is a convenience wrapper that
 composes several depictr plots with
 [`arrange_plots()`](https://pablobernabeu.github.io/depictr/reference/arrange_plots.md),
-and is handy for a quick model review or a report appendix.
+and serves well for a rapid model review or a report appendix.
 
 ## Usage
 

@@ -31,11 +31,11 @@ format_terms(
 
 - strip_prefix:
 
-  Remove a leading `b_` or `bs_` (as added by 'brms')?
+  Whether to remove a leading `b_` or `bs_` (as added by 'brms').
 
 - tidy_intercept:
 
-  Replace `(Intercept)` with `"Intercept"`?
+  Whether to replace `(Intercept)` with `"Intercept"`.
 
 - wrap:
 

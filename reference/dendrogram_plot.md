@@ -46,7 +46,8 @@ dendrogram_plot(
 
 - scale:
 
-  Scale variables before computing distances (data frame input)?
+  Whether to scale variables before computing distances (data frame
+  input).
 
 - k:
 
@@ -54,7 +55,7 @@ dendrogram_plot(
 
 - horizontal:
 
-  Draw the tree horizontally?
+  Whether to draw the tree horizontally.
 
 - palette:
 

@@ -6,7 +6,7 @@ principal component analysis and survival curves.
 ## Principal component analysis
 
 [`pca_plot()`](https://pablobernabeu.github.io/depictr/reference/pca_plot.md)
-runs a PCA on the numeric columns of a data frame and draws a biplot –
+runs a PCA on the numeric columns of a data frame and draws a biplot:
 the observations projected onto two components, with the variable
 loadings as arrows.
 [`scree_plot()`](https://pablobernabeu.github.io/depictr/reference/scree_plot.md)

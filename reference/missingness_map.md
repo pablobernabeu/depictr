@@ -31,11 +31,11 @@ missingness_map(
 
 - sort:
 
-  Order variables by their proportion of missing values?
+  Whether to order variables by their proportion of missing values.
 
 - show_pct:
 
-  Append the percentage missing to each variable label?
+  Whether to append the percentage missing to each variable label.
 
 - colours:
 

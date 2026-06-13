@@ -46,12 +46,12 @@ pca_plot(
 
 - scale:
 
-  Scale variables to unit variance before the PCA? Recommended when
-  variables are on different scales.
+  Whether to scale the variables to unit variance before the PCA. This
+  is advisable when the variables are on different scales.
 
 - loadings:
 
-  Draw variable-loading arrows?
+  Whether to draw variable-loading arrows.
 
 - point_alpha:
 

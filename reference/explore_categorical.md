@@ -36,8 +36,8 @@ explore_categorical(
 
 - proportion:
 
-  Show proportions instead of counts? When `group` is set, proportions
-  are computed within each group.
+  Whether to show proportions instead of counts. When `group` is set,
+  proportions are computed within each group.
 
 - position:
 
@@ -45,11 +45,12 @@ explore_categorical(
 
 - sort:
 
-  Order the bars from most to least frequent?
+  Whether to order the bars from most to least frequent.
 
 - horizontal:
 
-  Draw horizontal bars (helpful with many or long labels)?
+  Whether to draw horizontal bars, which helps when there are many
+  levels or long labels.
 
 - palette:
 

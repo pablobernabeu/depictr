@@ -1,11 +1,11 @@
 # Compare estimates from several models or sources
 
 Overlays the estimates from two or more models (or tidy estimate tables)
-on a single forest plot, with one colour per source. This is the general
+on a single forest plot, with one colour per source. It is the general
 engine behind
 [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
-(frequentist vs. Bayesian) and is also handy for comparing nested
-models, several optimisers, or estimates before and after a
+(frequentist against Bayesian), and serves equally well for comparing
+nested models, several optimisers, or estimates before and after a
 transformation.
 
 ## Usage
@@ -51,7 +51,7 @@ compare_models(
 
 - intercept:
 
-  Keep the intercept term? Defaults to `FALSE`.
+  Whether to keep the intercept term. Defaults to `FALSE`.
 
 - order:
 

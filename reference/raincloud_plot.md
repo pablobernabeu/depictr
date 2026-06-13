@@ -2,10 +2,10 @@
 
 A "raincloud" combines three views of a distribution: a half-violin
 density (the cloud), a narrow boxplot, and the raw jittered points (the
-rain). It shows the shape, the summary and the individual data at once,
-and is a popular, transparent alternative to the bare boxplot.
-Implemented with base graphics primitives, so it needs no extra
-packages.
+rain). It conveys the shape, the summary and the individual observations
+together, giving a fuller and more transparent picture than a boxplot
+alone. The plot is built from base graphics primitives and so needs no
+extra packages.
 
 ## Usage
 

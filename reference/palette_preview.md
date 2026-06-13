@@ -2,8 +2,8 @@
 
 Displays the colours returned by
 [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
-as labelled swatches – handy when choosing how many groups to show,
-picking a palette type, or documenting a figure.
+as labelled swatches. It is useful when choosing how many groups to
+show, selecting a palette type, or documenting a figure.
 
 ## Usage
 

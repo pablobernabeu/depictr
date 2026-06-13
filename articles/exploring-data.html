@@ -88,9 +88,10 @@ names can be given quoted or unquoted.</p>
 <div class="section level2">
 <h2 id="two-variables-any-types">Two variables, any types<a class="anchor" aria-label="anchor" href="#two-variables-any-types"></a>
 </h2>
-<p><code><a href="../reference/explore_bivariate.html">explore_bivariate()</a></code> picks the appropriate plot
-automatically – scatter for two numerics, boxplots for
-numeric-by-categorical, a filled bar chart for two categoricals.</p>
+<p><code><a href="../reference/explore_bivariate.html">explore_bivariate()</a></code> selects the appropriate plot
+automatically: a scatter plot for two numeric variables, box plots for a
+numeric variable against a categorical one, and a filled bar chart for
+two categorical variables.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/explore_bivariate.html">explore_bivariate</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">condition</span>, <span class="va">RT</span><span class="op">)</span></span></code></pre></div>
 <p><img src="exploring-data_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="672"></p>
@@ -118,8 +119,9 @@ single coloured grid.</p>
 </h2>
 <p><code><a href="../reference/raincloud_plot.html">raincloud_plot()</a></code> shows the density, the box summary and
 the raw points together, and <code><a href="../reference/group_comparison_plot.html">group_comparison_plot()</a></code> adds
-the group means with confidence intervals over the raw data – a clearer
-answer to “do these groups differ?” than a bar chart.</p>
+the group means with confidence intervals over the raw data. By showing
+the estimate alongside its uncertainty, the latter conveys whether the
+groups differ more faithfully than a bar chart.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/raincloud_plot.html">raincloud_plot</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">RT</span>, group <span class="op">=</span> <span class="va">condition</span><span class="op">)</span></span></code></pre></div>
 <p><img src="exploring-data_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="672"></p>

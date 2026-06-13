@@ -1,14 +1,14 @@
 # depictr
 
 **depictr** is a single, consistent toolkit of publication-ready plots
-that span the whole analysis workflow – from a first look at the data,
+that span the whole analysis workflow, from a first look at the data,
 through model estimates and predictions, to diagnostics, uncertainty and
-reporting. Where most packages own one slice of this work, depictr aims
-to cover it end to end with *one* theme, *one* palette and *one* set of
-label conventions. Every plotting function returns a
+reporting. Most packages address one part of this work; depictr aims to
+cover it from end to end with *one* theme, *one* palette and *one* set
+of label conventions. Every plotting function returns a
 [ggplot2](https://ggplot2.tidyverse.org) object (or a
 [patchwork](https://patchwork.data-imaginist.com) for composite panels),
-so you can keep customising with the usual `+` syntax.
+so a plot can be refined further with the usual `+` syntax.
 
 It grew out of three focused plotting functions
 ([frequentist_bayesian_plot](https://github.com/pablobernabeu/frequentist_bayesian_plot),
@@ -26,7 +26,7 @@ remotes::install_github("pablobernabeu/depictr")
 
 ## What’s in the box
 
-**Explore data** —
+**Explore data**:
 [`explore_distribution()`](https://pablobernabeu.github.io/depictr/reference/explore_distribution.md),
 [`explore_categorical()`](https://pablobernabeu.github.io/depictr/reference/explore_categorical.md),
 [`explore_bivariate()`](https://pablobernabeu.github.io/depictr/reference/explore_bivariate.md),
@@ -39,19 +39,19 @@ remotes::install_github("pablobernabeu/depictr")
 [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md),
 [`summary_table()`](https://pablobernabeu.github.io/depictr/reference/summary_table.md).
 
-**Multivariate, clustering & survival** —
+**Multivariate, clustering & survival**:
 [`pca_plot()`](https://pablobernabeu.github.io/depictr/reference/pca_plot.md),
 [`scree_plot()`](https://pablobernabeu.github.io/depictr/reference/scree_plot.md),
 [`cluster_plot()`](https://pablobernabeu.github.io/depictr/reference/cluster_plot.md),
 [`dendrogram_plot()`](https://pablobernabeu.github.io/depictr/reference/dendrogram_plot.md),
 [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md).
 
-**Time series** —
+**Time series**:
 [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md),
 [`acf_plot()`](https://pablobernabeu.github.io/depictr/reference/acf_plot.md),
 [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md).
 
-**Model estimates & inference** —
+**Model estimates & inference**:
 [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md),
 [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
 [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md),
@@ -62,7 +62,7 @@ remotes::install_github("pablobernabeu/depictr")
 [`optimizer_fixef_plot()`](https://pablobernabeu.github.io/depictr/reference/optimizer_fixef_plot.md),
 [`model_fit_table()`](https://pablobernabeu.github.io/depictr/reference/model_fit_table.md).
 
-**Diagnostics & classification** —
+**Diagnostics & classification**:
 [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md),
 [`influence_plot()`](https://pablobernabeu.github.io/depictr/reference/influence_plot.md),
 [`qq_plot()`](https://pablobernabeu.github.io/depictr/reference/qq_plot.md),
@@ -74,11 +74,11 @@ remotes::install_github("pablobernabeu/depictr")
 [`calibration_plot()`](https://pablobernabeu.github.io/depictr/reference/calibration_plot.md),
 [`confusion_matrix_plot()`](https://pablobernabeu.github.io/depictr/reference/confusion_matrix_plot.md).
 
-**Uncertainty & power** —
+**Uncertainty & power**:
 [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md),
 [`power_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/power_curve_plot.md).
 
-**Theming & reporting** —
+**Theming & reporting**:
 [`theme_depictr()`](https://pablobernabeu.github.io/depictr/reference/theme_depictr.md),
 [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
 /
@@ -93,7 +93,7 @@ Heavier modelling back-ends (`lme4`, `broom`, `simr`) are optional (in
 `Suggests`) and used only when present; the core functions, examples,
 tests and vignettes run on base `lm`/`glm` and the bundled data alone.
 
-## A quick tour
+## A short tour
 
 ``` r
 
@@ -131,20 +131,21 @@ with fixed seeds.
 
 ## Learn more
 
-- [`vignette("depictr")`](https://pablobernabeu.github.io/depictr/articles/depictr.md)
-  — getting started
-- [`vignette("exploring-data")`](https://pablobernabeu.github.io/depictr/articles/exploring-data.md)
-  — exploratory plots and tables
-- [`vignette("model-estimates")`](https://pablobernabeu.github.io/depictr/articles/model-estimates.md)
-  — estimates, comparison, predictions, random effects
-- [`vignette("diagnostics-and-uncertainty")`](https://pablobernabeu.github.io/depictr/articles/diagnostics-and-uncertainty.md)
-  — diagnostics, classification, posteriors, power
+- [`vignette("depictr")`](https://pablobernabeu.github.io/depictr/articles/depictr.md):
+  getting started
+- [`vignette("exploring-data")`](https://pablobernabeu.github.io/depictr/articles/exploring-data.md):
+  exploratory plots and tables
+- [`vignette("model-estimates")`](https://pablobernabeu.github.io/depictr/articles/model-estimates.md):
+  estimates, comparison, predictions, random effects
+- [`vignette("diagnostics-and-uncertainty")`](https://pablobernabeu.github.io/depictr/articles/diagnostics-and-uncertainty.md):
+  diagnostics, classification, posteriors, power
 
 ## How depictr relates to other packages
 
-depictr deliberately spans the workflow rather than competing
-feature-for-feature with the specialists. For deep dives you may still
-reach for [`ggstatsplot`](https://indrajeetpatil.github.io/ggstatsplot/)
+depictr aims for breadth and consistency across the workflow, and
+complements the specialised packages rather than replacing them. For a
+deeper treatment of any one area, several remain valuable, among them
+[`ggstatsplot`](https://indrajeetpatil.github.io/ggstatsplot/)
 (statistical details on plots),
 [`sjPlot`](https://strengejacke.github.io/sjPlot/) and the
 [easystats](https://easystats.github.io/easystats/) family (`see`,
@@ -158,8 +159,8 @@ clustering), [`survminer`](https://rpkgs.datanovia.com/survminer/)
 series), [`ggdist`](https://mjskay.github.io/ggdist/) / `dabestr`
 (distributions and estimation) and
 [`bayesplot`](https://mc-stan.org/bayesplot/) / `tidybayes` (Bayesian).
-depictr gives you a consistent, good-looking default across all of these
-tasks from one package.
+depictr offers a consistent and attractive default for all of these
+tasks within a single package.
 
 ## License
 
@@ -178,7 +179,7 @@ summaries.
 - [`explore_categorical()`](https://pablobernabeu.github.io/depictr/reference/explore_categorical.md)
   : Bar chart of a categorical variable
 - [`explore_bivariate()`](https://pablobernabeu.github.io/depictr/reference/explore_bivariate.md)
-  : The right plot for any pair of variables
+  : Plot any pair of variables
 - [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md)
   : Scatter-plot matrix
 - [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md)

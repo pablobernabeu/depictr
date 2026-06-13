@@ -53,7 +53,7 @@ timeseries_plot(
 
 - point:
 
-  Add points as well as the line?
+  Whether to add points as well as the line.
 
 - title, x_lab, y_lab:
 

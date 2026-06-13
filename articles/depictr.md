@@ -1,7 +1,7 @@
 # Getting started with depictr
 
 **depictr** is a single, consistent toolkit of plots that span the whole
-analysis workflow – from a first look at the data, through model
+analysis workflow, from a first look at the data, through model
 estimates and predictions, to diagnostics, uncertainty and reporting.
 Every plotting function returns a `ggplot2` object (or a `patchwork` for
 composite panels), so you can keep customising with the usual `+`
@@ -17,9 +17,11 @@ The package ships with three reproducibly simulated datasets used
 throughout the documentation: `lexical_decision`, `wellbeing_survey` and
 `crop_yield`.
 
-## One example per family
+## A tour by task
 
-**Explore the data.** Pick the right plot for any pair of variables:
+Begin with the data.
+[`explore_bivariate()`](https://pablobernabeu.github.io/depictr/reference/explore_bivariate.md)
+chooses a suitable plot for any pair of variables.
 
 ``` r
 
@@ -28,7 +30,9 @@ explore_bivariate(crop_yield, fertilizer, yield)
 
 ![](depictr_files/figure-html/unnamed-chunk-2-1.png)
 
-**Look at model estimates.** Fit a model and draw a forest plot:
+Turn next to the model. After fitting it,
+[`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)
+draws a forest plot of the estimates.
 
 ``` r
 
@@ -39,8 +43,9 @@ coefficient_plot(fit, order = "descending", title = "Drivers of crop yield")
 
 ![](depictr_files/figure-html/unnamed-chunk-3-1.png)
 
-**Show predictions.** What does the model predict as one predictor
-varies?
+To see what the model implies,
+[`effects_plot()`](https://pablobernabeu.github.io/depictr/reference/effects_plot.md)
+traces the predicted response as one predictor varies.
 
 ``` r
 
@@ -49,7 +54,8 @@ effects_plot(fit, "fertilizer")
 
 ![](depictr_files/figure-html/unnamed-chunk-4-1.png)
 
-**Check the fit.** A residual-diagnostics panel:
+[`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
+gathers the usual checks of the fit into one panel.
 
 ``` r
 
@@ -58,7 +64,10 @@ residual_diagnostics_plot(fit)
 
 ![](depictr_files/figure-html/unnamed-chunk-5-1.png)
 
-**Convey uncertainty.** Summarise posterior or simulation draws:
+Finally,
+[`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
+summarises posterior or simulation draws as a point with nested
+intervals.
 
 ``` r
 
@@ -73,12 +82,12 @@ posterior_plot(draws)
 
 ## The shared spine: `tidy_estimates()`
 
-Most model functions are built on
+Most of the model functions rest on
 [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md),
-which turns a model – or a data frame of pre-computed estimates – into
-one standard table. Because the plotting functions also accept that
-table, you can plug in estimates from any source (Bayesian posteriors,
-bootstrap intervals, numbers from a paper).
+which turns a model, or a data frame of pre-computed estimates, into one
+standard table. Because the plotting functions also accept that table,
+estimates from any source (Bayesian posteriors, bootstrap intervals, or
+figures taken from a paper) can be supplied directly.
 
 ``` r
 
@@ -123,12 +132,17 @@ palette_preview(type = "all")
 
 ## Where to next
 
-- [`vignette("exploring-data")`](https://pablobernabeu.github.io/depictr/articles/exploring-data.md)
-  – distributions, categories, bivariate plots, scatter-plot matrices,
-  correlations, missingness, outliers and summary tables.
-- [`vignette("model-estimates")`](https://pablobernabeu.github.io/depictr/articles/model-estimates.md)
-  – forest plots, model comparison, predicted values, interactions,
-  random effects and goodness-of-fit.
-- [`vignette("diagnostics-and-uncertainty")`](https://pablobernabeu.github.io/depictr/articles/diagnostics-and-uncertainty.md)
-  – residuals, influence, Q-Q, ROC, calibration, confusion matrices,
-  posteriors and power curves.
+The remaining articles go into each area in turn.
+[`vignette("exploring-data")`](https://pablobernabeu.github.io/depictr/articles/exploring-data.md)
+covers distributions, categories, bivariate plots, scatter-plot
+matrices, correlations, missingness, outliers and summary tables.
+[`vignette("model-estimates")`](https://pablobernabeu.github.io/depictr/articles/model-estimates.md)
+covers forest plots, model comparison, predicted values, interactions,
+random effects and goodness-of-fit.
+[`vignette("diagnostics-and-uncertainty")`](https://pablobernabeu.github.io/depictr/articles/diagnostics-and-uncertainty.md)
+covers residuals, influence, Q-Q, ROC, calibration, confusion matrices,
+posteriors and power curves. Two further articles,
+[`vignette("multivariate-and-survival")`](https://pablobernabeu.github.io/depictr/articles/multivariate-and-survival.md)
+and
+[`vignette("time-series")`](https://pablobernabeu.github.io/depictr/articles/time-series.md),
+cover the remaining methods.
