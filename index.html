@@ -152,7 +152,7 @@
 <li>
 <strong><code>dependency-check</code></strong> runs <strong>daily</strong>, checking the package and its full test suite against both the current and the development versions of its dependencies, so a breaking change in any dependency is caught within a day. On failure it opens, and keeps updated, a single tracking issue.</li>
 <li>
-<strong><code>dependency-autofix</code></strong> runs whenever <code>dependency-check</code> fails: it asks Claude Code to find the smallest change that restores compatibility and to open a pull request, falling back to a comment on the tracking issue when no safe automated fix exists. It is inert until an <code>ANTHROPIC_API_KEY</code> secret is added to the repository.</li>
+<strong><code>dependency-autofix</code></strong> runs whenever <code>dependency-check</code> fails: it asks Claude Code to find the smallest change that restores compatibility and to open a pull request, falling back to a comment on the tracking issue when no safe automated fix exists. It is inert until a <code>CLAUDE_CODE_OAUTH_TOKEN</code> secret is added to the repository — generate it with <code>claude setup-token</code> (it uses your Claude subscription, not billable API credits) and enable <em>Settings → Actions → General → Allow GitHub Actions to create and approve pull requests</em>.</li>
 <li>
 <strong><code>link-check</code></strong> runs weekly, validating every URL in the DESCRIPTION, README, help pages and vignettes with <code>urlchecker</code>, and opening a tracking issue if a link breaks or starts redirecting (both of which CRAN flags).</li>
 <li>
