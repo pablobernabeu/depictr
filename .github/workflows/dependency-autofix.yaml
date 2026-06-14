@@ -2,9 +2,12 @@
 #
 # When the scheduled dependency-check workflow fails, this workflow asks Claude
 # Code to investigate and, where it can do so safely, to open a pull request with
-# a fix. It is inert until an ANTHROPIC_API_KEY secret is added to the
-# repository; without that secret the step is skipped and the dependency-check
-# issue remains the means of flagging the maintainer.
+# a fix. It is inert until a CLAUDE_CODE_OAUTH_TOKEN secret is added to the
+# repository (generate it with `claude setup-token`, which authorises a Claude
+# subscription rather than billable API credits); without that secret the step
+# is skipped and the dependency-check issue remains the means of flagging the
+# maintainer. Opening pull requests also requires enabling "Allow GitHub Actions
+# to create and approve pull requests" under Settings > Actions > General.
 name: dependency-autofix
 
 on:
@@ -39,12 +42,12 @@ jobs:
           needs: check
 
       - name: Attempt an automated fix with Claude Code
-        if: ${{ env.ANTHROPIC_API_KEY != '' }}
+        if: ${{ env.CLAUDE_CODE_OAUTH_TOKEN != '' }}
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         uses: anthropics/claude-code-action@v1
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: >
             The scheduled dependency-check workflow for this R package is
             failing, most likely because a dependency released a change that

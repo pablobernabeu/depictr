@@ -132,8 +132,10 @@ scheduled GitHub Actions keep it healthy between releases:
 * **`dependency-autofix`** runs whenever `dependency-check` fails: it asks Claude
   Code to find the smallest change that restores compatibility and to open a pull
   request, falling back to a comment on the tracking issue when no safe automated
-  fix exists. It is inert until an `ANTHROPIC_API_KEY` secret is added to the
-  repository.
+  fix exists. It is inert until a `CLAUDE_CODE_OAUTH_TOKEN` secret is added to
+  the repository — generate it with `claude setup-token` (it uses your Claude
+  subscription, not billable API credits) and enable *Settings → Actions →
+  General → Allow GitHub Actions to create and approve pull requests*.
 * **`link-check`** runs weekly, validating every URL in the DESCRIPTION, README,
   help pages and vignettes with `urlchecker`, and opening a tracking issue if a
   link breaks or starts redirecting (both of which CRAN flags).
