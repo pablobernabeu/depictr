@@ -145,11 +145,10 @@ with fixed seeds.
 depictr aims for breadth and consistency across the workflow, and
 complements the specialised packages rather than replacing them. For a
 deeper treatment of any one area, several remain valuable, among them
-[`ggstatsplot`](https://indrajeetpatil.github.io/ggstatsplot/)
-(statistical details on plots),
-[`sjPlot`](https://strengejacke.github.io/sjPlot/) and the
-[easystats](https://easystats.github.io/easystats/) family (`see`,
-`parameters`, `performance`),
+[`ggstatsplot`](https://www.indrapatil.com/ggstatsplot/) (statistical
+details on plots), [`sjPlot`](https://strengejacke.github.io/sjPlot/)
+and the [easystats](https://easystats.github.io/easystats/) family
+(`see`, `parameters`, `performance`),
 [`marginaleffects`](https://marginaleffects.com) /
 [`ggeffects`](https://strengejacke.github.io/ggeffects/) (predictions),
 [`GGally`](https://ggobi.github.io/ggally/) (pairs),

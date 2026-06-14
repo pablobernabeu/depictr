@@ -192,3 +192,7 @@ Useful links:
 ## Author
 
 **Maintainer**: Pablo Bernabeu <pcbernabeu@gmail.com>
+
+Authors:
+
+- Pablo Bernabeu <pcbernabeu@gmail.com>

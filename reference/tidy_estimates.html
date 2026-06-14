@@ -81,7 +81,7 @@ on its own.</p>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Passed to methods (and to <code><a href="https://broom.tidymodels.org/reference/reexports.html" class="external-link">broom::tidy()</a></code> in the fallback). The
+<dd><p>Passed to methods (and to <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">broom::tidy()</a></code> in the fallback). The
 <code>merMod</code> method additionally accepts <code>effects</code>, which currently only
 supports <code>"fixed"</code>.</p></dd>
 
@@ -95,7 +95,7 @@ supports <code>"fixed"</code>.</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Methods are provided for <code>lm</code>, <code>glm</code> and <code>merMod</code> (mixed models fitted with
 'lme4') objects, and for data frames. For any other model class the function
-falls back to <code><a href="https://broom.tidymodels.org/reference/reexports.html" class="external-link">broom::tidy()</a></code> when the 'broom' package is installed.</p>
+falls back to <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">broom::tidy()</a></code> when the 'broom' package is installed.</p>
 <p>Confidence intervals are computed with the normal approximation
 (estimate +/- z * standard error) for <code>glm</code> and <code>merMod</code> objects, which is
 fast and dependency-free; <code>lm</code> objects use the exact t-based interval. Supply

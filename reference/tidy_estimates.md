@@ -28,8 +28,8 @@ tidy_estimates(x, conf_level = 0.95, ...)
 - ...:
 
   Passed to methods (and to
-  [`broom::tidy()`](https://broom.tidymodels.org/reference/reexports.html)
-  in the fallback). The `merMod` method additionally accepts `effects`,
+  [`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html) in
+  the fallback). The `merMod` method additionally accepts `effects`,
   which currently only supports `"fixed"`.
 
 ## Value
@@ -42,8 +42,8 @@ A data frame with one row per term and the columns `term`, `estimate`,
 Methods are provided for `lm`, `glm` and `merMod` (mixed models fitted
 with 'lme4') objects, and for data frames. For any other model class the
 function falls back to
-[`broom::tidy()`](https://broom.tidymodels.org/reference/reexports.html)
-when the 'broom' package is installed.
+[`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html) when
+the 'broom' package is installed.
 
 Confidence intervals are computed with the normal approximation
 (estimate +/- z \* standard error) for `glm` and `merMod` objects, which
