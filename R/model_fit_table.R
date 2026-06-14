@@ -12,6 +12,8 @@
 #'
 #' @return A data frame with one row per model and columns `model`, `n`, `df`,
 #'   `AIC`, `BIC`, `logLik`, `R2` and `RMSE`.
+#' @references
+#' \insertRef{mcfadden1974}{depictr}
 #' @export
 #' @examples
 #' m1 <- lm(yield ~ rainfall, data = crop_yield)

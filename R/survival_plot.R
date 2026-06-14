@@ -19,6 +19,10 @@
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.
+#' @references
+#' \insertRef{kaplan1958}{depictr}
+#'
+#' \insertRef{greenwood1926}{depictr}
 #' @export
 #' @examples
 #' set.seed(1)

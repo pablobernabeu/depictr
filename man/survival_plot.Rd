@@ -53,3 +53,8 @@ obs  <- pmin(time, cens)
 event <- as.integer(time <= cens)
 survival_plot(obs, event, group = grp, title = "Survival by treatment")
 }
+\references{
+\insertRef{kaplan1958}{depictr}
+
+\insertRef{greenwood1926}{depictr}
+}

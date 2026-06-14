@@ -15,6 +15,8 @@
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
+#' @references
+#' \insertRef{cook1977}{depictr}
 #' @export
 #' @examples
 #' fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)

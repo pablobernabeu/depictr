@@ -5,6 +5,9 @@ vignette: >
   %\VignetteIndexEntry{Multivariate analysis and survival}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+bibliography: ../inst/REFERENCES.bib
+csl: apa.csl
+link-citations: true
 ---
 
 ```{r setup, include = FALSE}
@@ -63,10 +66,11 @@ dendrogram_plot(region_means[-1], k = 2, title = "Regions clustered")
 
 ## Survival curves
 
-`survival_plot()` draws Kaplan-Meier curves with stepwise confidence limits and
-censoring marks. The estimate is computed in base R, so no modelling package is
-needed; you can pass follow-up times and an event indicator directly, a data
-frame, or a `survival::survfit` object.
+`survival_plot()` draws Kaplan-Meier curves [@kaplan1958] with stepwise
+confidence limits from Greenwood's formula [@greenwood1926] and censoring marks.
+The estimate is computed in base R, so no modelling package is needed; you can
+pass follow-up times and an event indicator directly, a data frame, or a
+`survival::survfit` object.
 
 ```{r}
 set.seed(1)
@@ -80,3 +84,5 @@ event <- as.integer(event_time <= censor_time)
 survival_plot(observed, event, group = group,
               title = "Survival by treatment")
 ```
+
+## References

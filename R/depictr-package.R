@@ -87,11 +87,15 @@
 #' [lexical_decision], [wellbeing_survey] and [crop_yield] are reproducibly
 #' simulated datasets used throughout the examples and vignettes.
 #'
+#' @references
+#' \insertRef{wickham2016}{depictr}
+#'
 #' @keywords internal
 "_PACKAGE"
 
 ## usethis namespace: start
 #' @importFrom rlang .data
+#' @importFrom Rdpack reprompt
 ## usethis namespace: end
 NULL
 

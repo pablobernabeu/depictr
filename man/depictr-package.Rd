@@ -109,6 +109,9 @@ conventions.
 simulated datasets used throughout the examples and vignettes.
 }
 
+\references{
+\insertRef{wickham2016}{depictr}
+}
 \seealso{
 Useful links:
 \itemize{

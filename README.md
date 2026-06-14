@@ -120,6 +120,22 @@ estimation) and [`bayesplot`](https://mc-stan.org/bayesplot/) / `tidybayes`
 (Bayesian). depictr offers a consistent and attractive default for all of these
 tasks within a single package.
 
+## Automated maintenance
+
+Because depictr draws on a number of plotting and modelling packages, a
+scheduled `dependency-check` workflow runs every second day, checking the
+package against both the current and the development versions of its
+dependencies. When a dependency change breaks something, the workflow opens (and
+keeps updated) a single tracking issue. A companion `dependency-autofix`
+workflow can attempt a fix and open a pull request first; it is inert until an
+`ANTHROPIC_API_KEY` secret is added to the repository.
+
+## Citing depictr
+
+`citation("depictr")` gives the preferred reference. The methods the package
+implements are cited in the relevant help pages and vignettes, drawing on a
+single bibliography at `inst/REFERENCES.bib`.
+
 ## License
 
 MIT (c) Pablo Bernabeu. See [LICENSE.md](LICENSE.md).

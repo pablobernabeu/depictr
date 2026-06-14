@@ -5,6 +5,9 @@ vignette: >
   %\VignetteIndexEntry{Getting started with depictr}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+bibliography: ../inst/REFERENCES.bib
+csl: apa.csl
+link-citations: true
 ---
 
 ```{r setup, include = FALSE}
@@ -15,9 +18,9 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
 **depictr** is a single, consistent toolkit of plots that span the whole
 analysis workflow, from a first look at the data, through model estimates and
 predictions, to diagnostics, uncertainty and reporting. Every plotting function
-returns a `ggplot2` object (or a `patchwork` for composite panels), so you can
-keep customising with the usual `+` syntax, and every plot shares one theme, one
-palette and one set of label conventions.
+returns a `ggplot2` object [@wickham2016] (or a `patchwork` for composite
+panels), so you can keep customising with the usual `+` syntax, and every plot
+shares one theme, one palette and one set of label conventions.
 
 ```{r}
 library(depictr)
@@ -93,7 +96,7 @@ ggplot(crop_yield, aes(fertilizer, yield, colour = treatment)) +
   theme_depictr()
 ```
 
-The qualitative palette is based on the Okabe-Ito set, which stays
+The qualitative palette is based on the Okabe-Ito set [@okabe2008], which stays
 distinguishable under the common forms of colour-vision deficiency; sequential
 and diverging variants are available too. Preview them with:
 
@@ -112,3 +115,5 @@ values, interactions, random effects and goodness-of-fit.
 calibration, confusion matrices, posteriors and power curves. Two further
 articles, `vignette("multivariate-and-survival")` and `vignette("time-series")`,
 cover the remaining methods.
+
+## References

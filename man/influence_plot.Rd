@@ -30,3 +30,6 @@ labelled.
 fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
 influence_plot(fit)
 }
+\references{
+\insertRef{cook1977}{depictr}
+}

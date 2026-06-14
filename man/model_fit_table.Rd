@@ -28,3 +28,6 @@ m3 <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment,
          data = crop_yield)
 model_fit_table(simple = m1, medium = m2, full = m3)
 }
+\references{
+\insertRef{mcfadden1974}{depictr}
+}

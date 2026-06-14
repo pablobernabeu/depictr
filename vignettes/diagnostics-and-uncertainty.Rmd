@@ -5,6 +5,9 @@ vignette: >
   %\VignetteIndexEntry{Diagnostics, classification and uncertainty}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+bibliography: ../inst/REFERENCES.bib
+csl: apa.csl
+link-citations: true
 ---
 
 ```{r setup, include = FALSE}
@@ -29,6 +32,9 @@ residual_diagnostics_plot(fit, title = "Crop-yield model")
 ```{r}
 influence_plot(fit)
 ```
+
+The bubble area is Cook's distance, the standard measure of an observation's
+influence on the fitted coefficients [@cook1977].
 
 `vif_plot()` checks for multicollinearity among the predictors:
 
@@ -117,3 +123,5 @@ arrange_plots(
   ncol = 2, title = "Diagnostics", tag_levels = "A"
 )
 ```
+
+## References

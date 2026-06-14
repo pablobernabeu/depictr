@@ -1,0 +1,62 @@
+# Optional automated fix attempt for dependency breakages.
+#
+# When the scheduled dependency-check workflow fails, this workflow asks Claude
+# Code to investigate and, where it can do so safely, to open a pull request with
+# a fix. It is inert until an ANTHROPIC_API_KEY secret is added to the
+# repository; without that secret the step is skipped and the dependency-check
+# issue remains the means of flagging the maintainer.
+name: dependency-autofix
+
+on:
+  workflow_run:
+    workflows: ["dependency-check"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  autofix:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck, any::roxygen2
+          needs: check
+
+      - name: Attempt an automated fix with Claude Code
+        if: ${{ env.ANTHROPIC_API_KEY != '' }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: >
+            The scheduled dependency-check workflow for this R package is
+            failing, most likely because a dependency released a change that
+            breaks the package. Reproduce the failure by running
+            rcmdcheck::rcmdcheck(args = "--no-manual"). Identify the smallest
+            change that restores compatibility with the current dependency
+            versions, preferring to adapt our code to the dependency's new
+            behaviour rather than pinning an old version. Re-run the check and
+            the tests until they pass, run roxygen2::roxygenise() if any
+            documentation changed, then open a pull request describing the
+            dependency change and the fix. If the failure cannot be resolved
+            safely without a larger redesign, do not force a change: instead
+            summarise the cause and the options in a comment on the open
+            "Dependency check is failing" issue.
+          claude_args: '--allowedTools "Bash,Edit,Read,Write,Grep,Glob"'

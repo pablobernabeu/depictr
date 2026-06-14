@@ -18,8 +18,8 @@
 #'   directions).
 #'
 #' @return A character vector of hex colour codes.
-#' @references Okabe, M. & Ito, K. (2008). Color Universal Design (CUD): How to
-#'   make figures and presentations that are friendly to colorblind people.
+#' @references
+#' \insertRef{okabe2008}{depictr}
 #' @export
 #' @examples
 #' depictr_palette(3)

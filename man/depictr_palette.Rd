@@ -33,6 +33,5 @@ depictr_palette(7, type = "sequential")
 scales::show_col(depictr_palette())
 }
 \references{
-Okabe, M. & Ito, K. (2008). Color Universal Design (CUD): How to
-make figures and presentations that are friendly to colorblind people.
+\insertRef{okabe2008}{depictr}
 }
