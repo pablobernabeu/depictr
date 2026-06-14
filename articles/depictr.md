@@ -3,10 +3,10 @@
 **depictr** is a single, consistent toolkit of plots that span the whole
 analysis workflow, from a first look at the data, through model
 estimates and predictions, to diagnostics, uncertainty and reporting.
-Every plotting function returns a `ggplot2` object (or a `patchwork` for
-composite panels), so you can keep customising with the usual `+`
-syntax, and every plot shares one theme, one palette and one set of
-label conventions.
+Every plotting function returns a `ggplot2` object ([Wickham,
+2016](#ref-wickham2016)) (or a `patchwork` for composite panels), so you
+can keep customising with the usual `+` syntax, and every plot shares
+one theme, one palette and one set of label conventions.
 
 ``` r
 
@@ -119,9 +119,10 @@ ggplot(crop_yield, aes(fertilizer, yield, colour = treatment)) +
 
 ![](depictr_files/figure-html/unnamed-chunk-8-1.png)
 
-The qualitative palette is based on the Okabe-Ito set, which stays
-distinguishable under the common forms of colour-vision deficiency;
-sequential and diverging variants are available too. Preview them with:
+The qualitative palette is based on the Okabe-Ito set ([Okabe & Ito,
+2008](#ref-okabe2008)), which stays distinguishable under the common
+forms of colour-vision deficiency; sequential and diverging variants are
+available too. Preview them with:
 
 ``` r
 
@@ -146,3 +147,12 @@ posteriors and power curves. Two further articles,
 and
 [`vignette("time-series")`](https://pablobernabeu.github.io/depictr/articles/time-series.md),
 cover the remaining methods.
+
+## References
+
+Okabe, M., & Ito, K. (2008). *Color universal design (CUD): How to make
+figures and presentations that are friendly to colorblind people*.
+<https://jfly.uni-koeln.de/color/>.
+
+Wickham, H. (2016). *ggplot2: Elegant graphics for data analysis* (2nd
+ed.). Springer. <https://doi.org/10.1007/978-3-319-24277-4>

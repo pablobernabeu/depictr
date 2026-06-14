@@ -60,6 +60,18 @@ survival_plot(
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
 object.
 
+## References
+
+Kaplan EL, Meier P (1958). “Nonparametric Estimation from Incomplete
+Observations.” *Journal of the American Statistical Association*,
+**53**(282), 457–481.
+[doi:10.1080/01621459.1958.10501452](https://doi.org/10.1080/01621459.1958.10501452)
+.
+
+Greenwood M (1926). *The Natural Duration of Cancer*, volume 33 of
+*Reports on Public Health and Medical Subjects*. His Majesty's
+Stationery Office, London.
+
 ## Examples
 
 ``` r

@@ -71,10 +71,11 @@ dendrogram_plot(region_means[-1], k = 2, title = "Regions clustered")
 ## Survival curves
 
 [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
-draws Kaplan-Meier curves with stepwise confidence limits and censoring
-marks. The estimate is computed in base R, so no modelling package is
-needed; you can pass follow-up times and an event indicator directly, a
-data frame, or a
+draws Kaplan-Meier curves ([Kaplan & Meier, 1958](#ref-kaplan1958)) with
+stepwise confidence limits from Greenwood’s formula ([Greenwood,
+1926](#ref-greenwood1926)) and censoring marks. The estimate is computed
+in base R, so no modelling package is needed; you can pass follow-up
+times and an event indicator directly, a data frame, or a
 [`survival::survfit`](https://rdrr.io/pkg/survival/man/survfit.html)
 object.
 
@@ -93,3 +94,13 @@ survival_plot(observed, event, group = group,
 ```
 
 ![](multivariate-and-survival_files/figure-html/unnamed-chunk-6-1.png)
+
+## References
+
+Greenwood, M. (1926). *The natural duration of cancer* (Vol. 33, pp.
+1–26). His Majesty’s Stationery Office.
+
+Kaplan, E. L., & Meier, P. (1958). Nonparametric estimation from
+incomplete observations. *Journal of the American Statistical
+Association*, *53*(282), 457–481.
+<https://doi.org/10.1080/01621459.1958.10501452>

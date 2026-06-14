@@ -27,6 +27,12 @@ model_fit_table(..., digits = 3)
 A data frame with one row per model and columns `model`, `n`, `df`,
 `AIC`, `BIC`, `logLik`, `R2` and `RMSE`.
 
+## References
+
+McFadden D (1974). “Conditional Logit Analysis of Qualitative Choice
+Behavior.” In Zarembka P (ed.), *Frontiers in Econometrics*, 105–142.
+Academic Press, New York, NY.
+
 ## Examples
 
 ``` r

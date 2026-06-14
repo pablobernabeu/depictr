@@ -2,7 +2,8 @@
 
 ## Authors
 
-- **Pablo Bernabeu**. Author, maintainer.
+- **[Pablo Bernabeu](https://github.com/pablobernabeu)**. Author,
+  maintainer.
 
 ## Citation
 

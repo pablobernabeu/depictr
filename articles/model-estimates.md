@@ -54,6 +54,10 @@ knitr::kable(model_fit_table(small = m1, medium = m2, full = m3))
 | medium | 200 |   5 | 454.182 | 470.674 | -222.091 | 0.549 | 0.735 |
 | full   | 200 |   6 | 406.816 | 426.606 | -197.408 | 0.648 | 0.649 |
 
+For `glm` models the `R2` column reports McFadden’s pseudo-R-squared
+([McFadden, 1974](#ref-mcfadden1974)) in place of the ordinary
+coefficient of determination.
+
 ## Frequentist and Bayesian estimates together
 
 ``` r
@@ -157,3 +161,9 @@ model_report(full, title = "Crop-yield model")
 ```
 
 ![](model-estimates_files/figure-html/unnamed-chunk-10-1.png)
+
+## References
+
+McFadden, D. (1974). Conditional logit analysis of qualitative choice
+behavior. In P. Zarembka (Ed.), *Frontiers in econometrics* (pp.
+105–142). Academic Press.

@@ -30,6 +30,9 @@ summaries.
 
 ## Multivariate, clustering and survival
 
+Principal components, k-means and hierarchical clustering, and
+Kaplan-Meier survival curves.
+
 - [`pca_plot()`](https://pablobernabeu.github.io/depictr/reference/pca_plot.md)
   : PCA biplot
 - [`scree_plot()`](https://pablobernabeu.github.io/depictr/reference/scree_plot.md)
@@ -43,6 +46,8 @@ summaries.
 
 ## Time series
 
+Series over time, autocorrelation and decomposition.
+
 - [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
   : Time-series plot
 - [`acf_plot()`](https://pablobernabeu.github.io/depictr/reference/acf_plot.md)
@@ -51,6 +56,9 @@ summaries.
   : Time-series decomposition plot
 
 ## Model estimates and inference
+
+Forest plots, model comparison, predicted values, interactions, random
+effects and goodness-of-fit, built on a shared tidy estimate table.
 
 - [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md)
   : Extract a tidy table of estimates
@@ -72,6 +80,9 @@ summaries.
   : Goodness-of-fit statistics across models
 
 ## Diagnostics and classification
+
+Residual diagnostics, influence, and the standard classification curves
+and tables.
 
 - [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
   : Residual-diagnostics panel for a fitted model
@@ -96,12 +107,17 @@ summaries.
 
 ## Uncertainty and power
 
+Posterior summaries and power analysis curves.
+
 - [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
   : Plot posterior distributions and intervals
 - [`power_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/power_curve_plot.md)
   : Plot a power analysis curve
 
 ## Theming and reporting
+
+A shared theme and colourblind-aware palette, label helpers, plot
+composition and saving, and a one-figure model report.
 
 - [`theme_depictr()`](https://pablobernabeu.github.io/depictr/reference/theme_depictr.md)
   : The depictr ggplot2 theme
@@ -123,6 +139,8 @@ summaries.
   : Save a plot with publication-ready defaults
 
 ## Data
+
+Reproducibly simulated datasets used throughout the documentation.
 
 - [`lexical_decision`](https://pablobernabeu.github.io/depictr/reference/lexical_decision.md)
   : Simulated lexical-decision experiment

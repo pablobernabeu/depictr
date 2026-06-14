@@ -28,6 +28,10 @@ influence_plot(fit)
 
 ![](diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-3-1.png)
 
+The bubble area is Cook’s distance, the standard measure of an
+observation’s influence on the fitted coefficients ([Cook,
+1977](#ref-cook1977)).
+
 [`vif_plot()`](https://pablobernabeu.github.io/depictr/reference/vif_plot.md)
 checks for multicollinearity among the predictors:
 
@@ -154,3 +158,9 @@ arrange_plots(
 ```
 
 ![](diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-14-1.png)
+
+## References
+
+Cook, R. D. (1977). Detection of influential observation in linear
+regression. *Technometrics*, *19*(1), 15–18.
+<https://doi.org/10.1080/00401706.1977.10489493>

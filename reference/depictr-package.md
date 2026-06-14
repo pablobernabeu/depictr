@@ -174,6 +174,13 @@ and
 are reproducibly simulated datasets used throughout the examples and
 vignettes.
 
+## References
+
+Wickham H (2016). *ggplot2: Elegant Graphics for Data Analysis*, 2nd
+edition. Springer, Cham, Switzerland. ISBN 978-3-319-24277-4.
+[doi:10.1007/978-3-319-24277-4](https://doi.org/10.1007/978-3-319-24277-4)
+.
+
 ## See also
 
 Useful links:

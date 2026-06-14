@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>A Unified Toolkit for Visualising Statistical Models and Data • depictr</title>
-<script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -19,11 +19,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="index.html">depictr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,6 +51,14 @@
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/pablobernabeu/depictr/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -137,6 +145,16 @@
 <p>depictr aims for breadth and consistency across the workflow, and complements the specialised packages rather than replacing them. For a deeper treatment of any one area, several remain valuable, among them <a href="https://indrajeetpatil.github.io/ggstatsplot/" class="external-link"><code>ggstatsplot</code></a> (statistical details on plots), <a href="https://strengejacke.github.io/sjPlot/" class="external-link"><code>sjPlot</code></a> and the <a href="https://easystats.github.io/easystats/" class="external-link">easystats</a> family (<code>see</code>, <code>parameters</code>, <code>performance</code>), <a href="https://marginaleffects.com" class="external-link"><code>marginaleffects</code></a> / <a href="https://strengejacke.github.io/ggeffects/" class="external-link"><code>ggeffects</code></a> (predictions), <a href="https://ggobi.github.io/ggally/" class="external-link"><code>GGally</code></a> (pairs), <a href="https://rpkgs.datanovia.com/factoextra/" class="external-link"><code>factoextra</code></a> (PCA and clustering), <a href="https://rpkgs.datanovia.com/survminer/" class="external-link"><code>survminer</code></a> (survival), <a href="https://feasts.tidyverts.org" class="external-link"><code>feasts</code></a> / <code>ggfortify</code> (time series), <a href="https://mjskay.github.io/ggdist/" class="external-link"><code>ggdist</code></a> / <code>dabestr</code> (distributions and estimation) and <a href="https://mc-stan.org/bayesplot/" class="external-link"><code>bayesplot</code></a> / <code>tidybayes</code> (Bayesian). depictr offers a consistent and attractive default for all of these tasks within a single package.</p>
 </div>
 <div class="section level2">
+<h2 id="automated-maintenance">Automated maintenance<a class="anchor" aria-label="anchor" href="#automated-maintenance"></a>
+</h2>
+<p>Because depictr draws on a number of plotting and modelling packages, a scheduled <code>dependency-check</code> workflow runs every second day, checking the package against both the current and the development versions of its dependencies. When a dependency change breaks something, the workflow opens (and keeps updated) a single tracking issue. A companion <code>dependency-autofix</code> workflow can attempt a fix and open a pull request first; it is inert until an <code>ANTHROPIC_API_KEY</code> secret is added to the repository.</p>
+</div>
+<div class="section level2">
+<h2 id="citing-depictr">Citing depictr<a class="anchor" aria-label="anchor" href="#citing-depictr"></a>
+</h2>
+<p><code>citation("depictr")</code> gives the preferred reference. The methods the package implements are cited in the relevant help pages and vignettes, drawing on a single bibliography at <code>inst/REFERENCES.bib</code>.</p>
+</div>
+<div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
 </h2>
 <p>MIT (c) Pablo Bernabeu. See <a href="LICENSE.html">LICENSE.md</a>.</p>
@@ -169,25 +187,19 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Pablo Bernabeu <br><small class="roles"> Author, maintainer </small>   </li>
+<li>
+<a href="https://github.com/pablobernabeu" class="external-link">Pablo Bernabeu</a> <br><small class="roles"> Author, maintainer </small>   </li>
 </ul>
 </div>
 
-<div class="dev-status">
-<h2 data-toc-skip>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="https://github.com/pablobernabeu/depictr/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/pablobernabeu/depictr/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
-<li><a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a></li>
-</ul>
-</div>
+
 
   </aside>
 </div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Pablo Bernabeu.</p>
+  <p>Developed by <a href="https://github.com/pablobernabeu" class="external-link">Pablo Bernabeu</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
