@@ -163,14 +163,28 @@ tasks within a single package.
 
 ## Automated maintenance
 
-Because depictr draws on a number of plotting and modelling packages, a
-scheduled `dependency-check` workflow runs every second day, checking
-the package against both the current and the development versions of its
-dependencies. When a dependency change breaks something, the workflow
-opens (and keeps updated) a single tracking issue. A companion
-`dependency-autofix` workflow can attempt a fix and open a pull request
-first; it is inert until an `ANTHROPIC_API_KEY` secret is added to the
-repository.
+depictr draws on a number of plotting and modelling packages, so several
+scheduled GitHub Actions keep it healthy between releases:
+
+- **`dependency-check`** runs **daily**, checking the package and its
+  full test suite against both the current and the development versions
+  of its dependencies, so a breaking change in any dependency is caught
+  within a day. On failure it opens, and keeps updated, a single
+  tracking issue.
+- **`dependency-autofix`** runs whenever `dependency-check` fails: it
+  asks Claude Code to find the smallest change that restores
+  compatibility and to open a pull request, falling back to a comment on
+  the tracking issue when no safe automated fix exists. It is inert
+  until an `ANTHROPIC_API_KEY` secret is added to the repository.
+- **`link-check`** runs weekly, validating every URL in the DESCRIPTION,
+  README, help pages and vignettes with `urlchecker`, and opening a
+  tracking issue if a link breaks or starts redirecting (both of which
+  CRAN flags).
+- **`R-CMD-check`** runs on every push and pull request across Linux,
+  macOS and Windows (R release, development and previous release).
+
+Each scheduled workflow can also be run on demand from the repository’s
+**Actions** tab.
 
 ## Citing depictr
 
