@@ -1,0 +1,59 @@
+# Scheduled link-rot check for depictr.
+#
+# CRAN flags moved and broken URLs, so this workflow runs urlchecker over the
+# package sources (DESCRIPTION, README, help pages and vignettes) on a weekly
+# cadence (and on demand). On failure it opens, or updates, a single issue so a
+# broken or redirecting link can be fixed before it becomes a CRAN problem.
+name: link-check
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"   # Mondays at 05:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  link-check:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      # Install urlchecker and the package itself: urlchecker expands the Rdpack
+      # \insertRef macros in the help pages, which needs depictr (and its bundled
+      # inst/REFERENCES.bib) on the library path.
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::urlchecker, local::.
+          needs: check
+
+      - name: Check URLs with urlchecker
+        run: |
+          problems <- urlchecker::url_check(".")
+          print(problems)
+          if (nrow(problems) > 0) {
+            stop(sprintf("urlchecker found %d problem URL(s).", nrow(problems)))
+          }
+          cat("All URLs OK.\n")
+        shell: Rscript {0}
+
+      - name: Open or update an issue on failure
+        if: failure()
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          filename: .github/link-issue.md
+          update_existing: true
