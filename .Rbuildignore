@@ -9,4 +9,4 @@
 ^LICENSE\.md$
 ^\.git$
 ^pkgdown$
-^CRAN-RELEASE-CHECKLIST\.md$
+^dev$

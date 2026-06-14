@@ -68,5 +68,5 @@ jobs:
           CONFIG: ${{ matrix.config.label }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         with:
-          filename: .github/dependency-issue.md
+          filename: .github/issue-templates/dependency-issue.md
           update_existing: true
