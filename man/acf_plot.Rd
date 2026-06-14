@@ -17,7 +17,7 @@ acf_plot(
 \arguments{
 \item{x}{A numeric vector or \code{ts} object.}
 
-\item{lag_max}{Maximum lag (passed to \code{\link[stats:acf]{stats::acf()}} / \code{\link[stats:acf]{stats::pacf()}}).}
+\item{lag_max}{Maximum lag (passed to \code{\link[stats:acf]{stats::acf()}} / \code{\link[stats:pacf]{stats::pacf()}}).}
 
 \item{type}{\code{"correlation"} for the ACF or \code{"partial"} for the PACF.}
 

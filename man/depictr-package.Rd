@@ -123,5 +123,10 @@ Useful links:
 \author{
 \strong{Maintainer}: Pablo Bernabeu \email{pcbernabeu@gmail.com}
 
+Authors:
+\itemize{
+  \item Pablo Bernabeu \email{pcbernabeu@gmail.com}
+}
+
 }
 \keyword{internal}

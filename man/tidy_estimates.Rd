@@ -11,7 +11,7 @@ tidy_estimates(x, conf_level = 0.95, ...)
 
 \item{conf_level}{Confidence (or credible) level for the interval.}
 
-\item{...}{Passed to methods (and to \code{\link[broom:reexports]{broom::tidy()}} in the fallback). The
+\item{...}{Passed to methods (and to \code{\link[broom:tidy]{broom::tidy()}} in the fallback). The
 \code{merMod} method additionally accepts \code{effects}, which currently only
 supports \code{"fixed"}.}
 }
@@ -29,7 +29,7 @@ on its own.
 \details{
 Methods are provided for \code{lm}, \code{glm} and \code{merMod} (mixed models fitted with
 'lme4') objects, and for data frames. For any other model class the function
-falls back to \code{\link[broom:reexports]{broom::tidy()}} when the 'broom' package is installed.
+falls back to \code{\link[broom:tidy]{broom::tidy()}} when the 'broom' package is installed.
 
 Confidence intervals are computed with the normal approximation
 (estimate +/- z * standard error) for \code{glm} and \code{merMod} objects, which is

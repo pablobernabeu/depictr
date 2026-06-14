@@ -14,7 +14,7 @@ function returns a 'ggplot2' object.
 
 ## Test environments
 
-* local: Ubuntu 24.04, R 4.3.3
+* local: Windows 11, R 4.5.1 (R CMD check --as-cran)
 * GitHub Actions: ubuntu-latest (release, devel, oldrel-1),
   windows-latest (release), macOS-latest (release)
 * win-builder (devel and release)

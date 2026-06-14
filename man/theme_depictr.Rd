@@ -18,7 +18,7 @@ A ggplot2 theme object.
 }
 \description{
 A clean, minimal theme used by every plotting function in the package. It is
-a light modification of \code{\link[ggplot2:ggtheme]{ggplot2::theme_minimal()}} with subtle gridlines,
+a light modification of \code{\link[ggplot2:theme_minimal]{ggplot2::theme_minimal()}} with subtle gridlines,
 centred titles and comfortable margins.
 }
 \examples{
