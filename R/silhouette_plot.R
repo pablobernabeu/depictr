@@ -105,7 +105,9 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
       fill = grDevices::adjustcolor("white", alpha.f = 0.75),
       linewidth = 0, label.padding = ggplot2::unit(0.12, "lines")
     ) +
-    ggplot2::scale_fill_manual(values = pal, name = "Cluster") +
+    # The per-band labels already name each cluster (with its n and mean width),
+    # so a separate colour legend would be redundant.
+    ggplot2::scale_fill_manual(values = pal, guide = "none") +
     ggplot2::coord_flip(clip = "off") +
     ggplot2::labs(
       x = NULL, y = "Silhouette width",

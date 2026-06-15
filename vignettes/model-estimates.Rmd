@@ -64,16 +64,21 @@ coefficient_plot(
 )
 ```
 
-Keeping the intercept (several hundred milliseconds) on the same axis as the
-small slopes would squash them against the zero line. Two arguments handle this:
-`facet = TRUE` gives each term its own free-scaled panel, while `standardize =
-TRUE` instead rescales every coefficient by its predictor's standard deviation
-so the magnitudes become directly comparable.
+Factor levels are given readable labels automatically (`conditionunrelated`
+becomes `condition: unrelated`); pass `labels` to override any of them. The
+slopes also sit on quite different scales, so `standardize = TRUE` rescales each
+coefficient by its predictor's standard deviation, putting them on one
+comparable axis:
 
-```{r coef-facet, eval = has_lmer, fig.height = 4.5}
-coefficient_plot(fit, intercept = TRUE, facet = TRUE,
-                 title = "Every term on its own scale")
+```{r coef-std, eval = has_lmer}
+coefficient_plot(fit, standardize = TRUE, order = "ascending",
+                 title = "Standardised predictors of RT")
 ```
+
+To keep the raw units instead -- including a large intercept that would
+otherwise squash the slopes -- `facet = TRUE` gives each term its own
+free-scaled panel (the layout the frequentist-vs-Bayesian comparison below uses
+by default).
 
 ## Comparing models
 
@@ -170,6 +175,8 @@ slopes <- draws[c("conditionunrelated", "modalityauditory", "word_frequency")]
 
 posterior_plot(
   slopes, style = "halfeye", rope = c(-5, 5), pd = TRUE,
+  labels = c(conditionunrelated = "condition: unrelated",
+             modalityauditory = "modality: auditory"),
   title = "Fixed-effect posteriors (ms), with ROPE and pd"
 )
 ```
@@ -208,7 +215,11 @@ opt_long <- data.frame(
   value     = as.vector(fx)
 )
 
-optimizer_fixef_plot(opt_long, title = "Fixed effects across optimisers")
+optimizer_fixef_plot(
+  opt_long, title = "Fixed effects across optimisers",
+  labels = c(conditionunrelated = "condition: unrelated",
+             modalityauditory = "modality: auditory")
+)
 ```
 
 Every optimiser lands on the same estimate for each term -- the points coincide

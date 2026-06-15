@@ -10,6 +10,7 @@ posterior_plot(
   point = c("median", "mean"),
   widths = c(0.66, 0.95),
   interaction = c("times", "asterisk", "colon", "space"),
+  labels = NULL,
   reference_line = 0,
   rope = NULL,
   pd = FALSE,
@@ -40,6 +41,10 @@ and a missing 'ggdist' fall back to \code{"interval"}.}
 outer width is used for the caption and the displayed interval mass.}
 
 \item{interaction}{Passed to \code{\link[=format_terms]{format_terms()}} for the parameter labels.}
+
+\item{labels}{Optional named character vector renaming parameters, e.g.
+\code{c(conditionunrelated = "condition: unrelated")}. Unmatched parameters fall
+back to \code{\link[=format_terms]{format_terms()}}.}
 
 \item{reference_line}{Position of a vertical reference line, or \code{NULL}/\code{NA}
 to omit it. There is no universally meaningful reference for every

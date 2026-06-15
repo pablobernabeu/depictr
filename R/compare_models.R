@@ -111,6 +111,15 @@ compare_models <- function(...,
   # and the brms-style "b_stress") share a single row instead of producing
   # duplicated factor levels. All ordering and grid-completion below therefore
   # works on `label`, not `term`.
+  #
+  # Prettify factor coefficient names by default, taken from the first fitted
+  # model among the sources; user-supplied `labels` still take precedence.
+  auto <- NULL
+  for (s in sources) {
+    auto <- pretty_coef_map(s)
+    if (!is.null(auto)) break
+  }
+  labels <- merge_pretty_labels(labels, auto)
   est$label <- make_labels(est$term, labels, interaction)
 
   label_levels <- unique(est$label)

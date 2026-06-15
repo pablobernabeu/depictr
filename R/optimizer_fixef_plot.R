@@ -19,6 +19,11 @@
 #' @param select_terms Optional character vector of terms to display (the
 #'   intercept is always kept when `intercept = TRUE`).
 #' @param interaction Passed to [format_terms()] for the panel titles.
+#' @param labels Optional named character vector renaming the term panels, e.g.
+#'   `c(conditionunrelated = "Unrelated priming")`. When `x` is a raw
+#'   [lme4::allFit()] object, factor levels are prettified automatically (e.g.
+#'   `conditionunrelated` to `condition: unrelated`) and these labels override
+#'   that default.
 #' @param number_optimizers Whether to prefix each optimiser name with a
 #'   number, so that the legend doubles as an index.
 #' @param free_y Whether to give each panel its own y-axis range. This is
@@ -54,6 +59,7 @@ optimizer_fixef_plot <- function(x,
                                  select_terms = NULL,
                                  interaction = c("times", "asterisk",
                                                  "colon", "space"),
+                                 labels = NULL,
                                  number_optimizers = TRUE,
                                  free_y = TRUE,
                                  ncol = NULL,
@@ -63,6 +69,14 @@ optimizer_fixef_plot <- function(x,
                                  title = NULL) {
   interaction <- match.arg(interaction)
   df <- allfit_to_long(x)
+
+  # When given a raw allFit() object (a list of fitted models), prettify factor
+  # coefficient names by default (e.g. "conditionunrelated" -> "condition:
+  # unrelated"); user-supplied `labels` take precedence. A summarised allFit or a
+  # plain data frame carries no model, so there `labels` is used as given.
+  if (inherits(x, "allFit") && length(x)) {
+    labels <- merge_pretty_labels(labels, pretty_coef_map(x[[1]]))
+  }
 
   if (!intercept) {
     df <- df[!df$term %in% c("(Intercept)", "Intercept"), , drop = FALSE]
@@ -88,11 +102,8 @@ optimizer_fixef_plot <- function(x,
   }
 
   term_levels <- unique(df$term)
-  df$panel <- factor(
-    format_terms(df$term, interaction = interaction, tidy_intercept = TRUE),
-    levels = format_terms(term_levels, interaction = interaction,
-                          tidy_intercept = TRUE)
-  )
+  panel_lab <- function(t) make_labels(t, labels, interaction)
+  df$panel <- factor(panel_lab(df$term), levels = panel_lab(term_levels))
 
   pal <- palette %||% depictr_palette(nlevels(df$optimizer))
 

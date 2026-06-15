@@ -133,8 +133,11 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
     )
   }
 
+  # When the centroids are labelled in place, the colour legend just repeats the
+  # cluster numbers, so drop it; keep it when the labels are switched off.
   p <- p +
-    scale_colour_depictr(palette = pal_fun, name = "Cluster") +
+    scale_colour_depictr(palette = pal_fun, name = "Cluster",
+                         guide = if (label_centers) "none" else "legend") +
     ggplot2::labs(
       x = sprintf("PC1 (%.1f%%)", 100 * ve[1]),
       y = sprintf("PC2 (%.1f%%)", 100 * ve[2]),

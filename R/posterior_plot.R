@@ -30,6 +30,9 @@
 #' @param widths Two interval widths (inner and outer), as probabilities. The
 #'   outer width is used for the caption and the displayed interval mass.
 #' @param interaction Passed to [format_terms()] for the parameter labels.
+#' @param labels Optional named character vector renaming parameters, e.g.
+#'   `c(conditionunrelated = "condition: unrelated")`. Unmatched parameters fall
+#'   back to [format_terms()].
 #' @param reference_line Position of a vertical reference line, or `NULL`/`NA`
 #'   to omit it. There is no universally meaningful reference for every
 #'   parameter, so this defaults to `0` (the usual "no effect" line for
@@ -80,6 +83,7 @@ posterior_plot <- function(draws,
                            widths = c(0.66, 0.95),
                            interaction = c("times", "asterisk", "colon",
                                            "space"),
+                           labels = NULL,
                            reference_line = 0,
                            rope = NULL,
                            pd = FALSE,
@@ -128,10 +132,9 @@ posterior_plot <- function(draws,
                pd = pd_val, stringsAsFactors = FALSE)
   }))
 
-  lvls <- rev(format_terms(params, interaction = interaction))
-  label_for <- function(term) {
-    factor(format_terms(term, interaction = interaction), levels = lvls)
-  }
+  lab_of <- function(term) make_labels(term, labels, interaction)
+  lvls <- rev(lab_of(params))
+  label_for <- function(term) factor(lab_of(term), levels = lvls)
   summ$label <- label_for(summ$term)
   long$label <- label_for(long$term)
 

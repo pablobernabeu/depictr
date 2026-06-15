@@ -9,6 +9,7 @@ optimizer_fixef_plot(
   intercept = TRUE,
   select_terms = NULL,
   interaction = c("times", "asterisk", "colon", "space"),
+  labels = NULL,
   number_optimizers = TRUE,
   free_y = TRUE,
   ncol = NULL,
@@ -29,6 +30,12 @@ one row per optimiser-by-term combination (columns such as \code{optimizer},
 intercept is always kept when \code{intercept = TRUE}).}
 
 \item{interaction}{Passed to \code{\link[=format_terms]{format_terms()}} for the panel titles.}
+
+\item{labels}{Optional named character vector renaming the term panels, e.g.
+\code{c(conditionunrelated = "Unrelated priming")}. When \code{x} is a raw
+\code{\link[lme4:allFit]{lme4::allFit()}} object, factor levels are prettified automatically (e.g.
+\code{conditionunrelated} to \code{condition: unrelated}) and these labels override
+that default.}
 
 \item{number_optimizers}{Whether to prefix each optimiser name with a
 number, so that the legend doubles as an index.}
