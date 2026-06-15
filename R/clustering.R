@@ -10,12 +10,21 @@
 #'
 #' @param data A data frame.
 #' @param cols Numeric columns to cluster on (default: all numeric).
-#' @param k Number of clusters for k-means (ignored if `clusters` is supplied).
+#' @param k Number of clusters for k-means (ignored if `clusters` is supplied,
+#'   or overridden when `suggest_k` chooses a value).
 #' @param clusters Optional vector of cluster assignments (e.g. from
 #'   [stats::kmeans()] or [stats::cutree()]); use this to plot a clustering you
-#'   computed yourself. Must have exactly one entry per row of `data` (rows with
-#'   missing values in `cols` are dropped from both before plotting).
+#'   computed yourself. Hierarchical or PAM assignments (such as
+#'   [stats::cutree()] output matching [dendrogram_plot()]) are accepted. Must
+#'   have exactly one entry per row of `data` (rows with missing values in
+#'   `cols` are dropped from both before plotting).
 #' @param scale Whether to scale variables to unit variance before clustering and the PCA.
+#' @param suggest_k Optionally choose `k` automatically with a cluster-quality
+#'   diagnostic instead of using the supplied `k`. Either `TRUE` (uses the
+#'   average-silhouette criterion), a string naming the criterion
+#'   (`"silhouette"`, `"wss"` or `"gap"`; see [k_diagnostic()]), or `NULL`
+#'   (the default) to leave `k` unchanged. Ignored when `clusters` is supplied.
+#' @param k_range Candidate values of `k` searched when `suggest_k` is set.
 #' @param hulls Whether to draw a shaded convex hull around each cluster.
 #' @param label_centers Whether to label the cluster centroids.
 #' @param point_alpha Point transparency.
@@ -26,13 +35,21 @@
 #' @param nstart Number of random starts for [stats::kmeans()].
 #' @param iter.max Maximum iterations for [stats::kmeans()].
 #'
-#' @return A [ggplot2::ggplot] object.
+#' @return A [ggplot2::ggplot] object. When `suggest_k` is used, the chosen `k`
+#'   and the full diagnostic are attached as the attribute `"k_diagnostic"`.
+#' @seealso [k_diagnostic()] and [silhouette_plot()] for cluster-quality
+#'   diagnostics.
 #' @export
 #' @examples
 #' cluster_plot(crop_yield, cols = c("rainfall", "fertilizer", "soil_ph",
 #'                                   "yield"), k = 3, seed = 1)
+#' # Let a silhouette diagnostic choose k:
+#' cluster_plot(crop_yield, cols = c("rainfall", "fertilizer", "soil_ph",
+#'                                   "yield"), suggest_k = TRUE, k_range = 2:6,
+#'              seed = 1)
 cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
-                         scale = TRUE, hulls = TRUE, label_centers = TRUE,
+                         scale = TRUE, suggest_k = NULL, k_range = 2:8,
+                         hulls = TRUE, label_centers = TRUE,
                          point_alpha = 0.8, palette = NULL, title = NULL,
                          seed = NULL, nstart = 10, iter.max = 10) {
   if (!is.data.frame(data)) stop("`data` must be a data frame.", call. = FALSE)
@@ -43,6 +60,23 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
   cc <- stats::complete.cases(data[cols])
   mat <- as.matrix(data[cc, cols, drop = FALSE])
   X <- if (scale) scale(mat) else mat
+
+  kd <- NULL
+  subtitle <- NULL
+  if (is.null(clusters) && !is.null(suggest_k) &&
+      !identical(suggest_k, FALSE)) {
+    method <- if (isTRUE(suggest_k)) "silhouette" else suggest_k
+    if (!is.null(seed)) {
+      if (!is.numeric(seed) || length(seed) != 1) {
+        stop("`seed` must be a single number or NULL.", call. = FALSE)
+      }
+      set.seed(seed)
+    }
+    kd <- k_diagnostic(data, k_range = k_range, method = method,
+                       cols = cols, scale = scale, nstart = nstart)
+    k <- kd$suggested
+    subtitle <- sprintf("k = %d suggested by %s diagnostic", k, kd$method)
+  }
 
   if (is.null(clusters)) {
     if (!is.null(seed)) {
@@ -99,14 +133,16 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
     )
   }
 
-  p +
+  p <- p +
     scale_colour_depictr(palette = pal_fun, name = "Cluster") +
     ggplot2::labs(
       x = sprintf("PC1 (%.1f%%)", 100 * ve[1]),
       y = sprintf("PC2 (%.1f%%)", 100 * ve[2]),
-      title = title
+      title = title, subtitle = subtitle
     ) +
     theme_depictr()
+  if (!is.null(kd)) attr(p, "k_diagnostic") <- kd
+  p
 }
 
 #' Dendrogram
