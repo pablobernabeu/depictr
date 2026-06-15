@@ -11,7 +11,7 @@
 #'   or a two-level factor with the positive class second).
 #' @param score When `x` is an outcome vector, the matching vector of scores or
 #'   predicted probabilities.
-#' @param colour Curve colour.
+#' @param colour Curve colour. Defaults to the depictr brand blue.
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object. The AUC is also stored in
@@ -21,19 +21,20 @@
 #' gfit <- glm(accuracy ~ word_frequency + condition + RT,
 #'             data = lexical_decision, family = binomial)
 #' roc_curve_plot(gfit)
-roc_curve_plot <- function(x, score = NULL, colour = "#005b96", title = NULL) {
+roc_curve_plot <- function(x, score = NULL, colour = depictr_brand(),
+                           title = NULL) {
   io <- binary_inputs(x, score)
   roc <- roc_points(io$actual, io$score)
   auc <- roc_auc(roc)
 
   p <- ggplot2::ggplot(roc, ggplot2::aes(x = .data$fpr, y = .data$tpr)) +
     ggplot2::geom_abline(slope = 1, intercept = 0, linetype = 2,
-                         colour = "grey60") +
+                         colour = depictr_reference()) +
     ggplot2::geom_line(colour = colour, linewidth = 0.9) +
     ggplot2::annotate("text", x = 0.98, y = 0.04, hjust = 1,
                       label = paste0("AUC = ", formatC(auc, format = "f",
                                                        digits = 3)),
-                      colour = "#0a3d62", fontface = "bold") +
+                      colour = depictr_brand(), fontface = "bold") +
     ggplot2::coord_equal() +
     ggplot2::labs(x = "False positive rate", y = "True positive rate",
                   title = title) +
@@ -47,13 +48,17 @@ roc_curve_plot <- function(x, score = NULL, colour = "#005b96", title = NULL) {
 #' Assesses how well predicted probabilities match observed frequencies. The
 #' scores are split into bins; for each bin the mean predicted probability is
 #' plotted against the observed event rate, with the diagonal marking perfect
-#' calibration.
+#' calibration. A Wilson binomial confidence interval is drawn on each bin's
+#' observed proportion so that bins backed by few observations are not
+#' over-interpreted.
 #'
 #' @param x A binomial `glm`, or the vector of observed outcomes.
 #' @param score When `x` is an outcome vector, the matching predicted
 #'   probabilities.
 #' @param bins Number of (equal-count) bins.
-#' @param colour Point/line colour.
+#' @param colour Point/line colour. Defaults to the depictr brand blue.
+#' @param conf_level Confidence level for the per-bin Wilson interval on the
+#'   observed proportion. Use `NA` to omit the intervals.
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -62,7 +67,8 @@ roc_curve_plot <- function(x, score = NULL, colour = "#005b96", title = NULL) {
 #' gfit <- glm(accuracy ~ word_frequency + RT, data = lexical_decision,
 #'             family = binomial)
 #' calibration_plot(gfit, bins = 8)
-calibration_plot <- function(x, score = NULL, bins = 10, colour = "#005b96",
+calibration_plot <- function(x, score = NULL, bins = 10,
+                             colour = depictr_brand(), conf_level = 0.95,
                              title = NULL) {
   io <- binary_inputs(x, score)
   probs <- pmin(pmax(io$score, 0), 1)
@@ -75,13 +81,29 @@ calibration_plot <- function(x, score = NULL, bins = 10, colour = "#005b96",
   agg <- data.frame(
     predicted = tapply(probs, bin, mean),
     observed = tapply(io$actual, bin, mean),
+    successes = tapply(io$actual, bin, sum),
     n = tapply(io$actual, bin, length)
   )
   agg <- agg[stats::complete.cases(agg), , drop = FALSE]
 
-  ggplot2::ggplot(agg, ggplot2::aes(x = .data$predicted, y = .data$observed)) +
+  draw_ci <- !is.na(conf_level)
+  if (draw_ci) {
+    ci <- wilson_interval(agg$successes, agg$n, conf_level)
+    agg$conf.low <- ci$lower
+    agg$conf.high <- ci$upper
+  }
+
+  p <- ggplot2::ggplot(agg,
+                       ggplot2::aes(x = .data$predicted, y = .data$observed)) +
     ggplot2::geom_abline(slope = 1, intercept = 0, linetype = 2,
-                         colour = "grey60") +
+                         colour = depictr_reference())
+  if (draw_ci) {
+    p <- p + ggplot2::geom_errorbar(
+      ggplot2::aes(ymin = .data$conf.low, ymax = .data$conf.high),
+      width = 0.02, linewidth = 0.5, colour = colour, alpha = 0.7
+    )
+  }
+  p +
     ggplot2::geom_line(colour = colour, linewidth = 0.7) +
     ggplot2::geom_point(ggplot2::aes(size = .data$n), colour = colour,
                         alpha = 0.7) +
@@ -159,20 +181,45 @@ confusion_matrix_plot <- function(x, predicted = NULL, threshold = 0.5,
     tab$label <- as.character(tab$Freq)
   }
 
+  # Source the tile fill from the canonical sequential palette (a single-hue
+  # ramp from a pale tint up to the brand-blue dark end) rather than ad-hoc
+  # hex literals. The contrast-text logic is unchanged: cells in the darker
+  # (above-median) half get white text, the lighter half dark text.
+  fill_ramp <- depictr_palette(type = "sequential")
   ggplot2::ggplot(tab, ggplot2::aes(x = .data$Predicted, y = .data$Actual,
                                     fill = .data$shade)) +
     ggplot2::geom_tile(colour = "white", linewidth = 1) +
     ggplot2::geom_text(ggplot2::aes(label = .data$label),
                        colour = ifelse(tab$shade > stats::median(tab$shade),
                                        "white", "grey15"), size = 3.5) +
-    ggplot2::scale_fill_gradient(low = "#eaf2f8", high = "#005b96",
-                                 guide = "none") +
+    ggplot2::scale_fill_gradientn(colours = fill_ramp, guide = "none") +
     ggplot2::coord_equal() +
     ggplot2::labs(x = "Predicted", y = "Actual", title = title) +
     theme_depictr(grid = "none")
 }
 
 # ---- internal helpers ------------------------------------------------------
+
+#' Wilson score interval for a binomial proportion
+#'
+#' Vectorised over `successes`/`n`. The Wilson interval is preferred to the
+#' Wald (normal-approximation) interval because it stays inside [0, 1] and
+#' behaves sensibly for small `n` and proportions near 0 or 1 - exactly the
+#' situation in the sparsely populated tail bins of a calibration plot.
+#'
+#' @param successes Integer count of positives in each bin.
+#' @param n Integer bin size.
+#' @param conf_level Confidence level (e.g. 0.95).
+#' @return A list with numeric vectors `lower` and `upper`.
+#' @noRd
+wilson_interval <- function(successes, n, conf_level = 0.95) {
+  z <- stats::qnorm(1 - (1 - conf_level) / 2)
+  phat <- successes / n
+  denom <- 1 + z^2 / n
+  centre <- (phat + z^2 / (2 * n)) / denom
+  half <- (z * sqrt(phat * (1 - phat) / n + z^2 / (4 * n^2))) / denom
+  list(lower = pmax(0, centre - half), upper = pmin(1, centre + half))
+}
 
 #' Coerce an outcome vector to 0/1
 #'

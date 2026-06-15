@@ -12,7 +12,7 @@
 #'   or a two-level factor with the positive class second).
 #' @param score When `x` is an outcome vector, the matching scores or predicted
 #'   probabilities.
-#' @param colour Curve colour.
+#' @param colour Curve colour. Defaults to the depictr brand blue.
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object. The average precision is stored in
@@ -22,7 +22,8 @@
 #' gfit <- glm(accuracy ~ word_frequency + RT + condition,
 #'             data = lexical_decision, family = binomial)
 #' pr_curve_plot(gfit)
-pr_curve_plot <- function(x, score = NULL, colour = "#005b96", title = NULL) {
+pr_curve_plot <- function(x, score = NULL, colour = depictr_brand(),
+                          title = NULL) {
   io <- binary_inputs(x, score)
   pr <- pr_points(io$actual, io$score)
   ap <- sum(diff(c(0, pr$recall)) * pr$precision)
@@ -30,12 +31,12 @@ pr_curve_plot <- function(x, score = NULL, colour = "#005b96", title = NULL) {
 
   p <- ggplot2::ggplot(pr, ggplot2::aes(x = .data$recall, y = .data$precision)) +
     ggplot2::geom_hline(yintercept = prevalence, linetype = 2,
-                        colour = "grey60") +
+                        colour = depictr_reference()) +
     ggplot2::geom_line(colour = colour, linewidth = 0.9) +
     ggplot2::annotate("text", x = 0.02, y = 0.04, hjust = 0,
                       label = paste0("AP = ", formatC(ap, format = "f",
                                                       digits = 3)),
-                      colour = "#0a3d62", fontface = "bold") +
+                      colour = depictr_brand(), fontface = "bold") +
     ggplot2::coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
     ggplot2::labs(x = "Recall", y = "Precision", title = title) +
     theme_depictr()
