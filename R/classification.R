@@ -4,42 +4,154 @@
 #'
 #' Plots the receiver operating characteristic (ROC) curve for a binary
 #' classifier and reports the area under the curve (AUC). The input can be a
-#' fitted binomial `glm`, or a pair of vectors: the observed binary outcome and
-#' a continuous score (e.g. predicted probabilities).
+#' fitted binomial `glm`, a pair of vectors (observed binary outcome and a
+#' continuous score), or - to **compare several models** - a *named list* of
+#' models or of (actual, score) pairs, which are overlaid as colour-coded curves
+#' with a legend and a per-curve AUC. An optional bootstrap confidence band can
+#' be drawn for the (single-model) curve and its AUC, and the Youden's J
+#' operating point can be marked.
 #'
-#' @param x A binomial `glm`, or the vector of observed outcomes (0/1, logical
-#'   or a two-level factor with the positive class second).
+#' @param x A binomial `glm`; the vector of observed outcomes (0/1, logical or a
+#'   two-level factor with the positive class second); or a *named* list of
+#'   models / (actual, score) pairs to overlay (see Details).
 #' @param score When `x` is an outcome vector, the matching vector of scores or
-#'   predicted probabilities.
-#' @param colour Curve colour. Defaults to the depictr brand blue.
+#'   predicted probabilities. When `x` is a named list of outcome vectors, a
+#'   matching named/positional list of score vectors.
+#' @param colour Curve colour for the single-model case. Defaults to the depictr
+#'   brand blue. Ignored when several models are overlaid (the colourblind-aware
+#'   [scale_colour_depictr()] palette is used instead).
+#' @param ci Bootstrap confidence band for a single ROC curve and its AUC.
+#'   `FALSE` (default) draws none; `TRUE` uses 2000 resamples; a positive integer
+#'   sets the number of resamples. Ignored when several models are overlaid.
+#' @param conf_level Confidence level for the bootstrap band.
+#' @param youden Logical; if `TRUE`, mark the Youden's J operating point (the
+#'   threshold maximising sensitivity + specificity - 1) on each curve.
 #' @param title Plot title.
 #'
-#' @return A [ggplot2::ggplot] object. The AUC is also stored in
-#'   `attr(plot, "auc")`.
+#' @details
+#' A named list overlays one curve per element, e.g.
+#' `roc_curve_plot(list("Full" = fit_full, "Reduced" = fit_reduced))`. Each
+#' element may be a `glm`, a length-2 list/data frame of `(actual, score)`, or an
+#' outcome vector paired with the matching element of a `score` list. Single-model
+#' calls are unchanged.
+#'
+#' @return A [ggplot2::ggplot] object. The AUC(s) are stored in
+#'   `attr(plot, "auc")` (a named vector when several models are supplied).
 #' @export
 #' @examples
 #' gfit <- glm(accuracy ~ word_frequency + condition + RT,
 #'             data = lexical_decision, family = binomial)
 #' roc_curve_plot(gfit)
+#'
+#' # Mark the Youden operating point and add a bootstrap band.
+#' roc_curve_plot(gfit, youden = TRUE, ci = 200)
+#'
+#' # Compare two models with a colour-coded legend and per-curve AUC.
+#' reduced <- glm(accuracy ~ word_frequency, data = lexical_decision,
+#'                family = binomial)
+#' roc_curve_plot(list(Full = gfit, Reduced = reduced))
 roc_curve_plot <- function(x, score = NULL, colour = depictr_brand(),
+                           ci = FALSE, conf_level = 0.95, youden = FALSE,
                            title = NULL) {
-  io <- binary_inputs(x, score)
-  roc <- roc_points(io$actual, io$score)
-  auc <- roc_auc(roc)
+  models <- as_model_list(x, score)
+  multi <- attr(models, "multi")
 
-  p <- ggplot2::ggplot(roc, ggplot2::aes(x = .data$fpr, y = .data$tpr)) +
+  # Per-model ROC points and AUC.
+  rocs <- lapply(models, function(m) roc_points(m$actual, m$score))
+  aucs <- vapply(rocs, roc_auc, numeric(1))
+
+  curve_df <- do.call(rbind, Map(function(r, nm) {
+    r$model <- nm; r
+  }, rocs, names(models)))
+  curve_df$model <- factor(curve_df$model, levels = names(models))
+
+  p <- ggplot2::ggplot() +
     ggplot2::geom_abline(slope = 1, intercept = 0, linetype = 2,
-                         colour = depictr_reference()) +
-    ggplot2::geom_line(colour = colour, linewidth = 0.9) +
-    ggplot2::annotate("text", x = 0.98, y = 0.04, hjust = 1,
-                      label = paste0("AUC = ", formatC(auc, format = "f",
-                                                       digits = 3)),
-                      colour = depictr_brand(), fontface = "bold") +
+                         colour = depictr_reference())
+
+  # Optional bootstrap band (single model only).
+  do_ci <- !isFALSE(ci) && !multi
+  if (do_ci) {
+    n_boot <- if (isTRUE(ci)) 2000L else as.integer(ci)
+    band <- roc_boot_ci(models[[1]]$actual, models[[1]]$score,
+                        n_boot = n_boot, conf_level = conf_level)
+    band_df <- data.frame(fpr = band$fpr, lower = band$lower, upper = band$upper)
+    p <- p + ggplot2::geom_ribbon(
+      data = band_df,
+      ggplot2::aes(x = .data$fpr, ymin = .data$lower, ymax = .data$upper),
+      fill = colour, alpha = 0.18
+    )
+  }
+
+  if (multi) {
+    p <- p +
+      ggplot2::geom_line(
+        data = curve_df,
+        ggplot2::aes(x = .data$fpr, y = .data$tpr, colour = .data$model),
+        linewidth = 0.9
+      ) +
+      scale_colour_depictr(
+        name = NULL,
+        labels = paste0(names(models), " (AUC ",
+                        formatC(aucs, format = "f", digits = 3), ")")
+      )
+  } else {
+    p <- p +
+      ggplot2::geom_line(data = curve_df,
+                         ggplot2::aes(x = .data$fpr, y = .data$tpr),
+                         colour = colour, linewidth = 0.9) +
+      ggplot2::annotate(
+        "text", x = 0.98, y = 0.04, hjust = 1,
+        label = paste0("AUC = ", formatC(aucs[[1]], format = "f", digits = 3),
+                       if (do_ci) paste0(
+                         " [", formatC(band$auc_low, format = "f", digits = 3),
+                         ", ", formatC(band$auc_high, format = "f", digits = 3),
+                         "]") else ""),
+        colour = depictr_brand(), fontface = "bold"
+      )
+  }
+
+  # Youden operating point(s).
+  if (isTRUE(youden)) {
+    yps <- lapply(models, function(m) youden_point(m$actual, m$score))
+    yp_df <- do.call(rbind, Map(function(yp, nm) {
+      data.frame(fpr = yp$fpr, tpr = yp$tpr, model = nm)
+    }, yps, names(models)))
+    yp_df$model <- factor(yp_df$model, levels = names(models))
+    if (multi) {
+      p <- p + ggplot2::geom_point(
+        data = yp_df,
+        ggplot2::aes(x = .data$fpr, y = .data$tpr, colour = .data$model),
+        size = 2.6, shape = 21, fill = "white", stroke = 1.1,
+        show.legend = FALSE
+      )
+    } else {
+      p <- p +
+        ggplot2::geom_point(data = yp_df,
+                            ggplot2::aes(x = .data$fpr, y = .data$tpr),
+                            colour = depictr_accent(), size = 2.6) +
+        ggplot2::annotate(
+          "text", x = yp_df$fpr[1] + 0.03, y = yp_df$tpr[1] - 0.03, hjust = 0,
+          vjust = 1, colour = depictr_accent(), fontface = "bold", size = 3.2,
+          label = paste0("Youden J\n(thr ",
+                         formatC(yps[[1]]$threshold, format = "f", digits = 2),
+                         ")")
+        )
+    }
+  }
+
+  p <- p +
     ggplot2::coord_equal() +
     ggplot2::labs(x = "False positive rate", y = "True positive rate",
                   title = title) +
     theme_depictr()
-  attr(p, "auc") <- auc
+
+  attr(p, "auc") <- if (multi) stats::setNames(aucs, names(models)) else aucs[[1]]
+  if (isTRUE(youden)) {
+    attr(p, "youden") <- if (multi) yps else yps[[1]]
+  }
+  if (do_ci) attr(p, "auc_ci") <- c(lower = unname(band$auc_low),
+                                    upper = unname(band$auc_high))
   p
 }
 
@@ -50,15 +162,19 @@ roc_curve_plot <- function(x, score = NULL, colour = depictr_brand(),
 #' plotted against the observed event rate, with the diagonal marking perfect
 #' calibration. A Wilson binomial confidence interval is drawn on each bin's
 #' observed proportion so that bins backed by few observations are not
-#' over-interpreted.
+#' over-interpreted. Pass a *named list* of models / (actual, score) pairs to
+#' overlay several colour-coded calibration curves with a legend.
 #'
-#' @param x A binomial `glm`, or the vector of observed outcomes.
+#' @param x A binomial `glm`, the vector of observed outcomes, or a *named* list
+#'   of models / (actual, score) pairs to overlay.
 #' @param score When `x` is an outcome vector, the matching predicted
-#'   probabilities.
+#'   probabilities (or a list of them for the multi-model case).
 #' @param bins Number of (equal-count) bins.
-#' @param colour Point/line colour. Defaults to the depictr brand blue.
+#' @param colour Point/line colour for the single-model case. Defaults to the
+#'   depictr brand blue. Ignored when several models are overlaid.
 #' @param conf_level Confidence level for the per-bin Wilson interval on the
-#'   observed proportion. Use `NA` to omit the intervals.
+#'   observed proportion. Use `NA` to omit the intervals. Intervals are only
+#'   drawn in the single-model case to keep the overlay legible.
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -70,22 +186,33 @@ roc_curve_plot <- function(x, score = NULL, colour = depictr_brand(),
 calibration_plot <- function(x, score = NULL, bins = 10,
                              colour = depictr_brand(), conf_level = 0.95,
                              title = NULL) {
-  io <- binary_inputs(x, score)
-  probs <- pmin(pmax(io$score, 0), 1)
-  brks <- stats::quantile(probs, probs = seq(0, 1, length.out = bins + 1),
-                          na.rm = TRUE)
-  brks <- unique(brks)
-  if (length(brks) < 3) stop("Too few distinct scores to form bins.",
-                             call. = FALSE)
-  bin <- cut(probs, breaks = brks, include.lowest = TRUE)
-  agg <- data.frame(
-    predicted = tapply(probs, bin, mean),
-    observed = tapply(io$actual, bin, mean),
-    successes = tapply(io$actual, bin, sum),
-    n = tapply(io$actual, bin, length)
-  )
-  agg <- agg[stats::complete.cases(agg), , drop = FALSE]
+  models <- as_model_list(x, score)
+  multi <- attr(models, "multi")
 
+  agg_one <- function(io) calibration_bins(io$actual, io$score, bins)
+  aggs <- lapply(models, agg_one)
+
+  if (multi) {
+    agg <- do.call(rbind, Map(function(a, nm) { a$model <- nm; a },
+                              aggs, names(models)))
+    agg$model <- factor(agg$model, levels = names(models))
+    return(
+      ggplot2::ggplot(agg, ggplot2::aes(x = .data$predicted, y = .data$observed,
+                                        colour = .data$model)) +
+        ggplot2::geom_abline(slope = 1, intercept = 0, linetype = 2,
+                             colour = depictr_reference()) +
+        ggplot2::geom_line(linewidth = 0.7) +
+        ggplot2::geom_point(ggplot2::aes(size = .data$n), alpha = 0.7) +
+        scale_colour_depictr(name = NULL) +
+        ggplot2::scale_size_area(name = "n", max_size = 7) +
+        ggplot2::coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+        ggplot2::labs(x = "Mean predicted probability",
+                      y = "Observed frequency", title = title) +
+        theme_depictr()
+    )
+  }
+
+  agg <- aggs[[1]]
   draw_ci <- !is.na(conf_level)
   if (draw_ci) {
     ci <- wilson_interval(agg$successes, agg$n, conf_level)
@@ -114,6 +241,25 @@ calibration_plot <- function(x, score = NULL, bins = 10,
     theme_depictr()
 }
 
+#' Per-bin calibration aggregation (equal-count quantile bins)
+#' @noRd
+calibration_bins <- function(actual, score, bins) {
+  probs <- pmin(pmax(score, 0), 1)
+  brks <- stats::quantile(probs, probs = seq(0, 1, length.out = bins + 1),
+                          na.rm = TRUE)
+  brks <- unique(brks)
+  if (length(brks) < 3) stop("Too few distinct scores to form bins.",
+                             call. = FALSE)
+  bin <- cut(probs, breaks = brks, include.lowest = TRUE)
+  agg <- data.frame(
+    predicted = tapply(probs, bin, mean),
+    observed = tapply(actual, bin, mean),
+    successes = tapply(actual, bin, sum),
+    n = tapply(actual, bin, length)
+  )
+  agg[stats::complete.cases(agg), , drop = FALSE]
+}
+
 #' Confusion matrix heatmap
 #'
 #' Cross-tabulates predicted against actual classes and displays the counts as a
@@ -124,25 +270,44 @@ calibration_plot <- function(x, score = NULL, bins = 10,
 #' @param predicted When `x` is an actual-class vector, the matching predicted
 #'   classes.
 #' @param threshold When `x` is a `glm`, the probability threshold for the
-#'   positive class.
+#'   positive class. As well as a number in `[0, 1]`, you may pass the string
+#'   `"youden"` to reuse the Youden's J optimal threshold (the same operating
+#'   point [roc_curve_plot()] marks), so the confusion matrix and the ROC curve
+#'   agree on the cut-off.
 #' @param normalize One of `"none"`, `"row"` (by actual class) or `"col"` (by
 #'   predicted class); controls the fill shading and the cell annotation.
 #' @param title Plot title.
 #'
-#' @return A [ggplot2::ggplot] object.
+#' @return A [ggplot2::ggplot] object. The threshold actually used is stored in
+#'   `attr(plot, "threshold")`.
 #' @export
 #' @examples
 #' gfit <- glm(accuracy ~ word_frequency + RT + condition,
 #'             data = lexical_decision, family = binomial)
 #' confusion_matrix_plot(gfit, threshold = 0.5)
+#'
+#' # Reuse the Youden-optimal operating point.
+#' confusion_matrix_plot(gfit, threshold = "youden")
 confusion_matrix_plot <- function(x, predicted = NULL, threshold = 0.5,
                                   normalize = c("none", "row", "col"),
                                   title = NULL) {
   normalize <- match.arg(normalize)
+  used_threshold <- NA_real_
   if (inherits(x, "glm")) {
     resp <- stats::model.response(stats::model.frame(x))
     actual_bin <- as_binary(resp)
-    pred_bin <- as.integer(stats::fitted(x) >= threshold)
+    fit <- as.numeric(stats::fitted(x))
+    if (is.character(threshold)) {
+      threshold <- match.arg(threshold, "youden")
+      io <- drop_incomplete(actual_bin, fit)
+      threshold <- youden_point(io$actual, io$score)$threshold
+    }
+    if (!is.numeric(threshold) || length(threshold) != 1L) {
+      stop("`threshold` must be a single number in [0, 1] or \"youden\".",
+           call. = FALSE)
+    }
+    used_threshold <- threshold
+    pred_bin <- as.integer(fit >= threshold)
     # Recover the model's own class names so the matrix is labelled with the
     # real outcome levels (e.g. "no"/"yes") rather than a hardcoded 0/1.
     if (is.factor(resp)) {
@@ -186,8 +351,8 @@ confusion_matrix_plot <- function(x, predicted = NULL, threshold = 0.5,
   # hex literals. The contrast-text logic is unchanged: cells in the darker
   # (above-median) half get white text, the lighter half dark text.
   fill_ramp <- depictr_palette(type = "sequential")
-  ggplot2::ggplot(tab, ggplot2::aes(x = .data$Predicted, y = .data$Actual,
-                                    fill = .data$shade)) +
+  p <- ggplot2::ggplot(tab, ggplot2::aes(x = .data$Predicted, y = .data$Actual,
+                                         fill = .data$shade)) +
     ggplot2::geom_tile(colour = "white", linewidth = 1) +
     ggplot2::geom_text(ggplot2::aes(label = .data$label),
                        colour = ifelse(tab$shade > stats::median(tab$shade),
@@ -196,6 +361,8 @@ confusion_matrix_plot <- function(x, predicted = NULL, threshold = 0.5,
     ggplot2::coord_equal() +
     ggplot2::labs(x = "Predicted", y = "Actual", title = title) +
     theme_depictr(grid = "none")
+  attr(p, "threshold") <- used_threshold
+  p
 }
 
 # ---- internal helpers ------------------------------------------------------
@@ -268,6 +435,154 @@ binary_inputs <- function(x, score) {
     stop("Supply `score` when `x` is not a model.", call. = FALSE)
   }
   drop_incomplete(as_binary(x), as.numeric(score))
+}
+
+#' Normalise the curve inputs into a named list of (actual, score) pairs
+#'
+#' This is the single entry point that lets every classification curve accept
+#' either a single model/vector (the original, backward-compatible behaviour) or
+#' a *named list* of models or (actual, score) pairs to overlay. It always
+#' returns a list of `list(actual = , score = )` entries with `names()` set, plus
+#' an attribute `"multi"` recording whether more than one model was supplied (so
+#' the callers know whether to draw a legend).
+#'
+#' Recognised shapes for `x`:
+#' \itemize{
+#'   \item a binomial `glm` (with `score = NULL`);
+#'   \item an outcome vector with a matching `score` vector;
+#'   \item a *named* list whose elements are each a `glm`, a length-2 list or
+#'     data frame of `(actual, score)` (named or positional), or an `actual`
+#'     vector - in which case the matching element of a parallel `score` list is
+#'     used.
+#' }
+#' @noRd
+as_model_list <- function(x, score = NULL) {
+  is_pair_list <- is.list(x) && !is.data.frame(x) && !inherits(x, "glm")
+
+  if (!is_pair_list) {
+    out <- list(binary_inputs(x, score))
+    names(out) <- "model"
+    attr(out, "multi") <- FALSE
+    return(out)
+  }
+
+  if (length(x) == 0L) {
+    stop("The list of models is empty.", call. = FALSE)
+  }
+  nms <- names(x)
+  if (is.null(nms) || any(!nzchar(nms))) {
+    stop("When supplying several models, use a *named* list, e.g. ",
+         "list(`Model A` = fitA, `Model B` = fitB).", call. = FALSE)
+  }
+  if (anyDuplicated(nms)) {
+    stop("Model names must be unique; duplicated: ",
+         paste(unique(nms[duplicated(nms)]), collapse = ", "), ".",
+         call. = FALSE)
+  }
+
+  out <- Map(function(el, sc) extract_pair(el, sc), x, score %||% vector("list", length(x)))
+  names(out) <- nms
+  attr(out, "multi") <- length(out) > 1L
+  out
+}
+
+#' Turn one element of a model list into an (actual, score) pair
+#' @noRd
+extract_pair <- function(el, sc = NULL) {
+  if (inherits(el, "glm")) return(binary_inputs(el, NULL))
+  if (is.data.frame(el) || (is.list(el) && length(el) == 2L)) {
+    actual <- if (!is.null(el[["actual"]])) el[["actual"]] else el[[1L]]
+    s      <- if (!is.null(el[["score"]]))  el[["score"]]  else el[[2L]]
+    return(binary_inputs(actual, s))
+  }
+  # Otherwise `el` is an outcome vector and `sc` the parallel score vector.
+  if (is.null(sc)) {
+    stop("Each model must be a glm, an (actual, score) pair, or an outcome ",
+         "vector with a matching `score` list element.", call. = FALSE)
+  }
+  binary_inputs(el, sc)
+}
+
+#' Youden's J operating point: the threshold maximising sensitivity + specificity
+#' - 1, i.e. the ROC point furthest above the chance diagonal (tpr - fpr).
+#'
+#' Returns the chosen score threshold and the (fpr, tpr) coordinates of that
+#' point on the ROC curve, computed on the collapsed distinct-threshold steps so
+#' that the result is order- and tie-independent.
+#' @noRd
+youden_point <- function(actual, score) {
+  P <- sum(actual == 1)
+  N <- sum(actual == 0)
+  cc <- threshold_counts(actual, score)
+  tpr <- cc$tp / P
+  fpr <- cc$fp / N
+  j <- tpr - fpr
+  i <- which.max(j)
+  thr <- distinct_thresholds(score)[i]
+  list(threshold = thr, fpr = fpr[i], tpr = tpr[i], j = j[i],
+       sensitivity = tpr[i], specificity = 1 - fpr[i])
+}
+
+#' Max-F1 operating point on the precision-recall curve.
+#'
+#' F1 = 2 * precision * recall / (precision + recall), maximised over the
+#' distinct-threshold steps.
+#' @noRd
+max_f1_point <- function(actual, score) {
+  P <- sum(actual == 1)
+  cc <- threshold_counts(actual, score)
+  recall <- cc$tp / P
+  precision <- cc$tp / (cc$tp + cc$fp)
+  f1 <- ifelse(precision + recall > 0,
+               2 * precision * recall / (precision + recall), 0)
+  i <- which.max(f1)
+  thr <- distinct_thresholds(score)[i]
+  list(threshold = thr, recall = recall[i], precision = precision[i],
+       f1 = f1[i])
+}
+
+#' The distinct score thresholds, in decreasing order, matching the rows that
+#' [threshold_counts()] returns (one per run of tied scores).
+#' @noRd
+distinct_thresholds <- function(score) {
+  s <- sort(unique(score), decreasing = TRUE)
+  s
+}
+
+#' Bootstrap percentile confidence band for an ROC curve and its AUC.
+#'
+#' Resamples observations with replacement `n_boot` times; for each resample the
+#' ROC is interpolated onto a common fixed FPR grid so the bands can be summarised
+#' pointwise. Returns the per-grid-point lower/upper TPR quantiles and the AUC
+#' quantiles. Resamples that happen to contain only one class are skipped.
+#' @noRd
+roc_boot_ci <- function(actual, score, n_boot = 2000, conf_level = 0.95,
+                        grid = seq(0, 1, length.out = 101)) {
+  n <- length(actual)
+  alpha <- 1 - conf_level
+  tpr_mat <- matrix(NA_real_, nrow = n_boot, ncol = length(grid))
+  aucs <- numeric(n_boot)
+  for (b in seq_len(n_boot)) {
+    idx <- sample.int(n, n, replace = TRUE)
+    ab <- actual[idx]
+    sb <- score[idx]
+    if (sum(ab == 1) == 0 || sum(ab == 0) == 0) {
+      aucs[b] <- NA_real_
+      next
+    }
+    rb <- roc_points(ab, sb)
+    # Step-interpolate TPR at each grid FPR (ROC is a step/right-continuous
+    # function; approx with a monotone rule gives a conservative reading).
+    tpr_mat[b, ] <- stats::approx(rb$fpr, rb$tpr, xout = grid, ties = "ordered",
+                                  rule = 2)$y
+    aucs[b] <- roc_auc(rb)
+  }
+  qs <- apply(tpr_mat, 2, stats::quantile, probs = c(alpha / 2, 1 - alpha / 2),
+              na.rm = TRUE)
+  auc_q <- stats::quantile(aucs, probs = c(alpha / 2, 1 - alpha / 2),
+                           na.rm = TRUE)
+  list(fpr = grid, lower = qs[1, ], upper = qs[2, ],
+       auc_low = auc_q[1], auc_high = auc_q[2])
 }
 
 #' Drop observations with a missing outcome or score, pairwise
