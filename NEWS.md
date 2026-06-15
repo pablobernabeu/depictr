@@ -90,10 +90,18 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
 * A pass over every plot for legibility: `silhouette_plot()` cluster labels no
   longer clip; `raincloud_plot()` uses one colour per group across all layers;
   `dendrogram_plot()` hides leaf labels for large trees; `confusion_matrix_plot()`
-  picks each label's colour from the tile luminance; `vif_plot()` adapts its
-  range and labels the threshold guides; `gain_plot()`/`lift_plot()` label their
-  reference lines; `timeseries_plot()` shows a single legend; and
+  picks each label's colour from the tile luminance; `gain_plot()`/`lift_plot()`
+  label their reference lines; `timeseries_plot()` shows a single legend; and
   `k_diagnostic()` now returns the diagnostic curve as a plot.
+* `coefficient_plot()` gains `standardize`, scaling each coefficient by its
+  predictor's standard deviation so magnitudes are comparable; `model_report()`
+  uses it by default, removing the empty band in its coefficient panel.
+* `vif_plot()` shows the ordinary VIF (not its square root) for single-df terms,
+  scales the axis to the data, and draws a single clearly-labelled threshold
+  line (reported in the caption when it is off-axis) -- no more wide empty band
+  or hard-to-read guides.
+* `seasonal_plot(style = "season")` reverses its sequential legend so the
+  darkest, most-recent cycle sits at the top, matching the plotted order.
 
 ## Data
 

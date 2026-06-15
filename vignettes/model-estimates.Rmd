@@ -64,6 +64,17 @@ coefficient_plot(
 )
 ```
 
+Keeping the intercept (several hundred milliseconds) on the same axis as the
+small slopes would squash them against the zero line. Two arguments handle this:
+`facet = TRUE` gives each term its own free-scaled panel, while `standardize =
+TRUE` instead rescales every coefficient by its predictor's standard deviation
+so the magnitudes become directly comparable.
+
+```{r coef-facet, eval = has_lmer, fig.height = 4.5}
+coefficient_plot(fit, intercept = TRUE, facet = TRUE,
+                 title = "Every term on its own scale")
+```
+
 ## Comparing models
 
 `compare_models()` overlays the estimates from several models so you can see how

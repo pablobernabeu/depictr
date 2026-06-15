@@ -13,10 +13,11 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
 library(depictr)
 ```
 
-depictr provides a coherent set of exploratory plots, a descriptive table and
-two estimation plots, all sharing the package theme and palette. Column names
-can be given quoted or unquoted. The examples use the bundled `lexical_decision`,
-`wellbeing_survey` and `crop_yield` datasets.
+depictr provides a coherent set of exploratory plots, estimation plots and a
+descriptive table, all sharing the package theme and palette. Column names can
+be given quoted or unquoted. The examples use the bundled `lexical_decision`,
+`wellbeing_survey` and `crop_yield` datasets. A closing section shows how to
+customise any of these plots with ordinary ggplot2 code.
 
 ## One variable
 
@@ -25,6 +26,23 @@ categorical one.
 
 ```{r}
 explore_distribution(lexical_decision, RT, group = condition, type = "density")
+```
+
+An overlay gets crowded once there are several groups, so `facet = TRUE` gives
+each group its own panel:
+
+```{r}
+explore_distribution(wellbeing_survey, life_satisfaction, group = region,
+                     type = "both", facet = TRUE)
+```
+
+`ecdf_plot()` is a bin-free alternative: the empirical cumulative distribution
+lets you read medians and quantiles straight off the curve and makes a shift
+between groups obvious (here the related condition is faster throughout).
+
+```{r}
+ecdf_plot(lexical_decision, RT, group = condition,
+          reference_quantiles = c(0.25, 0.5, 0.75))
 ```
 
 ```{r}
@@ -63,6 +81,13 @@ explore_pairs(crop_yield, cols = c("rainfall", "fertilizer", "soil_ph", "yield")
 correlation_heatmap(wellbeing_survey)
 ```
 
+`reorder = TRUE` orders the variables by hierarchical clustering, so blocks of
+mutually correlated variables sit together and the structure is easier to read:
+
+```{r, fig.height = 5}
+correlation_heatmap(wellbeing_survey, reorder = TRUE)
+```
+
 ## Distributions across groups
 
 `raincloud_plot()` shows the density, the box summary and the raw points
@@ -76,6 +101,13 @@ raincloud_plot(lexical_decision, RT, group = condition)
 
 ```{r}
 group_comparison_plot(lexical_decision, RT, condition)
+```
+
+To compare the *shape* of a distribution across several groups at once,
+`ridgeline_plot()` stacks one partially overlapping density per group:
+
+```{r, fig.height = 4}
+ridgeline_plot(wellbeing_survey, life_satisfaction, region)
 ```
 
 ## Estimation plots: effect size, not just a p-value
@@ -102,6 +134,19 @@ compared against a chosen reference (a Cumming plot).
 set.seed(1)
 group_comparison_plot(crop_yield, yield, treatment, differences = TRUE,
                       title = "Yield difference: enhanced vs. standard")
+```
+
+## Comparing two groups across categories
+
+`dumbbell_plot()` compares one value between two groups across a set of
+categories: the two group values per category are joined by a segment, so the
+size and direction of each gap is clear at a glance. Here it contrasts younger
+and older respondents' life satisfaction by region.
+
+```{r}
+wb <- wellbeing_survey
+wb$age_group <- ifelse(wb$age < median(wb$age), "younger", "older")
+dumbbell_plot(wb, region, life_satisfaction, age_group)
 ```
 
 ## Data quality: outliers and missingness
@@ -133,3 +178,32 @@ tab <- summary_table(
 )
 knitr::kable(tab)
 ```
+
+## Customising and extending the plots
+
+Every depictr function returns a plain `ggplot2` object (composite figures
+return a `patchwork`), so you can keep adding layers, scales, labels and theme
+tweaks with the usual `+`:
+
+```{r}
+library(ggplot2)
+
+scatter_trend(crop_yield, fertilizer, yield, group = treatment) +
+  labs(title = "Yield rises with fertiliser",
+       subtitle = "More steeply under the enhanced treatment") +
+  theme(legend.position = "bottom")
+```
+
+All the standard ggplot2 adjustments apply. A common one is reversing a colour
+legend so it reads in the same direction as the plotted curves:
+
+```{r}
+ecdf_plot(lexical_decision, RT, group = condition) +
+  guides(colour = guide_legend(reverse = TRUE))
+```
+
+Many functions also expose layout controls directly. `explore_distribution(facet
+= TRUE)` and `ridgeline_plot()` separate groups, `correlation_heatmap(reorder =
+TRUE)` clusters variables, and the model-estimate plots take `facet` and
+`standardize` to keep coefficients on very different scales legible -- see
+`vignette("model-estimates")`.
