@@ -13,22 +13,28 @@
 #' @param k Number of clusters for k-means (ignored if `clusters` is supplied).
 #' @param clusters Optional vector of cluster assignments (e.g. from
 #'   [stats::kmeans()] or [stats::cutree()]); use this to plot a clustering you
-#'   computed yourself.
+#'   computed yourself. Must have exactly one entry per row of `data` (rows with
+#'   missing values in `cols` are dropped from both before plotting).
 #' @param scale Whether to scale variables to unit variance before clustering and the PCA.
 #' @param hulls Whether to draw a shaded convex hull around each cluster.
 #' @param label_centers Whether to label the cluster centroids.
 #' @param point_alpha Point transparency.
 #' @param palette Colours for the clusters; defaults to [depictr_palette()].
 #' @param title Plot title.
+#' @param seed Optional integer seed for reproducible k-means (ignored when
+#'   `clusters` is supplied). Default `NULL` leaves the RNG state untouched.
+#' @param nstart Number of random starts for [stats::kmeans()].
+#' @param iter.max Maximum iterations for [stats::kmeans()].
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export
 #' @examples
 #' cluster_plot(crop_yield, cols = c("rainfall", "fertilizer", "soil_ph",
-#'                                   "yield"), k = 3)
+#'                                   "yield"), k = 3, seed = 1)
 cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
                          scale = TRUE, hulls = TRUE, label_centers = TRUE,
-                         point_alpha = 0.8, palette = NULL, title = NULL) {
+                         point_alpha = 0.8, palette = NULL, title = NULL,
+                         seed = NULL, nstart = 10, iter.max = 10) {
   if (!is.data.frame(data)) stop("`data` must be a data frame.", call. = FALSE)
   if (is.null(cols)) cols <- names(data)[vapply(data, is.numeric, logical(1))]
   else check_columns(data, cols)
@@ -39,13 +45,23 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
   X <- if (scale) scale(mat) else mat
 
   if (is.null(clusters)) {
-    km <- stats::kmeans(X, centers = k, nstart = 10)
+    if (!is.null(seed)) {
+      if (!is.numeric(seed) || length(seed) != 1) {
+        stop("`seed` must be a single number or NULL.", call. = FALSE)
+      }
+      set.seed(seed)
+    }
+    km <- stats::kmeans(X, centers = k, nstart = nstart, iter.max = iter.max)
     cl <- km$cluster
   } else {
-    cl <- clusters[cc]
-    if (length(cl) != nrow(X)) {
+    # `clusters` is defined per row of `data`; validate against the full row
+    # count *before* dropping incomplete rows so a length mismatch (e.g. a
+    # vector sized to the complete rows) is caught instead of silently
+    # over-indexing and misaligning the assignments.
+    if (length(clusters) != nrow(data)) {
       stop("`clusters` must have one entry per row of `data`.", call. = FALSE)
     }
+    cl <- clusters[cc]
   }
 
   pca <- stats::prcomp(X, center = TRUE, scale. = FALSE)
@@ -103,7 +119,8 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
 #' @param distance Distance measure passed to [stats::dist()].
 #' @param method Linkage method passed to [stats::hclust()].
 #' @param scale Whether to scale variables before computing distances (data frame input).
-#' @param k Optional number of clusters to highlight.
+#' @param k Optional number of clusters to highlight (between 1 and the number
+#'   of leaves). The cut-height line is drawn only when `2 <= k < n`.
 #' @param horizontal Whether to draw the tree horizontally.
 #' @param palette Colours for the `k` clusters; defaults to [depictr_palette()].
 #' @param title Plot title.
@@ -121,16 +138,33 @@ dendrogram_plot <- function(x, cols = NULL, distance = "euclidean",
                             horizontal = FALSE, palette = NULL, title = NULL) {
   hc <- as_hclust(x, cols, distance, method, scale)
   segs <- dendro_segments(hc)
+  n <- length(hc$order)
   # Position leaves at their plot x and y = 0
-  leaf_x <- numeric(length(hc$order))
-  leaf_x[hc$order] <- seq_along(hc$order)
+  leaf_x <- numeric(n)
+  leaf_x[hc$order] <- seq_len(n)
   leaves <- data.frame(x = leaf_x, y = 0,
-                       label = hc$labels %||% as.character(seq_along(leaf_x)))
+                       label = hc$labels %||% as.character(seq_len(n)),
+                       stringsAsFactors = FALSE)
 
+  cut_h <- NULL
   if (!is.null(k)) {
+    if (!is.numeric(k) || length(k) != 1 || k < 1 || k > n) {
+      stop("`k` must be a single number between 1 and the number of leaves.",
+           call. = FALSE)
+    }
+    k <- as.integer(k)
+    # `cutree()` returns assignments in leaf (i.e. observation) order, so map
+    # them onto the leaves positionally. Matching by name fails when the tree
+    # has no labels (dist/unnamed hclust input), because both the synthetic
+    # leaf labels and `cutree()`'s output are unnamed.
     cl <- stats::cutree(hc, k = k)
-    leaves$cluster <- factor(cl[match(leaves$label, names(cl))])
-    cut_h <- mean(rev(hc$height)[c(k - 1, k)])
+    leaves$cluster <- factor(cl)
+    # The cut height sits between successive merge heights; it is only
+    # meaningful when 2 <= k < n (k = 1 keeps every observation together and
+    # k = n splits them all, so there is no interior gap to mark).
+    if (k >= 2 && k < n) {
+      cut_h <- mean(rev(hc$height)[c(k - 1, k)])
+    }
   }
 
   p <- ggplot2::ggplot() +
@@ -143,9 +177,11 @@ dendrogram_plot <- function(x, cols = NULL, distance = "euclidean",
 
   if (!is.null(k)) {
     pal <- palette %||% depictr_palette(nlevels(leaves$cluster))
+    if (!is.null(cut_h)) {
+      p <- p + ggplot2::geom_hline(yintercept = cut_h, linetype = 2,
+                                   colour = "grey70")
+    }
     p <- p +
-      ggplot2::geom_hline(yintercept = cut_h, linetype = 2,
-                          colour = "grey70") +
       ggplot2::geom_text(
         data = leaves,
         ggplot2::aes(x = .data$x, y = .data$y, label = .data$label,
