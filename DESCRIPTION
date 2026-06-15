@@ -40,7 +40,9 @@ Suggests:
     simr,
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0)
+    survival,
+    testthat (>= 3.0.0),
+    withr
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RdMacros: Rdpack
