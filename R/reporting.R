@@ -8,19 +8,33 @@
 #' white, whichever is more legible against that tile (chosen by the tile's
 #' relative luminance), so labels stay readable on both light and dark colours.
 #'
+#' Set `cvd` to render the swatches as they would appear under a colour-vision
+#' deficiency, using the Machado et al. (2009) simulation. The tiles are
+#' recoloured to the simulated appearance while the labels keep the *original*
+#' hex code, so you can check at a glance whether two groups would still be
+#' told apart by a colourblind reader.
+#'
 #' @param n Number of colours to preview.
 #' @param type Palette type to preview: `"qualitative"`, `"sequential"`,
 #'   `"diverging"`, or `"all"` to show all three.
+#' @param cvd Colour-vision-deficiency simulation for the tiles: `"none"` (the
+#'   default, true colours), `"deutan"` (red-green, deuteranopia), `"protan"`
+#'   (red-green, protanopia) or `"tritan"` (blue-yellow, tritanopia).
 #'
 #' @return A [ggplot2::ggplot] object.
+#' @references
+#' \insertRef{machado2009}{depictr}
 #' @export
 #' @examples
 #' palette_preview()
 #' palette_preview(7, type = "sequential")
 #' palette_preview(type = "all")
+#' palette_preview(cvd = "deutan")
 palette_preview <- function(n = 8, type = c("qualitative", "sequential",
-                                            "diverging", "all")) {
+                                            "diverging", "all"),
+                            cvd = c("none", "deutan", "protan", "tritan")) {
   type <- match.arg(type)
+  cvd <- match.arg(cvd)
   types <- if (type == "all") {
     c("qualitative", "sequential", "diverging")
   } else {
@@ -32,20 +46,29 @@ palette_preview <- function(n = 8, type = c("qualitative", "sequential",
                stringsAsFactors = FALSE)
   }))
   df$type <- factor(df$type, levels = types)
+  # The tile is filled with the (possibly CVD-simulated) appearance; the label
+  # keeps the true hex so the original colour is always identifiable.
+  df$shown <- if (cvd == "none") df$col else cvd_simulate(df$col, cvd)
   # Pick a legible label colour per swatch: near-black on light tiles, white on
-  # dark ones. Decide by WCAG relative luminance (sRGB-linearised), which tracks
-  # perceived lightness far better than a raw RGB average and so avoids the
-  # white-on-pale-yellow contrast failure of a fixed label colour.
-  df$label_col <- ifelse(.relative_luminance(df$col) > 0.4,
+  # dark ones. Decide by WCAG relative luminance (sRGB-linearised) of the tile
+  # as displayed, which tracks perceived lightness far better than a raw RGB
+  # average and so avoids the white-on-pale contrast failure of a fixed colour.
+  df$label_col <- ifelse(.relative_luminance(df$shown) > 0.4,
                          "grey10", "white")
   show_labels <- type != "all"
 
-  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$i, y = 1, fill = .data$col)) +
+  base_title <- if (type == "all") "depictr palettes" else
+    paste0("depictr palette (", type, ")")
+  cvd_label <- c(deutan = "deuteranopia", protan = "protanopia",
+                 tritan = "tritanopia")
+  plot_title <- if (cvd == "none") base_title else
+    paste0(base_title, " — ", cvd_label[[cvd]], " simulation")
+
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$i, y = 1,
+                                        fill = .data$shown)) +
     ggplot2::geom_tile(width = 0.95, height = 0.95) +
     ggplot2::scale_fill_identity() +
-    ggplot2::labs(x = NULL, y = NULL,
-                  title = if (type == "all") "depictr palettes" else
-                    paste0("depictr palette (", type, ")")) +
+    ggplot2::labs(x = NULL, y = NULL, title = plot_title) +
     theme_depictr(grid = "none") +
     ggplot2::theme(
       axis.text = ggplot2::element_blank(),

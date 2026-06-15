@@ -11,11 +11,17 @@
 #'
 #' @param n Number of colours to return. If `NULL` (the default) the full
 #'   qualitative palette is returned. For the qualitative palette an `n` larger
-#'   than the eight base colours is interpolated; the sequential and diverging
-#'   palettes are ramps and accept any `n`.
+#'   than the available base colours is interpolated; the sequential and
+#'   diverging palettes are ramps and accept any `n`.
 #' @param type Palette type: `"qualitative"` (categorical groups),
 #'   `"sequential"` (ordered low-to-high) or `"diverging"` (a midpoint with two
 #'   directions).
+#'
+#' @details The qualitative palette can be overridden globally with
+#'   `options(depictr.palette = )` (see [depictr_options()]); when set, that
+#'   custom palette replaces the built-in Okabe-Ito set and is interpolated when
+#'   more colours are requested than it provides. The sequential and diverging
+#'   ramps are unaffected.
 #'
 #' @return A character vector of hex colour codes.
 #' @references
@@ -44,26 +50,34 @@ depictr_palette <- function(n = NULL, type = c("qualitative", "sequential",
     return(ramp(n %||% 7))
   }
 
-  # Qualitative: Okabe-Ito, led by the depictr brand blue
-  base <- c(
-    blue          = "#005b96",
-    orange        = "#e69f00",
-    bluish_green  = "#009e73",
-    vermillion    = "#d55e00",
-    reddish_purple = "#cc79a7",
-    sky_blue      = "#56b4e9",
-    yellow        = "#f0e442",
-    grey          = "#999999"
-  )
-  if (is.null(n)) return(unname(base))
-  if (n <= length(base)) return(unname(base[seq_len(n)]))
-  grDevices::colorRampPalette(unname(base))(n)
+  # Qualitative: a user-supplied palette (option) overrides the built-in
+  # Okabe-Ito set (led by the depictr brand blue); the option falls back to the
+  # package default.
+  base <- depictr_opt("palette")
+  if (is.null(base)) {
+    base <- c(
+      blue           = "#005b96",
+      orange         = "#e69f00",
+      bluish_green   = "#009e73",
+      vermillion     = "#d55e00",
+      reddish_purple = "#cc79a7",
+      sky_blue       = "#56b4e9",
+      yellow         = "#f0e442",
+      grey           = "#999999"
+    )
+  }
+  base <- unname(base)
+  if (is.null(n)) return(base)
+  if (n <= length(base)) return(base[seq_len(n)])
+  grDevices::colorRampPalette(base)(n)
 }
 
 #' depictr colour and fill scales
 #'
 #' Discrete ggplot2 scales using [depictr_palette()]. These are the canonical
-#' colour and fill scales used throughout the package.
+#' colour and fill scales used throughout the package. They honour the global
+#' `options(depictr.palette = )` (via [depictr_palette()]) and
+#' `options(depictr.na_value = )` settings; see [depictr_options()].
 #'
 #' @param n Optional number of colours to draw from [depictr_palette()]. By
 #'   default ggplot2 requests exactly as many colours as there are groups; pass
@@ -71,6 +85,8 @@ depictr_palette <- function(n = NULL, type = c("qualitative", "sequential",
 #' @param palette Optional palette override: a function of one argument (the
 #'   number of colours) returning a character vector of colours. Defaults to
 #'   [depictr_palette()].
+#' @param na.value Colour for `NA` levels. Defaults to the resolved
+#'   `depictr.na_value` option (the muted grey `"grey80"` unless changed).
 #' @param ... Passed to [ggplot2::discrete_scale()].
 #' @return A ggplot2 scale that can be added to a plot.
 #' @export
@@ -80,12 +96,13 @@ depictr_palette <- function(n = NULL, type = c("qualitative", "sequential",
 #'   geom_point() +
 #'   scale_colour_depictr() +
 #'   theme_depictr()
-scale_colour_depictr <- function(n = NULL, palette = NULL, ...) {
+scale_colour_depictr <- function(n = NULL, palette = NULL,
+                                 na.value = depictr_opt("na_value"), ...) {
   pal <- palette %||% function(k) depictr_palette(n %||% k)
   ggplot2::discrete_scale(
     "colour",
     palette = pal,
-    na.value = "grey80",
+    na.value = na.value,
     ...
   )
 }
@@ -96,12 +113,13 @@ scale_color_depictr <- scale_colour_depictr
 
 #' @rdname scale_colour_depictr
 #' @export
-scale_fill_depictr <- function(n = NULL, palette = NULL, ...) {
+scale_fill_depictr <- function(n = NULL, palette = NULL,
+                               na.value = depictr_opt("na_value"), ...) {
   pal <- palette %||% function(k) depictr_palette(n %||% k)
   ggplot2::discrete_scale(
     "fill",
     palette = pal,
-    na.value = "grey80",
+    na.value = na.value,
     ...
   )
 }
@@ -112,8 +130,16 @@ scale_fill_depictr <- function(n = NULL, palette = NULL, ...) {
 #' a light modification of [ggplot2::theme_minimal()] with subtle gridlines,
 #' centred titles and comfortable margins.
 #'
-#' @param base_size Base font size, in points.
-#' @param base_family Base font family.
+#' The default `base_size` and `base_family` come from the global options
+#' `depictr.base_size` and `depictr.base_family` (see [depictr_options()]), so
+#' the package-wide font size can be set once; passing the arguments explicitly
+#' overrides them. The title colour is the resolved [depictr_brand()], which in
+#' turn honours `options(depictr.brand = )`.
+#'
+#' @param base_size Base font size, in points. Defaults to the
+#'   `depictr.base_size` option.
+#' @param base_family Base font family. Defaults to the `depictr.base_family`
+#'   option.
 #' @param grid Which major gridlines to keep: `"xy"`, `"x"`, `"y"` or `"none"`.
 #'
 #' @return A ggplot2 theme object.
@@ -123,7 +149,9 @@ scale_fill_depictr <- function(n = NULL, palette = NULL, ...) {
 #' ggplot(crop_yield, aes(fertilizer, yield)) +
 #'   geom_point() +
 #'   theme_depictr()
-theme_depictr <- function(base_size = 11, base_family = "", grid = "xy") {
+theme_depictr <- function(base_size = depictr_opt("base_size"),
+                          base_family = depictr_opt("base_family"),
+                          grid = "xy") {
   grid <- match.arg(grid, c("xy", "x", "y", "none"))
   th <- ggplot2::theme_minimal(base_size = base_size, base_family = base_family) +
     ggplot2::theme(
