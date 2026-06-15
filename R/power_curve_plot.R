@@ -105,7 +105,7 @@ powercurve_to_df <- function(x) {
     ensure_installed("simr", "to summarise a powerCurve object")
     df <- as.data.frame(summary(x))
     title <- tryCatch(
-      stringr::str_remove(stringr::str_remove_all(x$text, "Power for predictor |^'|'$"), "$^"),
+      clean_predictor_name(x$text),
       error = function(e) NULL
     )
   } else {
@@ -135,4 +135,23 @@ powercurve_to_df <- function(x) {
 pick_col <- function(df, cands) {
   hit <- intersect(cands, names(df))
   if (length(hit)) hit[1] else NA_character_
+}
+
+#' Extract a clean predictor name from a powerCurve `$text` string
+#'
+#' 'simr' stores the title as e.g. `"Power for predictor 'word_frequency'"`,
+#' where the predictor name is wrapped in single quotes (or back-ticks when it
+#' is a non-syntactic name). The previous regex left the leading quote behind,
+#' so the title rendered as `'word_frequency`. This strips the boilerplate and
+#' any surrounding quoting on both sides.
+#' @noRd
+clean_predictor_name <- function(text) {
+  if (is.null(text) || !length(text)) return(NULL)
+  out <- sub("^Power for predictor[: ]*", "", text[1])
+  out <- trimws(out)
+  # Drop matching leading/trailing quotes or back-ticks left by deparse/quote.
+  out <- sub("^['\"`]+", "", out)
+  out <- sub("['\"`]+$", "", out)
+  out <- trimws(out)
+  if (!nzchar(out)) NULL else out
 }

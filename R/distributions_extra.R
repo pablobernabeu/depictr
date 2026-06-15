@@ -49,7 +49,7 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
     }
     de <- stats::density(v)
     w <- de$y / max(de$y) * width
-    data.frame(g = g,
+    data.frame(g = factor(g, levels = groups),
                x = c(pos[[g]] + w, rep(pos[[g]], length(w))),
                yy = c(de$x, rev(de$x)),
                stringsAsFactors = FALSE)
@@ -61,7 +61,8 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
   }
   box <- do.call(rbind, lapply(groups, function(g) {
     bs <- grDevices::boxplot.stats(d[[y]][d$.g == g])$stats
-    data.frame(g = g, x = pos[[g]], ymin = bs[1], lower = bs[2],
+    data.frame(g = factor(g, levels = groups), x = pos[[g]],
+               ymin = bs[1], lower = bs[2],
                middle = bs[3], upper = bs[4], ymax = bs[5],
                stringsAsFactors = FALSE)
   }))
@@ -86,8 +87,8 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
       data = box,
       ggplot2::aes(x = .data$x, ymin = .data$ymin, lower = .data$lower,
                    middle = .data$middle, upper = .data$upper,
-                   ymax = .data$ymax, group = .data$g),
-      stat = "identity", width = 0.09, fill = "white", colour = "grey30"
+                   ymax = .data$ymax, colour = .data$g, group = .data$g),
+      stat = "identity", width = 0.09, fill = "white"
     ) +
     ggplot2::scale_x_continuous(breaks = pos, labels = groups) +
     ggplot2::labs(x = x_lab %||% (group %||% NULL), y = y_lab, title = title) +

@@ -96,20 +96,46 @@ optimizer_fixef_plot <- function(x,
 
   pal <- palette %||% depictr_palette(nlevels(df$optimizer))
 
-  ggplot2::ggplot(
+  p <- ggplot2::ggplot(
     df,
     ggplot2::aes(x = 0, y = .data$value, colour = .data$optimizer)
   ) +
     ggplot2::geom_point(
       size = point_size,
       position = ggplot2::position_dodge(width = 0.6)
-    ) +
-    ggplot2::facet_wrap(
-      ~ panel,
-      scales = if (free_y) "free" else "free_x",
-      ncol = ncol,
-      labeller = ggplot2::label_wrap_gen(width = 24)
-    ) +
+    )
+
+  if (free_y) {
+    # With free y-axes, optimisers that AGREE produce a per-panel range of a
+    # few floating-point ULPs. The default break algorithm then zooms in and
+    # prints the SAME rounded number on every break, exaggerating noise and
+    # making a good (stable) fit look broken. Enforce a sensible minimum span
+    # per panel so agreement reads as a tight cluster on a readable scale.
+    limits <- facet_y_limits(df)
+    p <- p +
+      ggplot2::geom_blank(
+        data = limits,
+        ggplot2::aes(x = 0, y = .data$value),
+        inherit.aes = FALSE
+      ) +
+      ggplot2::facet_wrap(
+        ~ panel,
+        scales = "free",
+        ncol = ncol,
+        labeller = ggplot2::label_wrap_gen(width = 24)
+      ) +
+      ggplot2::scale_y_continuous(labels = format_fixef_breaks)
+  } else {
+    p <- p +
+      ggplot2::facet_wrap(
+        ~ panel,
+        scales = "free_x",
+        ncol = ncol,
+        labeller = ggplot2::label_wrap_gen(width = 24)
+      )
+  }
+
+  p +
     ggplot2::scale_colour_manual(values = pal) +
     ggplot2::labs(x = NULL, y = y_lab, colour = "Optimiser", title = title) +
     theme_depictr(grid = "y") +
@@ -140,8 +166,15 @@ allfit_to_long <- function(x) {
     )
     return(out)
   }
-  ensure_installed("lme4", "to summarise an allFit() object")
-  fx <- summary(x)$fixef
+  # `x` may already be a summarised allFit (e.g. the shipped inst/extdata
+  # object), in which case `summary(x)` returns an atomic vector and
+  # `summary(x)$fixef` errors with "$ operator is invalid for atomic vectors".
+  if (inherits(x, "summary.allFit")) {
+    fx <- x$fixef
+  } else {
+    ensure_installed("lme4", "to summarise an allFit() object")
+    fx <- summary(x)$fixef
+  }
   if (is.null(fx)) {
     stop("Could not extract fixed effects from the allFit object.",
          call. = FALSE)
@@ -153,4 +186,60 @@ allfit_to_long <- function(x) {
     value = as.vector(fx),
     stringsAsFactors = FALSE
   )
+}
+
+#' Per-panel y-limits that enforce a sensible minimum range
+#'
+#' Returns two rows per panel (a low and a high limit) suitable for feeding to
+#' [ggplot2::geom_blank()], so that each free y-axis spans at least a readable
+#' window. When optimisers agree to several decimals the natural spread is a
+#' handful of floating-point ULPs; without a floor on the range, the axis zooms
+#' in until every break carries the same rounded label. The window is centred
+#' on the panel's values and sized to the larger of the observed spread and a
+#' small fraction of the magnitude (falling back to an absolute floor near
+#' zero).
+#' @noRd
+facet_y_limits <- function(df) {
+  panels <- split(df$value, df$panel)
+  panels <- panels[!vapply(panels, function(v) all(is.na(v)), logical(1))]
+  rows <- lapply(names(panels), function(nm) {
+    v   <- panels[[nm]]
+    v   <- v[is.finite(v)]
+    mid <- mean(range(v))
+    obs <- diff(range(v))
+    # Minimum half-window: a small fraction of the magnitude, but never below
+    # an absolute floor (keeps near-zero effects readable too).
+    floor_abs  <- 1e-6
+    floor_frac <- 0.001 * max(abs(v))
+    half <- max(obs / 2, floor_frac, floor_abs)
+    # Pad a little beyond the data so points are not flush against the border.
+    half <- half * 1.1
+    data.frame(
+      panel = factor(nm, levels = levels(df$panel)),
+      value = c(mid - half, mid + half),
+      stringsAsFactors = FALSE
+    )
+  })
+  do.call(rbind, rows)
+}
+
+#' Format fixed-effect axis breaks so repeated labels stay distinct
+#'
+#' Chooses the number of significant digits from the spread of the breaks, so a
+#' tight cluster of nearly-equal values still gets distinguishable tick labels
+#' instead of the same rounded number repeated down the axis.
+#' @noRd
+format_fixef_breaks <- function(breaks) {
+  b <- breaks[is.finite(breaks)]
+  if (!length(b)) return(format(breaks))
+  span <- diff(range(b))
+  if (span <= 0) {
+    return(formatC(breaks, format = "g", digits = 4))
+  }
+  # Digits after the decimal needed to separate adjacent breaks, with a small
+  # safety margin and a sane cap.
+  decimals <- max(0, ceiling(-log10(span)) + 2)
+  decimals <- min(decimals, 8)
+  out <- formatC(breaks, format = "f", digits = decimals)
+  trimws(out)
 }
