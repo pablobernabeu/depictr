@@ -49,8 +49,8 @@ residual_diagnostics_plot <- function(model,
   }
   if ("qq" %in% which) {
     panels$qq <- ggplot2::ggplot(df, ggplot2::aes(sample = .data$std_resid)) +
-      ggplot2::stat_qq(alpha = point_alpha, colour = "#005b96") +
-      ggplot2::stat_qq_line(colour = "#e23b3b", linetype = 2) +
+      ggplot2::stat_qq(alpha = point_alpha, colour = depictr_brand()) +
+      ggplot2::stat_qq_line(colour = depictr_reference(), linetype = 2) +
       ggplot2::labs(x = "Theoretical quantiles", y = "Standardised residuals",
                     title = "Normal Q-Q") +
       theme_depictr()
@@ -76,7 +76,7 @@ residual_diagnostics_plot <- function(model,
         title = title,
         theme = ggplot2::theme(
           plot.title = ggplot2::element_text(
-            colour = "#005b96", face = "bold", hjust = 0.5
+            colour = depictr_brand(), face = "bold", hjust = 0.5
           )
         )
       )
@@ -92,13 +92,13 @@ diag_scatter <- function(df, x, y, x_lab, y_lab, title, alpha, smooth,
   p <- ggplot2::ggplot(df, ggplot2::aes(x = .data[[x]], y = .data[[y]]))
   if (!is.null(hline)) {
     p <- p + ggplot2::geom_hline(yintercept = hline, linetype = 2,
-                                 colour = "grey60")
+                                 colour = depictr_reference())
   }
-  p <- p + ggplot2::geom_point(alpha = alpha, colour = "#005b96")
+  p <- p + ggplot2::geom_point(alpha = alpha, colour = depictr_brand())
   if (smooth) {
     p <- p + ggplot2::geom_smooth(
       method = "loess", formula = y ~ x, se = FALSE,
-      colour = "#e23b3b", linewidth = 0.7, na.rm = TRUE
+      colour = depictr_reference(), linewidth = 0.7, na.rm = TRUE
     )
   }
   p + ggplot2::labs(x = x_lab, y = y_lab, title = title) + theme_depictr()

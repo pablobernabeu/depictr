@@ -11,7 +11,7 @@
 #' @param model A fitted `lm` or `glm` model.
 #' @param n_label Number of most-influential points (by Cook's distance) to
 #'   label.
-#' @param colour Bubble colour.
+#' @param colour Bubble colour. Defaults to the depictr brand blue.
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -21,7 +21,7 @@
 #' @examples
 #' fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
 #' influence_plot(fit)
-influence_plot <- function(model, n_label = 3, colour = "#005b96",
+influence_plot <- function(model, n_label = 3, colour = depictr_brand(),
                            title = NULL) {
   if (!inherits(model, "lm")) {
     stop("`model` must be an 'lm' or 'glm' object.", call. = FALSE)
@@ -41,15 +41,15 @@ influence_plot <- function(model, n_label = 3, colour = "#005b96",
 
   ggplot2::ggplot(df, ggplot2::aes(x = .data$leverage, y = .data$residual)) +
     ggplot2::geom_hline(yintercept = c(-2, 0, 2), linetype = c(3, 2, 3),
-                        colour = "grey60") +
+                        colour = depictr_reference()) +
     ggplot2::geom_vline(xintercept = lev_thresh, linetype = 3,
-                        colour = "grey60") +
+                        colour = depictr_reference()) +
     ggplot2::geom_point(ggplot2::aes(size = .data$cook), alpha = 0.5,
                         colour = colour) +
     ggplot2::geom_text(
       data = top,
       ggplot2::aes(label = .data$label),
-      vjust = -0.8, size = 3, colour = "#e23b3b"
+      vjust = -0.8, size = 3, colour = depictr_accent()
     ) +
     ggplot2::scale_size_area(name = "Cook's D", max_size = 9) +
     ggplot2::labs(x = "Leverage", y = "Studentised residual", title = title) +
@@ -63,7 +63,7 @@ influence_plot <- function(model, n_label = 3, colour = "#005b96",
 #'
 #' @param x A numeric vector, or a fitted `lm`/`glm` model (its standardised
 #'   residuals are used).
-#' @param colour Point colour.
+#' @param colour Point colour. Defaults to the depictr brand blue.
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -72,7 +72,7 @@ influence_plot <- function(model, n_label = 3, colour = "#005b96",
 #' qq_plot(rnorm(100))
 #' fit <- lm(yield ~ rainfall + fertilizer, data = crop_yield)
 #' qq_plot(fit)
-qq_plot <- function(x, colour = "#005b96", title = NULL,
+qq_plot <- function(x, colour = depictr_brand(), title = NULL,
                     x_lab = "Theoretical quantiles",
                     y_lab = NULL) {
   if (inherits(x, "lm")) {
@@ -86,7 +86,7 @@ qq_plot <- function(x, colour = "#005b96", title = NULL,
   df <- data.frame(sample = vals[is.finite(vals)])
   ggplot2::ggplot(df, ggplot2::aes(sample = .data$sample)) +
     ggplot2::stat_qq(colour = colour, alpha = 0.6) +
-    ggplot2::stat_qq_line(colour = "#e23b3b", linetype = 2) +
+    ggplot2::stat_qq_line(colour = depictr_reference(), linetype = 2) +
     ggplot2::labs(x = x_lab, y = y_lab, title = title) +
     theme_depictr()
 }
