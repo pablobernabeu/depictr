@@ -15,17 +15,33 @@
 #' @param rolling Optional integer window for a centred moving-average overlay.
 #'   The data are ordered by time (within each group) before the moving average
 #'   is computed, so unsorted input is handled correctly.
+#' @param forecast Optional forecast overlay for a single (non-grouped) series.
+#'   Either an integer horizon (number of future steps) to forecast with the
+#'   built-in STL + seasonal-naive-with-drift method (see [ts_forecast()]), or a
+#'   pre-computed forecast supplied as a data frame with columns `time`, `fit`
+#'   and (optionally) `lwr`/`upr` -- for instance from a fitted
+#'   `forecast::forecast()` object. The point forecast continues the line and a
+#'   shaded prediction-interval ribbon, which widens with the horizon, is drawn
+#'   behind it.
+#' @param frequency Number of observations per period, used only to coerce a
+#'   numeric `x` to a `ts` when an integer `forecast` horizon is requested.
+#' @param level Prediction-interval coverage for the built-in forecast (a single
+#'   number strictly between 0 and 1, e.g. `0.95`).
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param point Whether to add points as well as the line.
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.
+#' @seealso [ts_forecast()], [decompose_plot()], [seasonal_plot()]
 #' @export
 #' @examples
 #' timeseries_plot(AirPassengers, rolling = 12,
 #'                 title = "Air passengers", y_lab = "Passengers")
+#' # 24-month forecast with a 90% prediction interval
+#' timeseries_plot(AirPassengers, forecast = 24, level = 0.9)
 timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
-                            rolling = NULL, palette = NULL, point = FALSE,
+                            rolling = NULL, forecast = NULL, frequency = NULL,
+                            level = 0.95, palette = NULL, point = FALSE,
                             title = NULL, x_lab = NULL, y_lab = NULL) {
   if (is.data.frame(x)) {
     tcol <- resolve_var(x, rlang::enquo(time), "time")
@@ -102,6 +118,27 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
     }
   }
 
+  if (!is.null(forecast)) {
+    if (multi) {
+      stop("A forecast overlay is only supported for a single series.",
+           call. = FALSE)
+    }
+    fc <- resolve_forecast(forecast, x, df, frequency = frequency,
+                           level = level)
+    if (!is.null(fc$lwr) && !is.null(fc$upr)) {
+      p <- p + ggplot2::geom_ribbon(
+        data = fc, ggplot2::aes(x = .data$time, ymin = .data$lwr,
+                                ymax = .data$upr),
+        fill = depictr_brand(), alpha = 0.15, inherit.aes = FALSE
+      )
+    }
+    p <- p + ggplot2::geom_line(
+      data = fc, ggplot2::aes(x = .data$time, y = .data$fit),
+      colour = depictr_accent(), linewidth = 0.8, linetype = "longdash",
+      na.rm = TRUE, inherit.aes = FALSE
+    )
+  }
+
   if (multi) p <- p + ggplot2::scale_colour_manual(values = pal, name = NULL)
   p + ggplot2::labs(x = x_lab, y = y_lab, title = title) + theme_depictr()
 }
@@ -176,15 +213,36 @@ acf_plot <- function(x, lag_max = NULL, type = c("correlation", "partial"),
 #'   data); taken from `x` when it is a `ts`.
 #' @param method `"stl"` (loess-based) or `"classical"`
 #'   ([stats::decompose()]).
+#' @param robust For `method = "stl"`, whether to fit a robust STL
+#'   ([stats::stl()] with `robust = TRUE`), which down-weights outliers in the
+#'   loess fits so that an unusual point bleeds less into the trend and seasonal
+#'   components. Ignored for the classical method.
+#' @param confidence Whether to draw a confidence ribbon around the trend
+#'   component. The band is a normal-approximation interval based on the
+#'   remainder's standard deviation (see Details). `FALSE` reproduces the
+#'   previous behaviour exactly.
+#' @param level Coverage of the trend confidence ribbon (a single number
+#'   strictly between 0 and 1).
 #' @param title Plot title.
 #'
+#' @details
+#' The trend confidence ribbon is a pragmatic normal-approximation band:
+#' `trend +/- z * sd(remainder)`, where `z = qnorm((1 + level) / 2)` and the
+#' remainder standard deviation is computed on the non-missing remainder values.
+#' It conveys the scale of the unexplained variation around the smoothed trend
+#' rather than a formal sampling-distribution interval.
+#'
 #' @return A 'patchwork' object (printable like a [ggplot2::ggplot]).
+#' @seealso [ts_forecast()], [seasonal_plot()]
 #' @export
 #' @examples
 #' decompose_plot(AirPassengers)
 #' decompose_plot(AirPassengers, method = "classical")
+#' # Robust STL with a confidence ribbon on the trend
+#' decompose_plot(AirPassengers, robust = TRUE, confidence = TRUE)
 decompose_plot <- function(x, frequency = NULL,
-                           method = c("stl", "classical"), title = NULL) {
+                           method = c("stl", "classical"), robust = FALSE,
+                           confidence = FALSE, level = 0.95, title = NULL) {
   method <- match.arg(method)
   if (!stats::is.ts(x)) {
     if (is.null(frequency)) {
@@ -196,10 +254,16 @@ decompose_plot <- function(x, frequency = NULL,
     stop("Decomposition needs a seasonal series (frequency >= 2).",
          call. = FALSE)
   }
+  if (confidence &&
+      (!is.numeric(level) || length(level) != 1 || !is.finite(level) ||
+       level <= 0 || level >= 1)) {
+    stop("`level` must be a single number strictly between 0 and 1.",
+         call. = FALSE)
+  }
   tt <- as.numeric(stats::time(x))
 
   if (method == "stl") {
-    dec <- stats::stl(x, s.window = "periodic")$time.series
+    dec <- stats::stl(x, s.window = "periodic", robust = robust)$time.series
     comps <- data.frame(
       trend = as.numeric(dec[, "trend"]),
       seasonal = as.numeric(dec[, "seasonal"]),
@@ -215,13 +279,31 @@ decompose_plot <- function(x, frequency = NULL,
   }
   observed <- as.numeric(x)
 
-  panel <- function(y, lab, colour) {
-    ggplot2::ggplot(data.frame(t = tt, y = y),
-                    ggplot2::aes(x = .data$t, y = .data$y)) +
+  panel <- function(y, lab, colour, ribbon = NULL) {
+    pd <- data.frame(t = tt, y = y)
+    g <- ggplot2::ggplot(pd, ggplot2::aes(x = .data$t, y = .data$y))
+    if (!is.null(ribbon)) {
+      pd$lwr <- ribbon$lwr
+      pd$upr <- ribbon$upr
+      g <- g + ggplot2::geom_ribbon(
+        data = pd, ggplot2::aes(x = .data$t, ymin = .data$lwr,
+                                ymax = .data$upr),
+        fill = colour, alpha = 0.15, inherit.aes = FALSE
+      )
+    }
+    g +
       ggplot2::geom_line(colour = colour, linewidth = 0.6, na.rm = TRUE) +
       ggplot2::labs(x = NULL, y = lab) +
       theme_depictr(grid = "y") +
       ggplot2::theme(plot.margin = ggplot2::margin(2, 6, 2, 6))
+  }
+
+  trend_ribbon <- NULL
+  if (confidence) {
+    z <- stats::qnorm((1 + level) / 2)
+    s <- stats::sd(comps$remainder, na.rm = TRUE)
+    trend_ribbon <- data.frame(lwr = comps$trend - z * s,
+                               upr = comps$trend + z * s)
   }
 
   # One colour per component (observed/trend/seasonal/remainder) drawn from the
@@ -230,7 +312,7 @@ decompose_plot <- function(x, frequency = NULL,
   comp_cols <- depictr_palette(4)
   p <- patchwork::wrap_plots(
     panel(observed, "observed", comp_cols[1]),
-    panel(comps$trend, "trend", comp_cols[2]),
+    panel(comps$trend, "trend", comp_cols[2], ribbon = trend_ribbon),
     panel(comps$seasonal, "seasonal", comp_cols[3]),
     panel(comps$remainder, "remainder", comp_cols[4]),
     ncol = 1
@@ -245,7 +327,141 @@ decompose_plot <- function(x, frequency = NULL,
   p
 }
 
+#' Forecast a seasonal series with STL plus seasonal-naive drift
+#'
+#' A lightweight, dependency-free forecaster for a single seasonal series. The
+#' series is decomposed with [stats::stl()] into trend, seasonal and remainder.
+#' The trend is extrapolated linearly from its last `frequency` fitted values
+#' (the recent local slope), the seasonal pattern is carried forward by repeating
+#' the last full cycle of the seasonal component (a seasonal-naive forecast), and
+#' the point forecast is their sum.
+#'
+#' Prediction intervals are a random-walk-style normal band: the one-step
+#' standard deviation is estimated from the STL remainder and the interval at
+#' horizon `h` is `fit +/- z * sigma * sqrt(h)`, so the band necessarily widens
+#' with the horizon. This mirrors how seasonal-naive forecast variance
+#' accumulates over time and gives an honest, monotonically growing uncertainty
+#' band without pulling in a heavy modelling dependency. For a fully specified
+#' statistical model use, for example, `forecast::forecast()` and pass the
+#' resulting fit/interval columns to [timeseries_plot()] directly.
+#'
+#' @param x A `ts` object, or a numeric vector (then `frequency` is required).
+#' @param h Forecast horizon: the number of future steps (a positive integer).
+#' @param frequency Number of observations per period; taken from `x` when it is
+#'   a `ts`.
+#' @param level Prediction-interval coverage (a single number strictly between 0
+#'   and 1).
+#'
+#' @return A data frame with one row per forecast step and columns `time` (the
+#'   future times, on the same scale as [stats::time()]), `fit`, `lwr` and
+#'   `upr`.
+#' @seealso [timeseries_plot()]
+#' @export
+#' @examples
+#' fc <- ts_forecast(AirPassengers, h = 12)
+#' head(fc)
+#' # Interval width grows with the horizon
+#' diff(fc$upr - fc$lwr) >= 0
+ts_forecast <- function(x, h = 12, frequency = NULL, level = 0.95) {
+  if (!stats::is.ts(x)) {
+    if (is.null(frequency)) {
+      stop("Supply `frequency` when `x` is not a ts object.", call. = FALSE)
+    }
+    x <- stats::ts(as.numeric(x), frequency = frequency)
+  }
+  if (!is.numeric(h) || length(h) != 1 || !is.finite(h) || h < 1 ||
+      abs(h - round(h)) > .Machine$double.eps^0.5) {
+    stop("`h` must be a single positive integer.", call. = FALSE)
+  }
+  h <- as.integer(round(h))
+  if (!is.numeric(level) || length(level) != 1 || !is.finite(level) ||
+      level <= 0 || level >= 1) {
+    stop("`level` must be a single number strictly between 0 and 1.",
+         call. = FALSE)
+  }
+  freq <- stats::frequency(x)
+  if (freq < 2) {
+    stop("`ts_forecast()` needs a seasonal series (frequency >= 2).",
+         call. = FALSE)
+  }
+  n <- length(x)
+  if (n < 2 * freq) {
+    stop("Need at least two full cycles (", 2 * freq,
+         " observations) to forecast.", call. = FALSE)
+  }
+
+  dec <- stats::stl(x, s.window = "periodic")$time.series
+  trend <- as.numeric(dec[, "trend"])
+  seasonal <- as.numeric(dec[, "seasonal"])
+  remainder <- as.numeric(dec[, "remainder"])
+
+  # Local linear extrapolation of the trend from its last full cycle.
+  last_idx <- seq.int(n - freq + 1L, n)
+  tr_fit <- stats::lm(y ~ t, data = data.frame(t = last_idx,
+                                               y = trend[last_idx]))
+  future_idx <- seq.int(n + 1L, n + h)
+  trend_fc <- stats::predict(tr_fit,
+                             newdata = data.frame(t = future_idx))
+
+  # Seasonal-naive: repeat the seasonal component of the last full cycle. Index
+  # by the season position (1..freq) so the right month/quarter is carried
+  # forward regardless of where the ts starts within its cycle.
+  cyc <- as.integer(stats::cycle(x))
+  last_cycle_idx <- seq.int(n - freq + 1L, n)
+  # Seasonal value keyed by season position.
+  season_value <- stats::setNames(seasonal[last_cycle_idx],
+                                  cyc[last_cycle_idx])
+  last_pos <- cyc[n]
+  season_pos <- ((last_pos - 1L + seq_len(h)) %% freq) + 1L
+  seasonal_fc <- as.numeric(season_value[as.character(season_pos)])
+
+  fit <- as.numeric(trend_fc) + seasonal_fc
+
+  sigma <- stats::sd(remainder, na.rm = TRUE)
+  z <- stats::qnorm((1 + level) / 2)
+  half <- z * sigma * sqrt(seq_len(h))
+
+  delta <- stats::deltat(x)
+  last_time <- as.numeric(stats::time(x))[n]
+  future_time <- last_time + delta * seq_len(h)
+
+  data.frame(time = future_time, fit = fit, lwr = fit - half,
+             upr = fit + half)
+}
+
 # ---- internal helpers ------------------------------------------------------
+
+#' Resolve the `forecast` argument of `timeseries_plot()` to a tidy data frame
+#'
+#' Accepts either an integer horizon (dispatching to [ts_forecast()] on the
+#' original `ts`/numeric input) or a pre-computed data frame with at least
+#' `time` and `fit` columns. The data frame is prepended with the last observed
+#' point so the overlaid forecast line joins the history seamlessly.
+#' @noRd
+resolve_forecast <- function(forecast, x, df, frequency = NULL, level = 0.95) {
+  if (is.data.frame(forecast)) {
+    if (!all(c("time", "fit") %in% names(forecast))) {
+      stop("A forecast data frame must have `time` and `fit` columns.",
+           call. = FALSE)
+    }
+    fc <- forecast
+    if (is.null(fc$lwr)) fc$lwr <- NA_real_
+    if (is.null(fc$upr)) fc$upr <- NA_real_
+    fc <- fc[, c("time", "fit", "lwr", "upr")]
+  } else {
+    if (is.data.frame(x)) {
+      stop("An integer `forecast` horizon needs a ts or numeric `x`; ",
+           "for a data frame supply a pre-computed forecast data frame.",
+           call. = FALSE)
+    }
+    fc <- ts_forecast(x, h = forecast, frequency = frequency, level = level)
+  }
+  # Anchor the forecast line at the last observed point for a continuous join.
+  last_obs <- df[which.max(df$time), , drop = FALSE]
+  anchor <- data.frame(time = last_obs$time, fit = last_obs$value,
+                       lwr = last_obs$value, upr = last_obs$value)
+  rbind(anchor, fc)
+}
 
 #' Validate and coerce a rolling-window argument to a positive integer
 #'
