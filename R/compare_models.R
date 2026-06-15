@@ -126,14 +126,15 @@ compare_models <- function(...,
 
   if (!is.na(reference_line)) {
     p <- p + ggplot2::geom_vline(
-      xintercept = reference_line, linetype = 2, colour = "grey60"
+      xintercept = reference_line, linetype = 2, colour = depictr_reference()
     )
   }
 
   p +
-    ggplot2::geom_errorbarh(
+    ggplot2::geom_errorbar(
       ggplot2::aes(xmin = .data$conf.low, xmax = .data$conf.high),
-      height = 0.18, linewidth = line_size, position = dodge, na.rm = TRUE
+      orientation = "y", width = 0.18, linewidth = line_size,
+      position = dodge, na.rm = TRUE
     ) +
     ggplot2::geom_point(size = point_size, position = dodge, na.rm = TRUE) +
     ggplot2::scale_colour_manual(
