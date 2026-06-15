@@ -9,8 +9,10 @@
 #'
 #' @param time A numeric vector of follow-up times, a data frame with `time`,
 #'   `status` and optional `group` columns, or a `survfit` object.
-#' @param status Event indicator (1 = event, 0 = censored) when `time` is a
-#'   vector.
+#' @param status Event indicator when `time` is a vector. Either the 0/1
+#'   convention (`0` = censored, `1` = event) or the [survival::Surv()] 1/2
+#'   convention (`1` = censored, `2` = event) is accepted; logical values are
+#'   also allowed. Other codings raise an error.
 #' @param group Optional grouping variable (a vector, or a column name when
 #'   `time` is a data frame).
 #' @param conf_level Confidence level for the limits (`NA` to omit them).
@@ -110,8 +112,10 @@ km_input <- function(time, status, group, conf_level) {
   for (g in groups) {
     sub <- gv == g
     out <- km_estimate(tv[sub], sv[sub], conf_level)
-    out$curve$group <- g
-    out$censor$group <- g
+    # Assign group with rep() so a zero-row censor data frame is left untouched
+    # (direct `$group <- g` errors when the frame has no rows).
+    out$curve$group <- rep(g, nrow(out$curve))
+    out$censor$group <- rep(g, nrow(out$censor))
     curves[[g]] <- out$curve
     censors[[g]] <- out$censor
   }
@@ -123,18 +127,29 @@ km_input <- function(time, status, group, conf_level) {
 km_estimate <- function(time, status, conf_level) {
   keep <- !is.na(time) & !is.na(status)
   time <- time[keep]
-  status <- as.integer(status[keep])
+  status <- normalise_status(status[keep])
+  has_ci <- !is.na(conf_level)
+  tmax <- if (length(time)) max(time) else 0
+
   ut <- sort(unique(time[status == 1]))
   if (length(ut) == 0) {
-    curve <- data.frame(time = 0, surv = 1, lower = 1, upper = 1)
-    return(list(curve = curve, censor = empty_censor()))
+    # All censored (or no data): a flat line at surv = 1 extended to the last
+    # follow-up time, like survival::plot.survfit. Keep the column layout in
+    # step with the event case so groups can be row-bound together.
+    curve <- data.frame(time = unique(c(0, tmax)), surv = 1)
+    if (has_ci) {
+      curve$lower <- 1
+      curve$upper <- 1
+    }
+    censor <- censor_marks_df(sort(time[status == 0]), ut, numeric(0))
+    return(list(curve = curve, censor = censor))
   }
   n_risk  <- vapply(ut, function(t) sum(time >= t), numeric(1))
   n_event <- vapply(ut, function(t) sum(time == t & status == 1), numeric(1))
   surv <- cumprod(1 - n_event / n_risk)
 
   curve <- data.frame(time = c(0, ut), surv = c(1, surv))
-  if (!is.na(conf_level)) {
+  if (has_ci) {
     cum <- cumsum(n_event / (n_risk * (n_risk - n_event)))
     se <- surv * sqrt(cum)
     z <- stats::qnorm(1 - (1 - conf_level) / 2)
@@ -142,18 +157,49 @@ km_estimate <- function(time, status, conf_level) {
     curve$upper <- c(1, pmin(1, surv + z * se))
   }
 
-  # Censoring marks: survival level at each censoring time
-  ct <- sort(time[status == 0])
-  if (length(ct)) {
-    sl <- vapply(ct, function(t) {
-      idx <- sum(ut <= t)
-      if (idx == 0) 1 else surv[idx]
-    }, numeric(1))
-    censor <- data.frame(time = ct, surv = sl)
-  } else {
-    censor <- empty_censor()
+  # Extend the flat step to the last follow-up time when censoring continues
+  # past the final event (survival::plot.survfit does the same).
+  if (tmax > ut[length(ut)]) {
+    tail_row <- curve[nrow(curve), , drop = FALSE]
+    tail_row$time <- tmax
+    curve <- rbind(curve, tail_row)
   }
+
+  # Censoring marks: survival level at each censoring time
+  censor <- censor_marks_df(sort(time[status == 0]), ut, surv)
   list(curve = curve, censor = censor)
+}
+
+#' Coerce an event-status vector to the 0/1 convention used internally
+#'
+#' Accepts logical values and the two common numeric encodings: 0/1
+#' (0 = censored, 1 = event) and the [survival::Surv()] 1/2 convention
+#' (1 = censored, 2 = event). Anything else is an error.
+#' @noRd
+normalise_status <- function(status) {
+  if (is.logical(status)) return(as.integer(status))
+  status <- as.integer(status)
+  vals <- unique(status[!is.na(status)])
+  if (length(vals) == 0) return(status)
+  if (all(vals %in% c(0L, 1L))) {
+    status
+  } else if (all(vals %in% c(1L, 2L))) {
+    status - 1L
+  } else {
+    stop("`status` must use the 0/1 (0 = censored) or 1/2 ",
+         "(1 = censored) coding.", call. = FALSE)
+  }
+}
+
+#' Survival level at each censoring time, as a (possibly empty) data frame
+#' @noRd
+censor_marks_df <- function(ct, ut, surv) {
+  if (!length(ct)) return(empty_censor())
+  sl <- vapply(ct, function(t) {
+    idx <- sum(ut <= t)
+    if (idx == 0) 1 else surv[idx]
+  }, numeric(1))
+  data.frame(time = ct, surv = sl)
 }
 
 #' @noRd
@@ -161,12 +207,68 @@ empty_censor <- function() data.frame(time = numeric(0), surv = numeric(0))
 
 #' @noRd
 km_from_survfit <- function(sf, conf_level) {
-  s <- summary(sf)
-  grp <- if (!is.null(s$strata)) as.character(s$strata) else "all"
-  curve <- data.frame(time = s$time, surv = s$surv, group = grp)
-  if (!is.null(s$lower)) {
-    curve$lower <- s$lower
-    curve$upper <- s$upper
+  # Use the survfit components directly rather than summary(): the latter drops
+  # pure-censoring time rows, so the censoring marks and the flat tail would be
+  # lost. This keeps the survfit path consistent with the vector/data-frame one
+  # (origin row at time 0, censoring marks, extension to last follow-up).
+  has_ci <- !is.na(conf_level) && !is.null(sf$lower)
+  if (!is.null(sf$strata)) {
+    grp_levels <- names(sf$strata)
+    grp <- rep(grp_levels, times = sf$strata)
+  } else {
+    grp_levels <- "all"
+    grp <- rep("all", length(sf$time))
   }
-  list(curve = curve, censor = empty_censor())
+
+  curves <- list()
+  censors <- list()
+  for (g in grp_levels) {
+    sel <- grp == g
+    tt <- sf$time[sel]
+    ss <- sf$surv[sel]
+    ord <- order(tt)
+    tt <- tt[ord]
+    ss <- ss[ord]
+    n_cens <- sf$n.censor[sel][ord]
+    n_evt  <- sf$n.event[sel][ord]
+
+    # Build the step curve, prepending the (time = 0, surv = 1) origin.
+    curve <- data.frame(time = c(0, tt), surv = c(1, ss),
+                        group = rep(g, length(tt) + 1L))
+    if (has_ci) {
+      lo <- sf$lower[sel][ord]
+      up <- sf$upper[sel][ord]
+      # survfit reports NA limits at points with no events (e.g. tail rows);
+      # carry the step forward so the band is drawn continuously.
+      lo <- fill_forward(lo, 1)
+      up <- fill_forward(up, 1)
+      curve$lower <- c(1, lo)
+      curve$upper <- c(1, up)
+    }
+    curves[[g]] <- curve
+
+    # Censoring marks at the survival level current at each censoring time.
+    ct <- tt[n_cens > 0]
+    if (length(ct)) {
+      # surv just after each event; for censoring marks use the level at that t.
+      sl <- ss[n_cens > 0]
+      cnt <- n_cens[n_cens > 0]
+      censors[[g]] <- data.frame(time = rep(ct, cnt), surv = rep(sl, cnt),
+                                 group = rep(g, sum(cnt)))
+    }
+  }
+
+  curve <- do.call(rbind, curves)
+  censor <- if (length(censors)) do.call(rbind, censors) else empty_censor()
+  list(curve = curve, censor = censor)
+}
+
+#' Replace leading/internal NAs by carrying the previous value forward
+#' @noRd
+fill_forward <- function(x, init) {
+  last <- init
+  for (i in seq_along(x)) {
+    if (is.na(x[i])) x[i] <- last else last <- x[i]
+  }
+  x
 }
