@@ -34,7 +34,7 @@
 #' }
 #' }
 random_effects_plot <- function(x, conf_level = 0.95, sort = TRUE,
-                                point_colour = "#005b96",
+                                point_colour = depictr_brand(),
                                 title = NULL, x_lab = "Random effect") {
   re <- if (is.data.frame(x)) ranef_from_df(x, conf_level) else
     ranef_from_model(x, conf_level)
@@ -47,10 +47,12 @@ random_effects_plot <- function(x, conf_level = 0.95, sort = TRUE,
   re$level <- factor(re$level, levels = unique(re$level))
 
   p <- ggplot2::ggplot(re, ggplot2::aes(x = .data$estimate, y = .data$level)) +
-    ggplot2::geom_vline(xintercept = 0, linetype = 2, colour = "grey60") +
-    ggplot2::geom_errorbarh(
+    ggplot2::geom_vline(xintercept = 0, linetype = 2,
+                        colour = depictr_reference()) +
+    ggplot2::geom_errorbar(
       ggplot2::aes(xmin = .data$conf.low, xmax = .data$conf.high),
-      height = 0, linewidth = 0.6, colour = point_colour, na.rm = TRUE
+      orientation = "y", width = 0, linewidth = 0.6, colour = point_colour,
+      na.rm = TRUE
     ) +
     ggplot2::geom_point(size = 1.6, colour = point_colour) +
     ggplot2::labs(x = x_lab, y = NULL, title = title) +

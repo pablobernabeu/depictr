@@ -42,8 +42,8 @@ coefficient_plot <- function(x,
                       order = c("none", "ascending", "descending"),
                       labels = NULL,
                       interaction = c("times", "asterisk", "colon", "space"),
-                      point_colour = "#005b96",
-                      reference_colour = "grey60",
+                      point_colour = depictr_brand(),
+                      reference_colour = depictr_reference(),
                       reference_line = 0,
                       point_size = 2.2,
                       line_size = 0.7,
@@ -84,10 +84,10 @@ coefficient_plot <- function(x,
   }
 
   p <- p +
-    ggplot2::geom_errorbarh(
+    ggplot2::geom_errorbar(
       ggplot2::aes(xmin = .data$conf.low, xmax = .data$conf.high),
-      height = 0.18, linewidth = line_size, colour = point_colour,
-      na.rm = TRUE
+      orientation = "y", width = 0.18, linewidth = line_size,
+      colour = point_colour, na.rm = TRUE
     ) +
     ggplot2::geom_point(size = point_size, colour = point_colour) +
     ggplot2::labs(x = x_lab, y = NULL, title = title, subtitle = subtitle) +
