@@ -118,11 +118,20 @@ confusion_matrix_plot <- function(x, predicted = NULL, threshold = 0.5,
                                   title = NULL) {
   normalize <- match.arg(normalize)
   if (inherits(x, "glm")) {
-    actual <- as_binary(stats::model.response(stats::model.frame(x)))
-    pred <- as.integer(stats::fitted(x) >= threshold)
-    lvls <- c("0", "1")
-    actual <- factor(actual, levels = c(0, 1), labels = lvls)
-    pred <- factor(pred, levels = c(0, 1), labels = lvls)
+    resp <- stats::model.response(stats::model.frame(x))
+    actual_bin <- as_binary(resp)
+    pred_bin <- as.integer(stats::fitted(x) >= threshold)
+    # Recover the model's own class names so the matrix is labelled with the
+    # real outcome levels (e.g. "no"/"yes") rather than a hardcoded 0/1.
+    if (is.factor(resp)) {
+      lvls <- levels(resp)
+    } else if (is.logical(resp)) {
+      lvls <- c("FALSE", "TRUE")
+    } else {
+      lvls <- c("0", "1")
+    }
+    actual <- factor(lvls[actual_bin + 1L], levels = lvls)
+    pred <- factor(lvls[pred_bin + 1L], levels = lvls)
   } else {
     if (is.null(predicted)) {
       stop("Supply `predicted` when `x` is not a model.", call. = FALSE)
@@ -165,44 +174,94 @@ confusion_matrix_plot <- function(x, predicted = NULL, threshold = 0.5,
 
 # ---- internal helpers ------------------------------------------------------
 
+#' Coerce an outcome vector to 0/1
+#'
+#' NA values are preserved (not coerced or rejected); complete-case filtering is
+#' handled by the callers so that `actual` and `score` are dropped pairwise.
+#'
+#' @param y A logical, two-level factor, or 0/1 numeric vector.
+#' @param positive For a factor, the level treated as the positive (1) class.
+#'   Defaults to the second (last) level, matching the package convention.
 #' @noRd
-as_binary <- function(y) {
+as_binary <- function(y, positive = NULL) {
   if (is.logical(y)) return(as.integer(y))
-  if (is.factor(y)) return(as.integer(as.integer(y) == 2L))
-  y <- as.numeric(y)
-  if (!all(y %in% c(0, 1), na.rm = TRUE)) {
+  if (is.factor(y)) {
+    lv <- levels(y)
+    if (length(lv) > 2L) {
+      stop("The outcome factor has ", length(lv),
+           " levels; a binary outcome must have exactly two. Levels: ",
+           paste(lv, collapse = ", "), ".", call. = FALSE)
+    }
+    if (is.null(positive)) {
+      positive <- lv[length(lv)]
+    } else if (!positive %in% lv) {
+      stop("`positive` (\"", positive,
+           "\") is not a level of the outcome factor. Levels: ",
+           paste(lv, collapse = ", "), ".", call. = FALSE)
+    }
+    return(as.integer(as.character(y) == positive))
+  }
+  yn <- suppressWarnings(as.numeric(y))
+  ok <- is.na(y) | yn %in% c(0, 1)
+  if (!all(ok)) {
     stop("The outcome must be binary (0/1, logical or a two-level factor).",
          call. = FALSE)
   }
-  as.integer(y)
+  as.integer(yn)
 }
 
 #' @noRd
 binary_inputs <- function(x, score) {
   if (inherits(x, "glm")) {
-    return(list(
-      actual = as_binary(stats::model.response(stats::model.frame(x))),
-      score = as.numeric(stats::fitted(x))
-    ))
+    actual <- as_binary(stats::model.response(stats::model.frame(x)))
+    sc <- as.numeric(stats::fitted(x))
+    return(drop_incomplete(actual, sc))
   }
   if (is.null(score)) {
     stop("Supply `score` when `x` is not a model.", call. = FALSE)
   }
-  list(actual = as_binary(x), score = as.numeric(score))
+  drop_incomplete(as_binary(x), as.numeric(score))
+}
+
+#' Drop observations with a missing outcome or score, pairwise
+#' @noRd
+drop_incomplete <- function(actual, score) {
+  keep <- !is.na(actual) & !is.na(score)
+  if (!all(keep)) {
+    message(sum(!keep), " observation(s) with a missing outcome or score ",
+            "were dropped.")
+  }
+  list(actual = actual[keep], score = score[keep])
+}
+
+#' Accumulate TP/FP counts at each distinct score threshold
+#'
+#' Collapsing tied scores into a single step makes ROC/PR/gain summaries
+#' independent of the input row order: the AUC then equals the Mann-Whitney
+#' statistic with ties counted as 0.5.
+#' @noRd
+threshold_counts <- function(actual, score) {
+  # Distinct thresholds in decreasing score order; ties share one step.
+  o <- order(score, decreasing = TRUE)
+  y <- actual[o]
+  s <- score[o]
+  tp <- cumsum(y == 1)
+  fp <- cumsum(y == 0)
+  # Keep the last row of each run of equal scores (the cumulative totals once
+  # every observation at that threshold has been included).
+  last <- !duplicated(s, fromLast = TRUE)
+  list(tp = tp[last], fp = fp[last])
 }
 
 #' @noRd
 roc_points <- function(actual, score) {
-  o <- order(score, decreasing = TRUE)
-  y <- actual[o]
   P <- sum(actual == 1)
   N <- sum(actual == 0)
   if (P == 0 || N == 0) {
     stop("ROC needs both positive and negative outcomes.", call. = FALSE)
   }
-  tpr <- cumsum(y == 1) / P
-  fpr <- cumsum(y == 0) / N
-  data.frame(fpr = c(0, fpr), tpr = c(0, tpr))
+  cc <- threshold_counts(actual, score)
+  data.frame(fpr = c(0, cc$fp / N), tpr = c(0, cc$tp / P))
 }
 
 #' @noRd

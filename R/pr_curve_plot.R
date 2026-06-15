@@ -52,9 +52,8 @@ pr_points <- function(actual, score) {
     stop("Precision-recall needs both positive and negative outcomes.",
          call. = FALSE)
   }
-  o <- order(score, decreasing = TRUE)
-  y <- actual[o]
-  tp <- cumsum(y == 1)
-  fp <- cumsum(y == 0)
-  data.frame(recall = tp / P, precision = tp / (tp + fp))
+  # Collapse tied scores into a single threshold step so the curve and the
+  # average precision do not depend on the input row order.
+  cc <- threshold_counts(actual, score)
+  data.frame(recall = cc$tp / P, precision = cc$tp / (cc$tp + cc$fp))
 }

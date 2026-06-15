@@ -79,14 +79,16 @@ lift_plot <- function(x, score = NULL, colour = "#005b96", title = NULL) {
 #' Cumulative share of population vs share of positives captured
 #' @noRd
 gain_table <- function(actual, score) {
+  n <- length(actual)
   P <- sum(actual == 1)
-  if (P == 0 || P == length(actual)) {
+  if (P == 0 || P == n) {
     stop("Gains/lift need both positive and negative outcomes.", call. = FALSE)
   }
-  o <- order(score, decreasing = TRUE)
-  y <- actual[o]
+  # Collapse tied scores: each distinct threshold targets all observations with
+  # that score at once, so the curve is independent of the input row order.
+  cc <- threshold_counts(actual, score)
   data.frame(
-    population = c(0, seq_along(y) / length(y)),
-    captured = c(0, cumsum(y == 1) / P)
+    population = c(0, (cc$tp + cc$fp) / n),
+    captured = c(0, cc$tp / P)
   )
 }
