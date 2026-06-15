@@ -20,3 +20,6 @@ Rplots.pdf
 # OS cruft
 .DS_Store
 Thumbs.db
+
+# local staging of ARC model outputs (small ones shipped via inst/extdata)
+dev/model-outputs/

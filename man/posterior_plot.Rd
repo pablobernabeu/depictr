@@ -2,46 +2,87 @@
 % Please edit documentation in R/posterior_plot.R
 \name{posterior_plot}
 \alias{posterior_plot}
-\title{Plot posterior distributions and intervals}
+\title{Plot posterior distributions}
 \usage{
 posterior_plot(
   draws,
+  style = c("halfeye", "interval", "gradient", "dots"),
   point = c("median", "mean"),
   widths = c(0.66, 0.95),
   interaction = c("times", "asterisk", "colon", "space"),
   reference_line = 0,
+  rope = NULL,
+  pd = FALSE,
   colour = depictr_brand(),
+  fill = depictr_brand(),
+  rope_fill = depictr_reference(),
+  rope_alpha = 0.15,
   title = NULL,
-  x_lab = "Value"
+  x_lab = "Value",
+  caption = NULL
 )
 }
 \arguments{
-\item{draws}{A data frame of draws: either long (parameter + value columns)
-or wide (one numeric column per parameter).}
+\item{draws}{Posterior draws: a fitted model (\code{brms}/\code{rstanarm}), a
+\code{posterior} draws object, a matrix, or a long/wide data frame (see
+Details).}
+
+\item{style}{One of \code{"halfeye"} (density slab + interval, the default),
+\code{"interval"} (point and two nested intervals, no slab), \code{"gradient"} (a
+colour-graded interval) or \code{"dots"} (a quantile dotplot). Unknown values
+and a missing 'ggdist' fall back to \code{"interval"}.}
 
 \item{point}{Central summary: \code{"median"} or \code{"mean"}.}
 
-\item{widths}{Two interval widths (inner and outer), as probabilities.}
+\item{widths}{Two interval widths (inner and outer), as probabilities. The
+outer width is used for the caption and the displayed interval mass.}
 
 \item{interaction}{Passed to \code{\link[=format_terms]{format_terms()}} for the parameter labels.}
 
-\item{reference_line}{Position of a vertical reference line (\code{NA} to omit).}
+\item{reference_line}{Position of a vertical reference line, or \code{NULL}/\code{NA}
+to omit it. There is no universally meaningful reference for every
+parameter, so this defaults to \code{0} (the usual "no effect" line for
+differences and slopes) but should be set or cleared deliberately.}
 
-\item{colour}{Colour for the points and intervals. Defaults to the depictr
-brand blue.}
+\item{rope}{Optional length-2 numeric \code{c(lo, hi)} giving a region of
+practical equivalence to shade behind the distributions.}
+
+\item{pd}{If \code{TRUE}, annotate each parameter with its probability of
+direction relative to \code{reference_line} -- the posterior probability that
+the parameter lies on its majority side of the reference (a value in
+[0.5, 1]). Requires a finite \code{reference_line}.}
+
+\item{colour, fill}{Colours for the point/interval and for the density slab.
+Default to the depictr brand blue.}
+
+\item{rope_fill, rope_alpha}{Fill colour and opacity of the ROPE band.}
 
 \item{title, x_lab}{Plot title and value-axis label.}
+
+\item{caption}{Plot caption. The default (\code{NULL}) auto-captions the interval
+mass; pass \code{NA} to omit a caption.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Summarises posterior (or, more generally, bootstrap or simulation) draws as a
-point with two nested credible intervals, in the classic "half-eye" style of
-uncertainty display. Draws may be supplied in long form (a parameter column
-and a value column) or wide form (one column of draws per parameter), so the
-function works with the output of any sampler and depends on no particular
-modelling package.
+Displays posterior (or, more generally, bootstrap or simulation) draws as a
+\emph{distribution} per parameter, in the style of a half-eye (a density slab with
+a point-and-interval beneath it), an interval-only forest plot, a gradient
+interval or a dotplot. The full shape of the posterior is shown, so skew,
+multimodality and the relative mass on either side of a reference value are
+all visible -- not just a point and two limits.
+}
+\details{
+Draws may be supplied in many shapes: a fitted Bayesian model (\code{brms} or
+\code{rstanarm}), a \code{posterior} \emph{draws} object, a wide data frame or matrix with
+one column of draws per parameter, or a long data frame (a parameter column
+and a value column). For fitted models only the fixed-effect (population)
+parameters are kept, with the \code{brms} \code{b_} prefix stripped.
+
+The slab styles use the 'ggdist' package. When 'ggdist' is not installed the
+function falls back to the point-and-nested-interval display (equivalent to
+\code{style = "interval"}) and emits an informative message.
 }
 \examples{
 # Wide draws: one column per parameter
@@ -53,4 +94,7 @@ draws <- data.frame(
   check.names = FALSE
 )
 posterior_plot(draws)
+
+# A region of practical equivalence and a probability-of-direction label
+posterior_plot(draws, rope = c(-0.1, 0.1), pd = TRUE)
 }

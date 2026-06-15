@@ -23,7 +23,8 @@ frequentist_bayesian_plot(
 \item{frequentist}{A frequentist model (e.g. from \code{lm}, \code{glm} or
 \code{lmerTest::lmer}) or a tidy data frame of estimates.}
 
-\item{bayesian}{A Bayesian model or a tidy data frame of posterior summaries.}
+\item{bayesian}{A Bayesian model, a \code{posterior} draws object, a draws
+matrix/data frame, or a tidy data frame of posterior summaries.}
 
 \item{conf_level}{Confidence/credible level for models.}
 
@@ -34,39 +35,53 @@ frequentist_bayesian_plot(
 frequentist legend label, which is helpful when the title names the
 Bayesian prior.}
 
-\item{vertical_line_at_x}{Position of the vertical reference line.}
+\item{vertical_line_at_x}{Position of the vertical reference line (\code{NA} to
+omit).}
 
 \item{title, subtitle, x_lab}{Title, subtitle and x-axis label.}
 
-\item{...}{Further arguments passed to \code{\link[=compare_models]{compare_models()}}.}
+\item{...}{Further arguments passed to \code{\link[=compare_models]{compare_models()}} on the summary
+path (ignored on the distribution path).}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Presents the estimates from a frequentist model and a Bayesian model side by
-side on one forest plot, with the two sources distinguished by the first two
-colours of the colourblind-safe \code{\link[=depictr_palette]{depictr_palette()}} (brand blue and orange).
-The function is a convenience wrapper around \code{\link[=compare_models]{compare_models()}}.
+Presents the estimates from a frequentist model and a Bayesian model on one
+plot, with the two sources distinguished by the first two colours of the
+colourblind-safe \code{\link[=depictr_palette]{depictr_palette()}} (brand blue and orange).
 }
 \details{
-It is a modernised, self-contained successor to the original
-\code{frequentist_bayesian_plot()} gist. The Bayesian estimates may be supplied
-as a fitted model or, more commonly, as a tidy data frame of posterior
-summaries (with columns such as \code{term}, \code{estimate} and
-\code{conf.low}/\code{conf.high}, or the \code{Estimate}, \verb{l-95\% CI} and \verb{u-95\% CI}
-produced by \code{brms::fixef()}). Terms are aligned by name, so any small
-differences in naming between the two sources need only be reconciled in the
-term labels.
+This is the modernised successor to the original \code{frequentist_bayesian_plot()}
+gist, which built on \code{brms::mcmc_plot()} to show the full Bayesian posterior
+with the frequentist estimate overlaid. That namesake behaviour is restored
+here: when \code{bayesian} carries posterior \emph{draws} (a \code{brms}/\code{rstanarm} fit, a
+\code{posterior} draws object, a draws matrix, or a long/wide draws data frame),
+the full posterior \strong{distribution} is drawn per term (a 'ggdist' half-eye)
+and the frequentist \strong{point and confidence interval} is overlaid at the same
+position. When \code{bayesian} is only a tidy table of posterior \emph{summaries}
+(columns such as \code{term}, \code{estimate}, \code{conf.low}/\code{conf.high}, or the
+\code{Estimate}, \verb{l-95\% CI}, \verb{u-95\% CI} of \code{brms::fixef()}), the function shows the
+familiar two-source forest plot via \code{\link[=compare_models]{compare_models()}}.
+
+Terms are aligned by their canonical display label, so the \code{brms}-style \code{b_}
+prefix is reconciled automatically against the frequentist term names.
 }
 \examples{
-# Same model fitted two ways here purely so the example is self-contained;
-# in practice `bayesian` would come from brms, rstanarm, etc.
+# Summary path: a tidy "Bayesian" summary as a data frame.
 freq <- lm(life_satisfaction ~ stress + sleep_hours + exercise_days,
            data = wellbeing_survey)
-# A stand-in "Bayesian" summary as a tidy data frame:
 bayes <- tidy_estimates(freq)
 bayes$estimate <- bayes$estimate * 0.95
 frequentist_bayesian_plot(freq, bayes,
                           title = "Frequentist vs. Bayesian estimates")
+
+# Distribution path: simulated posterior draws (one column per term) drawn as
+# full posteriors with the frequentist point + CI overlaid.
+set.seed(1)
+co <- coef(freq)
+draws <- as.data.frame(lapply(co, function(m) rnorm(2000, m, abs(m) * 0.1 + 0.05)))
+names(draws) <- names(co)
+frequentist_bayesian_plot(freq, draws,
+                          title = "Posterior with frequentist overlay")
 }
