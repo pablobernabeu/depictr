@@ -125,18 +125,40 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
 #' @param conf_level Confidence level for the intervals (t-based).
 #' @param show_points Whether to draw the raw data behind the means.
 #' @param point_alpha Transparency of the raw points.
+#' @param differences If `TRUE`, append a lower panel showing the pairwise mean
+#'   difference(s) against a reference group, each with a bootstrap confidence
+#'   interval, turning the plot into a full estimation plot via
+#'   [estimation_plot()]. The return value is then a 'patchwork' object. Defaults
+#'   to `FALSE` (the plain group-means plot, fully backward-compatible).
+#' @param reference Reference group for the difference panel when
+#'   `differences = TRUE`; defaults to the first level of `group`. Ignored
+#'   otherwise.
+#' @param n_boot Number of bootstrap resamples for the difference intervals when
+#'   `differences = TRUE`. Ignored otherwise.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
-#' @return A [ggplot2::ggplot] object.
+#' @return A [ggplot2::ggplot] object, or a 'patchwork' object when
+#'   `differences = TRUE`.
 #' @export
 #' @examples
 #' group_comparison_plot(lexical_decision, RT, condition)
 #' group_comparison_plot(crop_yield, yield, treatment)
+#' # Append the pairwise mean-difference panel (an estimation plot):
+#' set.seed(1)
+#' group_comparison_plot(crop_yield, yield, treatment, differences = TRUE)
 group_comparison_plot <- function(data, y, group, conf_level = 0.95,
                                   show_points = TRUE, point_alpha = 0.25,
-                                  palette = NULL, title = NULL, x_lab = NULL,
-                                  y_lab = NULL) {
+                                  differences = FALSE, reference = NULL,
+                                  n_boot = 5000, palette = NULL, title = NULL,
+                                  x_lab = NULL, y_lab = NULL) {
+  if (isTRUE(differences)) {
+    return(estimation_plot(
+      data, y = {{ y }}, group = {{ group }}, reference = reference,
+      conf_level = conf_level, n_boot = n_boot, show_points = show_points,
+      point_alpha = point_alpha, palette = palette, title = title, y_lab = y_lab
+    ))
+  }
   y <- resolve_var(data, rlang::enquo(y), "y")
   group <- resolve_var(data, rlang::enquo(group), "group")
   if (!is.numeric(data[[y]])) stop("`y` must be numeric.", call. = FALSE)
