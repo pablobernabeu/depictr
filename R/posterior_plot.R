@@ -15,7 +15,8 @@
 #' @param widths Two interval widths (inner and outer), as probabilities.
 #' @param interaction Passed to [format_terms()] for the parameter labels.
 #' @param reference_line Position of a vertical reference line (`NA` to omit).
-#' @param colour Colour for the points and intervals.
+#' @param colour Colour for the points and intervals. Defaults to the depictr
+#'   brand blue.
 #' @param title,x_lab Plot title and value-axis label.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -34,7 +35,7 @@ posterior_plot <- function(draws, point = c("median", "mean"),
                            widths = c(0.66, 0.95),
                            interaction = c("times", "asterisk", "colon",
                                            "space"),
-                           reference_line = 0, colour = "#005b96",
+                           reference_line = 0, colour = depictr_brand(),
                            title = NULL, x_lab = "Value") {
   point <- match.arg(point)
   interaction <- match.arg(interaction)
@@ -63,7 +64,7 @@ posterior_plot <- function(draws, point = c("median", "mean"),
   p <- ggplot2::ggplot(summ, ggplot2::aes(y = .data$label))
   if (!is.na(reference_line)) {
     p <- p + ggplot2::geom_vline(xintercept = reference_line, linetype = 2,
-                                 colour = "grey60")
+                                 colour = depictr_reference())
   }
   p +
     ggplot2::geom_linerange(
