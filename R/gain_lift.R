@@ -60,7 +60,14 @@ gain_plot <- function(x, score = NULL, colour = depictr_brand(), title = NULL) {
                          colour = depictr_reference(), linewidth = 0.5) +
       ggplot2::geom_line(data = gs[[1]],
                          ggplot2::aes(x = .data$population, y = .data$captured),
-                         colour = colour, linewidth = 0.9)
+                         colour = colour, linewidth = 0.9) +
+      # Label the reference lines in place rather than adding a second legend.
+      ggplot2::annotate("text", x = min(prevalence + 0.04, 0.85), y = 0.99,
+                        hjust = 0, vjust = 1, label = "Perfect model",
+                        colour = "grey40", size = 3, fontface = "italic") +
+      ggplot2::annotate("text", x = 0.97, y = 0.9, hjust = 1, vjust = 1,
+                        angle = 45, label = "Random baseline",
+                        colour = "grey40", size = 3, fontface = "italic")
   }
 
   p +
@@ -124,6 +131,14 @@ lift_plot <- function(x, score = NULL, colour = depictr_brand(), title = NULL) {
       ggplot2::geom_line(data = gs[[1]],
                          ggplot2::aes(x = .data$population, y = .data$lift),
                          colour = colour, linewidth = 0.9)
+  }
+
+  if (!multi) {
+    # Identify the baseline directly, matching gain_plot's style.
+    p <- p +
+      ggplot2::annotate("text", x = 0.99, y = 1, hjust = 1, vjust = -0.4,
+                        label = "Random baseline", colour = "grey40",
+                        size = 3, fontface = "italic")
   }
 
   p +

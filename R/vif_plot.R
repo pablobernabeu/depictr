@@ -60,7 +60,12 @@ vif_plot <- function(model, threshold = 5,
                    stringsAsFactors = FALSE)
   df <- df[order(df$vif), , drop = FALSE]
   df$term <- factor(df$term, levels = df$term)
-  df$flag <- factor(df$vif >= thr, levels = c(FALSE, TRUE))
+  df$flag <- factor(ifelse(df$vif >= thr, "above", "below"),
+                    levels = c("below", "above"))
+
+  # Adapt the x-range to the data and the reference lines, so the bars are not
+  # squeezed to the left with a wide empty band on the right.
+  upper <- max(c(df$vif, thr)) * 1.12
 
   x_lab <- if (any(res$df > 1)) {
     expression(GVIF^{1 / (2 * df)})
@@ -74,13 +79,29 @@ vif_plot <- function(model, threshold = 5,
     ggplot2::geom_vline(xintercept = thr_half, linetype = 2,
                         colour = depictr_reference()) +
     ggplot2::geom_vline(xintercept = thr, linetype = 1,
-                        colour = depictr_reference()) +
+                        colour = "grey40") +
+    # Label the threshold guides in place, staggered so they never collide when
+    # the two lines sit close together at a large-VIF range.
+    ggplot2::annotate("text", x = thr, y = Inf, vjust = 1.3, hjust = -0.1,
+                      label = paste0("VIF = ", format(threshold)),
+                      colour = "grey40", size = 3, fontface = "italic") +
+    ggplot2::annotate("text", x = thr_half, y = Inf, vjust = 3.0, hjust = -0.1,
+                      label = paste0("VIF = ", format(threshold / 2)),
+                      colour = depictr_reference(), size = 3,
+                      fontface = "italic") +
     ggplot2::scale_fill_manual(
-      values = c(`FALSE` = palette[1], `TRUE` = palette[2]), guide = "none",
+      name = NULL,
+      values = c(below = palette[1], above = palette[2]),
+      breaks = c("below", "above"),
+      labels = c(paste0("VIF < ", format(threshold)),
+                 paste0("VIF >= ", format(threshold))),
       drop = FALSE
     ) +
+    ggplot2::scale_x_continuous(limits = c(0, upper),
+                                expand = ggplot2::expansion(mult = c(0, 0))) +
     ggplot2::labs(x = x_lab, y = NULL, title = title) +
-    theme_depictr(grid = "x")
+    theme_depictr(grid = "x") +
+    ggplot2::theme(legend.position = "top", legend.justification = "right")
 }
 
 # ---- internal helpers ------------------------------------------------------

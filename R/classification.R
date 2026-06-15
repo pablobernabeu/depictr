@@ -347,16 +347,21 @@ confusion_matrix_plot <- function(x, predicted = NULL, threshold = 0.5,
   }
 
   # Source the tile fill from the canonical sequential palette (a single-hue
-  # ramp from a pale tint up to the brand-blue dark end) rather than ad-hoc
-  # hex literals. The contrast-text logic is unchanged: cells in the darker
-  # (above-median) half get white text, the lighter half dark text.
+  # ramp from a pale tint up to the brand-blue dark end). Choose each label's
+  # colour from the TILE's own luminance, so counts stay legible on both pale
+  # low-count and dark high-count cells. A global shade-vs-median rule fails
+  # when one cell dominates the range (it leaves white text on a pale cell).
   fill_ramp <- depictr_palette(type = "sequential")
+  rng <- range(tab$shade)
+  frac <- if (diff(rng) > 0) (tab$shade - rng[1]) / diff(rng) else rep(0, nrow(tab))
+  tile_hex <- grDevices::rgb(grDevices::colorRamp(fill_ramp)(frac),
+                             maxColorValue = 255)
+  tab$text_col <- ifelse(.relative_luminance(tile_hex) > 0.4, "grey15", "white")
   p <- ggplot2::ggplot(tab, ggplot2::aes(x = .data$Predicted, y = .data$Actual,
                                          fill = .data$shade)) +
     ggplot2::geom_tile(colour = "white", linewidth = 1) +
     ggplot2::geom_text(ggplot2::aes(label = .data$label),
-                       colour = ifelse(tab$shade > stats::median(tab$shade),
-                                       "white", "grey15"), size = 3.5) +
+                       colour = tab$text_col, size = 3.5) +
     ggplot2::scale_fill_gradientn(colours = fill_ramp, guide = "none") +
     ggplot2::coord_equal() +
     ggplot2::labs(x = "Predicted", y = "Actual", title = title) +
