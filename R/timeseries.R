@@ -13,6 +13,8 @@
 #' @param group When `x` is a data frame, an optional grouping column mapped to
 #'   colour.
 #' @param rolling Optional integer window for a centred moving-average overlay.
+#'   The data are ordered by time (within each group) before the moving average
+#'   is computed, so unsorted input is handled correctly.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param point Whether to add points as well as the line.
 #' @param title,x_lab,y_lab Title and axis labels.
@@ -50,6 +52,9 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
   }
   y_lab <- y_lab %||% "Value"
   df$series <- factor(df$series, levels = unique(df$series))
+  # Order by series then time so the moving average (and the drawn lines) follow
+  # time order even when the input data frame is unsorted.
+  df <- df[order(df$series, df$time), , drop = FALSE]
   multi <- nlevels(df$series) > 1
   pal <- palette %||% depictr_palette(nlevels(df$series))
 
@@ -70,14 +75,24 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
   }
 
   if (!is.null(rolling)) {
+    rolling <- validate_window(rolling)
+    min_len <- min(tabulate(df$series))
+    if (rolling > min_len) {
+      stop("`rolling` (", rolling, ") is larger than the shortest series (",
+           min_len, " observation", if (min_len == 1) "" else "s",
+           "); choose a smaller window.", call. = FALSE)
+    }
     df$roll <- stats::ave(df$value, df$series,
                           FUN = function(v) moving_average(v, rolling))
     if (multi) {
       p <- p + ggplot2::geom_line(
         data = df, ggplot2::aes(x = .data$time, y = .data$roll,
-                                colour = .data$series),
-        linewidth = 1, linetype = 1, na.rm = TRUE
-      )
+                                colour = .data$series,
+                                linetype = "Moving average"),
+        linewidth = 1, na.rm = TRUE
+      ) +
+        ggplot2::scale_linetype_manual(values = c("Moving average" = "dashed"),
+                                       name = NULL)
     } else {
       p <- p + ggplot2::geom_line(
         data = df, ggplot2::aes(x = .data$time, y = .data$roll),
@@ -98,7 +113,8 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
 #' @param x A numeric vector or `ts` object.
 #' @param lag_max Maximum lag (passed to [stats::acf()] / [stats::pacf()]).
 #' @param type `"correlation"` for the ACF or `"partial"` for the PACF.
-#' @param conf_level Confidence level for the significance bounds.
+#' @param conf_level Confidence level for the significance bounds; a single
+#'   number strictly between 0 and 1.
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -110,13 +126,28 @@ acf_plot <- function(x, lag_max = NULL, type = c("correlation", "partial"),
                      conf_level = 0.95, title = NULL, x_lab = "Lag",
                      y_lab = NULL) {
   type <- match.arg(type)
+  if (!is.numeric(conf_level) || length(conf_level) != 1 ||
+      !is.finite(conf_level) || conf_level <= 0 || conf_level >= 1) {
+    stop("`conf_level` must be a single number strictly between 0 and 1.",
+         call. = FALSE)
+  }
   v <- as.numeric(x)
-  v <- v[is.finite(v)]
+  # Keep the series in place (do not drop interior NAs, which would concatenate
+  # across gaps and bias the autocorrelation); na.pass preserves the time
+  # structure and acf()/pacf() handle the missingness pairwise.
+  obs <- which(!is.na(v))
+  if (length(obs) > 1 &&
+      anyNA(v[seq.int(obs[1], obs[length(obs)])])) {
+    warning("Series has interior missing values; the ", type,
+            " is computed pairwise (na.action = na.pass).", call. = FALSE)
+  }
   if (type == "partial") {
-    a <- stats::pacf(v, lag.max = lag_max, plot = FALSE)
+    a <- stats::pacf(v, lag.max = lag_max, plot = FALSE,
+                     na.action = stats::na.pass)
     y_lab <- y_lab %||% "Partial ACF"
   } else {
-    a <- stats::acf(v, lag.max = lag_max, plot = FALSE)
+    a <- stats::acf(v, lag.max = lag_max, plot = FALSE,
+                    na.action = stats::na.pass)
     y_lab <- y_lab %||% "ACF"
   }
   df <- data.frame(lag = as.numeric(a$lag), acf = as.numeric(a$acf))
@@ -209,11 +240,27 @@ decompose_plot <- function(x, frequency = NULL,
   p
 }
 
-# ---- internal helper -------------------------------------------------------
+# ---- internal helpers ------------------------------------------------------
+
+#' Validate and coerce a rolling-window argument to a positive integer
+#'
+#' A non-integer window would make `rep(1 / window, window)` sum to less than
+#' one and silently bias the moving average, so we require a whole number.
+#' @noRd
+validate_window <- function(window) {
+  if (!is.numeric(window) || length(window) != 1 || !is.finite(window)) {
+    stop("`rolling` must be a single positive integer.", call. = FALSE)
+  }
+  if (window < 1) stop("`rolling` must be a positive integer.", call. = FALSE)
+  if (abs(window - round(window)) > .Machine$double.eps^0.5) {
+    stop("`rolling` must be a whole number (got ", window, ").", call. = FALSE)
+  }
+  as.integer(round(window))
+}
 
 #' Centred moving average
 #' @noRd
 moving_average <- function(v, window) {
-  if (window < 1) stop("`rolling` must be a positive integer.", call. = FALSE)
+  window <- validate_window(window)
   as.numeric(stats::filter(v, rep(1 / window, window), sides = 2))
 }
