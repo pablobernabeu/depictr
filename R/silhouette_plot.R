@@ -95,7 +95,7 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
       ggplot2::aes(x = .data$index, y = y_pos, label = .data$label),
       inherit.aes = FALSE, hjust = 0, size = 3, colour = "grey15",
       fill = grDevices::adjustcolor("white", alpha.f = 0.75),
-      label.size = 0, label.padding = ggplot2::unit(0.12, "lines")
+      linewidth = 0, label.padding = ggplot2::unit(0.12, "lines")
     ) +
     ggplot2::geom_label(
       data = overall_ann,
@@ -103,7 +103,7 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
       inherit.aes = FALSE, hjust = 0.5, vjust = -0.2, size = 3,
       colour = "grey30",
       fill = grDevices::adjustcolor("white", alpha.f = 0.75),
-      label.size = 0, label.padding = ggplot2::unit(0.12, "lines")
+      linewidth = 0, label.padding = ggplot2::unit(0.12, "lines")
     ) +
     ggplot2::scale_fill_manual(values = pal, name = "Cluster") +
     ggplot2::coord_flip(clip = "off") +

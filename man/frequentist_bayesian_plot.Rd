@@ -11,6 +11,8 @@ frequentist_bayesian_plot(
   labels = NULL,
   interaction = c("times", "asterisk", "colon", "space"),
   intercept = TRUE,
+  facet = TRUE,
+  scales = c("free", "fixed"),
   note_frequentist_no_prior = FALSE,
   vertical_line_at_x = 0,
   title = NULL,
@@ -30,6 +32,13 @@ matrix/data frame, or a tidy data frame of posterior summaries.}
 
 \item{labels, interaction, intercept}{See \code{\link[=compare_models]{compare_models()}}.
 \code{intercept} defaults to \code{TRUE} here, matching the original behaviour.}
+
+\item{facet, scales}{Layout controls. Because a Bayesian model almost always
+carries a large intercept alongside small slopes, the comparison defaults
+to a faceted, free-scaled layout (\code{facet = TRUE}): each term gets its own
+panel and free x-axis, so every posterior and its frequentist overlay stay
+legible. Pass \code{facet = FALSE} (or \code{scales = "fixed"}) for the classic
+single shared-axis plot.}
 
 \item{note_frequentist_no_prior}{If \code{TRUE}, append "(no prior)" to the
 frequentist legend label, which is helpful when the title names the

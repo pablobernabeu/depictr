@@ -66,7 +66,7 @@ test_that("oversized rolling window gives a friendly error, not a cryptic one", 
   expect_s3_class(timeseries_plot(dfg, t, v, group = g, rolling = 3), "ggplot")
 })
 
-test_that("multi-group MA overlay uses a distinct (dashed) linetype", {
+test_that("multi-group MA overlay is dashed and adds no second legend", {
   dfg <- data.frame(
     t = rep(1:20, 2),
     v = rnorm(40),
@@ -74,11 +74,18 @@ test_that("multi-group MA overlay uses a distinct (dashed) linetype", {
   )
   p <- timeseries_plot(dfg, t, v, group = g, rolling = 4)
   built <- ggplot2::ggplot_build(p)
-  # A linetype scale must be present for the MA legend.
+  # The moving average adds a second line layer (raw series + MA overlay)...
+  geoms <- vapply(p$layers, function(l) class(l$geom)[1], character(1))
+  expect_gte(sum(geoms == "GeomLine"), 2L)
+  # ...drawn dashed somewhere in the built layers...
+  linetypes <- unlist(lapply(built$data, function(d)
+    if ("linetype" %in% names(d)) as.character(d$linetype) else NULL))
+  expect_true(any(linetypes %in% c("2", "dashed")))
+  # ...but it must NOT introduce a second (linetype) legend: one colour legend.
   has_linetype <- any(vapply(built$plot$scales$scales,
                              function(s) "linetype" %in% s$aesthetics,
                              logical(1)))
-  expect_true(has_linetype)
+  expect_false(has_linetype)
 })
 
 test_that("acf_plot keeps interior NAs (na.pass) and warns", {

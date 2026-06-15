@@ -13,6 +13,8 @@ posterior_plot(
   reference_line = 0,
   rope = NULL,
   pd = FALSE,
+  facet = FALSE,
+  scales = c("fixed", "free"),
   colour = depictr_brand(),
   fill = depictr_brand(),
   rope_fill = depictr_reference(),
@@ -51,6 +53,16 @@ practical equivalence to shade behind the distributions.}
 direction relative to \code{reference_line} -- the posterior probability that
 the parameter lies on its majority side of the reference (a value in
 [0.5, 1]). Requires a finite \code{reference_line}.}
+
+\item{facet}{Whether to give each parameter its own panel with a free
+x-axis, laid out one per row. This keeps the small parameters legible when
+a large one (typically the intercept) would otherwise stretch the shared
+axis and squish the rest. Defaults to \code{FALSE}. A convenience alias for
+\code{scales = "free"}.}
+
+\item{scales}{Either \code{"fixed"} (the default, a single shared x-axis) or
+\code{"free"} (one free-scaled panel per parameter). When \code{facet = TRUE} this is
+forced to \code{"free"}.}
 
 \item{colour, fill}{Colours for the point/interval and for the density slab.
 Default to the depictr brand blue.}
@@ -97,4 +109,7 @@ posterior_plot(draws)
 
 # A region of practical equivalence and a probability-of-direction label
 posterior_plot(draws, rope = c(-0.1, 0.1), pd = TRUE)
+
+# When one parameter dwarfs the others, give each its own free-scaled panel:
+posterior_plot(draws, facet = TRUE)
 }

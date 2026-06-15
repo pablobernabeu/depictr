@@ -12,6 +12,7 @@ dendrogram_plot(
   scale = TRUE,
   k = NULL,
   horizontal = FALSE,
+  labels = NULL,
   palette = NULL,
   title = NULL
 )
@@ -31,6 +32,13 @@ dendrogram_plot(
 of leaves). The cut-height line is drawn only when \verb{2 <= k < n}.}
 
 \item{horizontal}{Whether to draw the tree horizontally.}
+
+\item{labels}{Whether to print the leaf labels. \code{NULL} (the default) chooses
+automatically: labels are shown for small trees (up to 40 leaves) and
+suppressed for larger ones, where they would otherwise collapse into an
+unreadable smear. \code{TRUE}/\code{FALSE} force them on or off. When labels are
+hidden and \code{k} is set, the cluster membership is instead conveyed by a
+coloured strip of leaf ticks along the bottom of the tree.}
 
 \item{palette}{Colours for the \code{k} clusters; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 

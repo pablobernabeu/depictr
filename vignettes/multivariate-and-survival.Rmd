@@ -74,11 +74,17 @@ average silhouette width (the default, after Rousseeuw, 1987), the
 within-sum-of-squares elbow, or the gap statistic (Tibshirani, Walther & Hastie,
 2001). See `?k_diagnostic` for the references.
 
-```{r}
+```{r, fig.height = 3.5}
 kd <- k_diagnostic(crop_yield, k_range = 2:6, cols = num,
                    method = "silhouette")
-kd$suggested
-knitr::kable(kd$table, digits = 3)
+kd  # the diagnostic curve, with the suggested k marked
+```
+
+The suggested `k` and the underlying table are attached as attributes:
+
+```{r}
+attr(kd, "suggested")
+knitr::kable(attr(kd, "k_table"), digits = 3)
 ```
 
 `silhouette_plot()` then shows the quality of an actual clustering, one bar per
@@ -87,7 +93,8 @@ overall (the dashed line). Wide positive bars are well-placed observations;
 negative bars may belong to a neighbouring cluster.
 
 ```{r, fig.height = 5}
-cl <- kmeans(scale(crop_yield[num]), centers = kd$suggested, nstart = 10)$cluster
+cl <- kmeans(scale(crop_yield[num]), centers = attr(kd, "suggested"),
+             nstart = 10)$cluster
 silhouette_plot(crop_yield, cl, cols = num,
                 title = "Silhouette widths by cluster")
 ```
@@ -100,9 +107,9 @@ wb_num <- c("age", "income", "stress", "sleep_hours",
 wkd <- k_diagnostic(wellbeing_survey, k_range = 2:6, cols = wb_num,
                     method = "wss")
 wcl <- kmeans(scale(na.omit(wellbeing_survey[wb_num])),
-              centers = wkd$suggested, nstart = 10)$cluster
+              centers = attr(wkd, "suggested"), nstart = 10)$cluster
 silhouette_plot(na.omit(wellbeing_survey[wb_num]), wcl,
-                title = sprintf("Wellbeing survey, k = %d", wkd$suggested))
+                title = sprintf("Wellbeing survey, k = %d", attr(wkd, "suggested")))
 ```
 
 ## Survival curves

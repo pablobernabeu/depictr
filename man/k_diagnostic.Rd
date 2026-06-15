@@ -11,7 +11,8 @@ k_diagnostic(
   cols = NULL,
   scale = TRUE,
   nstart = 10,
-  B = 50
+  B = 50,
+  title = NULL
 )
 }
 \arguments{
@@ -29,23 +30,28 @@ elbow) or \code{"gap"}.}
 \item{nstart}{Number of random starts for \code{\link[stats:kmeans]{stats::kmeans()}}.}
 
 \item{B}{Number of reference bootstrap samples for the gap statistic.}
+
+\item{title}{Plot title.}
 }
 \value{
-A list with elements \code{table} (a data frame with one row per \code{k}),
-\code{suggested} (the chosen \code{k}) and \code{method}.
+A \link[ggplot2:ggplot]{ggplot2::ggplot} object showing the diagnostic value against \code{k},
+with the suggested \code{k} marked and named in the subtitle. The underlying
+computation is attached as attributes: \code{attr(p, "k_table")} (a data frame
+with one row per \code{k}), \code{attr(p, "suggested")} (the chosen \code{k}) and
+\code{attr(p, "method")}.
 }
 \description{
-Computes a cluster-quality diagnostic across a range of \code{k} and returns a
-tidy data frame plus a suggested \code{k}. Three criteria are available: the
-average silhouette width (maximised), the total within-cluster sum of squares
-"elbow" (the point of maximum curvature), and the gap statistic
+Computes a cluster-quality diagnostic across a range of \code{k} and draws the
+diagnostic curve, with the suggested \code{k} highlighted. Three criteria are
+available: the average silhouette width (maximised), the total within-cluster
+sum of squares "elbow" (the point of maximum curvature), and the gap statistic
 (the smallest \code{k} whose gap is within one standard error of the next, using
 the Tibshirani et al. heuristic).
 }
 \examples{
-kd <- k_diagnostic(crop_yield, k_range = 2:6,
-                   cols = c("rainfall", "fertilizer", "soil_ph", "yield"))
-kd$suggested
+p <- k_diagnostic(crop_yield, k_range = 2:6,
+                  cols = c("rainfall", "fertilizer", "soil_ph", "yield"))
+attr(p, "suggested")
 }
 \references{
 Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the interpretation

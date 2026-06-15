@@ -217,10 +217,11 @@ estimation_plot <- function(data, y, group, reference = NULL,
     es_lab <- switch(effsize,
                      hedges_g = "Hedges' g",
                      cohens_d = "Cohen's d")
-    diffs$es <- diffs[[effsize]]
-    lab_df <- diffs[is.finite(diffs$es), , drop = FALSE]
+    # Build the label data on a copy so the public "differences" attribute keeps
+    # its documented columns (no extra helper columns leak out).
+    lab_df <- diffs[is.finite(diffs[[effsize]]), , drop = FALSE]
     if (nrow(lab_df)) {
-      lab_df$es_label <- sprintf("%s = %.2f", es_lab, lab_df$es)
+      lab_df$es_label <- sprintf("%s = %.2f", es_lab, lab_df[[effsize]])
       lab_df$lab_y <- ifelse(is.finite(lab_df$upper), lab_df$upper, lab_df$diff)
       bottom <- bottom +
         ggplot2::geom_text(

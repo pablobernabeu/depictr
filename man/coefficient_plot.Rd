@@ -16,6 +16,8 @@ coefficient_plot(
   reference_line = 0,
   point_size = 2.2,
   line_size = 0.7,
+  facet = FALSE,
+  scales = c("fixed", "free"),
   title = NULL,
   subtitle = NULL,
   x_lab = "Estimate"
@@ -50,6 +52,16 @@ differences, \code{1} for odds/risk ratios). Use \code{NA} to omit it.}
 
 \item{point_size, line_size}{Size of the points and interval lines.}
 
+\item{facet}{Whether to give each term its own panel with a free x-axis,
+laid out one per row. This removes the squish that occurs when terms live
+on very different scales (for example a large intercept alongside small
+slopes). Defaults to \code{FALSE}, preserving the shared-axis layout. A
+convenience alias for \code{scales = "free"}.}
+
+\item{scales}{Either \code{"fixed"} (the default, a single shared x-axis) or
+\code{"free"} (one free-scaled panel per term). When \code{facet = TRUE} this is
+forced to \code{"free"}.}
+
 \item{title, subtitle, x_lab}{Plot title, subtitle and x-axis label.}
 }
 \value{
@@ -67,4 +79,8 @@ coefficient_plot(fit)
 
 # Order terms and add a title
 coefficient_plot(fit, order = "descending", title = "Drivers of crop yield")
+
+# When an intercept or large term squishes the rest, give each term its own
+# free-scaled panel:
+coefficient_plot(fit, intercept = TRUE, facet = TRUE)
 }

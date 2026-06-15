@@ -36,9 +36,11 @@ the bootstrap difference intervals.}
 
 \item{n_boot}{Number of bootstrap resamples for the difference intervals.}
 
-\item{effsize}{Standardised effect size to annotate on the two-group plot:
+\item{effsize}{Standardised effect size annotated beside each difference:
 \code{"hedges_g"} (the default, small-sample corrected), \code{"cohens_d"}, or
-\code{"none"}. Ignored when there are more than two groups.}
+\code{"none"} to omit it. Every contrast against the reference is labelled, so
+the standardised effect is shown for both the two-group and multi-group
+cases.}
 
 \item{show_points}{Whether to draw the raw data behind the group means.}
 

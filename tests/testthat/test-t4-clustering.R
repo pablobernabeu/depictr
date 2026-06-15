@@ -62,11 +62,15 @@ test_that("k_diagnostic(method = 'wss') recovers withinss and an elbow", {
   set.seed(7)
   kd <- k_diagnostic(crop_yield, k_range = 2:7, method = "wss", cols = cols,
                      nstart = 10)
-  expect_named(kd, c("table", "suggested", "method"))
-  expect_true(all(c("k", "wss") %in% names(kd$table)))
+  # k_diagnostic() returns a ggplot of the diagnostic curve; the numbers are
+  # carried as attributes.
+  expect_s3_class(kd, "ggplot")
+  expect_equal(attr(kd, "method"), "wss")
+  tab <- attr(kd, "k_table")
+  expect_true(all(c("k", "wss") %in% names(tab)))
   # Within-SS must decrease as k grows
-  expect_true(all(diff(kd$table$wss) < 0))
-  expect_true(kd$suggested %in% kd$table$k)
+  expect_true(all(diff(tab$wss) < 0))
+  expect_true(attr(kd, "suggested") %in% tab$k)
 })
 
 test_that("k_diagnostic(method = 'silhouette') picks the argmax average width", {
@@ -74,7 +78,10 @@ test_that("k_diagnostic(method = 'silhouette') picks the argmax average width", 
   set.seed(11)
   kd <- k_diagnostic(crop_yield, k_range = 2:6, method = "silhouette",
                      cols = cols)
-  expect_equal(kd$suggested, kd$table$k[which.max(kd$table$avg_silhouette)])
+  expect_s3_class(kd, "ggplot")
+  ktab <- attr(kd, "k_table")
+  expect_equal(attr(kd, "suggested"),
+               ktab$k[which.max(ktab$avg_silhouette)])
 
   # Each tabulated value matches an independent silhouette computation
   set.seed(99)

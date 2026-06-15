@@ -101,7 +101,7 @@ pca_plot <- function(x, cols = NULL, group = NULL, components = c(1, 2),
         ggplot2::aes(x = .data$labx, y = .data$laby, label = .data$varname),
         colour = depictr_accent(), fontface = "bold", size = 3.6,
         fill = grDevices::adjustcolor("white", alpha.f = 0.7),
-        label.size = 0, label.padding = ggplot2::unit(0.12, "lines"),
+        linewidth = 0, label.padding = ggplot2::unit(0.12, "lines"),
         inherit.aes = FALSE
       )
   }
