@@ -37,26 +37,33 @@ reference:
   - outlier_plot
   - raincloud_plot
   - group_comparison_plot
+  - estimation_plot
   - scatter_trend
   - summary_table
 
 - title: Multivariate, clustering and survival
   desc: >
-    Principal components, k-means and hierarchical clustering, and
-    Kaplan-Meier survival curves.
+    Principal components, k-means and hierarchical clustering with cluster
+    diagnostics, and Kaplan-Meier survival curves.
   contents:
   - pca_plot
   - scree_plot
   - cluster_plot
+  - silhouette_plot
+  - k_diagnostic
   - dendrogram_plot
   - survival_plot
 
 - title: Time series
-  desc: Series over time, autocorrelation and decomposition.
+  desc: >
+    Series over time, autocorrelation, decomposition, seasonal subseries and
+    forecasting.
   contents:
   - timeseries_plot
   - acf_plot
   - decompose_plot
+  - seasonal_plot
+  - ts_forecast
 
 - title: Model estimates and inference
   desc: >
@@ -79,6 +86,7 @@ reference:
     and tables.
   contents:
   - residual_diagnostics_plot
+  - binned_residual_plot
   - influence_plot
   - qq_plot
   - vif_plot
@@ -87,6 +95,7 @@ reference:
   - gain_plot
   - lift_plot
   - calibration_plot
+  - threshold_plot
   - confusion_matrix_plot
 
 - title: Uncertainty and power
@@ -108,6 +117,7 @@ reference:
   - model_report
   - arrange_plots
   - save_plot
+  - depictr_options
 
 - title: Data
   desc: Reproducibly simulated datasets used throughout the documentation.

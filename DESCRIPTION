@@ -9,14 +9,17 @@ Authors@R: person(given = "Pablo",
 Description: A cohesive, publication-ready toolkit of plots that span the whole
     analysis workflow with one consistent look. It covers exploratory data
     analysis (distributions, categorical summaries, bivariate plots, scatter-plot
-    matrices, correlation heatmaps, missing-data maps, outliers and descriptive
-    tables); model estimates and inference (forest plots, model comparison,
-    frequentist and Bayesian estimates, predicted values, interactions, random
-    effects and optimiser checks); diagnostics and classification (residual
-    panels, influence, quantile-quantile, ROC, calibration and confusion
-    matrices); uncertainty and power; and reporting helpers (a shared theme,
-    colourblind-aware palettes, plot composition and saving). Every plotting
-    function returns a 'ggplot2' object, heavier modelling back-ends are
+    matrices, correlation heatmaps, missing-data maps, outliers, estimation
+    statistics and descriptive tables); multivariate analysis, clustering with
+    diagnostics and Kaplan-Meier survival curves; time series (trends,
+    autocorrelation, decomposition, seasonality and forecasting); model estimates
+    and inference (forest plots, model comparison, frequentist and Bayesian
+    estimates, predicted values, interactions, random effects and optimiser
+    checks); diagnostics and classification (residual panels, binned residuals,
+    influence, quantile-quantile, ROC, calibration, threshold tuning and
+    confusion matrices); uncertainty and power; and reporting helpers (a shared
+    theme, colourblind-aware palettes, plot composition and saving). Every
+    plotting function returns a 'ggplot2' object, heavier modelling back-ends are
     optional, and the package ships with reproducibly simulated datasets so that
     every example and vignette runs without further setup.
 License: MIT + file LICENSE
