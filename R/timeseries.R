@@ -73,6 +73,7 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
   df <- df[order(df$series, df$time), , drop = FALSE]
   multi <- nlevels(df$series) > 1
   pal <- palette %||% depictr_palette(nlevels(df$series))
+  caption <- NULL
 
   mapping <- if (multi) {
     ggplot2::aes(x = .data$time, y = .data$value, colour = .data$series)
@@ -101,14 +102,17 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
     df$roll <- stats::ave(df$value, df$series,
                           FUN = function(v) moving_average(v, rolling))
     if (multi) {
+      # Draw the moving average as a dashed line in each series' colour so it
+      # shares the single colour legend. `show.legend = FALSE` keeps it out of
+      # the legend key glyphs, and a caption (added below) explains the dashes,
+      # so the plot keeps exactly one legend box instead of adding a second one.
       p <- p + ggplot2::geom_line(
         data = df, ggplot2::aes(x = .data$time, y = .data$roll,
-                                colour = .data$series,
-                                linetype = "Moving average"),
-        linewidth = 1, na.rm = TRUE
-      ) +
-        ggplot2::scale_linetype_manual(values = c("Moving average" = "dashed"),
-                                       name = NULL)
+                                colour = .data$series),
+        linewidth = 1, linetype = "dashed", na.rm = TRUE, show.legend = FALSE
+      )
+      caption <- paste0("Dashed line: ", rolling,
+                        "-point centred moving average")
     } else {
       p <- p + ggplot2::geom_line(
         data = df, ggplot2::aes(x = .data$time, y = .data$roll),
@@ -140,7 +144,8 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
   }
 
   if (multi) p <- p + ggplot2::scale_colour_manual(values = pal, name = NULL)
-  p + ggplot2::labs(x = x_lab, y = y_lab, title = title) + theme_depictr()
+  p + ggplot2::labs(x = x_lab, y = y_lab, title = title, caption = caption) +
+    theme_depictr()
 }
 
 #' Autocorrelation plot
@@ -456,11 +461,51 @@ resolve_forecast <- function(forecast, x, df, frequency = NULL, level = 0.95) {
     }
     fc <- ts_forecast(x, h = forecast, frequency = frequency, level = level)
   }
+  # Reconcile the forecast times with the historical axis. ts_forecast() (and a
+  # forecast::forecast object) return decimal-year `time` values, but the
+  # history may be plotted from a Date/POSIXct column. Plotting raw decimal
+  # years on a Date axis would interpret them as days since the epoch, dropping
+  # the forecast around 1976; convert them so the forecast continues from the
+  # end of the history on one shared scale.
+  fc$time <- reconcile_forecast_time(fc$time, df$time)
   # Anchor the forecast line at the last observed point for a continuous join.
   last_obs <- df[which.max(df$time), , drop = FALSE]
   anchor <- data.frame(time = last_obs$time, fit = last_obs$value,
                        lwr = last_obs$value, upr = last_obs$value)
   rbind(anchor, fc)
+}
+
+#' Reconcile forecast times with the class of the historical time axis
+#'
+#' The built-in forecaster returns decimal-year numbers (e.g. 2024.083). When
+#' the history is plotted from a `Date` or `POSIXct` column, those numbers must
+#' be coerced to the same class so the overlay lands on the historical axis
+#' rather than being read as days/seconds since the epoch. Times that are
+#' already on the right class (or where the history is plain numeric) are
+#' returned unchanged.
+#' @noRd
+reconcile_forecast_time <- function(fc_time, hist_time) {
+  if (inherits(hist_time, "Date") && !inherits(fc_time, "Date")) {
+    return(decimal_year_to_date(as.numeric(fc_time)))
+  }
+  if (inherits(hist_time, "POSIXct") && !inherits(fc_time, "POSIXct")) {
+    d <- decimal_year_to_date(as.numeric(fc_time))
+    return(as.POSIXct(d, tz = attr(hist_time, "tzone") %||% ""))
+  }
+  fc_time
+}
+
+#' Convert decimal years (e.g. 2024.5) to calendar `Date`s
+#'
+#' Maps each value to a day within its year using the fractional part, handling
+#' leap years by interpolating between successive 1 January boundaries.
+#' @noRd
+decimal_year_to_date <- function(t) {
+  yr <- floor(t)
+  frac <- t - yr
+  start <- as.Date(paste0(yr, "-01-01"))
+  end <- as.Date(paste0(yr + 1L, "-01-01"))
+  start + round(frac * as.numeric(end - start))
 }
 
 #' Validate and coerce a rolling-window argument to a positive integer
