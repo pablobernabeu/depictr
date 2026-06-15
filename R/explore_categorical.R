@@ -5,8 +5,13 @@
 #' Counts (or proportions) of the levels of a categorical variable, optionally
 #' split by a grouping variable.
 #'
+#' A continuous numeric column (more than 20 distinct values) is rejected with
+#' an error, since coercing it to a factor would draw one bar per value; use
+#' [explore_distribution()] for such variables instead.
+#'
 #' @param data A data frame.
-#' @param x The categorical variable (string or unquoted name).
+#' @param x The categorical variable (string or unquoted name). Numeric columns
+#'   are accepted only when they have at most 20 distinct values.
 #' @param group Optional grouping variable mapped to fill.
 #' @param proportion Whether to show proportions instead of counts. When
 #'   `group` is set, proportions are computed within each group.
@@ -33,6 +38,19 @@ explore_categorical <- function(data, x, group = NULL, proportion = FALSE,
   x <- resolve_var(data, rlang::enquo(x), "x")
   group <- resolve_var(data, rlang::enquo(group), "group")
   x_lab <- x_lab %||% x
+
+  # Guard against a continuous numeric column being silently turned into a
+  # factor with hundreds of levels (one bar each). Numeric columns with only a
+  # handful of distinct values (e.g. 0/1 codings or Likert items) are fine.
+  if (is.numeric(data[[x]])) {
+    n_distinct <- length(unique(stats::na.omit(data[[x]])))
+    if (n_distinct > 20) {
+      stop("`x` (", x, ") is numeric with ", n_distinct,
+           " distinct values; it looks continuous, not categorical. Use ",
+           "`explore_distribution()` instead, or convert it to a factor first.",
+           call. = FALSE)
+    }
+  }
 
   d <- data[!is.na(data[[x]]), , drop = FALSE]
   d[[x]] <- as.factor(d[[x]])
