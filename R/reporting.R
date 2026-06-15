@@ -4,7 +4,9 @@
 #'
 #' Displays the colours returned by [depictr_palette()] as labelled swatches.
 #' It is useful when choosing how many groups to show, selecting a palette type,
-#' or documenting a figure.
+#' or documenting a figure. Each swatch's hex label is drawn in near-black or
+#' white, whichever is more legible against that tile (chosen by the tile's
+#' relative luminance), so labels stay readable on both light and dark colours.
 #'
 #' @param n Number of colours to preview.
 #' @param type Palette type to preview: `"qualitative"`, `"sequential"`,
@@ -30,6 +32,12 @@ palette_preview <- function(n = 8, type = c("qualitative", "sequential",
                stringsAsFactors = FALSE)
   }))
   df$type <- factor(df$type, levels = types)
+  # Pick a legible label colour per swatch: near-black on light tiles, white on
+  # dark ones. Decide by WCAG relative luminance (sRGB-linearised), which tracks
+  # perceived lightness far better than a raw RGB average and so avoids the
+  # white-on-pale-yellow contrast failure of a fixed label colour.
+  df$label_col <- ifelse(.relative_luminance(df$col) > 0.4,
+                         "grey10", "white")
   show_labels <- type != "all"
 
   p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$i, y = 1, fill = .data$col)) +
@@ -48,10 +56,24 @@ palette_preview <- function(n = 8, type = c("qualitative", "sequential",
     p <- p + ggplot2::facet_wrap(~ type, ncol = 1)
   }
   if (show_labels) {
-    p <- p + ggplot2::geom_text(ggplot2::aes(label = .data$col), angle = 90,
-                                colour = "white", fontface = "bold", size = 3)
+    p <- p + ggplot2::geom_text(
+      ggplot2::aes(label = .data$col, colour = .data$label_col),
+      angle = 90, fontface = "bold", size = 3, show.legend = FALSE
+    ) +
+      ggplot2::scale_colour_identity()
   }
   p
+}
+
+# Relative luminance (WCAG 2.x) of one or more colours, in [0, 1].
+#
+# Used to choose a legible text colour against a coloured background: linearise
+# each sRGB channel, then take the standard 0.2126/0.7152/0.0722 weighting.
+# Vectorised over `cols`; returns a numeric vector the same length as `cols`.
+.relative_luminance <- function(cols) {
+  rgb <- grDevices::col2rgb(cols) / 255
+  lin <- ifelse(rgb <= 0.03928, rgb / 12.92, ((rgb + 0.055) / 1.055)^2.4)
+  as.numeric(0.2126 * lin[1, ] + 0.7152 * lin[2, ] + 0.0722 * lin[3, ])
 }
 
 #' Compose several plots into one figure
@@ -89,8 +111,8 @@ arrange_plots <- function(..., ncol = NULL, nrow = NULL,
     combined <- combined + patchwork::plot_annotation(
       title = title, subtitle = subtitle, tag_levels = tag_levels,
       theme = ggplot2::theme(
-        plot.title = ggplot2::element_text(colour = "#005b96", face = "bold",
-                                           hjust = 0.5),
+        plot.title = ggplot2::element_text(colour = depictr_brand(),
+                                           face = "bold", hjust = 0.5),
         plot.subtitle = ggplot2::element_text(hjust = 0.5, colour = "grey30")
       )
     )
