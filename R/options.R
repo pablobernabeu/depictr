@@ -39,8 +39,8 @@ depictr_opt <- function(name) {
 #' options are honoured by [theme_depictr()] (base size, base family and the
 #' accent used for titles), by [depictr_palette()] and the
 #' [scale_colour_depictr()] family (an optional custom qualitative palette), and
-#' by the colour accessors [depictr_brand()], [depictr_accent()] and
-#' [depictr_reference()].
+#' by the colour accessors `depictr_brand()`, `depictr_accent()` and
+#' `depictr_reference()`.
 #'
 #' Called with no arguments, `depictr_options()` returns the currently resolved
 #' values (option if set, otherwise package default). Called with named
@@ -53,10 +53,10 @@ depictr_opt <- function(name) {
 #' @param base_size Base font size in points for [theme_depictr()].
 #' @param base_family Base font family for [theme_depictr()].
 #' @param brand The depictr brand colour (used for plot titles and as the lead
-#'   qualitative colour). Returned by [depictr_brand()].
-#' @param accent A secondary highlight colour. Returned by [depictr_accent()].
+#'   qualitative colour). Returned by `depictr_brand()`.
+#' @param accent A secondary highlight colour. Returned by `depictr_accent()`.
 #' @param reference The colour used for reference / annotation lines. Returned
-#'   by [depictr_reference()].
+#'   by `depictr_reference()`.
 #' @param palette An optional custom qualitative palette: a character vector of
 #'   hex colours used by [depictr_palette()] (type `"qualitative"`) and the
 #'   discrete scales in place of the built-in Okabe-Ito set. `NULL` restores the

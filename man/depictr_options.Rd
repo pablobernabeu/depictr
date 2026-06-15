@@ -20,12 +20,12 @@ depictr_options(
 \item{base_family}{Base font family for \code{\link[=theme_depictr]{theme_depictr()}}.}
 
 \item{brand}{The depictr brand colour (used for plot titles and as the lead
-qualitative colour). Returned by \code{\link[=depictr_brand]{depictr_brand()}}.}
+qualitative colour). Returned by \code{depictr_brand()}.}
 
-\item{accent}{A secondary highlight colour. Returned by \code{\link[=depictr_accent]{depictr_accent()}}.}
+\item{accent}{A secondary highlight colour. Returned by \code{depictr_accent()}.}
 
 \item{reference}{The colour used for reference / annotation lines. Returned
-by \code{\link[=depictr_reference]{depictr_reference()}}.}
+by \code{depictr_reference()}.}
 
 \item{palette}{An optional custom qualitative palette: a character vector of
 hex colours used by \code{\link[=depictr_palette]{depictr_palette()}} (type \code{"qualitative"}) and the
@@ -46,8 +46,8 @@ shared look of every plot once, at the top of a script or in your
 options are honoured by \code{\link[=theme_depictr]{theme_depictr()}} (base size, base family and the
 accent used for titles), by \code{\link[=depictr_palette]{depictr_palette()}} and the
 \code{\link[=scale_colour_depictr]{scale_colour_depictr()}} family (an optional custom qualitative palette), and
-by the colour accessors \code{\link[=depictr_brand]{depictr_brand()}}, \code{\link[=depictr_accent]{depictr_accent()}} and
-\code{\link[=depictr_reference]{depictr_reference()}}.
+by the colour accessors \code{depictr_brand()}, \code{depictr_accent()} and
+\code{depictr_reference()}.
 }
 \details{
 Called with no arguments, \code{depictr_options()} returns the currently resolved

@@ -88,13 +88,11 @@ extract_draws <- function(x) {
 
 #' @noRd
 extract_draws_brms <- function(x) {
-  ensure_installed("brms", "to extract draws from a 'brmsfit' object")
-  # posterior::as_draws_df() is the modern path; fall back to brms's own method.
-  draws <- if (requireNamespace("posterior", quietly = TRUE)) {
-    posterior::as_draws_df(x)
-  } else {
-    brms::as_draws_df(x)
-  }
+  # A 'brmsfit' is created by brms, whose posterior::as_draws_df() method is
+  # therefore already loaded in the user's session; routing through posterior
+  # means depictr needs no hard brms dependency of its own.
+  ensure_installed("posterior", "to extract draws from a 'brmsfit' object")
+  draws <- posterior::as_draws_df(x)
   df <- as.data.frame(draws)
   # Keep only population-level (fixed) effects: the `b_` parameters. Drop the
   # intercept-less book-keeping and group-level (`r_`, `sd_`, `cor_`) terms.

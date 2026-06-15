@@ -133,7 +133,7 @@ scale_fill_depictr <- function(n = NULL, palette = NULL,
 #' The default `base_size` and `base_family` come from the global options
 #' `depictr.base_size` and `depictr.base_family` (see [depictr_options()]), so
 #' the package-wide font size can be set once; passing the arguments explicitly
-#' overrides them. The title colour is the resolved [depictr_brand()], which in
+#' overrides them. The title colour is the resolved `depictr_brand()`, which in
 #' turn honours `options(depictr.brand = )`.
 #'
 #' @param base_size Base font size, in points. Defaults to the

@@ -31,7 +31,7 @@ centred titles and comfortable margins.
 The default \code{base_size} and \code{base_family} come from the global options
 \code{depictr.base_size} and \code{depictr.base_family} (see \code{\link[=depictr_options]{depictr_options()}}), so
 the package-wide font size can be set once; passing the arguments explicitly
-overrides them. The title colour is the resolved \code{\link[=depictr_brand]{depictr_brand()}}, which in
+overrides them. The title colour is the resolved \code{depictr_brand()}, which in
 turn honours \code{options(depictr.brand = )}.
 }
 \examples{

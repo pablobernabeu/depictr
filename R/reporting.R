@@ -62,7 +62,7 @@ palette_preview <- function(n = 8, type = c("qualitative", "sequential",
   cvd_label <- c(deutan = "deuteranopia", protan = "protanopia",
                  tritan = "tritanopia")
   plot_title <- if (cvd == "none") base_title else
-    paste0(base_title, " — ", cvd_label[[cvd]], " simulation")
+    paste0(base_title, " - ", cvd_label[[cvd]], " simulation")
 
   p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$i, y = 1,
                                         fill = .data$shown)) +

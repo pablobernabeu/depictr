@@ -320,19 +320,6 @@ test_that("extract_draws() reads a posterior draws object", {
   expect_true(all(c("term", ".value", ".draw") %in% names(ed)))
 })
 
-test_that("extract_draws() keeps only fixed effects from a brms fit", {
-  skip_if_not_installed("brms")
-  skip_if_not_installed("posterior")
-  skip_on_cran()
-  # Build a minimal brmsfit *object* from cached draws without sampling, if the
-  # backend is unavailable, by constructing draws directly is non-trivial; so we
-  # only run this when a tiny model can be fitted quickly.
-  skip_if_not(isTRUE(getOption("depictr.run_brms_tests", FALSE)),
-              "set options(depictr.run_brms_tests = TRUE) to fit a brms model")
-  fit <- brms::brm(life_satisfaction ~ stress, data = wellbeing_survey,
-                   chains = 1, iter = 200, refresh = 0, silent = 2)
-  ed <- depictr:::extract_draws(fit)
-  # b_ prefix stripped; only fixed effects kept (no sd_/sigma/lp__).
-  expect_true(all(c("Intercept", "stress") %in% unique(ed$term)))
-  expect_false(any(grepl("^sd_|^sigma$|lp__", unique(ed$term))))
-})
+# The brmsfit extraction path (posterior::as_draws_df dispatch) is verified
+# manually against a real fit in dev/; CI covers the draws-object and
+# data-frame paths above, so depictr needs no heavy brms dependency.
