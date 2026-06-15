@@ -41,6 +41,9 @@ Suggests:
     knitr,
     rmarkdown,
     survival,
+    ggdist,
+    posterior,
+    distributional,
     testthat (>= 3.0.0),
     withr
 VignetteBuilder: knitr
