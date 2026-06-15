@@ -68,9 +68,9 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
     p <- p + ggplot2::geom_line(linewidth = 0.6, na.rm = TRUE)
     if (point) p <- p + ggplot2::geom_point(size = 0.9, na.rm = TRUE)
   } else {
-    p <- p + ggplot2::geom_line(linewidth = 0.6, colour = "#005b96",
+    p <- p + ggplot2::geom_line(linewidth = 0.6, colour = depictr_brand(),
                                 na.rm = TRUE)
-    if (point) p <- p + ggplot2::geom_point(size = 0.9, colour = "#005b96",
+    if (point) p <- p + ggplot2::geom_point(size = 0.9, colour = depictr_brand(),
                                             na.rm = TRUE)
   }
 
@@ -96,7 +96,8 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
     } else {
       p <- p + ggplot2::geom_line(
         data = df, ggplot2::aes(x = .data$time, y = .data$roll),
-        colour = "#e23b3b", linewidth = 0.9, na.rm = TRUE, inherit.aes = FALSE
+        colour = depictr_accent(), linewidth = 0.9, na.rm = TRUE,
+        inherit.aes = FALSE
       )
     }
   }
@@ -157,10 +158,10 @@ acf_plot <- function(x, lag_max = NULL, type = c("correlation", "partial"),
   ggplot2::ggplot(df, ggplot2::aes(x = .data$lag, y = .data$acf)) +
     ggplot2::geom_hline(yintercept = 0, colour = "grey40") +
     ggplot2::geom_hline(yintercept = c(-bound, bound), linetype = 2,
-                        colour = "#e23b3b") +
+                        colour = depictr_reference()) +
     ggplot2::geom_segment(ggplot2::aes(xend = .data$lag, yend = 0),
-                          colour = "#005b96", linewidth = 0.6) +
-    ggplot2::geom_point(colour = "#005b96", size = 1.6) +
+                          colour = depictr_brand(), linewidth = 0.6) +
+    ggplot2::geom_point(colour = depictr_brand(), size = 1.6) +
     ggplot2::labs(x = x_lab, y = y_lab, title = title) +
     theme_depictr()
 }
@@ -223,18 +224,22 @@ decompose_plot <- function(x, frequency = NULL,
       ggplot2::theme(plot.margin = ggplot2::margin(2, 6, 2, 6))
   }
 
+  # One colour per component (observed/trend/seasonal/remainder) drawn from the
+  # canonical qualitative palette, so the four panels stay colourblind-safe and
+  # mutually distinct without ad-hoc hex literals.
+  comp_cols <- depictr_palette(4)
   p <- patchwork::wrap_plots(
-    panel(observed, "observed", "#005b96"),
-    panel(comps$trend, "trend", "#0a3d62"),
-    panel(comps$seasonal, "seasonal", "#2e8b57"),
-    panel(comps$remainder, "remainder", "#e08a1e"),
+    panel(observed, "observed", comp_cols[1]),
+    panel(comps$trend, "trend", comp_cols[2]),
+    panel(comps$seasonal, "seasonal", comp_cols[3]),
+    panel(comps$remainder, "remainder", comp_cols[4]),
     ncol = 1
   )
   if (!is.null(title)) {
     p <- p + patchwork::plot_annotation(
       title = title,
       theme = ggplot2::theme(plot.title = ggplot2::element_text(
-        colour = "#005b96", face = "bold", hjust = 0.5))
+        colour = depictr_brand(), face = "bold", hjust = 0.5))
     )
   }
   p

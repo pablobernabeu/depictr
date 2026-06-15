@@ -62,7 +62,7 @@ pca_plot <- function(x, cols = NULL, group = NULL, components = c(1, 2),
 
   if (is.null(grp)) {
     p <- ggplot2::ggplot(scores, ggplot2::aes(x = .data$PCx, y = .data$PCy)) +
-      ggplot2::geom_point(alpha = point_alpha, colour = "#005b96")
+      ggplot2::geom_point(alpha = point_alpha, colour = depictr_brand())
   } else {
     pal <- palette %||% depictr_palette(nlevels(grp))
     p <- ggplot2::ggplot(scores, ggplot2::aes(x = .data$PCx, y = .data$PCy,
@@ -86,12 +86,12 @@ pca_plot <- function(x, cols = NULL, group = NULL, components = c(1, 2),
         data = rot,
         ggplot2::aes(x = 0, y = 0, xend = .data$PCx, yend = .data$PCy),
         arrow = ggplot2::arrow(length = ggplot2::unit(0.18, "cm")),
-        colour = "#e23b3b", inherit.aes = FALSE
+        colour = depictr_accent(), inherit.aes = FALSE
       ) +
       ggplot2::geom_text(
         data = rot,
         ggplot2::aes(x = .data$PCx, y = .data$PCy, label = .data$varname),
-        colour = "#b1262d", size = 3, vjust = -0.4, inherit.aes = FALSE
+        colour = depictr_accent(), size = 3, vjust = -0.4, inherit.aes = FALSE
       )
   }
 
@@ -141,12 +141,12 @@ scree_plot <- function(x, cols = NULL, scale = TRUE, n = NULL, title = NULL) {
   )
 
   ggplot2::ggplot(df, ggplot2::aes(x = .data$component)) +
-    ggplot2::geom_col(ggplot2::aes(y = .data$variance), fill = "#005b96",
+    ggplot2::geom_col(ggplot2::aes(y = .data$variance), fill = depictr_brand(),
                       width = 0.7) +
     ggplot2::geom_line(ggplot2::aes(y = .data$cumulative, group = 1),
-                       colour = "#e23b3b", linewidth = 0.7) +
-    ggplot2::geom_point(ggplot2::aes(y = .data$cumulative), colour = "#e23b3b",
-                        size = 1.8) +
+                       colour = depictr_accent(), linewidth = 0.7) +
+    ggplot2::geom_point(ggplot2::aes(y = .data$cumulative),
+                        colour = depictr_accent(), size = 1.8) +
     ggplot2::scale_y_continuous(
       labels = scales::percent_format(accuracy = 1),
       sec.axis = ggplot2::dup_axis(name = "Cumulative")

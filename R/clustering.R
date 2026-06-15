@@ -68,7 +68,10 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
   ve <- (pca$sdev^2) / sum(pca$sdev^2)
   df <- data.frame(PCx = pca$x[, 1], PCy = pca$x[, 2],
                    cluster = factor(cl))
-  pal <- palette %||% depictr_palette(nlevels(df$cluster))
+  # Route cluster colour/fill through the canonical depictr scales. With no
+  # `palette` override this is exactly scale_*_depictr(); a supplied `palette`
+  # is honoured by passing it as the scale's palette function.
+  pal_fun <- if (is.null(palette)) NULL else function(k) palette
 
   p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$PCx, y = .data$PCy,
                                         colour = .data$cluster))
@@ -80,7 +83,7 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
       data = hull,
       ggplot2::aes(fill = .data$cluster, colour = .data$cluster),
       alpha = 0.15, linewidth = 0.3
-    ) + ggplot2::scale_fill_manual(values = pal, guide = "none")
+    ) + scale_fill_depictr(palette = pal_fun, guide = "none")
   }
   p <- p + ggplot2::geom_point(alpha = point_alpha, size = 1.6)
 
@@ -97,7 +100,7 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
   }
 
   p +
-    ggplot2::scale_colour_manual(values = pal, name = "Cluster") +
+    scale_colour_depictr(palette = pal_fun, name = "Cluster") +
     ggplot2::labs(
       x = sprintf("PC1 (%.1f%%)", 100 * ve[1]),
       y = sprintf("PC2 (%.1f%%)", 100 * ve[2]),
@@ -176,7 +179,9 @@ dendrogram_plot <- function(x, cols = NULL, distance = "euclidean",
     )
 
   if (!is.null(k)) {
-    pal <- palette %||% depictr_palette(nlevels(leaves$cluster))
+    # Route leaf-cluster colour through the canonical depictr scale; a supplied
+    # `palette` is honoured by passing it as the scale's palette function.
+    pal_fun <- if (is.null(palette)) NULL else function(j) palette
     if (!is.null(cut_h)) {
       p <- p + ggplot2::geom_hline(yintercept = cut_h, linetype = 2,
                                    colour = "grey70")
@@ -189,7 +194,7 @@ dendrogram_plot <- function(x, cols = NULL, distance = "euclidean",
         angle = if (horizontal) 0 else 90,
         hjust = 1.05, size = 3, show.legend = FALSE
       ) +
-      ggplot2::scale_colour_manual(values = pal)
+      scale_colour_depictr(palette = pal_fun)
   } else {
     p <- p + ggplot2::geom_text(
       data = leaves,
