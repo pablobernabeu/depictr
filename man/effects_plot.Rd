@@ -17,7 +17,7 @@ effects_plot(
 )
 }
 \arguments{
-\item{model}{A fitted model (\code{lm}, \code{glm}, ...).}
+\item{model}{A fitted model (\code{lm}, \code{glm}, \code{merMod}, ...).}
 
 \item{predictor}{Name of the focal predictor (string).}
 
@@ -43,7 +43,10 @@ confidence intervals (factor predictor) convey uncertainty.
 \details{
 Predictions and standard errors come from \code{\link[stats:predict]{stats::predict()}}; \code{glm}
 predictions are formed on the link scale and back-transformed, so a binomial
-model shows predicted probabilities. Works with \code{lm} and \code{glm}; other model
+model shows predicted probabilities. Mixed models fitted with
+\code{\link[lme4:lmer]{lme4::lmer()}}/\code{\link[lme4:glmer]{lme4::glmer()}} are supported too: predictions use only the
+fixed effects (\code{re.form = NA}) and standard errors come from the fixed-effect
+design matrix and \code{vcov()}. Works with \code{lm}, \code{glm} and \code{merMod}; other model
 classes are attempted on a best-effort basis.
 }
 \examples{

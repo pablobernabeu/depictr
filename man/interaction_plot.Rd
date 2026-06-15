@@ -19,7 +19,7 @@ interaction_plot(
 )
 }
 \arguments{
-\item{model}{A fitted model (\code{lm}, \code{glm}, ...).}
+\item{model}{A fitted model (\code{lm}, \code{glm}, \code{merMod}, ...).}
 
 \item{predictor}{Name of the focal predictor on the x-axis (string).}
 

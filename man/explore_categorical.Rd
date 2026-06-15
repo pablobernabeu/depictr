@@ -20,7 +20,8 @@ explore_categorical(
 \arguments{
 \item{data}{A data frame.}
 
-\item{x}{The categorical variable (string or unquoted name).}
+\item{x}{The categorical variable (string or unquoted name). Numeric columns
+are accepted only when they have at most 20 distinct values.}
 
 \item{group}{Optional grouping variable mapped to fill.}
 
@@ -46,6 +47,11 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 \description{
 Counts (or proportions) of the levels of a categorical variable, optionally
 split by a grouping variable.
+}
+\details{
+A continuous numeric column (more than 20 distinct values) is rejected with
+an error, since coercing it to a factor would draw one bar per value; use
+\code{\link[=explore_distribution]{explore_distribution()}} for such variables instead.
 }
 \examples{
 explore_categorical(wellbeing_survey, region)

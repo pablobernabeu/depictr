@@ -21,7 +21,8 @@ acf_plot(
 
 \item{type}{\code{"correlation"} for the ACF or \code{"partial"} for the PACF.}
 
-\item{conf_level}{Confidence level for the significance bounds.}
+\item{conf_level}{Confidence level for the significance bounds; a single
+number strictly between 0 and 1.}
 
 \item{title, x_lab, y_lab}{Title and axis labels.}
 }

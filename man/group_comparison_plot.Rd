@@ -43,6 +43,10 @@ variable: each group's mean with a confidence interval, over a backdrop of
 the raw (jittered) data. By showing both the estimate and its uncertainty, it
 conveys whether the groups differ more faithfully than a bar chart does.
 }
+\details{
+A group with a single observation has no degrees of freedom for a t-based
+interval, so only its mean is drawn (no interval) and a warning is issued.
+}
 \examples{
 group_comparison_plot(lexical_decision, RT, condition)
 group_comparison_plot(crop_yield, yield, treatment)

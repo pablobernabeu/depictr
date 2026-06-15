@@ -1,0 +1,22 @@
+# R session / build artifacts
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+Rplots.pdf
+/figure/
+/doc/
+/Meta/
+*.Rcheck/
+*.tar.gz
+
+# pkgdown local build output (site is deployed from the gh-pages branch)
+/docs/
+
+# Claude Code worktrees / local settings
+.claude/
+
+# OS cruft
+.DS_Store
+Thumbs.db

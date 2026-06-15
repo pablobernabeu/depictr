@@ -4,22 +4,36 @@
 \alias{summary_table}
 \title{A "Table 1" style descriptive summary}
 \usage{
-summary_table(data, vars = NULL, group = NULL, digits = 1)
+summary_table(
+  data,
+  vars = NULL,
+  group = NULL,
+  digits = 1,
+  missing = TRUE,
+  max_levels = 20
+)
 }
 \arguments{
 \item{data}{A data frame.}
 
 \item{vars}{Columns to summarise. If \code{NULL}, all columns except \code{group} are
-used.}
+used, with high-cardinality identifier-like columns skipped (see Details).}
 
 \item{group}{Optional grouping variable; one summary column is produced per
 level, alongside an overall column.}
 
 \item{digits}{Number of decimal places for numeric summaries.}
+
+\item{missing}{Whether to add a \verb{Missing, n (\%)} row for variables that
+contain missing values. Defaults to \code{TRUE}.}
+
+\item{max_levels}{When \code{vars} is \code{NULL}, character/factor columns whose
+distinct-level count is at least \code{max_levels} \emph{and} exceeds half the number
+of rows are treated as identifiers and skipped. Defaults to \code{20}.}
 }
 \value{
 A data frame with columns \code{variable}, \code{statistic}, \code{Overall} and one
-column per group level.
+column per group level. The first row reports \code{N}.
 }
 \description{
 Builds the kind of descriptive table that opens many empirical papers:
@@ -27,6 +41,18 @@ numeric variables are summarised as mean (SD), categorical variables as
 counts and percentages, optionally split into one column per level of a
 grouping variable. The result is a plain data frame, ready to pass to
 \code{\link[knitr:kable]{knitr::kable()}} or a table package.
+}
+\details{
+The first row of the table always reports the sample size (\code{N}) overall and
+per group. By default each variable is also followed by a \verb{Missing, n (\%)}
+row whenever it contains missing values; set \code{missing = FALSE} to suppress
+these.
+
+When \code{vars} is \code{NULL}, high-cardinality character/factor columns (those whose
+number of distinct levels approaches the number of rows, e.g. identifier
+columns) are skipped automatically, with a message, rather than being
+expanded into hundreds of one-per-row entries. Pass such a column explicitly
+via \code{vars} to override this.
 }
 \examples{
 summary_table(crop_yield, vars = c("yield", "rainfall", "treatment"))

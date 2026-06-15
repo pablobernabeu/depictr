@@ -14,7 +14,10 @@ cluster_plot(
   label_centers = TRUE,
   point_alpha = 0.8,
   palette = NULL,
-  title = NULL
+  title = NULL,
+  seed = NULL,
+  nstart = 10,
+  iter.max = 10
 )
 }
 \arguments{
@@ -26,7 +29,8 @@ cluster_plot(
 
 \item{clusters}{Optional vector of cluster assignments (e.g. from
 \code{\link[stats:kmeans]{stats::kmeans()}} or \code{\link[stats:cutree]{stats::cutree()}}); use this to plot a clustering you
-computed yourself.}
+computed yourself. Must have exactly one entry per row of \code{data} (rows with
+missing values in \code{cols} are dropped from both before plotting).}
 
 \item{scale}{Whether to scale variables to unit variance before clustering and the PCA.}
 
@@ -39,6 +43,13 @@ computed yourself.}
 \item{palette}{Colours for the clusters; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title}{Plot title.}
+
+\item{seed}{Optional integer seed for reproducible k-means (ignored when
+\code{clusters} is supplied). Default \code{NULL} leaves the RNG state untouched.}
+
+\item{nstart}{Number of random starts for \code{\link[stats:kmeans]{stats::kmeans()}}.}
+
+\item{iter.max}{Maximum iterations for \code{\link[stats:kmeans]{stats::kmeans()}}.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
@@ -52,5 +63,5 @@ for any number of variables.
 }
 \examples{
 cluster_plot(crop_yield, cols = c("rainfall", "fertilizer", "soil_ph",
-                                  "yield"), k = 3)
+                                  "yield"), k = 3, seed = 1)
 }

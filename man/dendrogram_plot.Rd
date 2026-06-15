@@ -27,7 +27,8 @@ dendrogram_plot(
 
 \item{scale}{Whether to scale variables before computing distances (data frame input).}
 
-\item{k}{Optional number of clusters to highlight.}
+\item{k}{Optional number of clusters to highlight (between 1 and the number
+of leaves). The cut-height line is drawn only when \verb{2 <= k < n}.}
 
 \item{horizontal}{Whether to draw the tree horizontally.}
 

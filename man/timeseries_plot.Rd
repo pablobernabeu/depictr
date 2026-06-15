@@ -28,7 +28,9 @@ name); when \code{x} is a numeric vector, an optional vector of times.}
 \item{group}{When \code{x} is a data frame, an optional grouping column mapped to
 colour.}
 
-\item{rolling}{Optional integer window for a centred moving-average overlay.}
+\item{rolling}{Optional integer window for a centred moving-average overlay.
+The data are ordered by time (within each group) before the moving average
+is computed, so unsorted input is handled correctly.}
 
 \item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 

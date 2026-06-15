@@ -11,7 +11,7 @@ explore_distribution(
   type = c("histogram", "density", "both"),
   bins = 30,
   alpha = 0.6,
-  position = "identity",
+  position = NULL,
   palette = NULL,
   title = NULL,
   x_lab = NULL
@@ -33,7 +33,9 @@ colour/fill.}
 \item{alpha}{Fill transparency (useful when groups overlap).}
 
 \item{position}{Histogram position adjustment, e.g. \code{"identity"},
-\code{"stack"} or \code{"dodge"}.}
+\code{"stack"} or \code{"dodge"}. The default (\code{NULL}) chooses \code{"dodge"} when
+\code{group} is set (so overlapping bars stay readable) and \code{"identity"}
+otherwise.}
 
 \item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 

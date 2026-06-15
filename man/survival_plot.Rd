@@ -20,8 +20,10 @@ survival_plot(
 \item{time}{A numeric vector of follow-up times, a data frame with \code{time},
 \code{status} and optional \code{group} columns, or a \code{survfit} object.}
 
-\item{status}{Event indicator (1 = event, 0 = censored) when \code{time} is a
-vector.}
+\item{status}{Event indicator when \code{time} is a vector. Either the 0/1
+convention (\code{0} = censored, \code{1} = event) or the \code{\link[survival:Surv]{survival::Surv()}} 1/2
+convention (\code{1} = censored, \code{2} = event) is accepted; logical values are
+also allowed. Other codings raise an error.}
 
 \item{group}{Optional grouping variable (a vector, or a column name when
 \code{time} is a data frame).}

@@ -10,3 +10,7 @@
 ^\.git$
 ^pkgdown$
 ^dev$
+^\.claude$
+^Rplots\.pdf$
+^figure$
+^\.gitignore$

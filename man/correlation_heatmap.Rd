@@ -42,6 +42,14 @@ Computes the pairwise correlations between the numeric columns of a data
 frame and displays them as a colour-coded heatmap, optionally annotated with
 the correlation values.
 }
+\details{
+Columns with (near-)zero variance cannot be correlated and are
+dropped automatically with an informative message, so the raw
+\code{"the standard deviation is zero"} warning from \code{\link[stats:cor]{stats::cor()}} is not
+surfaced. If, after dropping them, any cells still come out \code{NA} (e.g. two
+variables that never co-occur under \code{"pairwise.complete.obs"}), those cells
+are rendered in grey and labelled \code{n/a} rather than left blank.
+}
 \examples{
 correlation_heatmap(wellbeing_survey)
 correlation_heatmap(crop_yield, method = "spearman", show_values = FALSE)
