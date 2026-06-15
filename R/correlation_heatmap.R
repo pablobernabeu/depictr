@@ -17,6 +17,13 @@
 #'   highest correlations.
 #' @param title Plot title.
 #'
+#' @details Columns with (near-)zero variance cannot be correlated and are
+#'   dropped automatically with an informative message, so the raw
+#'   `"the standard deviation is zero"` warning from [stats::cor()] is not
+#'   surfaced. If, after dropping them, any cells still come out `NA` (e.g. two
+#'   variables that never co-occur under `"pairwise.complete.obs"`), those cells
+#'   are rendered in grey and labelled `n/a` rather than left blank.
+#'
 #' @return A [ggplot2::ggplot] object.
 #' @export
 #' @examples
@@ -33,12 +40,26 @@ correlation_heatmap <- function(data, cols = NULL, method = "pearson",
   } else {
     check_columns(data, cols)
   }
+  if (length(palette) != 3) {
+    stop("`palette` must have exactly three colours.", call. = FALSE)
+  }
+
+  # Drop (near-)constant columns: cor() cannot define a correlation for them
+  # and would otherwise emit a raw "standard deviation is zero" warning and
+  # leave a band of unannotated NA cells.
+  is_const <- vapply(cols, function(cn) {
+    v <- data[[cn]][!is.na(data[[cn]])]
+    length(v) < 2 || stats::sd(v) < .Machine$double.eps^0.5
+  }, logical(1))
+  if (any(is_const)) {
+    message("correlation_heatmap(): dropping zero-variance column(s): ",
+            paste(cols[is_const], collapse = ", "), ".")
+    cols <- cols[!is_const]
+  }
+
   if (length(cols) < 2) {
     stop("Need at least two numeric columns to compute correlations.",
          call. = FALSE)
-  }
-  if (length(palette) != 3) {
-    stop("`palette` must have exactly three colours.", call. = FALSE)
   }
 
   cm <- stats::cor(data[cols], use = use, method = method)
@@ -56,7 +77,8 @@ correlation_heatmap <- function(data, cols = NULL, method = "pearson",
     ggplot2::geom_tile(colour = "white", linewidth = 0.4) +
     ggplot2::scale_fill_gradient2(
       low = palette[1], mid = palette[2], high = palette[3],
-      midpoint = 0, limits = c(-1, 1), name = "Correlation"
+      midpoint = 0, limits = c(-1, 1), name = "Correlation",
+      na.value = "grey85"
     ) +
     ggplot2::coord_fixed() +
     ggplot2::labs(x = NULL, y = NULL, title = title) +
@@ -67,10 +89,20 @@ correlation_heatmap <- function(data, cols = NULL, method = "pearson",
     )
 
   if (show_values) {
+    # Label undefined (NA) correlations distinctly rather than leaving blanks.
+    long$label <- ifelse(
+      is.na(long$corr), "n/a",
+      formatC(long$corr, format = "f", digits = digits)
+    )
+    label_colour <- ifelse(
+      is.na(long$corr), "grey40",
+      ifelse(abs(long$corr) > 0.6, "white", "grey20")
+    )
     p <- p + ggplot2::geom_text(
-      ggplot2::aes(label = formatC(.data$corr, format = "f", digits = digits)),
+      data = long,
+      ggplot2::aes(label = .data$label),
       size = 3,
-      colour = ifelse(abs(long$corr) > 0.6, "white", "grey20")
+      colour = label_colour
     )
   }
   p
