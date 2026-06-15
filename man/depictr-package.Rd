@@ -115,7 +115,7 @@ simulated datasets used throughout the examples and vignettes.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://pablobernabeu.github.io/depictr}
+  \item \url{https://pablobernabeu.github.io/depictr/}
   \item \url{https://github.com/pablobernabeu/depictr}
   \item Report bugs at \url{https://github.com/pablobernabeu/depictr/issues}
 }
