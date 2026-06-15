@@ -7,13 +7,15 @@
 gain_plot(x, score = NULL, colour = depictr_brand(), title = NULL)
 }
 \arguments{
-\item{x}{A binomial \code{glm}, or the vector of observed outcomes (0/1, logical
-or a two-level factor with the positive class second).}
+\item{x}{A binomial \code{glm}; the vector of observed outcomes (0/1, logical or a
+two-level factor with the positive class second); or a \emph{named} list of
+models / (actual, score) pairs to overlay.}
 
 \item{score}{When \code{x} is an outcome vector, the matching scores or predicted
-probabilities.}
+probabilities (or a list of them for the multi-model case).}
 
-\item{colour}{Curve colour. Defaults to the depictr brand blue.}
+\item{colour}{Curve colour for the single-model case. Defaults to the depictr
+brand blue. Ignored when several models are overlaid.}
 
 \item{title}{Plot title.}
 }
@@ -25,10 +27,16 @@ Shows how many of the positive cases are captured as a growing share of the
 population is targeted in order of predicted score. It is the customary chart
 for judging a classifier's value for ranking and targeting, as in marketing,
 triage and fraud detection. The diagonal marks the no-model baseline and the
-upper envelope a perfect model.
+upper envelope a perfect model. Pass a \emph{named list} of models / (actual,
+score) pairs to overlay several colour-coded gains curves with a legend.
 }
 \examples{
 gfit <- glm(accuracy ~ word_frequency + RT + condition,
             data = lexical_decision, family = binomial)
 gain_plot(gfit)
+
+# Compare two models.
+reduced <- glm(accuracy ~ word_frequency, data = lexical_decision,
+               family = binomial)
+gain_plot(list(Full = gfit, Reduced = reduced))
 }

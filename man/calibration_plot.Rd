@@ -14,17 +14,20 @@ calibration_plot(
 )
 }
 \arguments{
-\item{x}{A binomial \code{glm}, or the vector of observed outcomes.}
+\item{x}{A binomial \code{glm}, the vector of observed outcomes, or a \emph{named} list
+of models / (actual, score) pairs to overlay.}
 
 \item{score}{When \code{x} is an outcome vector, the matching predicted
-probabilities.}
+probabilities (or a list of them for the multi-model case).}
 
 \item{bins}{Number of (equal-count) bins.}
 
-\item{colour}{Point/line colour. Defaults to the depictr brand blue.}
+\item{colour}{Point/line colour for the single-model case. Defaults to the
+depictr brand blue. Ignored when several models are overlaid.}
 
 \item{conf_level}{Confidence level for the per-bin Wilson interval on the
-observed proportion. Use \code{NA} to omit the intervals.}
+observed proportion. Use \code{NA} to omit the intervals. Intervals are only
+drawn in the single-model case to keep the overlay legible.}
 
 \item{title}{Plot title.}
 }
@@ -37,7 +40,8 @@ scores are split into bins; for each bin the mean predicted probability is
 plotted against the observed event rate, with the diagonal marking perfect
 calibration. A Wilson binomial confidence interval is drawn on each bin's
 observed proportion so that bins backed by few observations are not
-over-interpreted.
+over-interpreted. Pass a \emph{named list} of models / (actual, score) pairs to
+overlay several colour-coded calibration curves with a legend.
 }
 \examples{
 gfit <- glm(accuracy ~ word_frequency + RT, data = lexical_decision,

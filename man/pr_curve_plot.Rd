@@ -4,32 +4,54 @@
 \alias{pr_curve_plot}
 \title{Precision-recall curve}
 \usage{
-pr_curve_plot(x, score = NULL, colour = depictr_brand(), title = NULL)
+pr_curve_plot(
+  x,
+  score = NULL,
+  colour = depictr_brand(),
+  f1 = FALSE,
+  title = NULL
+)
 }
 \arguments{
-\item{x}{A binomial \code{glm}, or the vector of observed outcomes (0/1, logical
-or a two-level factor with the positive class second).}
+\item{x}{A binomial \code{glm}; the vector of observed outcomes (0/1, logical or a
+two-level factor with the positive class second); or a \emph{named} list of
+models / (actual, score) pairs to overlay.}
 
 \item{score}{When \code{x} is an outcome vector, the matching scores or predicted
-probabilities.}
+probabilities (or a list of them for the multi-model case).}
 
-\item{colour}{Curve colour. Defaults to the depictr brand blue.}
+\item{colour}{Curve colour for the single-model case. Defaults to the depictr
+brand blue. Ignored when several models are overlaid.}
+
+\item{f1}{Logical; if \code{TRUE}, mark the maximum-F1 operating point on each
+curve (the threshold maximising the harmonic mean of precision and recall).}
 
 \item{title}{Plot title.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object. The average precision is stored in
-\code{attr(plot, "average_precision")}.
+\code{attr(plot, "average_precision")} (a named vector when several models are
+supplied).
 }
 \description{
 Plots precision against recall for a binary classifier and reports the
 average precision (the area under the curve). The precision-recall curve is
 more informative than the ROC curve when the positive class is rare, because
 it ignores the many true negatives. A horizontal line marks the no-skill
-baseline (the positive-class prevalence).
+baseline (the positive-class prevalence). Pass a \emph{named list} of models /
+(actual, score) pairs to overlay several colour-coded curves with a legend
+and per-curve average precision.
 }
 \examples{
 gfit <- glm(accuracy ~ word_frequency + RT + condition,
             data = lexical_decision, family = binomial)
 pr_curve_plot(gfit)
+
+# Mark the maximum-F1 operating point.
+pr_curve_plot(gfit, f1 = TRUE)
+
+# Compare two models with per-curve average precision in the legend.
+reduced <- glm(accuracy ~ word_frequency, data = lexical_decision,
+               family = binomial)
+pr_curve_plot(list(Full = gfit, Reduced = reduced))
 }

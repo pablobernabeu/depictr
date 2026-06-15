@@ -10,7 +10,9 @@ residual_diagnostics_plot(
   ncol = 2,
   point_alpha = 0.6,
   smooth = TRUE,
-  title = NULL
+  title = NULL,
+  glm_panels = TRUE,
+  seed = NULL
 )
 }
 \arguments{
@@ -26,6 +28,13 @@ residual_diagnostics_plot(
 \item{smooth}{Whether to add a loess guide line to the residual panels.}
 
 \item{title}{Overall title for the panel.}
+
+\item{glm_panels}{For a \code{glm}, whether to use the GLM-appropriate binned and
+quantile-residual panels (the default) instead of the classic \code{lm} panels.
+Ignored for an \code{lm}.}
+
+\item{seed}{Optional integer seed for the randomisation of discrete quantile
+residuals, for reproducible \code{glm} Q-Q panels.}
 }
 \value{
 A 'patchwork' object (printable like a \link[ggplot2:ggplot]{ggplot2::ggplot}).
@@ -36,8 +45,29 @@ values, a normal Q-Q plot of the standardised residuals, a scale-location
 plot, and residuals against leverage) into a single panel using 'patchwork'.
 The function works with \code{lm} and \code{glm} objects.
 }
+\details{
+For a \code{glm}, the default panels are made GLM-aware (\code{glm_panels = TRUE}): the
+"residuals vs. fitted" panel is replaced by a \emph{binned}-residual plot
+(Gelman & Hill, 2007; see \code{\link[=binned_residual_plot]{binned_residual_plot()}}), which is readable even
+for binary or count models, and the Q-Q panel uses \emph{randomized quantile}
+residuals (Dunn & Smyth, 1996), which are standard normal under a correctly
+specified model regardless of the response family. The scale-location and
+leverage panels are unchanged. For an \code{lm} the behaviour is identical to
+before. Set \code{glm_panels = FALSE} to force the classic \code{lm}-style panels for a
+\code{glm} as well.
+}
 \examples{
 fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
 residual_diagnostics_plot(fit)
 residual_diagnostics_plot(fit, which = c("resid_fitted", "qq"))
+
+# A logistic GLM gets binned and quantile-residual panels automatically:
+gfit <- glm(adverse_event ~ biomarker + age + arm,
+            data = clinical_trial, family = binomial)
+residual_diagnostics_plot(gfit)
+}
+\references{
+\insertRef{gelman2007}{depictr}
+
+\insertRef{dunn1996}{depictr}
 }

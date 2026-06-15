@@ -6,7 +6,8 @@
 \usage{
 palette_preview(
   n = 8,
-  type = c("qualitative", "sequential", "diverging", "all")
+  type = c("qualitative", "sequential", "diverging", "all"),
+  cvd = c("none", "deutan", "protan", "tritan")
 )
 }
 \arguments{
@@ -14,6 +15,10 @@ palette_preview(
 
 \item{type}{Palette type to preview: \code{"qualitative"}, \code{"sequential"},
 \code{"diverging"}, or \code{"all"} to show all three.}
+
+\item{cvd}{Colour-vision-deficiency simulation for the tiles: \code{"none"} (the
+default, true colours), \code{"deutan"} (red-green, deuteranopia), \code{"protan"}
+(red-green, protanopia) or \code{"tritan"} (blue-yellow, tritanopia).}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
@@ -25,8 +30,19 @@ or documenting a figure. Each swatch's hex label is drawn in near-black or
 white, whichever is more legible against that tile (chosen by the tile's
 relative luminance), so labels stay readable on both light and dark colours.
 }
+\details{
+Set \code{cvd} to render the swatches as they would appear under a colour-vision
+deficiency, using the Machado et al. (2009) simulation. The tiles are
+recoloured to the simulated appearance while the labels keep the \emph{original}
+hex code, so you can check at a glance whether two groups would still be
+told apart by a colourblind reader.
+}
 \examples{
 palette_preview()
 palette_preview(7, type = "sequential")
 palette_preview(type = "all")
+palette_preview(cvd = "deutan")
+}
+\references{
+\insertRef{machado2009}{depictr}
 }

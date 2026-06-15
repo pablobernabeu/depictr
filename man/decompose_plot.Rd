@@ -8,6 +8,9 @@ decompose_plot(
   x,
   frequency = NULL,
   method = c("stl", "classical"),
+  robust = FALSE,
+  confidence = FALSE,
+  level = 0.95,
   title = NULL
 )
 }
@@ -20,6 +23,19 @@ data); taken from \code{x} when it is a \code{ts}.}
 \item{method}{\code{"stl"} (loess-based) or \code{"classical"}
 (\code{\link[stats:decompose]{stats::decompose()}}).}
 
+\item{robust}{For \code{method = "stl"}, whether to fit a robust STL
+(\code{\link[stats:stl]{stats::stl()}} with \code{robust = TRUE}), which down-weights outliers in the
+loess fits so that an unusual point bleeds less into the trend and seasonal
+components. Ignored for the classical method.}
+
+\item{confidence}{Whether to draw a confidence ribbon around the trend
+component. The band is a normal-approximation interval based on the
+remainder's standard deviation (see Details). \code{FALSE} reproduces the
+previous behaviour exactly.}
+
+\item{level}{Coverage of the trend confidence ribbon (a single number
+strictly between 0 and 1).}
+
 \item{title}{Plot title.}
 }
 \value{
@@ -29,7 +45,19 @@ A 'patchwork' object (printable like a \link[ggplot2:ggplot]{ggplot2::ggplot}).
 Decomposes a seasonal time series into trend, seasonal and remainder
 components and shows them, with the original series, as stacked panels.
 }
+\details{
+The trend confidence ribbon is a pragmatic normal-approximation band:
+\verb{trend +/- z * sd(remainder)}, where \code{z = qnorm((1 + level) / 2)} and the
+remainder standard deviation is computed on the non-missing remainder values.
+It conveys the scale of the unexplained variation around the smoothed trend
+rather than a formal sampling-distribution interval.
+}
 \examples{
 decompose_plot(AirPassengers)
 decompose_plot(AirPassengers, method = "classical")
+# Robust STL with a confidence ribbon on the trend
+decompose_plot(AirPassengers, robust = TRUE, confidence = TRUE)
+}
+\seealso{
+\code{\link[=ts_forecast]{ts_forecast()}}, \code{\link[=seasonal_plot]{seasonal_plot()}}
 }

@@ -9,8 +9,8 @@ depictr_palette(n = NULL, type = c("qualitative", "sequential", "diverging"))
 \arguments{
 \item{n}{Number of colours to return. If \code{NULL} (the default) the full
 qualitative palette is returned. For the qualitative palette an \code{n} larger
-than the eight base colours is interpolated; the sequential and diverging
-palettes are ramps and accept any \code{n}.}
+than the available base colours is interpolated; the sequential and
+diverging palettes are ramps and accept any \code{n}.}
 
 \item{type}{Palette type: \code{"qualitative"} (categorical groups),
 \code{"sequential"} (ordered low-to-high) or \code{"diverging"} (a midpoint with two
@@ -26,6 +26,13 @@ recommended categorical palette that stays distinguishable under the common
 forms of colour-vision deficiency, with the depictr brand blue leading. The
 sequential and diverging palettes are perceptually ordered single-hue and
 red-blue ramps.
+}
+\details{
+The qualitative palette can be overridden globally with
+\code{options(depictr.palette = )} (see \code{\link[=depictr_options]{depictr_options()}}); when set, that
+custom palette replaces the built-in Okabe-Ito set and is interpolated when
+more colours are requested than it provides. The sequential and diverging
+ramps are unaffected.
 }
 \examples{
 depictr_palette(3)

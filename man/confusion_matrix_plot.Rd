@@ -19,7 +19,10 @@ confusion_matrix_plot(
 classes.}
 
 \item{threshold}{When \code{x} is a \code{glm}, the probability threshold for the
-positive class.}
+positive class. As well as a number in \verb{[0, 1]}, you may pass the string
+\code{"youden"} to reuse the Youden's J optimal threshold (the same operating
+point \code{\link[=roc_curve_plot]{roc_curve_plot()}} marks), so the confusion matrix and the ROC curve
+agree on the cut-off.}
 
 \item{normalize}{One of \code{"none"}, \code{"row"} (by actual class) or \code{"col"} (by
 predicted class); controls the fill shading and the cell annotation.}
@@ -27,7 +30,8 @@ predicted class); controls the fill shading and the cell annotation.}
 \item{title}{Plot title.}
 }
 \value{
-A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
+A \link[ggplot2:ggplot]{ggplot2::ggplot} object. The threshold actually used is stored in
+\code{attr(plot, "threshold")}.
 }
 \description{
 Cross-tabulates predicted against actual classes and displays the counts as a
@@ -38,4 +42,7 @@ threshold) or a pair of vectors of actual and predicted classes.
 gfit <- glm(accuracy ~ word_frequency + RT + condition,
             data = lexical_decision, family = binomial)
 confusion_matrix_plot(gfit, threshold = 0.5)
+
+# Reuse the Youden-optimal operating point.
+confusion_matrix_plot(gfit, threshold = "youden")
 }

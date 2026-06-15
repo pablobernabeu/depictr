@@ -44,6 +44,8 @@ Suggests:
     ggdist,
     posterior,
     distributional,
+    boot,
+    cluster,
     testthat (>= 3.0.0),
     withr
 VignetteBuilder: knitr

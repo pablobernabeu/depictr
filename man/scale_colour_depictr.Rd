@@ -6,11 +6,26 @@
 \alias{scale_fill_depictr}
 \title{depictr colour and fill scales}
 \usage{
-scale_colour_depictr(n = NULL, palette = NULL, ...)
+scale_colour_depictr(
+  n = NULL,
+  palette = NULL,
+  na.value = depictr_opt("na_value"),
+  ...
+)
 
-scale_color_depictr(n = NULL, palette = NULL, ...)
+scale_color_depictr(
+  n = NULL,
+  palette = NULL,
+  na.value = depictr_opt("na_value"),
+  ...
+)
 
-scale_fill_depictr(n = NULL, palette = NULL, ...)
+scale_fill_depictr(
+  n = NULL,
+  palette = NULL,
+  na.value = depictr_opt("na_value"),
+  ...
+)
 }
 \arguments{
 \item{n}{Optional number of colours to draw from \code{\link[=depictr_palette]{depictr_palette()}}. By
@@ -21,6 +36,9 @@ default ggplot2 requests exactly as many colours as there are groups; pass
 number of colours) returning a character vector of colours. Defaults to
 \code{\link[=depictr_palette]{depictr_palette()}}.}
 
+\item{na.value}{Colour for \code{NA} levels. Defaults to the resolved
+\code{depictr.na_value} option (the muted grey \code{"grey80"} unless changed).}
+
 \item{...}{Passed to \code{\link[ggplot2:discrete_scale]{ggplot2::discrete_scale()}}.}
 }
 \value{
@@ -28,7 +46,9 @@ A ggplot2 scale that can be added to a plot.
 }
 \description{
 Discrete ggplot2 scales using \code{\link[=depictr_palette]{depictr_palette()}}. These are the canonical
-colour and fill scales used throughout the package.
+colour and fill scales used throughout the package. They honour the global
+\code{options(depictr.palette = )} (via \code{\link[=depictr_palette]{depictr_palette()}}) and
+\code{options(depictr.na_value = )} settings; see \code{\link[=depictr_options]{depictr_options()}}.
 }
 \examples{
 library(ggplot2)

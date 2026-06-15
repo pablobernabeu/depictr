@@ -10,6 +10,8 @@ cluster_plot(
   k = 3,
   clusters = NULL,
   scale = TRUE,
+  suggest_k = NULL,
+  k_range = 2:8,
   hulls = TRUE,
   label_centers = TRUE,
   point_alpha = 0.8,
@@ -25,14 +27,25 @@ cluster_plot(
 
 \item{cols}{Numeric columns to cluster on (default: all numeric).}
 
-\item{k}{Number of clusters for k-means (ignored if \code{clusters} is supplied).}
+\item{k}{Number of clusters for k-means (ignored if \code{clusters} is supplied,
+or overridden when \code{suggest_k} chooses a value).}
 
 \item{clusters}{Optional vector of cluster assignments (e.g. from
 \code{\link[stats:kmeans]{stats::kmeans()}} or \code{\link[stats:cutree]{stats::cutree()}}); use this to plot a clustering you
-computed yourself. Must have exactly one entry per row of \code{data} (rows with
-missing values in \code{cols} are dropped from both before plotting).}
+computed yourself. Hierarchical or PAM assignments (such as
+\code{\link[stats:cutree]{stats::cutree()}} output matching \code{\link[=dendrogram_plot]{dendrogram_plot()}}) are accepted. Must
+have exactly one entry per row of \code{data} (rows with missing values in
+\code{cols} are dropped from both before plotting).}
 
 \item{scale}{Whether to scale variables to unit variance before clustering and the PCA.}
+
+\item{suggest_k}{Optionally choose \code{k} automatically with a cluster-quality
+diagnostic instead of using the supplied \code{k}. Either \code{TRUE} (uses the
+average-silhouette criterion), a string naming the criterion
+(\code{"silhouette"}, \code{"wss"} or \code{"gap"}; see \code{\link[=k_diagnostic]{k_diagnostic()}}), or \code{NULL}
+(the default) to leave \code{k} unchanged. Ignored when \code{clusters} is supplied.}
+
+\item{k_range}{Candidate values of \code{k} searched when \code{suggest_k} is set.}
 
 \item{hulls}{Whether to draw a shaded convex hull around each cluster.}
 
@@ -52,7 +65,8 @@ missing values in \code{cols} are dropped from both before plotting).}
 \item{iter.max}{Maximum iterations for \code{\link[stats:kmeans]{stats::kmeans()}}.}
 }
 \value{
-A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
+A \link[ggplot2:ggplot]{ggplot2::ggplot} object. When \code{suggest_k} is used, the chosen \code{k}
+and the full diagnostic are attached as the attribute \code{"k_diagnostic"}.
 }
 \description{
 Runs k-means clustering on the numeric columns of a data frame (or uses a
@@ -64,4 +78,12 @@ for any number of variables.
 \examples{
 cluster_plot(crop_yield, cols = c("rainfall", "fertilizer", "soil_ph",
                                   "yield"), k = 3, seed = 1)
+# Let a silhouette diagnostic choose k:
+cluster_plot(crop_yield, cols = c("rainfall", "fertilizer", "soil_ph",
+                                  "yield"), suggest_k = TRUE, k_range = 2:6,
+             seed = 1)
+}
+\seealso{
+\code{\link[=k_diagnostic]{k_diagnostic()}} and \code{\link[=silhouette_plot]{silhouette_plot()}} for cluster-quality
+diagnostics.
 }

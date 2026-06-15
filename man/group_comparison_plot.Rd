@@ -11,6 +11,9 @@ group_comparison_plot(
   conf_level = 0.95,
   show_points = TRUE,
   point_alpha = 0.25,
+  differences = FALSE,
+  reference = NULL,
+  n_boot = 5000,
   palette = NULL,
   title = NULL,
   x_lab = NULL,
@@ -30,12 +33,26 @@ group_comparison_plot(
 
 \item{point_alpha}{Transparency of the raw points.}
 
+\item{differences}{If \code{TRUE}, append a lower panel showing the pairwise mean
+difference(s) against a reference group, each with a bootstrap confidence
+interval, turning the plot into a full estimation plot via
+\code{\link[=estimation_plot]{estimation_plot()}}. The return value is then a 'patchwork' object. Defaults
+to \code{FALSE} (the plain group-means plot, fully backward-compatible).}
+
+\item{reference}{Reference group for the difference panel when
+\code{differences = TRUE}; defaults to the first level of \code{group}. Ignored
+otherwise.}
+
+\item{n_boot}{Number of bootstrap resamples for the difference intervals when
+\code{differences = TRUE}. Ignored otherwise.}
+
 \item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title, x_lab, y_lab}{Title and axis labels.}
 }
 \value{
-A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
+A \link[ggplot2:ggplot]{ggplot2::ggplot} object, or a 'patchwork' object when
+\code{differences = TRUE}.
 }
 \description{
 An estimation-style plot of a numeric outcome across the levels of a grouping
@@ -50,4 +67,7 @@ interval, so only its mean is drawn (no interval) and a warning is issued.
 \examples{
 group_comparison_plot(lexical_decision, RT, condition)
 group_comparison_plot(crop_yield, yield, treatment)
+# Append the pairwise mean-difference panel (an estimation plot):
+set.seed(1)
+group_comparison_plot(crop_yield, yield, treatment, differences = TRUE)
 }

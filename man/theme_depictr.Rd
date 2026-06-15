@@ -4,12 +4,18 @@
 \alias{theme_depictr}
 \title{The depictr ggplot2 theme}
 \usage{
-theme_depictr(base_size = 11, base_family = "", grid = "xy")
+theme_depictr(
+  base_size = depictr_opt("base_size"),
+  base_family = depictr_opt("base_family"),
+  grid = "xy"
+)
 }
 \arguments{
-\item{base_size}{Base font size, in points.}
+\item{base_size}{Base font size, in points. Defaults to the
+\code{depictr.base_size} option.}
 
-\item{base_family}{Base font family.}
+\item{base_family}{Base font family. Defaults to the \code{depictr.base_family}
+option.}
 
 \item{grid}{Which major gridlines to keep: \code{"xy"}, \code{"x"}, \code{"y"} or \code{"none"}.}
 }
@@ -20,6 +26,13 @@ A ggplot2 theme object.
 A clean, minimal theme used by every plotting function in the package. It is
 a light modification of \code{\link[ggplot2:theme_minimal]{ggplot2::theme_minimal()}} with subtle gridlines,
 centred titles and comfortable margins.
+}
+\details{
+The default \code{base_size} and \code{base_family} come from the global options
+\code{depictr.base_size} and \code{depictr.base_family} (see \code{\link[=depictr_options]{depictr_options()}}), so
+the package-wide font size can be set once; passing the arguments explicitly
+overrides them. The title colour is the resolved \code{\link[=depictr_brand]{depictr_brand()}}, which in
+turn honours \code{options(depictr.brand = )}.
 }
 \examples{
 library(ggplot2)
