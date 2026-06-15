@@ -81,21 +81,33 @@ pca_plot <- function(x, cols = NULL, group = NULL, components = c(1, 2),
     mult <- span / max(abs(as.matrix(rot[c("PCx", "PCy")]))) * 0.75
     rot$PCx <- rot$PCx * mult
     rot$PCy <- rot$PCy * mult
+    # Place each label just past its arrow head, nudged outward along the arrow
+    # direction, so labels sit beyond the point cloud and clear each other and
+    # the arrows. A semi-transparent white box (geom_label) gives a halo that
+    # keeps the text legible over the points.
+    arrow_len <- sqrt(rot$PCx^2 + rot$PCy^2)
+    nudge <- span * 0.08
+    rot$labx <- rot$PCx + rot$PCx / arrow_len * nudge
+    rot$laby <- rot$PCy + rot$PCy / arrow_len * nudge
     p <- p +
       ggplot2::geom_segment(
         data = rot,
         ggplot2::aes(x = 0, y = 0, xend = .data$PCx, yend = .data$PCy),
         arrow = ggplot2::arrow(length = ggplot2::unit(0.18, "cm")),
-        colour = depictr_accent(), inherit.aes = FALSE
+        colour = depictr_accent(), linewidth = 0.5, inherit.aes = FALSE
       ) +
-      ggplot2::geom_text(
+      ggplot2::geom_label(
         data = rot,
-        ggplot2::aes(x = .data$PCx, y = .data$PCy, label = .data$varname),
-        colour = depictr_accent(), size = 3, vjust = -0.4, inherit.aes = FALSE
+        ggplot2::aes(x = .data$labx, y = .data$laby, label = .data$varname),
+        colour = depictr_accent(), fontface = "bold", size = 3.6,
+        fill = grDevices::adjustcolor("white", alpha.f = 0.7),
+        label.size = 0, label.padding = ggplot2::unit(0.12, "lines"),
+        inherit.aes = FALSE
       )
   }
 
   p +
+    ggplot2::coord_cartesian(clip = "off") +
     ggplot2::labs(
       x = sprintf("PC%d (%.1f%%)", ci[1], 100 * ve[ci[1]]),
       y = sprintf("PC%d (%.1f%%)", ci[2], 100 * ve[ci[2]]),

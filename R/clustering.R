@@ -72,8 +72,8 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
       }
       set.seed(seed)
     }
-    kd <- k_diagnostic(data, k_range = k_range, method = method,
-                       cols = cols, scale = scale, nstart = nstart)
+    kd <- k_diagnostic_data(data, k_range = k_range, method = method,
+                            cols = cols, scale = scale, nstart = nstart)
     k <- kd$suggested
     subtitle <- sprintf("k = %d suggested by %s diagnostic", k, kd$method)
   }
@@ -161,6 +161,12 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
 #' @param k Optional number of clusters to highlight (between 1 and the number
 #'   of leaves). The cut-height line is drawn only when `2 <= k < n`.
 #' @param horizontal Whether to draw the tree horizontally.
+#' @param labels Whether to print the leaf labels. `NULL` (the default) chooses
+#'   automatically: labels are shown for small trees (up to 40 leaves) and
+#'   suppressed for larger ones, where they would otherwise collapse into an
+#'   unreadable smear. `TRUE`/`FALSE` force them on or off. When labels are
+#'   hidden and `k` is set, the cluster membership is instead conveyed by a
+#'   coloured strip of leaf ticks along the bottom of the tree.
 #' @param palette Colours for the `k` clusters; defaults to [depictr_palette()].
 #' @param title Plot title.
 #'
@@ -174,7 +180,8 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
 #' dendrogram_plot(d[-1], k = 2)
 dendrogram_plot <- function(x, cols = NULL, distance = "euclidean",
                             method = "complete", scale = TRUE, k = NULL,
-                            horizontal = FALSE, palette = NULL, title = NULL) {
+                            horizontal = FALSE, labels = NULL, palette = NULL,
+                            title = NULL) {
   hc <- as_hclust(x, cols, distance, method, scale)
   segs <- dendro_segments(hc)
   n <- length(hc$order)
@@ -184,6 +191,18 @@ dendrogram_plot <- function(x, cols = NULL, distance = "euclidean",
   leaves <- data.frame(x = leaf_x, y = 0,
                        label = hc$labels %||% as.character(seq_len(n)),
                        stringsAsFactors = FALSE)
+
+  # Decide whether to print leaf labels. Auto (NULL): show them only for small
+  # trees, where they stay legible; beyond ~40 leaves they overlap into an
+  # unreadable band, so suppress them and convey clusters via coloured ticks.
+  if (is.null(labels)) {
+    show_labels <- n <= 40L
+  } else {
+    if (!is.logical(labels) || length(labels) != 1 || is.na(labels)) {
+      stop("`labels` must be TRUE, FALSE or NULL.", call. = FALSE)
+    }
+    show_labels <- labels
+  }
 
   cut_h <- NULL
   if (!is.null(k)) {
@@ -206,6 +225,10 @@ dendrogram_plot <- function(x, cols = NULL, distance = "euclidean",
     }
   }
 
+  # `pal_fun` routes leaf-cluster colour through the canonical depictr scale; a
+  # supplied `palette` is honoured by passing it as the scale's palette function.
+  pal_fun <- if (is.null(palette)) NULL else function(j) palette
+
   p <- ggplot2::ggplot() +
     ggplot2::geom_segment(
       data = segs,
@@ -214,34 +237,55 @@ dendrogram_plot <- function(x, cols = NULL, distance = "euclidean",
       colour = "grey35", linewidth = 0.4
     )
 
-  if (!is.null(k)) {
-    # Route leaf-cluster colour through the canonical depictr scale; a supplied
-    # `palette` is honoured by passing it as the scale's palette function.
-    pal_fun <- if (is.null(palette)) NULL else function(j) palette
-    if (!is.null(cut_h)) {
-      p <- p + ggplot2::geom_hline(yintercept = cut_h, linetype = 2,
-                                   colour = "grey70")
-    }
-    p <- p +
-      ggplot2::geom_text(
-        data = leaves,
-        ggplot2::aes(x = .data$x, y = .data$y, label = .data$label,
-                     colour = .data$cluster),
-        angle = if (horizontal) 0 else 90,
-        hjust = 1.05, size = 3, show.legend = FALSE
-      ) +
-      scale_colour_depictr(palette = pal_fun)
-  } else {
-    p <- p + ggplot2::geom_text(
-      data = leaves,
-      ggplot2::aes(x = .data$x, y = .data$y, label = .data$label),
-      angle = if (horizontal) 0 else 90, hjust = 1.05, size = 3,
-      colour = "grey25"
-    )
+  if (!is.null(k) && !is.null(cut_h)) {
+    p <- p + ggplot2::geom_hline(yintercept = cut_h, linetype = 2,
+                                 colour = "grey70")
   }
 
+  if (show_labels) {
+    if (!is.null(k)) {
+      p <- p +
+        ggplot2::geom_text(
+          data = leaves,
+          ggplot2::aes(x = .data$x, y = .data$y, label = .data$label,
+                       colour = .data$cluster),
+          angle = if (horizontal) 0 else 90,
+          hjust = 1.05, size = 3, show.legend = FALSE
+        ) +
+        scale_colour_depictr(palette = pal_fun)
+    } else {
+      p <- p + ggplot2::geom_text(
+        data = leaves,
+        ggplot2::aes(x = .data$x, y = .data$y, label = .data$label),
+        angle = if (horizontal) 0 else 90, hjust = 1.05, size = 3,
+        colour = "grey25"
+      )
+    }
+  } else if (!is.null(k)) {
+    # Labels are hidden but we still want to convey the k clusters. Draw a
+    # coloured strip of short ticks below each leaf, one per observation, so the
+    # clustering is visible without any text.
+    tick_len <- max(hc$height) * 0.03
+    ticks <- leaves
+    ticks$yend <- -tick_len
+    p <- p +
+      ggplot2::geom_segment(
+        data = ticks,
+        ggplot2::aes(x = .data$x, xend = .data$x, y = 0, yend = .data$yend,
+                     colour = .data$cluster),
+        linewidth = 1.1, show.legend = FALSE
+      ) +
+      scale_colour_depictr(palette = pal_fun)
+  }
+  # When labels are hidden and there is no k, nothing is drawn at the bottom.
+
+  # Reserve a little more room below the tree when a coloured tick strip is
+  # shown so it is not clipped at the panel edge.
+  lower_expand <- if (!show_labels && !is.null(k)) 0.06 else 0.12
   p <- p +
-    ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0.12, 0.04))) +
+    ggplot2::scale_y_continuous(
+      expand = ggplot2::expansion(mult = c(lower_expand, 0.04))
+    ) +
     ggplot2::labs(x = NULL, y = "Height", title = title) +
     theme_depictr(grid = "none") +
     ggplot2::theme(axis.text.x = ggplot2::element_blank(),

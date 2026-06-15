@@ -62,7 +62,11 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
   avg_width <- mean(sil$sil_width)
   pal <- palette %||% depictr_palette(nlevels(sil$cluster))
 
-  # Cluster annotation: place label at the middle of each cluster block.
+  # Cluster annotation: place the label at the middle of each cluster block,
+  # left-anchored just to the right of zero (post-flip, this reads horizontally
+  # inside the band) so it is always fully on-panel rather than clipped off the
+  # left edge. A semi-transparent white box keeps it legible over the bars.
+  y_pos <- max(0.04, 0.04 * max(sil$sil_width, na.rm = TRUE))
   ann <- do.call(rbind, lapply(levels(sil$cluster), function(g) {
     rows <- sil[sil$cluster == g, , drop = FALSE]
     data.frame(
@@ -73,6 +77,11 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
       stringsAsFactors = FALSE
     )
   }))
+  overall_ann <- data.frame(
+    index = max(sil$index), sil_width = avg_width,
+    label = sprintf("overall avg = %.2f", avg_width),
+    stringsAsFactors = FALSE
+  )
 
   p <- ggplot2::ggplot(
     sil,
@@ -81,18 +90,23 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
     ggplot2::geom_col(width = 1) +
     ggplot2::geom_hline(yintercept = avg_width, linetype = 2,
                         colour = "grey30") +
-    ggplot2::geom_text(
+    ggplot2::geom_label(
       data = ann,
-      ggplot2::aes(x = .data$index, y = -0.02, label = .data$label),
-      inherit.aes = FALSE, hjust = 1, size = 3, colour = "grey20"
+      ggplot2::aes(x = .data$index, y = y_pos, label = .data$label),
+      inherit.aes = FALSE, hjust = 0, size = 3, colour = "grey15",
+      fill = grDevices::adjustcolor("white", alpha.f = 0.75),
+      label.size = 0, label.padding = ggplot2::unit(0.12, "lines")
     ) +
-    ggplot2::annotate(
-      "text", x = max(sil$index), y = avg_width,
-      label = sprintf("overall avg = %.2f", avg_width),
-      hjust = 1, vjust = -0.6, size = 3, colour = "grey30"
+    ggplot2::geom_label(
+      data = overall_ann,
+      ggplot2::aes(x = .data$index, y = .data$sil_width, label = .data$label),
+      inherit.aes = FALSE, hjust = 0.5, vjust = -0.2, size = 3,
+      colour = "grey30",
+      fill = grDevices::adjustcolor("white", alpha.f = 0.75),
+      label.size = 0, label.padding = ggplot2::unit(0.12, "lines")
     ) +
     ggplot2::scale_fill_manual(values = pal, name = "Cluster") +
-    ggplot2::coord_flip() +
+    ggplot2::coord_flip(clip = "off") +
     ggplot2::labs(
       x = NULL, y = "Silhouette width",
       title = title %||% "Silhouette plot"
@@ -108,10 +122,10 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
 
 #' Suggest a number of clusters
 #'
-#' Computes a cluster-quality diagnostic across a range of `k` and returns a
-#' tidy data frame plus a suggested `k`. Three criteria are available: the
-#' average silhouette width (maximised), the total within-cluster sum of squares
-#' "elbow" (the point of maximum curvature), and the gap statistic
+#' Computes a cluster-quality diagnostic across a range of `k` and draws the
+#' diagnostic curve, with the suggested `k` highlighted. Three criteria are
+#' available: the average silhouette width (maximised), the total within-cluster
+#' sum of squares "elbow" (the point of maximum curvature), and the gap statistic
 #' (the smallest `k` whose gap is within one standard error of the next, using
 #' the Tibshirani et al. heuristic).
 #'
@@ -123,9 +137,13 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
 #' @param scale Whether to scale variables to unit variance first.
 #' @param nstart Number of random starts for [stats::kmeans()].
 #' @param B Number of reference bootstrap samples for the gap statistic.
+#' @param title Plot title.
 #'
-#' @return A list with elements `table` (a data frame with one row per `k`),
-#'   `suggested` (the chosen `k`) and `method`.
+#' @return A [ggplot2::ggplot] object showing the diagnostic value against `k`,
+#'   with the suggested `k` marked and named in the subtitle. The underlying
+#'   computation is attached as attributes: `attr(p, "k_table")` (a data frame
+#'   with one row per `k`), `attr(p, "suggested")` (the chosen `k`) and
+#'   `attr(p, "method")`.
 #' @references
 #' Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the interpretation
 #' and validation of cluster analysis. *Journal of Computational and Applied
@@ -137,12 +155,72 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
 #' \doi{10.1111/1467-9868.00293}
 #' @export
 #' @examples
-#' kd <- k_diagnostic(crop_yield, k_range = 2:6,
-#'                    cols = c("rainfall", "fertilizer", "soil_ph", "yield"))
-#' kd$suggested
+#' p <- k_diagnostic(crop_yield, k_range = 2:6,
+#'                   cols = c("rainfall", "fertilizer", "soil_ph", "yield"))
+#' attr(p, "suggested")
 k_diagnostic <- function(data, k_range = 2:8,
                          method = c("silhouette", "wss", "gap"),
-                         cols = NULL, scale = TRUE, nstart = 10, B = 50) {
+                         cols = NULL, scale = TRUE, nstart = 10, B = 50,
+                         title = NULL) {
+  kd <- k_diagnostic_data(data, k_range = k_range, method = method,
+                          cols = cols, scale = scale, nstart = nstart, B = B)
+  tab <- kd$table
+  # The y-variable is the second column of the table (the criterion that varies
+  # with k); the first column is always `k`.
+  y_var <- setdiff(names(tab), "k")[1]
+  y_lab <- switch(kd$method,
+                  silhouette = "Average silhouette width",
+                  wss = "Within-cluster sum of squares",
+                  gap = "Gap statistic")
+  best <- tab[tab$k == kd$suggested, , drop = FALSE]
+
+  p <- ggplot2::ggplot(tab, ggplot2::aes(x = .data$k, y = .data[[y_var]])) +
+    ggplot2::geom_vline(xintercept = kd$suggested, linetype = 2,
+                        colour = depictr_reference()) +
+    ggplot2::geom_line(colour = depictr_brand(), linewidth = 0.7) +
+    ggplot2::geom_point(colour = depictr_brand(), size = 2)
+
+  if (kd$method == "gap" && "se" %in% names(tab)) {
+    p <- p + ggplot2::geom_errorbar(
+      ggplot2::aes(ymin = .data[[y_var]] - .data$se,
+                   ymax = .data[[y_var]] + .data$se),
+      width = 0.15, colour = depictr_brand()
+    )
+  }
+
+  p <- p +
+    ggplot2::geom_point(data = best, ggplot2::aes(x = .data$k,
+                                                  y = .data[[y_var]]),
+                        colour = depictr_accent(), size = 4) +
+    ggplot2::scale_x_continuous(breaks = tab$k) +
+    ggplot2::labs(
+      x = "Number of clusters (k)", y = y_lab,
+      title = title %||% "Cluster-number diagnostic",
+      subtitle = sprintf("k = %d suggested by %s diagnostic",
+                         kd$suggested, kd$method)
+    ) +
+    theme_depictr(grid = "y")
+
+  attr(p, "k_table") <- kd$table
+  attr(p, "suggested") <- kd$suggested
+  attr(p, "method") <- kd$method
+  p
+}
+
+#' Cluster-number diagnostic computation
+#'
+#' The numeric engine behind [k_diagnostic()]: evaluates the chosen criterion
+#' across `k_range` and returns the tidy table, suggested `k` and method as a
+#' list, without building a plot. Used internally by [k_diagnostic()] and
+#' [cluster_plot()].
+#'
+#' @inheritParams k_diagnostic
+#' @return A list with elements `table` (a data frame with one row per `k`),
+#'   `suggested` (the chosen `k`) and `method`.
+#' @noRd
+k_diagnostic_data <- function(data, k_range = 2:8,
+                              method = c("silhouette", "wss", "gap"),
+                              cols = NULL, scale = TRUE, nstart = 10, B = 50) {
   method <- match.arg(method)
   X <- numeric_matrix(data, cols, scale)
   k_range <- sort(unique(as.integer(k_range)))
