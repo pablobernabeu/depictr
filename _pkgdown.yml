@@ -115,6 +115,8 @@ reference:
   - lexical_decision
   - wellbeing_survey
   - crop_yield
+  - clinical_trial
+  - monthly_sales
 
 articles:
 - title: Articles
