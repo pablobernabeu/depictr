@@ -8,7 +8,7 @@ random_effects_plot(
   x,
   conf_level = 0.95,
   sort = TRUE,
-  point_colour = "#005b96",
+  point_colour = depictr_brand(),
   title = NULL,
   x_lab = "Random effect"
 )

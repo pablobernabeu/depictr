@@ -6,7 +6,7 @@
 \usage{
 qq_plot(
   x,
-  colour = "#005b96",
+  colour = depictr_brand(),
   title = NULL,
   x_lab = "Theoretical quantiles",
   y_lab = NULL
@@ -16,7 +16,7 @@ qq_plot(
 \item{x}{A numeric vector, or a fitted \code{lm}/\code{glm} model (its standardised
 residuals are used).}
 
-\item{colour}{Point colour.}
+\item{colour}{Point colour. Defaults to the depictr brand blue.}
 
 \item{title, x_lab, y_lab}{Title and axis labels.}
 }

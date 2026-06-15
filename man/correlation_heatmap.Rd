@@ -11,7 +11,7 @@ correlation_heatmap(
   use = "pairwise.complete.obs",
   show_values = TRUE,
   digits = 2,
-  palette = c("#b2182b", "white", "#005b96"),
+  palette = depictr_palette(5, "diverging")[c(1, 3, 5)],
   title = NULL
 )
 }
@@ -30,7 +30,9 @@ numeric columns are used.}
 \item{digits}{Number of decimal places for the annotations.}
 
 \item{palette}{Length-3 vector of colours for the lowest, mid (zero) and
-highest correlations.}
+highest correlations. Defaults to the endpoints and midpoint of the
+colourblind-aware \code{\link[=depictr_palette]{depictr_palette()}} diverging ramp (negative
+correlations red, zero neutral, positive correlations brand blue).}
 
 \item{title}{Plot title.}
 }

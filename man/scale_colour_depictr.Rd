@@ -6,20 +6,29 @@
 \alias{scale_fill_depictr}
 \title{depictr colour and fill scales}
 \usage{
-scale_colour_depictr(...)
+scale_colour_depictr(n = NULL, palette = NULL, ...)
 
-scale_color_depictr(...)
+scale_color_depictr(n = NULL, palette = NULL, ...)
 
-scale_fill_depictr(...)
+scale_fill_depictr(n = NULL, palette = NULL, ...)
 }
 \arguments{
+\item{n}{Optional number of colours to draw from \code{\link[=depictr_palette]{depictr_palette()}}. By
+default ggplot2 requests exactly as many colours as there are groups; pass
+\code{n} only to force a fixed slice of the palette.}
+
+\item{palette}{Optional palette override: a function of one argument (the
+number of colours) returning a character vector of colours. Defaults to
+\code{\link[=depictr_palette]{depictr_palette()}}.}
+
 \item{...}{Passed to \code{\link[ggplot2:discrete_scale]{ggplot2::discrete_scale()}}.}
 }
 \value{
 A ggplot2 scale that can be added to a plot.
 }
 \description{
-Discrete ggplot2 scales using \code{\link[=depictr_palette]{depictr_palette()}}.
+Discrete ggplot2 scales using \code{\link[=depictr_palette]{depictr_palette()}}. These are the canonical
+colour and fill scales used throughout the package.
 }
 \examples{
 library(ggplot2)

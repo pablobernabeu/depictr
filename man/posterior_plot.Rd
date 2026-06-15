@@ -10,7 +10,7 @@ posterior_plot(
   widths = c(0.66, 0.95),
   interaction = c("times", "asterisk", "colon", "space"),
   reference_line = 0,
-  colour = "#005b96",
+  colour = depictr_brand(),
   title = NULL,
   x_lab = "Value"
 )
@@ -27,7 +27,8 @@ or wide (one numeric column per parameter).}
 
 \item{reference_line}{Position of a vertical reference line (\code{NA} to omit).}
 
-\item{colour}{Colour for the points and intervals.}
+\item{colour}{Colour for the points and intervals. Defaults to the depictr
+brand blue.}
 
 \item{title, x_lab}{Plot title and value-axis label.}
 }

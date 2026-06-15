@@ -4,7 +4,14 @@
 \alias{calibration_plot}
 \title{Calibration plot}
 \usage{
-calibration_plot(x, score = NULL, bins = 10, colour = "#005b96", title = NULL)
+calibration_plot(
+  x,
+  score = NULL,
+  bins = 10,
+  colour = depictr_brand(),
+  conf_level = 0.95,
+  title = NULL
+)
 }
 \arguments{
 \item{x}{A binomial \code{glm}, or the vector of observed outcomes.}
@@ -14,7 +21,10 @@ probabilities.}
 
 \item{bins}{Number of (equal-count) bins.}
 
-\item{colour}{Point/line colour.}
+\item{colour}{Point/line colour. Defaults to the depictr brand blue.}
+
+\item{conf_level}{Confidence level for the per-bin Wilson interval on the
+observed proportion. Use \code{NA} to omit the intervals.}
 
 \item{title}{Plot title.}
 }
@@ -25,7 +35,9 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 Assesses how well predicted probabilities match observed frequencies. The
 scores are split into bins; for each bin the mean predicted probability is
 plotted against the observed event rate, with the diagonal marking perfect
-calibration.
+calibration. A Wilson binomial confidence interval is drawn on each bin's
+observed proportion so that bins backed by few observations are not
+over-interpreted.
 }
 \examples{
 gfit <- glm(accuracy ~ word_frequency + RT, data = lexical_decision,

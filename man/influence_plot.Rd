@@ -4,7 +4,7 @@
 \alias{influence_plot}
 \title{Influence plot}
 \usage{
-influence_plot(model, n_label = 3, colour = "#005b96", title = NULL)
+influence_plot(model, n_label = 3, colour = depictr_brand(), title = NULL)
 }
 \arguments{
 \item{model}{A fitted \code{lm} or \code{glm} model.}
@@ -12,7 +12,7 @@ influence_plot(model, n_label = 3, colour = "#005b96", title = NULL)
 \item{n_label}{Number of most-influential points (by Cook's distance) to
 label.}
 
-\item{colour}{Bubble colour.}
+\item{colour}{Bubble colour. Defaults to the depictr brand blue.}
 
 \item{title}{Plot title.}
 }

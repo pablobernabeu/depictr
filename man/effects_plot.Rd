@@ -10,7 +10,7 @@ effects_plot(
   conf_level = 0.95,
   n = 100,
   rug = TRUE,
-  colour = "#005b96",
+  colour = depictr_brand(),
   title = NULL,
   x_lab = NULL,
   y_lab = NULL
@@ -27,7 +27,8 @@ effects_plot(
 
 \item{rug}{Whether to add a rug of the observed predictor values (numeric predictors).}
 
-\item{colour}{Colour for the line/points and band.}
+\item{colour}{Colour for the line/points and band. Defaults to the depictr
+brand blue.}
 
 \item{title, x_lab, y_lab}{Title and axis labels.}
 }

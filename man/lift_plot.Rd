@@ -4,7 +4,7 @@
 \alias{lift_plot}
 \title{Cumulative lift chart}
 \usage{
-lift_plot(x, score = NULL, colour = "#005b96", title = NULL)
+lift_plot(x, score = NULL, colour = depictr_brand(), title = NULL)
 }
 \arguments{
 \item{x}{A binomial \code{glm}, or the vector of observed outcomes (0/1, logical
@@ -13,7 +13,7 @@ or a two-level factor with the positive class second).}
 \item{score}{When \code{x} is an outcome vector, the matching scores or predicted
 probabilities.}
 
-\item{colour}{Curve colour.}
+\item{colour}{Curve colour. Defaults to the depictr brand blue.}
 
 \item{title}{Plot title.}
 }

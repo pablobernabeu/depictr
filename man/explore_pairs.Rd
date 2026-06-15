@@ -10,6 +10,7 @@ explore_pairs(
   group = NULL,
   max_cols = 8,
   point_alpha = 0.5,
+  method = c("pearson", "spearman", "kendall"),
   palette = NULL,
   title = NULL
 )
@@ -26,6 +27,9 @@ used (up to \code{max_cols}).}
 quickly).}
 
 \item{point_alpha}{Point transparency in the scatter panels.}
+
+\item{method}{Correlation method for the upper-triangle coefficients, passed
+to \code{\link[stats:cor]{stats::cor()}}: \code{"pearson"}, \code{"spearman"} or \code{"kendall"}.}
 
 \item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
@@ -44,6 +48,6 @@ Built with 'patchwork', so it shares the package theme and palette.
 explore_pairs(crop_yield, cols = c("rainfall", "fertilizer", "yield"))
 \donttest{
 explore_pairs(crop_yield, cols = c("rainfall", "fertilizer", "yield"),
-              group = treatment)
+              group = treatment, method = "spearman")
 }
 }

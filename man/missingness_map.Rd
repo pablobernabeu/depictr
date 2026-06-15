@@ -9,7 +9,7 @@ missingness_map(
   cols = NULL,
   sort = TRUE,
   show_pct = TRUE,
-  colours = c("grey85", "#b2182b"),
+  colours = c("grey85", depictr_accent()),
   title = NULL
 )
 }
@@ -22,7 +22,9 @@ missingness_map(
 
 \item{show_pct}{Whether to append the percentage missing to each variable label.}
 
-\item{colours}{Length-2 vector: colours for present and missing cells.}
+\item{colours}{Length-2 vector: colours for present and missing cells.
+Defaults to a muted grey for present cells and the colourblind-safe
+\code{\link[=depictr_palette]{depictr_palette()}} accent for missing cells.}
 
 \item{title}{Plot title.}
 }

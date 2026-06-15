@@ -45,9 +45,9 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 Presents the estimates from a frequentist model and a Bayesian model side by
-side on one forest plot, in the familiar red (frequentist) and blue
-(Bayesian) styling. The function is a convenience wrapper around
-\code{\link[=compare_models]{compare_models()}}.
+side on one forest plot, with the two sources distinguished by the first two
+colours of the colourblind-safe \code{\link[=depictr_palette]{depictr_palette()}} (brand blue and orange).
+The function is a convenience wrapper around \code{\link[=compare_models]{compare_models()}}.
 }
 \details{
 It is a modernised, self-contained successor to the original
