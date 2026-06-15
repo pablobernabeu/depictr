@@ -255,9 +255,9 @@ prob_direction <- function(v, ref = 0) {
 
 #' Normalise the `draws` argument of posterior_plot() to a long table
 #'
-#' A plain long/wide data frame uses the original [draws_to_long()] path so its
+#' A plain long/wide data frame uses the original `draws_to_long()` path so its
 #' established behaviour and tests are untouched; richer Bayesian inputs (fits,
-#' draws objects, matrices) route through [extract_draws()].
+#' draws objects, matrices) route through `extract_draws()`.
 #' @noRd
 normalise_posterior_draws <- function(draws) {
   if (is.data.frame(draws)) {

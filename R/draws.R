@@ -13,7 +13,7 @@
 #' TRUE for fitted Bayesian models (brms/rstanarm), posterior `draws` objects,
 #' and matrices. Data frames are *not* claimed here, because a tidy data frame
 #' of posterior *summaries* (estimate/conf.low/...) must keep flowing down the
-#' summary path; [has_draws()] disambiguates those two data-frame cases.
+#' summary path; `has_draws()` disambiguates those two data-frame cases.
 #' @noRd
 is_draws_source <- function(x) {
   inherits(x, c("brmsfit", "stanreg", "draws", "draws_df", "draws_matrix",
@@ -65,7 +65,7 @@ has_draws <- function(x) {
 #' Extract a tidy long table of draws from any supported source
 #'
 #' @return A data frame with columns `term` (character), `.value` (numeric) and
-#'   `.draw` (integer). NA values are dropped, matching [draws_to_long()].
+#'   `.draw` (integer). NA values are dropped, matching `draws_to_long()`.
 #' @noRd
 extract_draws <- function(x) {
   long <- if (inherits(x, "brmsfit")) {
@@ -153,7 +153,7 @@ extract_draws_df <- function(x) {
 
 #' Long-melt a wide draws data frame, dropping sampler index columns
 #'
-#' Mirrors the column-selection logic in [draws_to_long()] (the existing wide
+#' Mirrors the column-selection logic in `draws_to_long()` (the existing wide
 #' path), but emits the `term` / `.value` / `.draw` schema used throughout the
 #' distribution layer.
 #' @noRd

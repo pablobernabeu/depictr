@@ -370,7 +370,7 @@ confusion_matrix_plot <- function(x, predicted = NULL, threshold = 0.5,
 #' Wilson score interval for a binomial proportion
 #'
 #' Vectorised over `successes`/`n`. The Wilson interval is preferred to the
-#' Wald (normal-approximation) interval because it stays inside [0, 1] and
+#' Wald (normal-approximation) interval because it stays inside `[0, 1]` and
 #' behaves sensibly for small `n` and proportions near 0 or 1 - exactly the
 #' situation in the sparsely populated tail bins of a calibration plot.
 #'
@@ -542,7 +542,7 @@ max_f1_point <- function(actual, score) {
 }
 
 #' The distinct score thresholds, in decreasing order, matching the rows that
-#' [threshold_counts()] returns (one per run of tied scores).
+#' `threshold_counts()` returns (one per run of tied scores).
 #' @noRd
 distinct_thresholds <- function(score) {
   s <- sort(unique(score), decreasing = TRUE)

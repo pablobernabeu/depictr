@@ -52,7 +52,7 @@
 #' # full posteriors with the frequentist point + CI overlaid.
 #' set.seed(1)
 #' co <- coef(freq)
-#' draws <- as.data.frame(lapply(co, function(m) rnorm(2000, m, abs(m) * 0.1 + 0.05)))
+#' draws <- as.data.frame(lapply(co, function(m) rnorm(400, m, abs(m) * 0.1 + 0.05)))
 #' names(draws) <- names(co)
 #' frequentist_bayesian_plot(freq, draws,
 #'                           title = "Posterior with frequentist overlay")

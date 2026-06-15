@@ -39,6 +39,7 @@ Imports:
     Rdpack
 Suggests:
     lme4,
+    lmerTest,
     broom,
     simr,
     knitr,

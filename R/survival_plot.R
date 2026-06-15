@@ -460,7 +460,7 @@ format_median <- function(x) {
 
 # ---- number at risk --------------------------------------------------------
 
-#' Sensible default risk-table break times spanning [0, max time]
+#' Sensible default risk-table break times spanning `[0, max time]`
 #' @noRd
 risk_break_default <- function(time) {
   tmax <- max(time, na.rm = TRUE)
