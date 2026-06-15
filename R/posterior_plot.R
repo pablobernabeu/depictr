@@ -40,6 +40,14 @@
 #'   direction relative to `reference_line` -- the posterior probability that
 #'   the parameter lies on its majority side of the reference (a value in
 #'   \[0.5, 1\]). Requires a finite `reference_line`.
+#' @param facet Whether to give each parameter its own panel with a free
+#'   x-axis, laid out one per row. This keeps the small parameters legible when
+#'   a large one (typically the intercept) would otherwise stretch the shared
+#'   axis and squish the rest. Defaults to `FALSE`. A convenience alias for
+#'   `scales = "free"`.
+#' @param scales Either `"fixed"` (the default, a single shared x-axis) or
+#'   `"free"` (one free-scaled panel per parameter). When `facet = TRUE` this is
+#'   forced to `"free"`.
 #' @param colour,fill Colours for the point/interval and for the density slab.
 #'   Default to the depictr brand blue.
 #' @param rope_fill,rope_alpha Fill colour and opacity of the ROPE band.
@@ -62,6 +70,9 @@
 #'
 #' # A region of practical equivalence and a probability-of-direction label
 #' posterior_plot(draws, rope = c(-0.1, 0.1), pd = TRUE)
+#'
+#' # When one parameter dwarfs the others, give each its own free-scaled panel:
+#' posterior_plot(draws, facet = TRUE)
 posterior_plot <- function(draws,
                            style = c("halfeye", "interval", "gradient",
                                      "dots"),
@@ -72,6 +83,8 @@ posterior_plot <- function(draws,
                            reference_line = 0,
                            rope = NULL,
                            pd = FALSE,
+                           facet = FALSE,
+                           scales = c("fixed", "free"),
                            colour = depictr_brand(),
                            fill = depictr_brand(),
                            rope_fill = depictr_reference(),
@@ -81,6 +94,8 @@ posterior_plot <- function(draws,
   style <- match.arg(style)
   point <- match.arg(point)
   interaction <- match.arg(interaction)
+  scales <- match.arg(scales)
+  if (facet) scales <- "free"
   if (length(widths) != 2) stop("`widths` must have two values.", call. = FALSE)
   widths <- sort(widths)
 
@@ -140,7 +155,10 @@ posterior_plot <- function(draws,
       fill = rope_fill, alpha = rope_alpha
     )
   }
-  if (!is.na(ref)) {
+  # Shared-axis layout draws one full-height reference line; the faceted layout
+  # draws it per panel below (only where the interval brackets it), so a
+  # large-intercept panel is not stretched back to the reference value.
+  if (!is.na(ref) && scales == "fixed") {
     p <- p + ggplot2::geom_vline(xintercept = ref, linetype = 2,
                                  colour = depictr_reference())
   }
@@ -169,9 +187,34 @@ posterior_plot <- function(draws,
     caption
   }
 
-  p +
+  p <- p +
     ggplot2::labs(x = x_lab, y = NULL, title = title, caption = cap) +
     theme_depictr(grid = "x")
+
+  # Free-scaled, one-parameter-per-row layout: keeps small parameters legible
+  # when a large one (typically the intercept) would otherwise stretch the
+  # shared axis and squish the rest.
+  if (scales == "free") {
+    if (!is.na(ref)) {
+      brack <- ref >= summ$outer_lo & ref <= summ$outer_hi
+      if (any(brack)) {
+        refdf <- summ[brack, "label", drop = FALSE]
+        refdf$xref <- ref
+        p <- p + ggplot2::geom_vline(
+          data = refdf, ggplot2::aes(xintercept = .data$xref),
+          linetype = 2, colour = depictr_reference(), inherit.aes = FALSE
+        )
+      }
+    }
+    p <- p +
+      ggplot2::facet_wrap(ggplot2::vars(.data$label), ncol = 1,
+                          scales = "free", strip.position = "top",
+                          labeller = ggplot2::label_wrap_gen(width = 28)) +
+      ggplot2::theme(axis.text.y = ggplot2::element_blank(),
+                     axis.ticks.y = ggplot2::element_blank(),
+                     panel.spacing.y = ggplot2::unit(2, "pt"))
+  }
+  p
 }
 
 # ---- rendering helpers (ggdist) --------------------------------------------

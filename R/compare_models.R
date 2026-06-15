@@ -23,6 +23,14 @@
 #' @param reference_line Position of a vertical reference line (`NA` to omit).
 #' @param palette Colours for the sources; defaults to [depictr_palette()].
 #' @param point_size,line_size Point and interval-line sizes.
+#' @param facet Whether to give each term its own panel with a free x-axis,
+#'   laid out one per row, so that terms on very different scales (for example a
+#'   large intercept alongside small slopes) stay legible. The source overlay
+#'   and its single legend are preserved within the faceted layout. Defaults to
+#'   `FALSE`. A convenience alias for `scales = "free"`.
+#' @param scales Either `"fixed"` (the default, a single shared x-axis) or
+#'   `"free"` (one free-scaled panel per term). When `facet = TRUE` this is
+#'   forced to `"free"`.
 #' @param legend_title,legend_ncol Legend title and number of columns.
 #' @param title,subtitle,x_lab Title, subtitle and x-axis label.
 #'
@@ -34,6 +42,10 @@
 #'          data = crop_yield[crop_yield$treatment == "standard", ])
 #' compare_models(`All fields` = m1, `Standard only` = m2,
 #'                        title = "Estimates by subset")
+#'
+#' # Keep the intercept legible alongside the slopes:
+#' compare_models(`All fields` = m1, `Standard only` = m2,
+#'                intercept = TRUE, facet = TRUE)
 compare_models <- function(...,
                                     names = NULL,
                                     conf_level = 0.95,
@@ -47,6 +59,8 @@ compare_models <- function(...,
                                     palette = NULL,
                                     point_size = 2.2,
                                     line_size = 0.7,
+                                    facet = FALSE,
+                                    scales = c("fixed", "free"),
                                     legend_title = "Source",
                                     legend_ncol = 1,
                                     title = NULL,
@@ -54,6 +68,8 @@ compare_models <- function(...,
                                     x_lab = "Estimate") {
   order <- match.arg(order)
   interaction <- match.arg(interaction)
+  scales <- match.arg(scales)
+  if (facet) scales <- "free"
 
   sources <- list(...)
   if (length(sources) < 2) {
@@ -75,6 +91,12 @@ compare_models <- function(...,
   }, sources, src_names)
   est <- do.call(rbind, tidied)
   rownames(est) <- NULL
+
+  # Align the intercept across sources: frequentist models report "(Intercept)"
+  # while Bayesian summaries often use "Intercept" or "b_Intercept". Collapsing
+  # the aliases to a single canonical name lets the overlay (and faceting) match
+  # the term, instead of producing two near-identical rows/panels.
+  est$term[est$term %in% c("Intercept", "b_Intercept")] <- "(Intercept)"
 
   if (!intercept) {
     est <- est[!est$term %in% c("(Intercept)", "Intercept", "b_Intercept"), ,
@@ -124,13 +146,15 @@ compare_models <- function(...,
     ggplot2::aes(x = .data$estimate, y = .data$label, colour = .data$source)
   )
 
-  if (!is.na(reference_line)) {
+  # Shared-axis layout: one full-height reference line. Faceted layout: drawn
+  # per panel in add_term_facets(), so a large-intercept panel is not stretched.
+  if (!is.na(reference_line) && scales == "fixed") {
     p <- p + ggplot2::geom_vline(
       xintercept = reference_line, linetype = 2, colour = depictr_reference()
     )
   }
 
-  p +
+  p <- p +
     ggplot2::geom_errorbar(
       ggplot2::aes(xmin = .data$conf.low, xmax = .data$conf.high),
       orientation = "y", width = 0.18, linewidth = line_size,
@@ -144,4 +168,13 @@ compare_models <- function(...,
     ) +
     ggplot2::labs(x = x_lab, y = NULL, title = title, subtitle = subtitle) +
     theme_depictr(grid = "x")
+
+  if (scales == "free") {
+    # One free-scaled panel per term keeps the source overlay and its single
+    # legend, but lets each term occupy its own x-range.
+    p <- add_term_facets(p, reference_line = reference_line,
+                         reference_colour = "grey60")
+  }
+
+  p
 }

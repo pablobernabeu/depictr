@@ -28,6 +28,12 @@
 #' @param conf_level Confidence/credible level for models.
 #' @param labels,interaction,intercept See [compare_models()].
 #'   `intercept` defaults to `TRUE` here, matching the original behaviour.
+#' @param facet,scales Layout controls. Because a Bayesian model almost always
+#'   carries a large intercept alongside small slopes, the comparison defaults
+#'   to a faceted, free-scaled layout (`facet = TRUE`): each term gets its own
+#'   panel and free x-axis, so every posterior and its frequentist overlay stay
+#'   legible. Pass `facet = FALSE` (or `scales = "fixed"`) for the classic
+#'   single shared-axis plot.
 #' @param note_frequentist_no_prior If `TRUE`, append "(no prior)" to the
 #'   frequentist legend label, which is helpful when the title names the
 #'   Bayesian prior.
@@ -63,6 +69,8 @@ frequentist_bayesian_plot <- function(frequentist,
                                       interaction = c("times", "asterisk",
                                                       "colon", "space"),
                                       intercept = TRUE,
+                                      facet = TRUE,
+                                      scales = c("free", "fixed"),
                                       note_frequentist_no_prior = FALSE,
                                       vertical_line_at_x = 0,
                                       title = NULL,
@@ -70,6 +78,13 @@ frequentist_bayesian_plot <- function(frequentist,
                                       x_lab = "Estimate",
                                       ...) {
   interaction <- match.arg(interaction)
+  # `facet` is the primary control; `scales` is honoured only when supplied
+  # explicitly, so `facet = FALSE` stays meaningful despite the "free" default.
+  scales <- if (missing(scales)) {
+    if (facet) "free" else "fixed"
+  } else {
+    match.arg(scales)
+  }
   freq_label <- if (note_frequentist_no_prior) {
     "Frequentist analysis\n(no prior)"
   } else {
@@ -84,8 +99,8 @@ frequentist_bayesian_plot <- function(frequentist,
       frequentist = frequentist, bayesian = bayesian,
       conf_level = conf_level, labels = labels, interaction = interaction,
       intercept = intercept, freq_label = freq_label, bayes_label = bayes_label,
-      reference_line = vertical_line_at_x, title = title, subtitle = subtitle,
-      x_lab = x_lab
+      reference_line = vertical_line_at_x, scales = scales,
+      title = title, subtitle = subtitle, x_lab = x_lab
     ))
   }
 
@@ -100,6 +115,8 @@ frequentist_bayesian_plot <- function(frequentist,
       intercept = intercept,
       labels = labels,
       interaction = interaction,
+      facet = identical(scales, "free"),
+      scales = scales,
       reference_line = vertical_line_at_x,
       palette = depictr_palette(2),
       legend_title = NULL,
@@ -123,7 +140,8 @@ frequentist_bayesian_plot <- function(frequentist,
 #' @noRd
 fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
                              interaction, intercept, freq_label, bayes_label,
-                             reference_line, title, subtitle, x_lab) {
+                             reference_line, scales = "fixed",
+                             title, subtitle, x_lab) {
   pal <- depictr_palette(2)
   bayes_colour <- pal[1]
   freq_colour  <- pal[2]
@@ -169,7 +187,7 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
   }
 
   p <- ggplot2::ggplot()
-  if (!is.na(ref)) {
+  if (!is.na(ref) && scales == "fixed") {
     p <- p + ggplot2::geom_vline(xintercept = ref, linetype = 2,
                                  colour = depictr_reference())
   }
@@ -220,7 +238,7 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
       size = 2.4, position = nudge, na.rm = TRUE
     )
 
-  p +
+  p <- p +
     ggplot2::scale_colour_manual(
       values = stats::setNames(c(bayes_colour, freq_colour),
                                c(bayes_label, freq_label)),
@@ -231,4 +249,41 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
     ) +
     ggplot2::labs(x = x_lab, y = NULL, title = title, subtitle = subtitle) +
     theme_depictr(grid = "x")
+
+  # Free-scaled, one-term-per-row layout (the flagship default): a large
+  # intercept no longer squishes the slopes. The reference line is drawn only in
+  # panels whose span (Bayesian 95% interval unioned with the frequentist CI)
+  # brackets it, so a far-from-zero panel is not stretched back to the line.
+  if (scales == "free") {
+    if (!is.na(ref)) {
+      labs_all <- levels(draws$label)
+      dq <- tapply(draws$.value, draws$label, function(v)
+        stats::quantile(v, c(0.025, 0.975), names = FALSE, na.rm = TRUE))
+      lo <- vapply(labs_all, function(l)
+        min(c(dq[[l]][1], freq$conf.low[freq$label == l]), na.rm = TRUE),
+        numeric(1))
+      hi <- vapply(labs_all, function(l)
+        max(c(dq[[l]][2], freq$conf.high[freq$label == l]), na.rm = TRUE),
+        numeric(1))
+      keep <- is.finite(lo) & is.finite(hi) & ref >= lo & ref <= hi
+      if (any(keep)) {
+        refdf <- data.frame(
+          label = factor(labs_all[keep], levels = levels(draws$label)),
+          xref = ref, stringsAsFactors = FALSE
+        )
+        p <- p + ggplot2::geom_vline(
+          data = refdf, ggplot2::aes(xintercept = .data$xref),
+          linetype = 2, colour = depictr_reference(), inherit.aes = FALSE
+        )
+      }
+    }
+    p <- p +
+      ggplot2::facet_wrap(ggplot2::vars(.data$label), ncol = 1,
+                          scales = "free", strip.position = "top",
+                          labeller = ggplot2::label_wrap_gen(width = 28)) +
+      ggplot2::theme(axis.text.y = ggplot2::element_blank(),
+                     axis.ticks.y = ggplot2::element_blank(),
+                     panel.spacing.y = ggplot2::unit(2, "pt"))
+  }
+  p
 }
