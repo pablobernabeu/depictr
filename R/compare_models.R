@@ -84,16 +84,35 @@ compare_models <- function(...,
     stop("No terms left to plot.", call. = FALSE)
   }
 
-  term_levels <- unique(est$term)
+  # Align rows from different sources by a CANONICAL display label rather than
+  # the raw term name, so concepts that tidy to the same label (e.g. "stress"
+  # and the brms-style "b_stress") share a single row instead of producing
+  # duplicated factor levels. All ordering and grid-completion below therefore
+  # works on `label`, not `term`.
+  est$label <- make_labels(est$term, labels, interaction)
+
+  label_levels <- unique(est$label)
   if (order != "none") {
-    avg <- tapply(est$estimate, est$term, mean, na.rm = TRUE)
-    term_levels <- base::names(sort(avg, decreasing = (order == "descending")))
+    avg <- tapply(est$estimate, est$label, mean, na.rm = TRUE)
+    label_levels <- base::names(sort(avg, decreasing = (order == "descending")))
   } else {
-    term_levels <- rev(term_levels)
+    label_levels <- rev(label_levels)
   }
 
-  est$label <- make_labels(est$term, labels, interaction)
-  label_levels <- make_labels(term_levels, labels, interaction)
+  est$source <- factor(est$source, levels = src_names)
+
+  # Complete the label x source grid so every source has a row for every term.
+  # The added rows carry NA estimates (dropped by the geoms via `na.rm`), which
+  # keeps position_dodge from mis-centring terms that appear in only one source.
+  grid <- expand.grid(
+    label  = label_levels,
+    source = src_names,
+    KEEP.OUT.ATTRS = FALSE,
+    stringsAsFactors = FALSE
+  )
+  est <- merge(grid, est, by = c("label", "source"), all.x = TRUE,
+               sort = FALSE)
+
   est$label <- factor(est$label, levels = label_levels)
   est$source <- factor(est$source, levels = src_names)
 
