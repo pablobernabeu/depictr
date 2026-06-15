@@ -33,7 +33,14 @@
 #' @param scales Either `"fixed"` (the default, a single shared x-axis) or
 #'   `"free"` (one free-scaled panel per term). When `facet = TRUE` this is
 #'   forced to `"free"`.
-#' @param title,subtitle,x_lab Plot title, subtitle and x-axis label.
+#' @param standardize Whether to standardise the coefficients by multiplying
+#'   each by the standard deviation of its predictor column, putting them on a
+#'   common scale so their magnitudes are comparable (and removing the empty
+#'   band that otherwise appears when predictors are on very different scales).
+#'   Requires a fitted model (ignored, with a warning, for a tidy data frame).
+#'   Defaults to `FALSE`.
+#' @param title,subtitle,x_lab Plot title, subtitle and x-axis label. `x_lab`
+#'   defaults to "Estimate", or "Standardised estimate" when `standardize`.
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export
@@ -48,6 +55,9 @@
 #' # When an intercept or large term squishes the rest, give each term its own
 #' # free-scaled panel:
 #' coefficient_plot(fit, intercept = TRUE, facet = TRUE)
+#'
+#' # Or put the coefficients on a common, comparable scale:
+#' coefficient_plot(fit, standardize = TRUE)
 coefficient_plot <- function(x,
                       conf_level = 0.95,
                       intercept = FALSE,
@@ -61,15 +71,25 @@ coefficient_plot <- function(x,
                       line_size = 0.7,
                       facet = FALSE,
                       scales = c("fixed", "free"),
+                      standardize = FALSE,
                       title = NULL,
                       subtitle = NULL,
-                      x_lab = "Estimate") {
+                      x_lab = NULL) {
   order <- match.arg(order)
   interaction <- match.arg(interaction)
   scales <- match.arg(scales)
   if (facet) scales <- "free"
 
   est <- tidy_estimates(x, conf_level = conf_level)
+
+  # Optionally put every coefficient on a common, comparable scale by
+  # multiplying it (and its interval) by the standard deviation of its
+  # predictor column. This removes the dead band that appears when, say, a
+  # per-mm rainfall slope sits next to a per-category treatment effect.
+  if (standardize) {
+    est <- standardise_estimates(est, x)
+  }
+  x_lab <- x_lab %||% if (standardize) "Standardised estimate" else "Estimate"
 
   if (!intercept) {
     est <- est[!est$term %in% c("(Intercept)", "Intercept", "b_Intercept"), ,
@@ -117,6 +137,37 @@ coefficient_plot <- function(x,
 }
 
 # ---- internal helpers ------------------------------------------------------
+
+#' Standardise estimates by the SD of each predictor column
+#'
+#' Multiplies each estimate and its interval by the standard deviation of the
+#' matching model-matrix column, giving x-standardised coefficients on a common
+#' scale. Terms with no matching column (or the intercept, whose column has SD
+#' 0) are left unscaled. Needs a fitted model; warns and returns `est` unchanged
+#' for a data-frame input.
+#' @noRd
+standardise_estimates <- function(est, x) {
+  if (inherits(x, "data.frame")) {
+    warning("`standardize` needs a fitted model, not a data frame; ignoring it.",
+            call. = FALSE)
+    return(est)
+  }
+  mm <- tryCatch(stats::model.matrix(x), error = function(e) NULL)
+  if (is.null(mm)) {
+    warning("Could not obtain the model matrix; `standardize` ignored.",
+            call. = FALSE)
+    return(est)
+  }
+  sds <- apply(mm, 2, stats::sd)
+  sc <- sds[match(est$term, colnames(mm))]
+  sc[is.na(sc)] <- 1
+  sc[est$term %in% c("(Intercept)", "Intercept", "b_Intercept")] <- 1
+  for (col in intersect(c("estimate", "conf.low", "conf.high", "std.error"),
+                        names(est))) {
+    est[[col]] <- est[[col]] * sc
+  }
+  est
+}
 
 #' Lay a forest plot out one term per row, each panel free-scaled
 #'

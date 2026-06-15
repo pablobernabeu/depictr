@@ -69,9 +69,19 @@ test_that("vif_plot() builds and uses the colourblind-safe palette pair", {
   # No ad-hoc red/blue pair survives.
   expect_false("#e23b3b" %in% fills)
 
-  # Reference lines (vlines) are the neutral grey, not an off-palette colour.
-  line_cols <- unique(unlist(lapply(b$data[-1], function(d) d$colour)))
-  expect_true(depictr_reference() %in% line_cols)
+  # These VIFs are ~1, well below the threshold, so the line is off-axis and is
+  # reported in the caption rather than stranded in a wide empty band.
+  expect_match(p$labels$caption, "off the axis")
+})
+
+test_that("vif_plot() draws a neutral-grey threshold line under collinearity", {
+  set.seed(1)
+  d <- crop_yield
+  d$rain2 <- d$rainfall + stats::rnorm(nrow(d), 0, 5)
+  p <- vif_plot(lm(yield ~ rainfall + rain2 + fertilizer, data = d))
+  b <- ggplot2::ggplot_build(p)
+  line_cols <- unique(unlist(lapply(b$data[-1], function(dd) dd$colour)))
+  expect_true("grey40" %in% line_cols)
 })
 
 test_that("gvif_terms() reduces to ordinary VIF for single-df terms", {

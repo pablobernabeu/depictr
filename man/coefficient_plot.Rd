@@ -18,9 +18,10 @@ coefficient_plot(
   line_size = 0.7,
   facet = FALSE,
   scales = c("fixed", "free"),
+  standardize = FALSE,
   title = NULL,
   subtitle = NULL,
-  x_lab = "Estimate"
+  x_lab = NULL
 )
 }
 \arguments{
@@ -62,7 +63,15 @@ convenience alias for \code{scales = "free"}.}
 \code{"free"} (one free-scaled panel per term). When \code{facet = TRUE} this is
 forced to \code{"free"}.}
 
-\item{title, subtitle, x_lab}{Plot title, subtitle and x-axis label.}
+\item{standardize}{Whether to standardise the coefficients by multiplying
+each by the standard deviation of its predictor column, putting them on a
+common scale so their magnitudes are comparable (and removing the empty
+band that otherwise appears when predictors are on very different scales).
+Requires a fitted model (ignored, with a warning, for a tidy data frame).
+Defaults to \code{FALSE}.}
+
+\item{title, subtitle, x_lab}{Plot title, subtitle and x-axis label. \code{x_lab}
+defaults to "Estimate", or "Standardised estimate" when \code{standardize}.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
@@ -83,4 +92,7 @@ coefficient_plot(fit, order = "descending", title = "Drivers of crop yield")
 # When an intercept or large term squishes the rest, give each term its own
 # free-scaled panel:
 coefficient_plot(fit, intercept = TRUE, facet = TRUE)
+
+# Or put the coefficients on a common, comparable scale:
+coefficient_plot(fit, standardize = TRUE)
 }

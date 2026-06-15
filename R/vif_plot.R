@@ -3,10 +3,10 @@
 #' Variance inflation factor plot
 #'
 #' Computes a variance inflation factor for each *term* in a model and shows
-#' them as a bar chart, with reference lines at the usual rules of thumb
-#' (`threshold` and `threshold / 2`). High bars flag predictors whose
-#' coefficients are unstable because they are collinear with the others. Values
-#' are computed from base R (no 'car' dependency).
+#' them as a bar chart, with a reference line at the usual rule of thumb
+#' (`threshold`). High bars flag predictors whose coefficients are unstable
+#' because they are collinear with the others. Values are computed from base R
+#' (no 'car' dependency).
 #'
 #' For single-degree-of-freedom terms this is the ordinary VIF, \eqn{1/(1-R^2)}.
 #' For terms that span several design-matrix columns (multi-level factors, or
@@ -15,18 +15,20 @@
 #' predictor columns, \eqn{R_{11}} the block for the term and \eqn{R_{22}} the
 #' block for the remaining columns,
 #' \deqn{\mathrm{GVIF} = \frac{\det(R_{11})\,\det(R_{22})}{\det(R)}.}
-#' Because a GVIF for a term with \eqn{\mathrm{df}} columns is on the scale of a
-#' squared inflation raised to \eqn{\mathrm{df}}, the plot shows the comparable
-#' quantity \eqn{\mathrm{GVIF}^{1/(2\,\mathrm{df})}} so that every bar is on the
-#' same (single-df VIF-like) scale; the reference lines are squared
-#' accordingly. For single-df terms \eqn{\mathrm{GVIF}^{1/(2\,\mathrm{df})}}
-#' equals \eqn{\sqrt{\mathrm{VIF}}}.
+#' When every term has a single degree of freedom the bars are the ordinary
+#' VIFs, on a plain "Variance inflation factor" axis with the reference line at
+#' `threshold`. If any term spans several columns the bars switch to the
+#' comparable \eqn{\mathrm{GVIF}^{1/(2\,\mathrm{df})}} (which for a single-df
+#' term equals \eqn{\sqrt{\mathrm{VIF}}}) and the reference line moves to
+#' \eqn{\sqrt{\mathrm{threshold}}} accordingly. The x-axis is kept tight to the
+#' data: when every bar is comfortably below the threshold the line is reported
+#' in the caption rather than drawn into a wide empty band.
 #'
 #' @param model A fitted `lm` or `glm` model with at least two predictors.
-#' @param threshold Reference value for the ordinary VIF, drawn as a solid line
-#'   (a second, dashed line is drawn at `threshold / 2`). On the
-#'   \eqn{\mathrm{GVIF}^{1/(2\,\mathrm{df})}} scale used by the bars these become
-#'   \eqn{\sqrt{\mathrm{threshold}}} and \eqn{\sqrt{\mathrm{threshold}/2}}.
+#' @param threshold Reference value for the ordinary VIF, drawn as a line. For
+#'   models with multi-column terms it is shown on the
+#'   \eqn{\mathrm{GVIF}^{1/(2\,\mathrm{df})}} scale as
+#'   \eqn{\sqrt{\mathrm{threshold}}}.
 #' @param palette Length-2 colours encoding terms below and above the threshold.
 #'   Defaults to the colourblind-safe [depictr_palette()] pair (blue / orange).
 #' @param title Plot title.
@@ -50,45 +52,54 @@ vif_plot <- function(model, threshold = 5,
   }
 
   res <- gvif_terms(model)
+  multi <- any(res$df > 1)
 
-  # The bars are on the GVIF^(1/(2*df)) scale; map the VIF-scale `threshold`
-  # (and its half) onto that scale by taking square roots.
-  thr <- sqrt(threshold)
-  thr_half <- sqrt(threshold / 2)
-
-  df <- data.frame(term = res$term, vif = res$gvif_adj,
-                   stringsAsFactors = FALSE)
-  df <- df[order(df$vif), , drop = FALSE]
-  df$term <- factor(df$term, levels = df$term)
-  df$flag <- factor(ifelse(df$vif >= thr, "above", "below"),
-                    levels = c("below", "above"))
-
-  # Adapt the x-range to the data and the reference lines, so the bars are not
-  # squeezed to the left with a wide empty band on the right.
-  upper <- max(c(df$vif, thr)) * 1.12
-
-  x_lab <- if (any(res$df > 1)) {
-    expression(GVIF^{1 / (2 * df)})
+  # Single-degree-of-freedom terms are shown as the ordinary VIF on a plain
+  # "Variance inflation factor" axis, with the reference lines at the actual
+  # `threshold` and its half -- so a bar at 1 against a line at 5 reads
+  # honestly. Multi-df terms have no scalar VIF, so the comparable
+  # GVIF^(1/(2*df)) is plotted and the lines sit at the square roots of the VIF
+  # thresholds (Fox & Monette).
+  if (multi) {
+    value <- res$gvif_adj
+    line_main <- sqrt(threshold)
+    x_lab <- expression(GVIF^{1 / (2 * df)})
   } else {
-    "Variance inflation factor"
+    value <- res$gvif
+    line_main <- threshold
+    x_lab <- "Variance inflation factor"
   }
 
-  ggplot2::ggplot(df, ggplot2::aes(x = .data$vif, y = .data$term,
-                                   fill = .data$flag)) +
-    ggplot2::geom_col(width = 0.7) +
-    ggplot2::geom_vline(xintercept = thr_half, linetype = 2,
-                        colour = depictr_reference()) +
-    ggplot2::geom_vline(xintercept = thr, linetype = 1,
-                        colour = "grey40") +
-    # Label the threshold guides in place, staggered so they never collide when
-    # the two lines sit close together at a large-VIF range.
-    ggplot2::annotate("text", x = thr, y = Inf, vjust = 1.3, hjust = -0.1,
-                      label = paste0("VIF = ", format(threshold)),
-                      colour = "grey40", size = 3, fontface = "italic") +
-    ggplot2::annotate("text", x = thr_half, y = Inf, vjust = 3.0, hjust = -0.1,
-                      label = paste0("VIF = ", format(threshold / 2)),
-                      colour = depictr_reference(), size = 3,
-                      fontface = "italic") +
+  df <- data.frame(term = res$term, vif = value, stringsAsFactors = FALSE)
+  df <- df[order(df$vif), , drop = FALSE]
+  df$term <- factor(df$term, levels = df$term)
+  df$flag <- factor(ifelse(df$vif >= line_main, "above", "below"),
+                    levels = c("below", "above"))
+
+  # Scale the axis to the data so the bars stay prominent. Draw the single
+  # threshold line when it falls within that range; when every value is
+  # comfortably below it, note it in the caption rather than stranding a line in
+  # a wide empty band (which is both wasteful and hard to read).
+  upper <- max(df$vif) * 1.5
+  lab_main <- paste0("VIF = ", format(threshold))
+
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$vif, y = .data$term,
+                                        fill = .data$flag)) +
+    ggplot2::geom_col(width = 0.7)
+  caption <- NULL
+  if (line_main <= upper) {
+    p <- p +
+      ggplot2::geom_vline(xintercept = line_main, linetype = 1,
+                          colour = "grey40") +
+      ggplot2::annotate("text", x = line_main, y = Inf, vjust = 1.3,
+                        hjust = -0.08, label = lab_main, colour = "grey40",
+                        size = 3, fontface = "italic")
+  } else {
+    caption <- paste0("Threshold ", lab_main,
+                      " is off the axis (every value is well below it).")
+  }
+
+  p +
     ggplot2::scale_fill_manual(
       name = NULL,
       values = c(below = palette[1], above = palette[2]),
@@ -98,8 +109,8 @@ vif_plot <- function(model, threshold = 5,
       drop = FALSE
     ) +
     ggplot2::scale_x_continuous(limits = c(0, upper),
-                                expand = ggplot2::expansion(mult = c(0, 0))) +
-    ggplot2::labs(x = x_lab, y = NULL, title = title) +
+                                expand = ggplot2::expansion(mult = c(0, 0.02))) +
+    ggplot2::labs(x = x_lab, y = NULL, title = title, caption = caption) +
     theme_depictr(grid = "x") +
     ggplot2::theme(legend.position = "top", legend.justification = "right")
 }

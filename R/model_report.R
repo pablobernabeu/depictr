@@ -12,6 +12,10 @@
 #' @param model A fitted `lm` or `glm` model.
 #' @param predictor Focal predictor for the effect panel. If `NULL`, the first
 #'   numeric predictor (or, failing that, the first predictor) is used.
+#' @param standardize Whether the coefficient panel shows standardised
+#'   coefficients (each scaled by its predictor's standard deviation). Defaults
+#'   to `TRUE`, which keeps the panel readable in this compact overview by
+#'   putting predictors on a common scale; set `FALSE` for raw estimates.
 #' @param title Overall title.
 #' @param subtitle Overall subtitle. If `NULL`, a line of fit statistics
 #'   (number of observations, R-squared and AIC) is used.
@@ -26,8 +30,8 @@
 #' gfit <- glm(accuracy ~ word_frequency + RT + condition,
 #'             data = lexical_decision, family = binomial)
 #' model_report(gfit)
-model_report <- function(model, predictor = NULL, title = NULL,
-                         subtitle = NULL) {
+model_report <- function(model, predictor = NULL, standardize = TRUE,
+                         title = NULL, subtitle = NULL) {
   if (!inherits(model, "lm")) {
     stop("`model` must be an 'lm' or 'glm' object.", call. = FALSE)
   }
@@ -39,7 +43,10 @@ model_report <- function(model, predictor = NULL, title = NULL,
     predictor <- if (length(numeric_preds)) numeric_preds[1] else preds[1]
   }
 
-  p_coef <- coefficient_plot(model, title = "Coefficients")
+  p_coef <- coefficient_plot(
+    model, standardize = standardize,
+    title = if (standardize) "Coefficients (standardised)" else "Coefficients"
+  )
   p_eff <- effects_plot(model, predictor,
                         title = paste("Effect of", predictor))
   p_qq <- qq_plot(model, title = "Normal Q-Q")

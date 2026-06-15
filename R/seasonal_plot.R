@@ -96,7 +96,13 @@ seasonal_plot <- function(x, frequency = NULL,
     ggplot2::scale_x_continuous(
       breaks = seq_len(freq), labels = attr(df, "season_labels")
     ) +
-    ggplot2::scale_colour_manual(values = pal, name = NULL) +
+    # The cycles use a sequential (light-to-dark) ramp, so reverse the legend:
+    # the darkest/most-recent cycle then sits at the top of the key, matching
+    # how the later cycles usually sit highest in the plot.
+    ggplot2::scale_colour_manual(
+      values = pal, name = NULL,
+      guide = ggplot2::guide_legend(reverse = TRUE)
+    ) +
     ggplot2::labs(x = x_lab, y = y_lab, title = title) +
     theme_depictr(grid = "y")
 }

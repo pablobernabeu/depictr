@@ -9,10 +9,10 @@ vif_plot(model, threshold = 5, palette = depictr_palette(2), title = NULL)
 \arguments{
 \item{model}{A fitted \code{lm} or \code{glm} model with at least two predictors.}
 
-\item{threshold}{Reference value for the ordinary VIF, drawn as a solid line
-(a second, dashed line is drawn at \code{threshold / 2}). On the
-\eqn{\mathrm{GVIF}^{1/(2\,\mathrm{df})}} scale used by the bars these become
-\eqn{\sqrt{\mathrm{threshold}}} and \eqn{\sqrt{\mathrm{threshold}/2}}.}
+\item{threshold}{Reference value for the ordinary VIF, drawn as a line. For
+models with multi-column terms it is shown on the
+\eqn{\mathrm{GVIF}^{1/(2\,\mathrm{df})}} scale as
+\eqn{\sqrt{\mathrm{threshold}}}.}
 
 \item{palette}{Length-2 colours encoding terms below and above the threshold.
 Defaults to the colourblind-safe \code{\link[=depictr_palette]{depictr_palette()}} pair (blue / orange).}
@@ -24,10 +24,10 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 Computes a variance inflation factor for each \emph{term} in a model and shows
-them as a bar chart, with reference lines at the usual rules of thumb
-(\code{threshold} and \code{threshold / 2}). High bars flag predictors whose
-coefficients are unstable because they are collinear with the others. Values
-are computed from base R (no 'car' dependency).
+them as a bar chart, with a reference line at the usual rule of thumb
+(\code{threshold}). High bars flag predictors whose coefficients are unstable
+because they are collinear with the others. Values are computed from base R
+(no 'car' dependency).
 }
 \details{
 For single-degree-of-freedom terms this is the ordinary VIF, \eqn{1/(1-R^2)}.
@@ -37,12 +37,14 @@ Monette (1992): with \eqn{R} the correlation matrix of the (centred)
 predictor columns, \eqn{R_{11}} the block for the term and \eqn{R_{22}} the
 block for the remaining columns,
 \deqn{\mathrm{GVIF} = \frac{\det(R_{11})\,\det(R_{22})}{\det(R)}.}
-Because a GVIF for a term with \eqn{\mathrm{df}} columns is on the scale of a
-squared inflation raised to \eqn{\mathrm{df}}, the plot shows the comparable
-quantity \eqn{\mathrm{GVIF}^{1/(2\,\mathrm{df})}} so that every bar is on the
-same (single-df VIF-like) scale; the reference lines are squared
-accordingly. For single-df terms \eqn{\mathrm{GVIF}^{1/(2\,\mathrm{df})}}
-equals \eqn{\sqrt{\mathrm{VIF}}}.
+When every term has a single degree of freedom the bars are the ordinary
+VIFs, on a plain "Variance inflation factor" axis with the reference line at
+\code{threshold}. If any term spans several columns the bars switch to the
+comparable \eqn{\mathrm{GVIF}^{1/(2\,\mathrm{df})}} (which for a single-df
+term equals \eqn{\sqrt{\mathrm{VIF}}}) and the reference line moves to
+\eqn{\sqrt{\mathrm{threshold}}} accordingly. The x-axis is kept tight to the
+data: when every bar is comfortably below the threshold the line is reported
+in the caption rather than drawn into a wide empty band.
 }
 \examples{
 fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
