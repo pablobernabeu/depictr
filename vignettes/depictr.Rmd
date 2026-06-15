@@ -26,13 +26,29 @@ shares one theme, one palette and one set of label conventions.
 library(depictr)
 ```
 
-The package ships with three reproducibly simulated datasets used throughout the
-documentation: `lexical_decision`, `wellbeing_survey` and `crop_yield`.
+## Five datasets to explore
+
+The package ships with five reproducibly simulated datasets, each chosen to
+exercise a different family of plots. They are documented under their names
+(e.g. `?lexical_decision`) and load with `data()`:
+
+* `lexical_decision` -- a counterbalanced, crossed reaction-time/accuracy
+  experiment (participant, item, condition, modality, word frequency). For
+  mixed models and the classification plots.
+* `wellbeing_survey` -- a cross-sectional survey (life satisfaction, stress,
+  sleep, income, age, ordered education, region) with *informative*
+  missingness. For descriptives, correlations, regression and missing data.
+* `crop_yield` -- a field trial with a genuine fertiliser-by-treatment
+  interaction. For regression, scatter-trend and interaction plots.
+* `clinical_trial` -- a two-arm trial with separating survival curves and a
+  rare adverse-event outcome. For survival and imbalanced classification.
+* `monthly_sales` -- two seasonal monthly series (indoor/outdoor). For the
+  time-series plots.
 
 ## A tour by task
 
 Begin with the data. `explore_bivariate()` chooses a suitable plot for any pair
-of variables.
+of variables -- a scatter with a trend here, because both are numeric.
 
 ```{r}
 explore_bivariate(crop_yield, fertilizer, yield)
@@ -60,15 +76,15 @@ panel.
 residual_diagnostics_plot(fit)
 ```
 
-Finally, `posterior_plot()` summarises posterior or simulation draws as a point
-with nested intervals.
+For uncertainty, `posterior_plot()` summarises posterior or simulation draws as
+a distribution per parameter. These are the real fixed-effect posterior draws
+from a Bayesian fit of the lexical-decision model, shipped with the package.
 
 ```{r}
-set.seed(1)
-draws <- data.frame(intercept = rnorm(2000, 2, 0.2),
-                    fertilizer = rnorm(2000, 0.012, 0.002),
-                    rainfall = rnorm(2000, 0.004, 0.001))
-posterior_plot(draws)
+draws <- readRDS(system.file("extdata", "lexdec_draws.rds", package = "depictr"))
+posterior_plot(draws[c("conditionunrelated", "modalityauditory",
+                       "word_frequency")],
+               title = "Lexical-decision fixed effects (ms)")
 ```
 
 ## The shared spine: `tidy_estimates()`
@@ -104,16 +120,35 @@ and diverging variants are available too. Preview them with:
 palette_preview(type = "all")
 ```
 
+`palette_preview()` can also *simulate* a colour-vision deficiency, so you can
+check a palette as a deuteranope (red-green) would see it:
+
+```{r, fig.height = 2.6}
+palette_preview(cvd = "deutan")
+```
+
+Set the look once for a whole script with `depictr_options()` (base size, base
+family, brand and accent colours, or a custom palette), instead of passing the
+same arguments to every call. Called with no arguments it reports the current
+settings:
+
+```{r}
+depictr_options()
+```
+
 ## Where to next
 
 The remaining articles go into each area in turn.
 `vignette("exploring-data")` covers distributions, categories, bivariate plots,
-scatter-plot matrices, correlations, missingness, outliers and summary tables.
-`vignette("model-estimates")` covers forest plots, model comparison, predicted
-values, interactions, random effects and goodness-of-fit.
-`vignette("diagnostics-and-uncertainty")` covers residuals, influence, Q-Q, ROC,
-calibration, confusion matrices, posteriors and power curves. Two further
-articles, `vignette("multivariate-and-survival")` and `vignette("time-series")`,
-cover the remaining methods.
+scatter-plot matrices, correlations, missingness, outliers, summary tables and
+the new estimation plots.
+`vignette("model-estimates")` is the flagship: forest plots, model comparison,
+predicted values, interactions, random effects, optimiser checks and the
+frequentist-over-Bayesian-posterior overlay.
+`vignette("diagnostics-and-uncertainty")` covers residuals, GLM-appropriate
+binned residuals, the classification suite (ROC, PR, gains, lift, calibration,
+thresholds) on an imbalanced outcome, and power curves.
+Two further articles, `vignette("multivariate-and-survival")` and
+`vignette("time-series")`, cover the remaining methods.
 
 ## References

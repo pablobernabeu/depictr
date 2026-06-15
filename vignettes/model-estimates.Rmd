@@ -14,115 +14,203 @@ link-citations: true
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
                       fig.width = 7, fig.height = 4.5, dpi = 96)
 library(depictr)
+has_lme4   <- requireNamespace("lme4", quietly = TRUE)
+has_lmer   <- requireNamespace("lmerTest", quietly = TRUE)
+has_ggdist <- requireNamespace("ggdist", quietly = TRUE)
 ```
 
-This vignette covers the model-result plots: coefficients, model comparison,
-predicted values, interactions, random effects and goodness-of-fit.
+This is the flagship article. It works through depictr's model-result plots --
+coefficients, model comparison, predicted values, interactions, random effects
+and goodness-of-fit -- and then reaches the capability the package is named for:
+showing a **frequentist** estimate and a **full Bayesian posterior** for the
+same model on one figure.
+
+The running example is `lexical_decision`, a counterbalanced, crossed
+lexical-decision experiment (24 participants, 40 items, 960 trials). We model
+reaction time on correct trials as a function of priming `condition`
+(related/unrelated), presentation `modality` (visual/auditory) and item
+`word_frequency`, with crossed random intercepts for participant and item. The
+design is counterbalanced, so neither fixed factor is collinear with the item
+random effect -- a clean fit for a mixed model.
+
+```{r fit, eval = has_lmer}
+correct <- subset(lexical_decision, accuracy == 1)
+fit <- lmerTest::lmer(
+  RT ~ condition + modality + word_frequency +
+    (1 | participant) + (1 | item),
+  data = correct
+)
+```
+
+```{r fit-fallback, eval = !has_lmer, echo = FALSE}
+# Without lmerTest/lme4 the live fit is skipped; the remaining chunks that need
+# `fit` are guarded by the same condition so the article still knits.
+```
 
 ## Coefficient (forest) plots
 
-`coefficient_plot()` accepts any model `tidy_estimates()` understands, or a tidy
-data frame.
+`coefficient_plot()` reads the fitted mixed model directly (through
+`tidy_estimates()`) and draws a horizontal point-and-interval ("forest") plot.
+Unrelated primes and auditory presentation both slow responses, while more
+frequent words speed them up.
 
-```{r}
-fit <- lm(life_satisfaction ~ stress + sleep_hours + exercise_days,
-          data = wellbeing_survey)
-coefficient_plot(fit, order = "ascending",
-                 labels = c(stress = "Stress", sleep_hours = "Sleep (h)",
-                            exercise_days = "Exercise (days)"),
-                 title = "Predictors of life satisfaction")
+```{r coef, eval = has_lmer}
+coefficient_plot(
+  fit, order = "ascending",
+  labels = c(conditionunrelated = "Unrelated priming",
+             modalityauditory = "Auditory modality",
+             word_frequency = "Word frequency (Zipf)"),
+  title = "Predictors of lexical-decision RT (ms)"
+)
 ```
 
 ## Comparing models
 
-`compare_models()` overlays the estimates from several models, and
-`model_fit_table()` summarises their fit.
+`compare_models()` overlays the estimates from several models so you can see how
+a coefficient moves as the specification changes. Here a reduced model (dropping
+`modality`) is compared with the full model; `model_fit_table()` summarises their
+fit.
 
-```{r}
-m1 <- lm(yield ~ rainfall + fertilizer, data = crop_yield)
-m2 <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
-m3 <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment, data = crop_yield)
-
-compare_models(small = m1, medium = m2, full = m3, order = "descending")
+```{r compare, eval = has_lmer}
+reduced <- lmerTest::lmer(
+  RT ~ condition + word_frequency + (1 | participant) + (1 | item),
+  data = correct
+)
+compare_models(Reduced = reduced, Full = fit, order = "descending")
 ```
 
-```{r}
-knitr::kable(model_fit_table(small = m1, medium = m2, full = m3))
+```{r fit-table, eval = has_lmer}
+knitr::kable(model_fit_table(Reduced = reduced, Full = fit))
 ```
 
 For `glm` models the `R2` column reports McFadden's pseudo-R-squared
 [@mcfadden1974] in place of the ordinary coefficient of determination.
 
-## Frequentist and Bayesian estimates together
-
-```{r}
-freq  <- lm(life_satisfaction ~ stress + sleep_hours + exercise_days,
-            data = wellbeing_survey)
-bayes <- tidy_estimates(freq)
-bayes$estimate  <- bayes$estimate * 0.92      # stand-in posterior means
-bayes$conf.low  <- bayes$conf.low * 0.92
-bayes$conf.high <- bayes$conf.high * 0.92
-
-frequentist_bayesian_plot(freq, bayes, note_frequentist_no_prior = TRUE,
-                          title = "Frequentist and Bayesian estimates")
-```
-
 ## Predicted values and interactions
 
-`effects_plot()` shows what the model predicts as one predictor varies;
-`interaction_plot()` shows how that relationship changes across a second
-predictor.
+`effects_plot()` shows what the model predicts as one predictor varies, holding
+the others at typical values. It now works on the mixed model: predictions use
+the fixed effects only (`re.form = NA`) and the band is built from the
+fixed-effect design matrix and `vcov()`.
 
-```{r}
-fit2 <- lm(yield ~ fertilizer * treatment + rainfall, data = crop_yield)
-effects_plot(fit2, "rainfall")
+```{r effects, eval = has_lmer}
+effects_plot(fit, "word_frequency",
+             title = "Predicted RT across word frequency")
 ```
 
-```{r}
-interaction_plot(fit2, "fertilizer", "treatment")
+`interaction_plot()` shows how a relationship changes across a second predictor.
+The lexical-decision model is additive, so for a *genuine* interaction we switch
+to `crop_yield`, whose data-generating process contains a real
+fertiliser-by-treatment effect: fertiliser raises yield far more under the
+`enhanced` treatment than under `standard`, so the slopes diverge.
+
+```{r interaction}
+crop_fit <- lm(yield ~ fertilizer * treatment + rainfall, data = crop_yield)
+interaction_plot(crop_fit, "fertilizer", "treatment",
+                 title = "Fertiliser x treatment interaction")
 ```
 
-For a binomial `glm`, predictions are shown on the probability scale:
+## Frequentist and Bayesian estimates together
 
-```{r}
-gfit <- glm(accuracy ~ word_frequency + condition, data = lexical_decision,
-            family = binomial)
-effects_plot(gfit, "word_frequency")
+This is the package's namesake capability. Given the frequentist fit **and** a
+set of Bayesian posterior **draws**, `frequentist_bayesian_plot()` draws the
+*full posterior distribution* for each term (a 'ggdist' half-eye) and overlays
+the frequentist **point and confidence interval** at the same position. You see
+the entire shape of the posterior -- not just a point and two limits -- next to
+the frequentist estimate, with the two sources in the two leading
+colourblind-safe palette colours.
+
+The draws here are the real fixed-effect posterior from a `brms` fit of the
+same model (1000 draws x 4 parameters), shipped with the package so the slow
+MCMC need not be re-run. Terms are matched by canonical label, so the `brms`
+parameter names line up with the frequentist ones automatically.
+
+```{r fbp, eval = has_lmer && has_ggdist, fig.height = 4}
+draws <- readRDS(system.file("extdata", "lexdec_draws.rds", package = "depictr"))
+
+frequentist_bayesian_plot(
+  fit, draws,
+  intercept = FALSE,
+  note_frequentist_no_prior = TRUE,
+  title = "Frequentist estimate over the full Bayesian posterior"
+)
 ```
+
+The frequentist confidence interval and the bulk of the Bayesian posterior land
+in the same place -- reassuring agreement between the two paradigms -- but only
+the posterior shows the density, the skew and the mass on either side of zero.
+
+If `ggdist` is unavailable the function falls back to a point-and-interval forest
+plot of the two sources, and when the Bayesian side is supplied as a *summary*
+table instead of draws (for instance the `Estimate`/`Q2.5`/`Q97.5` of
+`brms::fixef()`) it draws the familiar two-source forest plot.
+
+## Posterior distributions on their own
+
+`posterior_plot()` summarises any draws (posterior, bootstrap or simulation) as
+a distribution per parameter. With `style = "halfeye"` it shows the density slab
+and a point-and-interval; a region of practical equivalence (ROPE) can be shaded
+and each parameter annotated with its probability of direction (the posterior
+mass on its majority side of the reference line).
+
+```{r posterior, eval = has_ggdist, fig.height = 4}
+draws <- readRDS(system.file("extdata", "lexdec_draws.rds", package = "depictr"))
+slopes <- draws[c("conditionunrelated", "modalityauditory", "word_frequency")]
+
+posterior_plot(
+  slopes, style = "halfeye", rope = c(-5, 5), pd = TRUE,
+  title = "Fixed-effect posteriors (ms), with ROPE and pd"
+)
+```
+
+The probability of direction for `word_frequency` and `conditionunrelated` is
+effectively 100%: the posterior sits almost entirely on one side of zero.
 
 ## Random effects
 
-`random_effects_plot()` draws a caterpillar plot. It reads an 'lme4' model
-directly, or a data frame of by-group estimates:
+`random_effects_plot()` draws a caterpillar plot of the conditional modes
+("BLUPs"). Reading the fitted model directly, it shows the by-item and
+by-participant departures from the average, sorted, with their uncertainty -- the
+usual way to spot unusual groups.
 
-```{r}
-re <- data.frame(level = paste0("site_", 1:12),
-                 estimate = sort(rnorm(12, 0, 0.5)),
-                 std.error = runif(12, 0.1, 0.3))
-random_effects_plot(re, title = "By-site departures")
+```{r ranef, eval = has_lme4, fig.height = 6}
+random_effects_plot(fit, title = "By-group departures (random intercepts)")
 ```
 
 ## Optimiser checks
 
-When a mixed model is fitted by several optimisers (via `lme4::allFit()`),
-`optimizer_fixef_plot()` shows whether they agree. Without 'lme4' you can build
-the input directly:
+A mixed-model fit should be stable across optimisers. `lme4::allFit()` refits the
+model with every available optimiser; `optimizer_fixef_plot()` then shows the
+fixed effects side by side, one panel per term. Tight clusters mean the fit has
+settled; scatter would signal a fragile solution.
 
-```{r}
-opt <- expand.grid(optimizer = c("bobyqa", "Nelder_Mead", "nlminbwrap"),
-                   term = c("(Intercept)", "stress", "sleep_hours"))
-opt$value <- c(4.5, 4.51, 4.49, -0.45, -0.44, -0.46, 0.25, 0.24, 0.26)
-optimizer_fixef_plot(opt)
+The package ships the `allFit()` summary for this model, so we can plot it
+without re-running the (slow) refits. The plot accepts a tidy data frame of
+optimiser-by-term values, which we read straight off the stored summary.
+
+```{r optim, fig.height = 4.5}
+af <- readRDS(system.file("extdata", "allfit_lexdec.rds", package = "depictr"))
+fx <- af$fixef    # optimisers x fixed effects
+opt_long <- data.frame(
+  optimizer = rep(rownames(fx), times = ncol(fx)),
+  term      = rep(colnames(fx), each = nrow(fx)),
+  value     = as.vector(fx)
+)
+
+optimizer_fixef_plot(opt_long, title = "Fixed effects across optimisers")
 ```
+
+Every optimiser lands on the same estimate for each term -- the points coincide
+within each panel -- so this fit is rock solid.
 
 ## A one-figure model report
 
-`model_report()` composes several of these views (the coefficients, the effect
-of a focal predictor, the residuals against fitted values and a Q-Q plot, with a
-fit-statistics subtitle) into a single figure for a rapid review or a report
-appendix.
+`model_report()` composes several views (coefficients, the effect of a focal
+predictor, residuals against fitted values and a Q-Q plot, with a fit-statistics
+subtitle) into a single figure for a rapid review or a report appendix. It works
+on `lm`/`glm` models; here we use the crop-yield model.
 
-```{r, fig.width = 9, fig.height = 7}
+```{r report, fig.width = 9, fig.height = 7}
 full <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment,
            data = crop_yield)
 model_report(full, title = "Crop-yield model")

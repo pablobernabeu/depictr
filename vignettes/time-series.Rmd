@@ -14,30 +14,30 @@ library(depictr)
 ```
 
 depictr provides a small, consistent set of time-series plots. The examples use
-`AirPassengers`, a classic monthly series that ships with base R.
+the bundled `monthly_sales` dataset: two product lines (`indoor` and `outdoor`),
+each with six years of monthly observations carrying a trend, a twelve-month
+seasonal cycle and noise.
 
-## Plotting a series
+## Plotting one or several series
 
-`timeseries_plot()` accepts a `ts` object, a numeric vector, or a data frame
-with time, value and (optionally) group columns. A moving-average overlay is one
-argument away.
+`timeseries_plot()` accepts a `ts` object, a numeric vector, or a data frame with
+time, value and (optionally) group columns. Passing the long-form data frame with
+a grouping column draws both series at once, each in its own colour; a
+moving-average overlay is one argument away.
 
 ```{r}
-timeseries_plot(AirPassengers, rolling = 12,
-                title = "Air passengers", y_lab = "Passengers (thousands)")
+timeseries_plot(monthly_sales, time = date, value = sales, group = series,
+                rolling = 12, title = "Monthly sales by product line",
+                y_lab = "Units")
 ```
 
-## Autocorrelation
+For the single-series views (decomposition, autocorrelation, the seasonal plot
+and forecasting) we extract one line as a monthly `ts` object of frequency 12.
 
-`acf_plot()` draws the autocorrelation (or, with `type = "partial"`, the partial
-autocorrelation) function, with approximate significance bounds.
-
-```{r, fig.height = 3.4}
-acf_plot(AirPassengers)
-```
-
-```{r, fig.height = 3.4}
-acf_plot(AirPassengers, type = "partial")
+```{r}
+indoor <- subset(monthly_sales, series == "indoor")
+indoor <- indoor[order(indoor$date), ]
+indoor_ts <- ts(indoor$sales, start = c(2018, 1), frequency = 12)
 ```
 
 ## Decomposition
@@ -47,5 +47,65 @@ remainder components. Use `method = "stl"` (the default, loess-based) or
 `method = "classical"`.
 
 ```{r, fig.height = 6}
-decompose_plot(AirPassengers, title = "Air passengers, decomposed")
+decompose_plot(indoor_ts, title = "Indoor sales, decomposed")
 ```
+
+## Autocorrelation
+
+`acf_plot()` draws the autocorrelation (or, with `type = "partial"`, the partial
+autocorrelation) function, with approximate significance bounds. The spikes at
+multiples of twelve are the annual seasonality.
+
+```{r, fig.height = 3.4}
+acf_plot(indoor_ts)
+```
+
+```{r, fig.height = 3.4}
+acf_plot(indoor_ts, type = "partial")
+```
+
+## The seasonal pattern up close
+
+`seasonal_plot()` draws a seasonal-subseries (cycle) plot: one small panel per
+month, with the value traced across successive years and a reference line at each
+month's mean. This shows the seasonal shape (differences *between* panels) and
+the year-on-year trend within each month (the slope *inside* each panel) at the
+same time -- something a single overlaid line cannot do.
+
+```{r, fig.height = 3.8}
+seasonal_plot(indoor_ts, title = "Indoor sales: monthly subseries")
+```
+
+With `style = "season"` every year becomes its own line over the months on a
+shared axis, which is handy for spotting an unusual year.
+
+```{r, fig.height = 4}
+seasonal_plot(indoor_ts, style = "season",
+              title = "Indoor sales: one line per year")
+```
+
+## Forecasting
+
+`ts_forecast()` is a lightweight, dependency-free forecaster: it decomposes the
+series with STL, extrapolates the recent trend, carries the seasonal pattern
+forward, and returns point forecasts with prediction intervals that widen with
+the horizon.
+
+```{r}
+fc <- ts_forecast(indoor_ts, h = 18, level = 0.9)
+head(fc)
+```
+
+Passing an integer horizon straight to `timeseries_plot()` overlays that forecast
+on the history: the point forecast continues the line and the shaded ribbon shows
+the (growing) 90% prediction interval.
+
+```{r, fig.height = 4}
+timeseries_plot(indoor_ts, forecast = 18, level = 0.9,
+                title = "Indoor sales with an 18-month forecast",
+                y_lab = "Units")
+```
+
+For a fully specified statistical model, fit it yourself (for example with
+`forecast::forecast()`) and pass the resulting `time`/`fit`/`lwr`/`upr` columns
+to `timeseries_plot(forecast = )` as a data frame.

@@ -13,9 +13,10 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
 library(depictr)
 ```
 
-depictr provides a coherent set of exploratory plots and a descriptive table,
-all sharing the package theme and palette. Column names can be given quoted or
-unquoted.
+depictr provides a coherent set of exploratory plots, a descriptive table and
+two estimation plots, all sharing the package theme and palette. Column names
+can be given quoted or unquoted. The examples use the bundled `lexical_decision`,
+`wellbeing_survey` and `crop_yield` datasets.
 
 ## One variable
 
@@ -41,7 +42,9 @@ categorical one, and a filled bar chart for two categorical variables.
 explore_bivariate(lexical_decision, condition, RT)
 ```
 
-For a focused scatter with a fitted trend, use `scatter_trend()`:
+For a focused scatter with a fitted trend, use `scatter_trend()`. The crop-yield
+trial has a real fertiliser-by-treatment interaction, visible here as two
+diverging slopes.
 
 ```{r}
 scatter_trend(crop_yield, fertilizer, yield, group = treatment)
@@ -75,11 +78,40 @@ raincloud_plot(lexical_decision, RT, group = condition)
 group_comparison_plot(lexical_decision, RT, condition)
 ```
 
+## Estimation plots: effect size, not just a p-value
+
+An *estimation plot* puts the effect size and its uncertainty at the centre of
+the comparison. `estimation_plot()` draws the classic Gardner-Altman two-group
+plot: the raw data with group means on top, and the **mean difference** with a
+bootstrap confidence interval beneath, aligned so a difference of zero sits under
+the reference group's mean. With two groups it also annotates a standardised
+effect size (Hedges' *g* by default).
+
+```{r, fig.height = 5}
+set.seed(1)
+estimation_plot(lexical_decision, RT, condition,
+                title = "RT difference: unrelated vs. related priming")
+```
+
+`group_comparison_plot(differences = TRUE)` is the same idea reached from the
+group-means plot: it appends the difference panel, turning a means comparison
+into a full estimation plot. With more than two groups every other group is
+compared against a chosen reference (a Cumming plot).
+
+```{r, fig.height = 5}
+set.seed(1)
+group_comparison_plot(crop_yield, yield, treatment, differences = TRUE,
+                      title = "Yield difference: enhanced vs. standard")
+```
+
 ## Data quality: outliers and missingness
 
 ```{r}
 outlier_plot(crop_yield, yield)
 ```
+
+`wellbeing_survey` has *informative* missingness -- income is missing more often
+at higher stress -- so the missingness map is worth a look before modelling.
 
 ```{r, fig.height = 5}
 missingness_map(wellbeing_survey)
@@ -88,12 +120,16 @@ missingness_map(wellbeing_survey)
 ## A descriptive summary table
 
 `summary_table()` builds a "Table 1": mean (SD) for numeric variables, counts
-and percentages for categorical ones, optionally by group. It returns a plain
-data frame, ready for `knitr::kable()`.
+and percentages for categorical ones, optionally by group. The first row always
+reports the sample size (`N`), and any variable with missing values gets a
+`Missing, n (%)` row -- both visible here for the wellbeing survey. It returns a
+plain data frame, ready for `knitr::kable()`.
 
 ```{r}
-tab <- summary_table(wellbeing_survey,
-                     vars = c("life_satisfaction", "stress", "education"),
-                     group = "region")
+tab <- summary_table(
+  wellbeing_survey,
+  vars = c("life_satisfaction", "income", "stress", "education"),
+  group = "region"
+)
 knitr::kable(tab)
 ```
