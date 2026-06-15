@@ -6,13 +6,16 @@
 #' population is targeted in order of predicted score. It is the customary chart
 #' for judging a classifier's value for ranking and targeting, as in marketing,
 #' triage and fraud detection. The diagonal marks the no-model baseline and the
-#' upper envelope a perfect model.
+#' upper envelope a perfect model. Pass a *named list* of models / (actual,
+#' score) pairs to overlay several colour-coded gains curves with a legend.
 #'
-#' @param x A binomial `glm`, or the vector of observed outcomes (0/1, logical
-#'   or a two-level factor with the positive class second).
+#' @param x A binomial `glm`; the vector of observed outcomes (0/1, logical or a
+#'   two-level factor with the positive class second); or a *named* list of
+#'   models / (actual, score) pairs to overlay.
 #' @param score When `x` is an outcome vector, the matching scores or predicted
-#'   probabilities.
-#' @param colour Curve colour. Defaults to the depictr brand blue.
+#'   probabilities (or a list of them for the multi-model case).
+#' @param colour Curve colour for the single-model case. Defaults to the depictr
+#'   brand blue. Ignored when several models are overlaid.
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -21,21 +24,46 @@
 #' gfit <- glm(accuracy ~ word_frequency + RT + condition,
 #'             data = lexical_decision, family = binomial)
 #' gain_plot(gfit)
+#'
+#' # Compare two models.
+#' reduced <- glm(accuracy ~ word_frequency, data = lexical_decision,
+#'                family = binomial)
+#' gain_plot(list(Full = gfit, Reduced = reduced))
 gain_plot <- function(x, score = NULL, colour = depictr_brand(), title = NULL) {
-  io <- binary_inputs(x, score)
-  g <- gain_table(io$actual, io$score)
-  prevalence <- mean(io$actual == 1)
-  perfect <- data.frame(
-    population = c(0, prevalence, 1),
-    captured = c(0, 1, 1)
-  )
+  models <- as_model_list(x, score)
+  multi <- attr(models, "multi")
 
-  ggplot2::ggplot(g, ggplot2::aes(x = .data$population, y = .data$captured)) +
+  gs <- lapply(models, function(m) gain_table(m$actual, m$score))
+  # The perfect-model envelope depends on prevalence; with one model it is drawn,
+  # with several (possibly differing prevalence) we omit it to keep things clean.
+  prevalence <- mean(models[[1]]$actual == 1)
+
+  p <- ggplot2::ggplot() +
     ggplot2::geom_abline(slope = 1, intercept = 0, linetype = 2,
-                         colour = depictr_reference()) +
-    ggplot2::geom_line(data = perfect, colour = depictr_reference(),
-                       linewidth = 0.5) +
-    ggplot2::geom_line(colour = colour, linewidth = 0.9) +
+                         colour = depictr_reference())
+
+  if (multi) {
+    g <- do.call(rbind, Map(function(d, nm) { d$model <- nm; d },
+                            gs, names(models)))
+    g$model <- factor(g$model, levels = names(models))
+    p <- p +
+      ggplot2::geom_line(data = g,
+                         ggplot2::aes(x = .data$population, y = .data$captured,
+                                      colour = .data$model), linewidth = 0.9) +
+      scale_colour_depictr(name = NULL)
+  } else {
+    perfect <- data.frame(population = c(0, prevalence, 1),
+                          captured = c(0, 1, 1))
+    p <- p +
+      ggplot2::geom_line(data = perfect,
+                         ggplot2::aes(x = .data$population, y = .data$captured),
+                         colour = depictr_reference(), linewidth = 0.5) +
+      ggplot2::geom_line(data = gs[[1]],
+                         ggplot2::aes(x = .data$population, y = .data$captured),
+                         colour = colour, linewidth = 0.9)
+  }
+
+  p +
     ggplot2::scale_x_continuous(labels = scales::percent_format(accuracy = 1)) +
     ggplot2::scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
     ggplot2::coord_equal() +
@@ -49,7 +77,9 @@ gain_plot <- function(x, score = NULL, colour = depictr_brand(), title = NULL) {
 #' Shows how many times more positive cases a classifier captures, at each depth
 #' of the score-ordered population, than random targeting would. A lift of 3 at
 #' the top 10% means that decile contains three times the baseline rate of
-#' positives. The horizontal line at 1 is the no-model baseline.
+#' positives. The horizontal line at 1 is the no-model baseline. Pass a *named
+#' list* of models / (actual, score) pairs to overlay several colour-coded lift
+#' curves with a legend.
 #'
 #' @inheritParams gain_plot
 #'
@@ -59,16 +89,44 @@ gain_plot <- function(x, score = NULL, colour = depictr_brand(), title = NULL) {
 #' gfit <- glm(accuracy ~ word_frequency + RT + condition,
 #'             data = lexical_decision, family = binomial)
 #' lift_plot(gfit)
+#'
+#' # Compare two models.
+#' reduced <- glm(accuracy ~ word_frequency, data = lexical_decision,
+#'                family = binomial)
+#' lift_plot(list(Full = gfit, Reduced = reduced))
 lift_plot <- function(x, score = NULL, colour = depictr_brand(), title = NULL) {
-  io <- binary_inputs(x, score)
-  g <- gain_table(io$actual, io$score)
-  g <- g[g$population > 0, , drop = FALSE]
-  g$lift <- g$captured / g$population
+  models <- as_model_list(x, score)
+  multi <- attr(models, "multi")
 
-  ggplot2::ggplot(g, ggplot2::aes(x = .data$population, y = .data$lift)) +
+  lift_one <- function(m) {
+    g <- gain_table(m$actual, m$score)
+    g <- g[g$population > 0, , drop = FALSE]
+    g$lift <- g$captured / g$population
+    g
+  }
+  gs <- lapply(models, lift_one)
+
+  p <- ggplot2::ggplot() +
     ggplot2::geom_hline(yintercept = 1, linetype = 2,
-                        colour = depictr_reference()) +
-    ggplot2::geom_line(colour = colour, linewidth = 0.9) +
+                        colour = depictr_reference())
+
+  if (multi) {
+    g <- do.call(rbind, Map(function(d, nm) { d$model <- nm; d },
+                            gs, names(models)))
+    g$model <- factor(g$model, levels = names(models))
+    p <- p +
+      ggplot2::geom_line(data = g,
+                         ggplot2::aes(x = .data$population, y = .data$lift,
+                                      colour = .data$model), linewidth = 0.9) +
+      scale_colour_depictr(name = NULL)
+  } else {
+    p <- p +
+      ggplot2::geom_line(data = gs[[1]],
+                         ggplot2::aes(x = .data$population, y = .data$lift),
+                         colour = colour, linewidth = 0.9)
+  }
+
+  p +
     ggplot2::scale_x_continuous(labels = scales::percent_format(accuracy = 1)) +
     ggplot2::expand_limits(y = 1) +
     ggplot2::labs(x = "Population targeted", y = "Cumulative lift",
