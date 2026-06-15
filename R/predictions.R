@@ -9,10 +9,13 @@
 #'
 #' Predictions and standard errors come from [stats::predict()]; `glm`
 #' predictions are formed on the link scale and back-transformed, so a binomial
-#' model shows predicted probabilities. Works with `lm` and `glm`; other model
+#' model shows predicted probabilities. Mixed models fitted with
+#' [lme4::lmer()]/[lme4::glmer()] are supported too: predictions use only the
+#' fixed effects (`re.form = NA`) and standard errors come from the fixed-effect
+#' design matrix and `vcov()`. Works with `lm`, `glm` and `merMod`; other model
 #' classes are attempted on a best-effort basis.
 #'
-#' @param model A fitted model (`lm`, `glm`, ...).
+#' @param model A fitted model (`lm`, `glm`, `merMod`, ...).
 #' @param predictor Name of the focal predictor (string).
 #' @param conf_level Confidence level for the interval.
 #' @param n Number of points across the range of a numeric predictor.
@@ -86,7 +89,7 @@ effects_plot <- function(model, predictor, conf_level = 0.95, n = 100,
 #' response changes across the levels (or representative values) of a second,
 #' moderating predictor. Other predictors are held at typical values.
 #'
-#' @param model A fitted model (`lm`, `glm`, ...).
+#' @param model A fitted model (`lm`, `glm`, `merMod`, ...).
 #' @param predictor Name of the focal predictor on the x-axis (string).
 #' @param moderator Name of the moderating predictor, mapped to colour (string).
 #' @param moderator_values For a numeric moderator, the values to show. Defaults
@@ -199,9 +202,27 @@ model_predict_grid <- function(model, vary, conf_level = 0.95) {
     if (is.factor(mf[[v]])) nd[[v]] <- factor(nd[[v]], levels = levels(mf[[v]]))
   }
 
-  z <- stats::qnorm(1 - (1 - conf_level) / 2)
-  is_glm <- inherits(model, "glm")
-  if (is_glm) {
+  alpha <- 1 - conf_level
+  if (inherits(model, "merMod")) {
+    # lme4 models: predict.merMod has no se.fit. Use the fixed effects only
+    # for the point estimate and derive the SE from the fixed-effect design
+    # matrix and the variance-covariance of the fixed effects.
+    fam <- stats::family(model)
+    link_fit <- stats::predict(model, newdata = nd, re.form = NA, type = "link")
+    terms_fe <- stats::delete.response(stats::terms(model, fixed.only = TRUE))
+    contr <- attr(stats::model.matrix(model), "contrasts")
+    X <- stats::model.matrix(terms_fe, data = nd, contrasts.arg = contr)
+    V <- as.matrix(stats::vcov(model))
+    X <- X[, colnames(V), drop = FALSE]
+    se <- sqrt(diag(X %*% V %*% t(X)))
+    inv <- fam$linkinv
+    z <- stats::qnorm(1 - alpha / 2)             # asymptotic for mixed models
+    nd$fit <- inv(link_fit)
+    nd$lwr <- inv(link_fit - z * se)
+    nd$upr <- inv(link_fit + z * se)
+    attr(nd, "binomial") <- fam$family == "binomial"
+  } else if (inherits(model, "glm")) {
+    z <- stats::qnorm(1 - alpha / 2)             # Wald interval on the link scale
     pr <- stats::predict(model, newdata = nd, type = "link", se.fit = TRUE)
     inv <- stats::family(model)$linkinv
     nd$fit <- inv(pr$fit)
@@ -210,9 +231,17 @@ model_predict_grid <- function(model, vary, conf_level = 0.95) {
     attr(nd, "binomial") <- stats::family(model)$family == "binomial"
   } else {
     pr <- stats::predict(model, newdata = nd, se.fit = TRUE)
+    # Use a t multiplier with the residual df when available (matches
+    # predict.lm / confint for lm); fall back to the Normal quantile otherwise.
+    df <- tryCatch(stats::df.residual(model), error = function(e) NULL)
+    mult <- if (!is.null(df) && is.finite(df) && df > 0) {
+      stats::qt(1 - alpha / 2, df)
+    } else {
+      stats::qnorm(1 - alpha / 2)
+    }
     nd$fit <- pr$fit
-    nd$lwr <- pr$fit - z * pr$se.fit
-    nd$upr <- pr$fit + z * pr$se.fit
+    nd$lwr <- pr$fit - mult * pr$se.fit
+    nd$upr <- pr$fit + mult * pr$se.fit
     attr(nd, "binomial") <- FALSE
   }
   attr(nd, "response") <- resp
