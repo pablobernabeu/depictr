@@ -62,8 +62,15 @@ depictr_palette <- function(n = NULL, type = c("qualitative", "sequential",
 
 #' depictr colour and fill scales
 #'
-#' Discrete ggplot2 scales using [depictr_palette()].
+#' Discrete ggplot2 scales using [depictr_palette()]. These are the canonical
+#' colour and fill scales used throughout the package.
 #'
+#' @param n Optional number of colours to draw from [depictr_palette()]. By
+#'   default ggplot2 requests exactly as many colours as there are groups; pass
+#'   `n` only to force a fixed slice of the palette.
+#' @param palette Optional palette override: a function of one argument (the
+#'   number of colours) returning a character vector of colours. Defaults to
+#'   [depictr_palette()].
 #' @param ... Passed to [ggplot2::discrete_scale()].
 #' @return A ggplot2 scale that can be added to a plot.
 #' @export
@@ -73,10 +80,12 @@ depictr_palette <- function(n = NULL, type = c("qualitative", "sequential",
 #'   geom_point() +
 #'   scale_colour_depictr() +
 #'   theme_depictr()
-scale_colour_depictr <- function(...) {
+scale_colour_depictr <- function(n = NULL, palette = NULL, ...) {
+  pal <- palette %||% function(k) depictr_palette(n %||% k)
   ggplot2::discrete_scale(
-    "colour", "depictr",
-    palette = function(n) depictr_palette(n),
+    "colour",
+    palette = pal,
+    na.value = "grey80",
     ...
   )
 }
@@ -87,10 +96,12 @@ scale_color_depictr <- scale_colour_depictr
 
 #' @rdname scale_colour_depictr
 #' @export
-scale_fill_depictr <- function(...) {
+scale_fill_depictr <- function(n = NULL, palette = NULL, ...) {
+  pal <- palette %||% function(k) depictr_palette(n %||% k)
   ggplot2::discrete_scale(
-    "fill", "depictr",
-    palette = function(n) depictr_palette(n),
+    "fill",
+    palette = pal,
+    na.value = "grey80",
     ...
   )
 }
@@ -117,7 +128,7 @@ theme_depictr <- function(base_size = 11, base_family = "", grid = "xy") {
   th <- ggplot2::theme_minimal(base_size = base_size, base_family = base_family) +
     ggplot2::theme(
       plot.title = ggplot2::element_text(
-        colour = "#005b96", hjust = 0.5, face = "bold",
+        colour = depictr_brand(), hjust = 0.5, face = "bold",
         size = ggplot2::rel(1.15),
         margin = ggplot2::margin(b = base_size * 0.6)
       ),
@@ -151,21 +162,26 @@ theme_depictr <- function(base_size = 11, base_family = "", grid = "xy") {
 #' Cleans up the term names produced by modelling functions so that they read
 #' well on a plot: the intercept is renamed, an optional `b_`/`bs_` Bayesian
 #' prefix is stripped, and interaction colons are converted to a chosen symbol.
+#' The `b_`/`bs_` prefix is stripped from *each* component of an interaction
+#' (e.g. `b_x:b_y`), not just the leading term. Missing values (`NA`) are kept
+#' as `NA` rather than being rendered as the literal text `"NA"`.
 #'
 #' @param x Character vector of term names.
 #' @param interaction How to render interaction colons: `"times"` (the default,
 #'   a Unicode multiplication sign), `"asterisk"`, `"colon"` (unchanged) or
 #'   `"space"`.
-#' @param strip_prefix Whether to remove a leading `b_` or `bs_` (as added by 'brms').
+#' @param strip_prefix Whether to remove a leading `b_` or `bs_` (as added by
+#'   'brms') from each interaction component.
 #' @param tidy_intercept Whether to replace `(Intercept)` with `"Intercept"`.
 #' @param wrap Optional integer width at which to wrap long labels onto new
 #'   lines (see [base::strwrap()]). `NULL` (default) leaves labels unwrapped.
 #'
-#' @return A character vector the same length as `x`.
+#' @return A character vector the same length as `x`, with `NA` preserved.
 #' @export
 #' @examples
 #' format_terms(c("(Intercept)", "b_conditionB", "freq:condition"))
 #' format_terms("region:education:age", interaction = "asterisk")
+#' format_terms(c("b_x:b_y", NA))
 format_terms <- function(x,
                          interaction = c("times", "asterisk", "colon", "space"),
                          strip_prefix = TRUE,
@@ -173,8 +189,18 @@ format_terms <- function(x,
                          wrap = NULL) {
   interaction <- match.arg(interaction)
   x <- as.character(x)
+  na <- is.na(x)
   if (strip_prefix) {
-    x <- stringr::str_replace(x, "^b[s]?_", "")
+    # Strip the b_/bs_ Bayesian prefix from each interaction component, not just
+    # the leading token: split on the interaction separator, strip each piece,
+    # then rejoin. `stringr` propagates NA, so missing values stay missing.
+    x <- vapply(
+      strsplit(x, ":", fixed = TRUE),
+      function(parts) paste(stringr::str_replace(parts, "^b[s]?_", ""),
+                            collapse = ":"),
+      character(1)
+    )
+    x[na] <- NA_character_
   }
   if (tidy_intercept) {
     x <- stringr::str_replace(x, "^\\(Intercept\\)$", "Intercept")
@@ -191,7 +217,8 @@ format_terms <- function(x,
   if (!is.null(wrap)) {
     x <- vapply(
       x,
-      function(s) paste(strwrap(s, width = wrap), collapse = "\n"),
+      function(s) if (is.na(s)) NA_character_ else
+        paste(strwrap(s, width = wrap), collapse = "\n"),
       character(1)
     )
     x <- unname(x)
