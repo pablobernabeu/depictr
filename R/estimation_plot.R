@@ -39,9 +39,11 @@
 #' @param conf_level Confidence level for both the group intervals (t-based) and
 #'   the bootstrap difference intervals.
 #' @param n_boot Number of bootstrap resamples for the difference intervals.
-#' @param effsize Standardised effect size to annotate on the two-group plot:
+#' @param effsize Standardised effect size annotated beside each difference:
 #'   `"hedges_g"` (the default, small-sample corrected), `"cohens_d"`, or
-#'   `"none"`. Ignored when there are more than two groups.
+#'   `"none"` to omit it. Every contrast against the reference is labelled, so
+#'   the standardised effect is shown for both the two-group and multi-group
+#'   cases.
 #' @param show_points Whether to draw the raw data behind the group means.
 #' @param point_alpha Transparency of the raw points.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
@@ -207,18 +209,28 @@ estimation_plot <- function(data, y, group, reference = NULL,
     ggplot2::scale_x_discrete(limits = others, drop = FALSE) +
     ggplot2::expand_limits(x = groups)
 
-  # Two-group Gardner-Altman: annotate the standardised effect size.
-  if (length(groups) == 2 && effsize != "none" && nrow(diffs) == 1) {
-    es_val <- diffs[[effsize]][1]
+  # Surface the standardised effect size for EVERY contrast, not only the
+  # two-group case. Showing Hedges' g / Cohen's d beside each bootstrap interval
+  # is what makes this an estimation plot rather than a plain mean-difference
+  # plot, and keeps it distinct from group_comparison_plot().
+  if (effsize != "none") {
     es_lab <- switch(effsize,
                      hedges_g = "Hedges' g",
                      cohens_d = "Cohen's d")
-    if (is.finite(es_val)) {
+    diffs$es <- diffs[[effsize]]
+    lab_df <- diffs[is.finite(diffs$es), , drop = FALSE]
+    if (nrow(lab_df)) {
+      lab_df$es_label <- sprintf("%s = %.2f", es_lab, lab_df$es)
+      lab_df$lab_y <- ifelse(is.finite(lab_df$upper), lab_df$upper, lab_df$diff)
       bottom <- bottom +
-        ggplot2::annotate(
-          "text", x = 1, y = diffs$diff[1], hjust = -0.25, vjust = 0.5,
-          label = sprintf("%s = %.2f", es_lab, es_val),
-          colour = "grey30", size = 3.2
+        ggplot2::geom_text(
+          data = lab_df,
+          ggplot2::aes(x = .data$group, y = .data$lab_y,
+                       label = .data$es_label),
+          inherit.aes = FALSE, vjust = -0.9, colour = "grey25", size = 3
+        ) +
+        ggplot2::scale_y_continuous(
+          expand = ggplot2::expansion(mult = c(0.08, 0.18))
         )
     }
   }
