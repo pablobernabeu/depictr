@@ -73,13 +73,13 @@ power_curve_plot <- function(x,
 
   if (!is.na(target)) {
     p <- p + ggplot2::geom_hline(
-      yintercept = target, linetype = 2, colour = "grey55"
+      yintercept = target, linetype = 2, colour = depictr_reference()
     )
   }
 
   p <- p +
-    ggplot2::geom_line(colour = "#005b96", na.rm = TRUE) +
-    ggplot2::geom_point(size = 2, colour = "#005b96", na.rm = TRUE) +
+    ggplot2::geom_line(colour = depictr_brand(), na.rm = TRUE) +
+    ggplot2::geom_point(size = 2, colour = depictr_brand(), na.rm = TRUE) +
     ggplot2::scale_y_continuous(
       name = "Power", limits = c(0, 1),
       breaks = seq(0, 1, 0.2), labels = scales::percent_format(accuracy = 1)

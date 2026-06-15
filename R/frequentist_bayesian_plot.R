@@ -3,9 +3,9 @@
 #' Plot frequentist and Bayesian estimates together
 #'
 #' Presents the estimates from a frequentist model and a Bayesian model side by
-#' side on one forest plot, in the familiar red (frequentist) and blue
-#' (Bayesian) styling. The function is a convenience wrapper around
-#' [compare_models()].
+#' side on one forest plot, with the two sources distinguished by the first two
+#' colours of the colourblind-safe [depictr_palette()] (brand blue and orange).
+#' The function is a convenience wrapper around [compare_models()].
 #'
 #' It is a modernised, self-contained successor to the original
 #' `frequentist_bayesian_plot()` gist. The Bayesian estimates may be supplied
@@ -73,7 +73,7 @@ frequentist_bayesian_plot <- function(frequentist,
       labels = labels,
       interaction = interaction,
       reference_line = vertical_line_at_x,
-      palette = c("#e23b3b", "#005b96"),
+      palette = depictr_palette(2),
       legend_title = NULL,
       title = title,
       subtitle = subtitle,

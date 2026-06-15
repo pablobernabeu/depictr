@@ -20,7 +20,8 @@
 #' @param conf_level Confidence level for the interval.
 #' @param n Number of points across the range of a numeric predictor.
 #' @param rug Whether to add a rug of the observed predictor values (numeric predictors).
-#' @param colour Colour for the line/points and band.
+#' @param colour Colour for the line/points and band. Defaults to the depictr
+#'   brand blue.
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -34,7 +35,7 @@
 #'             data = lexical_decision, family = binomial)
 #' effects_plot(gfit, "word_frequency")        # predicted probability
 effects_plot <- function(model, predictor, conf_level = 0.95, n = 100,
-                         rug = TRUE, colour = "#005b96",
+                         rug = TRUE, colour = depictr_brand(),
                          title = NULL, x_lab = NULL, y_lab = NULL) {
   mf <- stats::model.frame(model)
   if (!predictor %in% names(mf)[-1]) {
@@ -142,7 +143,11 @@ interaction_plot <- function(model, predictor, moderator,
   resp <- attr(grid, "response")
   grid$.mod <- factor(format(grid[[moderator]]),
                       levels = format(mod_values))
+  # The moderator levels are encoded by colour. Use the canonical depictr
+  # scales so the palette is sourced in one place; an explicit `palette`
+  # override (a vector of colours) is honoured by slicing it per request.
   pal <- palette %||% depictr_palette(length(mod_values))
+  pal_fun <- function(k) pal[seq_len(k)]
   x_lab <- x_lab %||% predictor
   y_lab <- y_lab %||% if (isTRUE(attr(grid, "binomial"))) {
     "Predicted probability"
@@ -165,13 +170,13 @@ interaction_plot <- function(model, predictor, moderator,
       p <- p + ggplot2::geom_ribbon(
         ggplot2::aes(ymin = .data$lwr, ymax = .data$upr, fill = .data$.mod),
         alpha = 0.15, colour = NA
-      ) + ggplot2::scale_fill_manual(values = pal, guide = "none")
+      ) + scale_fill_depictr(palette = pal_fun, guide = "none")
     }
     p <- p + ggplot2::geom_line(linewidth = 0.9)
   }
 
   p +
-    ggplot2::scale_colour_manual(values = pal, name = moderator) +
+    scale_colour_depictr(palette = pal_fun, name = moderator) +
     ggplot2::labs(x = x_lab, y = y_lab, title = title) +
     theme_depictr()
 }
