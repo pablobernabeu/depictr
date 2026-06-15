@@ -53,11 +53,7 @@ coefficient_plot <- function(x,
   order <- match.arg(order)
   interaction <- match.arg(interaction)
 
-  est <- if (inherits(x, "data.frame")) {
-    tidy_estimates(x, conf_level = conf_level)
-  } else {
-    tidy_estimates(x, conf_level = conf_level)
-  }
+  est <- tidy_estimates(x, conf_level = conf_level)
 
   if (!intercept) {
     est <- est[!est$term %in% c("(Intercept)", "Intercept", "b_Intercept"), ,

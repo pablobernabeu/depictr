@@ -48,10 +48,10 @@ posterior_plot <- function(draws, point = c("median", "mean"),
   summ <- do.call(rbind, lapply(params, function(p) {
     v <- long$value[long$parameter == p]
     inner <- stats::quantile(v, c((1 - widths[1]) / 2, 1 - (1 - widths[1]) / 2),
-                             names = FALSE)
+                             names = FALSE, na.rm = TRUE)
     outer <- stats::quantile(v, c((1 - widths[2]) / 2, 1 - (1 - widths[2]) / 2),
-                             names = FALSE)
-    data.frame(parameter = p, centre = point_fun(v),
+                             names = FALSE, na.rm = TRUE)
+    data.frame(parameter = p, centre = point_fun(v, na.rm = TRUE),
                inner_lo = inner[1], inner_hi = inner[2],
                outer_lo = outer[1], outer_hi = outer[2],
                stringsAsFactors = FALSE)
@@ -91,18 +91,25 @@ draws_to_long <- function(draws) {
                        names(draws))
   val_col <- intersect(c("value", ".value", "draw", "estimate"), names(draws))
   if (length(par_col) && length(val_col)) {
-    return(data.frame(parameter = as.character(draws[[par_col[1]]]),
-                      value = as.numeric(draws[[val_col[1]]]),
-                      stringsAsFactors = FALSE))
+    long <- data.frame(parameter = as.character(draws[[par_col[1]]]),
+                       value = as.numeric(draws[[val_col[1]]]),
+                       stringsAsFactors = FALSE)
+    return(long[!is.na(long$value), , drop = FALSE])
   }
+  # Wide form: each remaining numeric column is one parameter. Known sampler
+  # index/book-keeping columns are not parameters and must be dropped first.
+  index_cols <- c(".chain", ".iteration", ".draw", "draw", "chain",
+                  "iteration", ".row")
   num <- names(draws)[vapply(draws, is.numeric, logical(1))]
+  num <- setdiff(num, index_cols)
   if (length(num) < 1) {
     stop("Could not find draws: supply long (parameter + value) or wide ",
          "(numeric columns) data.", call. = FALSE)
   }
-  data.frame(
+  long <- data.frame(
     parameter = rep(num, each = nrow(draws)),
     value = unlist(draws[num], use.names = FALSE),
     stringsAsFactors = FALSE
   )
+  long[!is.na(long$value), , drop = FALSE]
 }

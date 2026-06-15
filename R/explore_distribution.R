@@ -14,7 +14,9 @@
 #' @param bins Number of histogram bins.
 #' @param alpha Fill transparency (useful when groups overlap).
 #' @param position Histogram position adjustment, e.g. `"identity"`,
-#'   `"stack"` or `"dodge"`.
+#'   `"stack"` or `"dodge"`. The default (`NULL`) chooses `"dodge"` when
+#'   `group` is set (so overlapping bars stay readable) and `"identity"`
+#'   otherwise.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title,x_lab Plot title and x-axis label (defaults to the variable
 #'   name).
@@ -26,7 +28,7 @@
 #' explore_distribution(lexical_decision, RT, group = condition, type = "density")
 explore_distribution <- function(data, x, group = NULL,
                               type = c("histogram", "density", "both"),
-                              bins = 30, alpha = 0.6, position = "identity",
+                              bins = 30, alpha = 0.6, position = NULL,
                               palette = NULL, title = NULL, x_lab = NULL) {
   type <- match.arg(type)
   x <- resolve_var(data, rlang::enquo(x), "x")
@@ -35,6 +37,15 @@ explore_distribution <- function(data, x, group = NULL,
     stop("`x` must be a numeric variable.", call. = FALSE)
   }
   x_lab <- x_lab %||% x
+
+  # Default position: dodge keeps grouped bars readable; identity for ungrouped.
+  position <- position %||% (if (is.null(group)) "identity" else "dodge")
+
+  # Drop rows with NA in the mapped variables so ggplot2 does not emit a
+  # "Removed N rows" warning at draw time.
+  mapped <- c(x, group)
+  keep <- stats::complete.cases(data[, mapped, drop = FALSE])
+  data <- data[keep, , drop = FALSE]
 
   aes_main <- if (is.null(group)) {
     ggplot2::aes(x = .data[[x]])

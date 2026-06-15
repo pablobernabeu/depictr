@@ -8,6 +8,10 @@
 #' giving a fuller and more transparent picture than a boxplot alone. The plot
 #' is built from base graphics primitives and so needs no extra packages.
 #'
+#' Groups with fewer than two observations cannot have a density estimated, so
+#' their half-violin is omitted (the points and box are still drawn) and a
+#' warning is issued.
+#'
 #' @param data A data frame.
 #' @param y The numeric variable (string or unquoted name).
 #' @param group Optional grouping variable on the x-axis.
@@ -34,8 +38,15 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
   groups <- levels(d$.g)
   pos <- stats::setNames(seq_along(groups), groups)
 
+  sparse <- character(0)
   dens <- do.call(rbind, lapply(groups, function(g) {
     v <- d[[y]][d$.g == g]
+    # stats::density() needs at least two points to pick a bandwidth, so a
+    # group with fewer is shown as points + box only (no half-violin).
+    if (length(v) < 2) {
+      sparse <<- c(sparse, g)
+      return(NULL)
+    }
     de <- stats::density(v)
     w <- de$y / max(de$y) * width
     data.frame(g = g,
@@ -43,6 +54,11 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
                yy = c(de$x, rev(de$x)),
                stringsAsFactors = FALSE)
   }))
+  if (length(sparse)) {
+    warning("No half-violin drawn for group(s) with n < 2: ",
+            paste(sparse, collapse = ", "),
+            "; showing points and box only.", call. = FALSE)
+  }
   box <- do.call(rbind, lapply(groups, function(g) {
     bs <- grDevices::boxplot.stats(d[[y]][d$.g == g])$stats
     data.frame(g = g, x = pos[[g]], ymin = bs[1], lower = bs[2],
@@ -54,12 +70,15 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
 
   pal <- palette %||% depictr_palette(length(groups))
 
-  p <- ggplot2::ggplot() +
-    ggplot2::geom_polygon(
+  p <- ggplot2::ggplot()
+  if (!is.null(dens) && nrow(dens)) {
+    p <- p + ggplot2::geom_polygon(
       data = dens,
       ggplot2::aes(x = .data$x, y = .data$yy, fill = .data$g, group = .data$g),
       alpha = 0.5, colour = NA
-    ) +
+    )
+  }
+  p <- p +
     ggplot2::geom_point(
       data = d,
       ggplot2::aes(x = .data$.x, y = .data[[y]], colour = .data$.g),
@@ -93,6 +112,9 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
 #' the raw (jittered) data. By showing both the estimate and its uncertainty, it
 #' conveys whether the groups differ more faithfully than a bar chart does.
 #'
+#' A group with a single observation has no degrees of freedom for a t-based
+#' interval, so only its mean is drawn (no interval) and a warning is issued.
+#'
 #' @param data A data frame.
 #' @param y The numeric outcome (string or unquoted name).
 #' @param group The grouping variable (string or unquoted name).
@@ -121,14 +143,28 @@ group_comparison_plot <- function(data, y, group, conf_level = 0.95,
   d[[group]] <- as.factor(d[[group]])
   groups <- levels(d[[group]])
 
+  sparse <- character(0)
   summ <- do.call(rbind, lapply(groups, function(g) {
     v <- d[[y]][d[[group]] == g]
     nv <- length(v)
+    m <- mean(v)
+    if (nv < 2) {
+      # A single observation has no degrees of freedom for a t interval
+      # (qt(df = 0) is NaN), so draw the mean only and flag the group.
+      sparse <<- c(sparse, g)
+      return(data.frame(group = g, mean = m, lower = m, upper = m,
+                        stringsAsFactors = FALSE))
+    }
     se <- stats::sd(v) / sqrt(nv)
     tc <- stats::qt(1 - (1 - conf_level) / 2, df = nv - 1)
-    data.frame(group = g, mean = mean(v), lower = mean(v) - tc * se,
-               upper = mean(v) + tc * se, stringsAsFactors = FALSE)
+    data.frame(group = g, mean = m, lower = m - tc * se,
+               upper = m + tc * se, stringsAsFactors = FALSE)
   }))
+  if (length(sparse)) {
+    warning("No confidence interval drawn for group(s) with n < 2: ",
+            paste(sparse, collapse = ", "), "; showing the mean only.",
+            call. = FALSE)
+  }
   summ$group <- factor(summ$group, levels = groups)
   pal <- palette %||% depictr_palette(length(groups))
 
