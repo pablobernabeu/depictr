@@ -32,7 +32,10 @@ test_that("posterior_plot() draws points/intervals in brand blue and a neutral r
     `slope:group` = rnorm(2000, -0.2, 0.2),
     check.names = FALSE
   )
-  p <- posterior_plot(draws)
+  # The colour single-source-of-truth is pinned on the interval style, whose
+  # geoms are explicitly coloured (the half-eye slab default is exercised in
+  # test-posterior-layer.R).
+  p <- posterior_plot(draws, style = "interval")
   expect_no_warning(b <- ggplot2::ggplot_build(p))
 
   # Layer 1 is the reference vline; remaining linerange/point layers are brand.
