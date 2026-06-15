@@ -14,6 +14,13 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
 * `estimation_plot()` for estimation statistics: group effect sizes
   (mean differences, Cohen's *d* / Hedges' *g*) with bootstrap confidence
   intervals, in the spirit of the "new statistics".
+* `ecdf_plot()` (empirical cumulative distribution, optionally by group),
+  `ridgeline_plot()` (overlapping per-group densities) and `dumbbell_plot()`
+  (a connected two-group comparison across categories).
+* `explore_distribution()` gains `facet` to draw one panel per group instead of
+  overlaying them (much clearer beyond a few groups), and
+  `correlation_heatmap()` gains `reorder` to cluster correlated variables
+  together.
 
 ## Multivariate, clustering and survival
 
@@ -72,6 +79,21 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
 * `depictr_options()` sets package-wide defaults once -- the brand and accent
   colours, qualitative palette, base font size and family, and the colour used
   for missing values -- which every plot and scale then honours.
+
+## Layout and legibility
+
+* `coefficient_plot()`, `compare_models()`, `posterior_plot()` and
+  `frequentist_bayesian_plot()` gain a `facet`/`scales` option that lays each
+  term out in its own free-scaled panel, so terms on very different scales (a
+  large intercept alongside small slopes) stay legible instead of being squished
+  onto the zero line. `frequentist_bayesian_plot()` uses this layout by default.
+* A pass over every plot for legibility: `silhouette_plot()` cluster labels no
+  longer clip; `raincloud_plot()` uses one colour per group across all layers;
+  `dendrogram_plot()` hides leaf labels for large trees; `confusion_matrix_plot()`
+  picks each label's colour from the tile luminance; `vif_plot()` adapts its
+  range and labels the threshold guides; `gain_plot()`/`lift_plot()` label their
+  reference lines; `timeseries_plot()` shows a single legend; and
+  `k_diagnostic()` now returns the diagnostic curve as a plot.
 
 ## Data
 

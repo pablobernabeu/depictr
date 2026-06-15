@@ -30,11 +30,11 @@ remotes::install_github("pablobernabeu/depictr")
 
 ## What's in the box
 
-**Explore data**: `explore_distribution()`, `explore_categorical()`,
-`explore_bivariate()`, `explore_pairs()`, `correlation_heatmap()`,
-`missingness_map()`, `outlier_plot()`, `raincloud_plot()`,
-`group_comparison_plot()`, `estimation_plot()`, `scatter_trend()`,
-`summary_table()`.
+**Explore data**: `explore_distribution()`, `ecdf_plot()`,
+`explore_categorical()`, `explore_bivariate()`, `explore_pairs()`,
+`correlation_heatmap()`, `missingness_map()`, `outlier_plot()`,
+`raincloud_plot()`, `ridgeline_plot()`, `group_comparison_plot()`,
+`estimation_plot()`, `dumbbell_plot()`, `scatter_trend()`, `summary_table()`.
 
 **Multivariate, clustering & survival**: `pca_plot()`, `scree_plot()`,
 `cluster_plot()`, `silhouette_plot()`, `k_diagnostic()`, `dendrogram_plot()`,

@@ -17,6 +17,11 @@
 #'   highest correlations. Defaults to the endpoints and midpoint of the
 #'   colourblind-aware [depictr_palette()] diverging ramp (negative
 #'   correlations red, zero neutral, positive correlations brand blue).
+#' @param reorder Whether to reorder the variables by hierarchical clustering of
+#'   the correlation matrix (using \eqn{1 - r} as the distance), so that blocks
+#'   of mutually correlated variables sit together and structure is easier to
+#'   see. Defaults to `FALSE` (the order of `cols`). Skipped with a message if
+#'   any correlation is undefined (`NA`).
 #' @param title Plot title.
 #'
 #' @details Columns with (near-)zero variance cannot be correlated and are
@@ -31,11 +36,14 @@
 #' @examples
 #' correlation_heatmap(wellbeing_survey)
 #' correlation_heatmap(crop_yield, method = "spearman", show_values = FALSE)
+#' # Cluster correlated variables together:
+#' correlation_heatmap(wellbeing_survey, reorder = TRUE)
 correlation_heatmap <- function(data, cols = NULL, method = "pearson",
                                     use = "pairwise.complete.obs",
                                     show_values = TRUE, digits = 2,
                                     palette = depictr_palette(
                                       5, "diverging")[c(1, 3, 5)],
+                                    reorder = FALSE,
                                     title = NULL) {
   if (!is.data.frame(data)) stop("`data` must be a data frame.", call. = FALSE)
   if (is.null(cols)) {
@@ -66,6 +74,19 @@ correlation_heatmap <- function(data, cols = NULL, method = "pearson",
   }
 
   cm <- stats::cor(data[cols], use = use, method = method)
+
+  # Optionally reorder variables so correlated blocks are adjacent. 1 - r is a
+  # valid distance (small for strongly positively correlated pairs); clustering
+  # needs a complete matrix, so skip if any correlation is undefined.
+  if (isTRUE(reorder) && ncol(cm) > 2) {
+    if (anyNA(cm)) {
+      message("correlation_heatmap(): cannot reorder with undefined (NA) ",
+              "correlations; keeping the original column order.")
+    } else {
+      ord <- stats::hclust(stats::as.dist(1 - cm))$order
+      cm <- cm[ord, ord, drop = FALSE]
+    }
+  }
   vars <- colnames(cm)
   long <- data.frame(
     var1 = factor(rep(vars, times = length(vars)), levels = vars),

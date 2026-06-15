@@ -29,6 +29,7 @@ reference:
     A first look at distributions, relationships, data quality and summaries.
   contents:
   - explore_distribution
+  - ecdf_plot
   - explore_categorical
   - explore_bivariate
   - explore_pairs
@@ -36,8 +37,10 @@ reference:
   - missingness_map
   - outlier_plot
   - raincloud_plot
+  - ridgeline_plot
   - group_comparison_plot
   - estimation_plot
+  - dumbbell_plot
   - scatter_trend
   - summary_table
 

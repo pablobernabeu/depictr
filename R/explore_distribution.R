@@ -18,6 +18,10 @@
 #'   `group` is set (so overlapping bars stay readable) and `"identity"`
 #'   otherwise.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
+#' @param facet When a `group` is given, draw one panel per group instead of
+#'   overlaying them. This is much clearer than an overlay once there are more
+#'   than two or three groups (overlaid histograms in particular become hard to
+#'   read). Defaults to `FALSE`. Ignored when there is no `group`.
 #' @param title,x_lab Plot title and x-axis label (defaults to the variable
 #'   name).
 #'
@@ -26,10 +30,14 @@
 #' @examples
 #' explore_distribution(lexical_decision, RT)
 #' explore_distribution(lexical_decision, RT, group = condition, type = "density")
+#' # One panel per group keeps many groups legible:
+#' explore_distribution(wellbeing_survey, life_satisfaction, group = region,
+#'                      type = "both", facet = TRUE)
 explore_distribution <- function(data, x, group = NULL,
                               type = c("histogram", "density", "both"),
                               bins = 30, alpha = 0.6, position = NULL,
-                              palette = NULL, title = NULL, x_lab = NULL) {
+                              palette = NULL, facet = FALSE,
+                              title = NULL, x_lab = NULL) {
   type <- match.arg(type)
   x <- resolve_var(data, rlang::enquo(x), "x")
   group <- resolve_var(data, rlang::enquo(group), "group")
@@ -80,6 +88,12 @@ explore_distribution <- function(data, x, group = NULL,
       p <- p +
         ggplot2::scale_fill_manual(values = palette) +
         ggplot2::scale_colour_manual(values = palette)
+    }
+    # One panel per group declutters the overlay; the strips name the groups, so
+    # the now-redundant colour legend is dropped.
+    if (facet) {
+      p <- p + ggplot2::facet_wrap(ggplot2::vars(.data[[group]])) +
+        ggplot2::theme(legend.position = "none")
     }
   }
   p

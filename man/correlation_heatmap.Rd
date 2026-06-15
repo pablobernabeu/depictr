@@ -12,6 +12,7 @@ correlation_heatmap(
   show_values = TRUE,
   digits = 2,
   palette = depictr_palette(5, "diverging")[c(1, 3, 5)],
+  reorder = FALSE,
   title = NULL
 )
 }
@@ -34,6 +35,12 @@ highest correlations. Defaults to the endpoints and midpoint of the
 colourblind-aware \code{\link[=depictr_palette]{depictr_palette()}} diverging ramp (negative
 correlations red, zero neutral, positive correlations brand blue).}
 
+\item{reorder}{Whether to reorder the variables by hierarchical clustering of
+the correlation matrix (using \eqn{1 - r} as the distance), so that blocks
+of mutually correlated variables sit together and structure is easier to
+see. Defaults to \code{FALSE} (the order of \code{cols}). Skipped with a message if
+any correlation is undefined (\code{NA}).}
+
 \item{title}{Plot title.}
 }
 \value{
@@ -55,4 +62,6 @@ are rendered in grey and labelled \code{n/a} rather than left blank.
 \examples{
 correlation_heatmap(wellbeing_survey)
 correlation_heatmap(crop_yield, method = "spearman", show_values = FALSE)
+# Cluster correlated variables together:
+correlation_heatmap(wellbeing_survey, reorder = TRUE)
 }

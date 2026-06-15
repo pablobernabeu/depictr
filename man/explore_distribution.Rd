@@ -13,6 +13,7 @@ explore_distribution(
   alpha = 0.6,
   position = NULL,
   palette = NULL,
+  facet = FALSE,
   title = NULL,
   x_lab = NULL
 )
@@ -39,6 +40,11 @@ otherwise.}
 
 \item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
+\item{facet}{When a \code{group} is given, draw one panel per group instead of
+overlaying them. This is much clearer than an overlay once there are more
+than two or three groups (overlaid histograms in particular become hard to
+read). Defaults to \code{FALSE}. Ignored when there is no \code{group}.}
+
 \item{title, x_lab}{Plot title and x-axis label (defaults to the variable
 name).}
 }
@@ -52,4 +58,7 @@ variable. A quick first look at a continuous variable.
 \examples{
 explore_distribution(lexical_decision, RT)
 explore_distribution(lexical_decision, RT, group = condition, type = "density")
+# One panel per group keeps many groups legible:
+explore_distribution(wellbeing_survey, life_satisfaction, group = region,
+                     type = "both", facet = TRUE)
 }
