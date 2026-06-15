@@ -87,11 +87,14 @@ explore_categorical <- function(data, x, group = NULL, proportion = FALSE,
 
   p <- ggplot2::ggplot(tab, mapping)
   if (is.null(group)) {
-    p <- p + ggplot2::geom_col(fill = "#005b96", width = 0.75)
+    p <- p + ggplot2::geom_col(fill = depictr_brand(), width = 0.75)
   } else {
     p <- p + ggplot2::geom_col(position = position, width = 0.75)
-    pal <- palette %||% depictr_palette(nlevels(factor(tab$grp)))
-    p <- p + ggplot2::scale_fill_manual(values = pal, name = group)
+    if (is.null(palette)) {
+      p <- p + scale_fill_depictr(name = group)
+    } else {
+      p <- p + ggplot2::scale_fill_manual(values = palette, name = group)
+    }
   }
 
   p <- p + ggplot2::labs(x = x_lab, y = y_lab, title = title) +

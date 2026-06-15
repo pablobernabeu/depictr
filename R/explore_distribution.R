@@ -72,10 +72,15 @@ explore_distribution <- function(data, x, group = NULL,
     theme_depictr()
 
   if (!is.null(group)) {
-    pal <- palette %||% depictr_palette(length(unique(data[[group]])))
-    p <- p +
-      ggplot2::scale_fill_manual(values = pal) +
-      ggplot2::scale_colour_manual(values = pal)
+    if (is.null(palette)) {
+      p <- p +
+        scale_fill_depictr() +
+        scale_colour_depictr()
+    } else {
+      p <- p +
+        ggplot2::scale_fill_manual(values = palette) +
+        ggplot2::scale_colour_manual(values = palette)
+    }
   }
   p
 }

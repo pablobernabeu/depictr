@@ -41,7 +41,7 @@ scatter_trend <- function(data, x, y, group = NULL, method = "lm",
   p <- ggplot2::ggplot(data, mapping)
   if (is.null(group)) {
     p <- p + ggplot2::geom_point(alpha = point_alpha, na.rm = TRUE,
-                                 colour = "#005b96")
+                                 colour = depictr_brand())
   } else {
     p <- p + ggplot2::geom_point(alpha = point_alpha, na.rm = TRUE)
   }
@@ -50,7 +50,7 @@ scatter_trend <- function(data, x, y, group = NULL, method = "lm",
     if (is.null(group)) {
       p <- p + ggplot2::geom_smooth(
         method = method, se = se, formula = y ~ x, na.rm = TRUE,
-        colour = "#e23b3b", alpha = 0.18
+        colour = depictr_accent(), alpha = 0.18
       )
     } else {
       p <- p + ggplot2::geom_smooth(
@@ -63,10 +63,15 @@ scatter_trend <- function(data, x, y, group = NULL, method = "lm",
     theme_depictr()
 
   if (!is.null(group)) {
-    pal <- palette %||% depictr_palette(length(unique(data[[group]])))
-    p <- p +
-      ggplot2::scale_colour_manual(values = pal) +
-      ggplot2::scale_fill_manual(values = pal)
+    if (is.null(palette)) {
+      p <- p +
+        scale_colour_depictr() +
+        scale_fill_depictr()
+    } else {
+      p <- p +
+        ggplot2::scale_colour_manual(values = palette) +
+        ggplot2::scale_fill_manual(values = palette)
+    }
   }
   p
 }

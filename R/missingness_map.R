@@ -13,6 +13,8 @@
 #' @param sort Whether to order variables by their proportion of missing values.
 #' @param show_pct Whether to append the percentage missing to each variable label.
 #' @param colours Length-2 vector: colours for present and missing cells.
+#'   Defaults to a muted grey for present cells and the colourblind-safe
+#'   [depictr_palette()] accent for missing cells.
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -20,7 +22,8 @@
 #' @examples
 #' missingness_map(wellbeing_survey)
 missingness_map <- function(data, cols = NULL, sort = TRUE, show_pct = TRUE,
-                             colours = c("grey85", "#b2182b"), title = NULL) {
+                             colours = c("grey85", depictr_accent()),
+                             title = NULL) {
   if (!is.data.frame(data)) stop("`data` must be a data frame.", call. = FALSE)
   if (is.null(cols)) cols <- names(data) else check_columns(data, cols)
   if (length(colours) != 2) {

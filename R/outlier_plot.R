@@ -22,7 +22,7 @@
 #' outlier_plot(lexical_decision, RT, group = condition, type = "both")
 outlier_plot <- function(data, y, group = NULL,
                          type = c("box", "violin", "both"),
-                         flag = TRUE, outlier_colour = "#e23b3b",
+                         flag = TRUE, outlier_colour = depictr_accent(),
                          palette = NULL, title = NULL, y_lab = NULL) {
   type <- match.arg(type)
   y <- resolve_var(data, rlang::enquo(y), "y")
@@ -73,9 +73,10 @@ outlier_plot <- function(data, y, group = NULL,
   if (is.null(group)) {
     p <- p + ggplot2::theme(axis.text.x = ggplot2::element_blank(),
                             axis.ticks.x = ggplot2::element_blank())
+  } else if (is.null(palette)) {
+    p <- p + scale_fill_depictr()
   } else {
-    pal <- palette %||% depictr_palette(nlevels(d$.x))
-    p <- p + ggplot2::scale_fill_manual(values = pal)
+    p <- p + ggplot2::scale_fill_manual(values = palette)
   }
   p
 }

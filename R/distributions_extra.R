@@ -68,8 +68,6 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
   d$.x <- pos[as.character(d$.g)] - 0.22 +
     stats::runif(nrow(d), -0.06, 0.06)
 
-  pal <- palette %||% depictr_palette(length(groups))
-
   p <- ggplot2::ggplot()
   if (!is.null(dens) && nrow(dens)) {
     p <- p + ggplot2::geom_polygon(
@@ -91,12 +89,18 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
                    ymax = .data$ymax, group = .data$g),
       stat = "identity", width = 0.09, fill = "white", colour = "grey30"
     ) +
-    ggplot2::scale_fill_manual(values = pal) +
-    ggplot2::scale_colour_manual(values = pal) +
     ggplot2::scale_x_continuous(breaks = pos, labels = groups) +
     ggplot2::labs(x = x_lab %||% (group %||% NULL), y = y_lab, title = title) +
     theme_depictr(grid = "y") +
     ggplot2::theme(legend.position = "none")
+
+  if (is.null(palette)) {
+    p <- p + scale_fill_depictr() + scale_colour_depictr()
+  } else {
+    p <- p +
+      ggplot2::scale_fill_manual(values = palette) +
+      ggplot2::scale_colour_manual(values = palette)
+  }
 
   if (is.null(group)) {
     p <- p + ggplot2::theme(axis.text.x = ggplot2::element_blank(),
@@ -166,7 +170,6 @@ group_comparison_plot <- function(data, y, group, conf_level = 0.95,
             call. = FALSE)
   }
   summ$group <- factor(summ$group, levels = groups)
-  pal <- palette %||% depictr_palette(length(groups))
 
   p <- ggplot2::ggplot(summ, ggplot2::aes(x = .data$group, colour = .data$group))
   if (show_points) {
@@ -176,13 +179,18 @@ group_comparison_plot <- function(data, y, group, conf_level = 0.95,
       width = 0.12, alpha = point_alpha, size = 0.9, inherit.aes = FALSE
     )
   }
-  p +
+  p <- p +
     ggplot2::geom_pointrange(
       ggplot2::aes(y = .data$mean, ymin = .data$lower, ymax = .data$upper),
       linewidth = 0.8, size = 0.6
     ) +
-    ggplot2::scale_colour_manual(values = pal) +
     ggplot2::labs(x = x_lab, y = y_lab, title = title) +
     theme_depictr(grid = "y") +
     ggplot2::theme(legend.position = "none")
+  if (is.null(palette)) {
+    p <- p + scale_colour_depictr()
+  } else {
+    p <- p + ggplot2::scale_colour_manual(values = palette)
+  }
+  p
 }
