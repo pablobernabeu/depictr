@@ -14,6 +14,8 @@
 #' @param max_cols Safety cap on the number of variables (a k-by-k matrix grows
 #'   quickly).
 #' @param point_alpha Point transparency in the scatter panels.
+#' @param method Correlation method for the upper-triangle coefficients, passed
+#'   to [stats::cor()]: `"pearson"`, `"spearman"` or `"kendall"`.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title Overall title for the matrix.
 #'
@@ -23,10 +25,13 @@
 #' explore_pairs(crop_yield, cols = c("rainfall", "fertilizer", "yield"))
 #' \donttest{
 #' explore_pairs(crop_yield, cols = c("rainfall", "fertilizer", "yield"),
-#'               group = treatment)
+#'               group = treatment, method = "spearman")
 #' }
 explore_pairs <- function(data, cols = NULL, group = NULL, max_cols = 8,
-                          point_alpha = 0.5, palette = NULL, title = NULL) {
+                          point_alpha = 0.5,
+                          method = c("pearson", "spearman", "kendall"),
+                          palette = NULL, title = NULL) {
+  method <- match.arg(method)
   group <- resolve_var(data, rlang::enquo(group), "group")
   if (is.null(cols)) {
     cols <- names(data)[vapply(data, is.numeric, logical(1))]
@@ -54,7 +59,7 @@ explore_pairs <- function(data, cols = NULL, group = NULL, max_cols = 8,
   for (i in seq_len(k)) {       # row
     for (j in seq_len(k)) {     # column
       panels[[pos]] <- pairs_panel(d, cols[j], cols[i], i, j, k, group, pal,
-                                   point_alpha)
+                                   point_alpha, method)
       pos <- pos + 1L
     }
   }
@@ -68,7 +73,7 @@ explore_pairs <- function(data, cols = NULL, group = NULL, max_cols = 8,
     combined <- combined + patchwork::plot_annotation(
       title = title,
       theme = ggplot2::theme(plot.title = ggplot2::element_text(
-        colour = "#005b96", face = "bold", hjust = 0.5))
+        colour = depictr_brand(), face = "bold", hjust = 0.5))
     )
   }
   combined
@@ -78,7 +83,8 @@ explore_pairs <- function(data, cols = NULL, group = NULL, max_cols = 8,
 
 #' Build one panel of the scatter-plot matrix
 #' @noRd
-pairs_panel <- function(d, xvar, yvar, i, j, k, group, pal, point_alpha) {
+pairs_panel <- function(d, xvar, yvar, i, j, k, group, pal, point_alpha,
+                        method = "pearson") {
   # Keep axis text only on the outer edge (bottom row / left column) so the
   # matrix stays clean; variable names live on the diagonal.
   show_x <- i == k
@@ -101,7 +107,7 @@ pairs_panel <- function(d, xvar, yvar, i, j, k, group, pal, point_alpha) {
     # Diagonal: density, labelled with the variable name
     p <- ggplot2::ggplot(d, ggplot2::aes(x = .data[[xvar]]))
     if (is.null(group)) {
-      p <- p + ggplot2::geom_density(fill = "#005b96", alpha = 0.5,
+      p <- p + ggplot2::geom_density(fill = depictr_brand(), alpha = 0.5,
                                      colour = NA, na.rm = TRUE)
     } else {
       p <- p + ggplot2::geom_density(
@@ -112,7 +118,7 @@ pairs_panel <- function(d, xvar, yvar, i, j, k, group, pal, point_alpha) {
     }
     p <- p +
       ggplot2::annotate("text", x = -Inf, y = Inf, label = xvar, hjust = -0.1,
-                        vjust = 1.4, fontface = "bold", colour = "#0a3d62",
+                        vjust = 1.4, fontface = "bold", colour = depictr_brand(),
                         size = 3.2) +
       base +
       ggplot2::theme(axis.text.y = ggplot2::element_blank(),
@@ -124,7 +130,7 @@ pairs_panel <- function(d, xvar, yvar, i, j, k, group, pal, point_alpha) {
     # Lower triangle: scatter
     p <- ggplot2::ggplot(d, ggplot2::aes(x = .data[[xvar]], y = .data[[yvar]]))
     if (is.null(group)) {
-      p <- p + ggplot2::geom_point(alpha = point_alpha, colour = "#005b96",
+      p <- p + ggplot2::geom_point(alpha = point_alpha, colour = depictr_brand(),
                                    size = 0.9, na.rm = TRUE)
     } else {
       p <- p + ggplot2::geom_point(
@@ -137,16 +143,18 @@ pairs_panel <- function(d, xvar, yvar, i, j, k, group, pal, point_alpha) {
 
   # Upper triangle: correlation coefficient(s), no clipping
   if (is.null(group)) {
-    r <- stats::cor(d[[xvar]], d[[yvar]], use = "pairwise.complete.obs")
+    r <- stats::cor(d[[xvar]], d[[yvar]], use = "pairwise.complete.obs",
+                    method = method)
     lab <- data.frame(x = 0.5, y = 0.5,
                       label = paste0("r = ", formatC(r, format = "f", digits = 2)))
     p <- ggplot2::ggplot(lab, ggplot2::aes(x = .data$x, y = .data$y)) +
       ggplot2::geom_text(ggplot2::aes(label = .data$label),
-                         size = 3.6, colour = "#0a3d62")
+                         size = 3.6, colour = depictr_brand())
   } else {
     grp <- d[[group]]
     parts <- tapply(seq_len(nrow(d)), grp, function(idx) {
-      stats::cor(d[[xvar]][idx], d[[yvar]][idx], use = "pairwise.complete.obs")
+      stats::cor(d[[xvar]][idx], d[[yvar]][idx], use = "pairwise.complete.obs",
+                 method = method)
     })
     lab <- data.frame(
       x = 0.5,

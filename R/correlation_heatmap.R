@@ -14,7 +14,9 @@
 #' @param show_values Whether to annotate each cell with its correlation.
 #' @param digits Number of decimal places for the annotations.
 #' @param palette Length-3 vector of colours for the lowest, mid (zero) and
-#'   highest correlations.
+#'   highest correlations. Defaults to the endpoints and midpoint of the
+#'   colourblind-aware [depictr_palette()] diverging ramp (negative
+#'   correlations red, zero neutral, positive correlations brand blue).
 #' @param title Plot title.
 #'
 #' @details Columns with (near-)zero variance cannot be correlated and are
@@ -32,7 +34,8 @@
 correlation_heatmap <- function(data, cols = NULL, method = "pearson",
                                     use = "pairwise.complete.obs",
                                     show_values = TRUE, digits = 2,
-                                    palette = c("#b2182b", "white", "#005b96"),
+                                    palette = depictr_palette(
+                                      5, "diverging")[c(1, 3, 5)],
                                     title = NULL) {
   if (!is.data.frame(data)) stop("`data` must be a data frame.", call. = FALSE)
   if (is.null(cols)) {
