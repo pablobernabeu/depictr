@@ -12,7 +12,7 @@
 #'   or a two-level factor with the positive class second).
 #' @param score When `x` is an outcome vector, the matching scores or predicted
 #'   probabilities.
-#' @param colour Curve colour.
+#' @param colour Curve colour. Defaults to the depictr brand blue.
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -21,7 +21,7 @@
 #' gfit <- glm(accuracy ~ word_frequency + RT + condition,
 #'             data = lexical_decision, family = binomial)
 #' gain_plot(gfit)
-gain_plot <- function(x, score = NULL, colour = "#005b96", title = NULL) {
+gain_plot <- function(x, score = NULL, colour = depictr_brand(), title = NULL) {
   io <- binary_inputs(x, score)
   g <- gain_table(io$actual, io$score)
   prevalence <- mean(io$actual == 1)
@@ -32,8 +32,9 @@ gain_plot <- function(x, score = NULL, colour = "#005b96", title = NULL) {
 
   ggplot2::ggplot(g, ggplot2::aes(x = .data$population, y = .data$captured)) +
     ggplot2::geom_abline(slope = 1, intercept = 0, linetype = 2,
-                         colour = "grey60") +
-    ggplot2::geom_line(data = perfect, colour = "grey75", linewidth = 0.5) +
+                         colour = depictr_reference()) +
+    ggplot2::geom_line(data = perfect, colour = depictr_reference(),
+                       linewidth = 0.5) +
     ggplot2::geom_line(colour = colour, linewidth = 0.9) +
     ggplot2::scale_x_continuous(labels = scales::percent_format(accuracy = 1)) +
     ggplot2::scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
@@ -58,14 +59,15 @@ gain_plot <- function(x, score = NULL, colour = "#005b96", title = NULL) {
 #' gfit <- glm(accuracy ~ word_frequency + RT + condition,
 #'             data = lexical_decision, family = binomial)
 #' lift_plot(gfit)
-lift_plot <- function(x, score = NULL, colour = "#005b96", title = NULL) {
+lift_plot <- function(x, score = NULL, colour = depictr_brand(), title = NULL) {
   io <- binary_inputs(x, score)
   g <- gain_table(io$actual, io$score)
   g <- g[g$population > 0, , drop = FALSE]
   g$lift <- g$captured / g$population
 
   ggplot2::ggplot(g, ggplot2::aes(x = .data$population, y = .data$lift)) +
-    ggplot2::geom_hline(yintercept = 1, linetype = 2, colour = "grey60") +
+    ggplot2::geom_hline(yintercept = 1, linetype = 2,
+                        colour = depictr_reference()) +
     ggplot2::geom_line(colour = colour, linewidth = 0.9) +
     ggplot2::scale_x_continuous(labels = scales::percent_format(accuracy = 1)) +
     ggplot2::expand_limits(y = 1) +
