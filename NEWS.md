@@ -103,7 +103,7 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
 * `seasonal_plot(style = "season")` reverses its sequential legend so the
   darkest, most-recent cycle sits at the top, matching the plotted order.
 * Factor coefficient names are prettified by default -- `conditionunrelated`
-  becomes `condition: unrelated` -- in `coefficient_plot()`, `compare_models()`
+  becomes `unrelated` -- in `coefficient_plot()`, `compare_models()`
   and `frequentist_bayesian_plot()` (read from the model); `optimizer_fixef_plot()`
   and `posterior_plot()` gain a `labels` argument for the same. Any user-supplied
   `labels` take precedence.

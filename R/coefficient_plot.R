@@ -92,7 +92,7 @@ coefficient_plot <- function(x,
   x_lab <- x_lab %||% if (standardise) "Standardised estimate" else "Estimate"
 
   # Prettify factor coefficient names by default (e.g. "conditionunrelated" ->
-  # "condition: unrelated"); any user-supplied `labels` take precedence.
+  # "unrelated"); any user-supplied `labels` take precedence.
   labels <- merge_pretty_labels(labels, pretty_coef_map(x))
 
   if (!intercept) {
@@ -142,14 +142,15 @@ coefficient_plot <- function(x,
 
 # ---- internal helpers ------------------------------------------------------
 
-#' Build a raw-name -> "variable: level" map for a model's factor coefficients
+#' Build a raw-name -> level-name map for a model's factor coefficients
 #'
 #' Turns the design-matrix names that R produces for factor levels (e.g.
-#' `conditionunrelated`) into readable labels (`condition: unrelated`) by
-#' matching each coefficient column to its model term and stripping the term
-#' prefix to recover the level. Continuous terms (column == term) and
-#' interactions are left for [format_terms()]. Returns a named character vector,
-#' or `NULL` when `x` is not a supported fitted model.
+#' `conditionunrelated`) into the bare level name (`unrelated`) by matching each
+#' coefficient column to its model term and stripping the term prefix. The
+#' baseline level is the model's implicit reference, so it is not named.
+#' Continuous terms (column == term) and interactions are left for
+#' [format_terms()]. Returns a named character vector, or `NULL` when `x` is not
+#' a supported fitted model.
 #' @noRd
 pretty_coef_map <- function(x) {
   if (!inherits(x, c("lm", "glm", "merMod", "lmerMod", "glmerMod",
@@ -168,10 +169,11 @@ pretty_coef_map <- function(x) {
     if (a < 1 || a > length(tl)) next                 # intercept / unknown
     term <- tl[a]
     col <- cols[i]
-    # A single-variable factor level reads "<term><level>"; show "term: level".
+    # A single-variable factor level reads "<term><level>"; show just the level
+    # (the reference level is the implicit baseline, so it is not named).
     if (!grepl(":", term, fixed = TRUE) &&
         startsWith(col, term) && nchar(col) > nchar(term)) {
-      out[col] <- paste0(term, ": ", substring(col, nchar(term) + 1L))
+      out[col] <- substring(col, nchar(term) + 1L)
     }
   }
   if (length(out)) out else NULL

@@ -34,7 +34,7 @@ intercept is always kept when \code{intercept = TRUE}).}
 \item{labels}{Optional named character vector renaming the term panels, e.g.
 \code{c(conditionunrelated = "Unrelated priming")}. When \code{x} is a raw
 \code{\link[lme4:allFit]{lme4::allFit()}} object, factor levels are prettified automatically (e.g.
-\code{conditionunrelated} to \code{condition: unrelated}) and these labels override
+\code{conditionunrelated} to \code{unrelated}) and these labels override
 that default.}
 
 \item{number_optimizers}{Whether to prefix each optimiser name with a

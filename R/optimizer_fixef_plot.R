@@ -22,7 +22,7 @@
 #' @param labels Optional named character vector renaming the term panels, e.g.
 #'   `c(conditionunrelated = "Unrelated priming")`. When `x` is a raw
 #'   [lme4::allFit()] object, factor levels are prettified automatically (e.g.
-#'   `conditionunrelated` to `condition: unrelated`) and these labels override
+#'   `conditionunrelated` to `unrelated`) and these labels override
 #'   that default.
 #' @param number_optimizers Whether to prefix each optimiser name with a
 #'   number, so that the legend doubles as an index.

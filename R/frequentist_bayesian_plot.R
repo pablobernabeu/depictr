@@ -93,7 +93,7 @@ frequentist_bayesian_plot <- function(frequentist,
   bayes_label <- "Bayesian analysis"
 
   # Prettify factor coefficient names by default from the frequentist model
-  # (e.g. "conditionunrelated" -> "condition: unrelated"); the same map applies
+  # (e.g. "conditionunrelated" -> "unrelated"); the same map applies
   # to the frequentist estimates and the b_-stripped Bayesian draw names, and
   # any user-supplied `labels` take precedence.
   labels <- merge_pretty_labels(labels, pretty_coef_map(frequentist))

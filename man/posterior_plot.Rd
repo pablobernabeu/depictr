@@ -43,7 +43,7 @@ outer width is used for the caption and the displayed interval mass.}
 \item{interaction}{Passed to \code{\link[=format_terms]{format_terms()}} for the parameter labels.}
 
 \item{labels}{Optional named character vector renaming parameters, e.g.
-\code{c(conditionunrelated = "condition: unrelated")}. Unmatched parameters fall
+\code{c(conditionunrelated = "unrelated")}. Unmatched parameters fall
 back to \code{\link[=format_terms]{format_terms()}}.}
 
 \item{reference_line}{Position of a vertical reference line, or \code{NULL}/\code{NA}

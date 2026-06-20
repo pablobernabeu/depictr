@@ -72,8 +72,12 @@ model_report <- function(model, predictor = NULL, standardise = TRUE,
     }
   }
 
+  # Free each panel's left axis title from cross-panel alignment so it sits next
+  # to its own axis, rather than being pushed out to match a neighbour with
+  # wider axis text (which leaves a gap between the title and the plot area).
+  freel <- function(p) patchwork::free(p, type = "label", side = "l")
   arrange_plots(
-    p_coef, p_eff, p_rf, p_qq,
+    freel(p_coef), freel(p_eff), freel(p_rf), freel(p_qq),
     ncol = 2,
     title = title %||% "Model report",
     subtitle = subtitle,
