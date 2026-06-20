@@ -214,20 +214,24 @@ estimation_plot <- function(data, y, group, reference = NULL,
   # is what makes this an estimation plot rather than a plain mean-difference
   # plot, and keeps it distinct from group_comparison_plot().
   if (effsize != "none") {
-    es_lab <- switch(effsize,
-                     hedges_g = "Hedges' g",
-                     cohens_d = "Cohen's d")
+    es_prefix <- switch(effsize, hedges_g = "Hedges' ", cohens_d = "Cohen's ")
+    es_letter <- switch(effsize, hedges_g = "g", cohens_d = "d")
     # Build the label data on a copy so the public "differences" attribute keeps
     # its documented columns (no extra helper columns leak out).
     lab_df <- diffs[is.finite(diffs[[effsize]]), , drop = FALSE]
     if (nrow(lab_df)) {
-      lab_df$es_label <- sprintf("%s = %.2f", es_lab, lab_df[[effsize]])
+      # plotmath label (parse = TRUE) so the effect-size letter is italic.
+      lab_df$es_label <- sprintf('"%s"*italic(%s)*" = %s"', es_prefix,
+                                 es_letter,
+                                 formatC(lab_df[[effsize]], format = "f",
+                                         digits = 2))
       lab_df$lab_y <- ifelse(is.finite(lab_df$upper), lab_df$upper, lab_df$diff)
       bottom <- bottom +
         ggplot2::geom_text(
           data = lab_df,
           ggplot2::aes(x = .data$group, y = .data$lab_y,
                        label = .data$es_label),
+          parse = TRUE,
           inherit.aes = FALSE, vjust = -0.9, colour = "grey25", size = 3
         ) +
         ggplot2::scale_y_continuous(

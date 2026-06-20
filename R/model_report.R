@@ -12,7 +12,7 @@
 #' @param model A fitted `lm` or `glm` model.
 #' @param predictor Focal predictor for the effect panel. If `NULL`, the first
 #'   numeric predictor (or, failing that, the first predictor) is used.
-#' @param standardize Whether the coefficient panel shows standardised
+#' @param standardise Whether the coefficient panel shows standardised
 #'   coefficients (each scaled by its predictor's standard deviation). Defaults
 #'   to `TRUE`, which keeps the panel readable in this compact overview by
 #'   putting predictors on a common scale; set `FALSE` for raw estimates.
@@ -23,14 +23,14 @@
 #' @return A 'patchwork' object (printable like a [ggplot2::ggplot]).
 #' @export
 #' @examples
-#' fit <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment,
+#' fit <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment,
 #'           data = crop_yield)
 #' model_report(fit, title = "Crop-yield model")
 #'
 #' gfit <- glm(accuracy ~ word_frequency + RT + condition,
 #'             data = lexical_decision, family = binomial)
 #' model_report(gfit)
-model_report <- function(model, predictor = NULL, standardize = TRUE,
+model_report <- function(model, predictor = NULL, standardise = TRUE,
                          title = NULL, subtitle = NULL) {
   if (!inherits(model, "lm")) {
     stop("`model` must be an 'lm' or 'glm' object.", call. = FALSE)
@@ -44,8 +44,8 @@ model_report <- function(model, predictor = NULL, standardize = TRUE,
   }
 
   p_coef <- coefficient_plot(
-    model, standardize = standardize,
-    title = if (standardize) "Coefficients (standardised)" else "Coefficients"
+    model, standardise = standardise,
+    title = if (standardise) "Coefficients (standardised)" else "Coefficients"
   )
   p_eff <- effects_plot(model, predictor,
                         title = paste("Effect of", predictor))
@@ -59,9 +59,17 @@ model_report <- function(model, predictor = NULL, standardize = TRUE,
     n <- tryCatch(stats::nobs(model), error = function(e) NA_integer_)
     r2 <- fit_r2(model)
     aic <- tryCatch(stats::AIC(model), error = function(e) NA_real_)
-    r2_lab <- if (inherits(model, "glm")) "pseudo-R\u00b2" else "R\u00b2"
-    subtitle <- sprintf("n = %s   |   %s = %.3f   |   AIC = %.1f",
-                        n, r2_lab, r2, aic)
+    nc <- as.character(n)
+    r2f <- formatC(r2, digits = 3, format = "f")
+    aicf <- formatC(aic, digits = 1, format = "f")
+    # A plotmath subtitle so the statistical letters n and R are italic.
+    subtitle <- if (inherits(model, "glm")) {
+      bquote(italic(n) * " = " * .(nc) * "    |    pseudo-" * italic(R)^2 *
+               " = " * .(r2f) * "    |    AIC = " * .(aicf))
+    } else {
+      bquote(italic(n) * " = " * .(nc) * "    |    " * italic(R)^2 *
+               " = " * .(r2f) * "    |    AIC = " * .(aicf))
+    }
   }
 
   arrange_plots(

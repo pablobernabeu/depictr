@@ -1,21 +1,21 @@
 test_that("pca_plot() works from data frames and prcomp objects", {
   expect_s3_class(
-    pca_plot(crop_yield, cols = c("rainfall", "fertilizer", "yield")),
+    pca_plot(crop_yield, cols = c("rainfall", "fertiliser", "yield")),
     "ggplot"
   )
   expect_s3_class(
-    pca_plot(crop_yield, cols = c("rainfall", "fertilizer", "yield"),
+    pca_plot(crop_yield, cols = c("rainfall", "fertiliser", "yield"),
              group = "treatment"),
     "ggplot"
   )
-  pc <- prcomp(crop_yield[c("rainfall", "fertilizer", "yield")], scale. = TRUE)
+  pc <- prcomp(crop_yield[c("rainfall", "fertiliser", "yield")], scale. = TRUE)
   expect_s3_class(pca_plot(pc), "ggplot")
   expect_error(pca_plot(crop_yield, cols = "yield"), "at least two")
 })
 
 test_that("scree_plot() returns a ggplot", {
   expect_s3_class(
-    scree_plot(crop_yield, cols = c("rainfall", "fertilizer", "soil_ph",
+    scree_plot(crop_yield, cols = c("rainfall", "fertiliser", "soil_ph",
                                     "yield")),
     "ggplot"
   )
@@ -49,7 +49,7 @@ test_that("survival_plot() accepts vectors, data frames and groups", {
 })
 
 test_that("vif_plot() and pr_curve_plot() work", {
-  fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
   expect_s3_class(vif_plot(fit), "ggplot")
   expect_error(vif_plot(lm(yield ~ rainfall, data = crop_yield)),
                "at least two")

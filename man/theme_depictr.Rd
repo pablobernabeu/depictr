@@ -36,7 +36,7 @@ turn honours \code{options(depictr.brand = )}.
 }
 \examples{
 library(ggplot2)
-ggplot(crop_yield, aes(fertilizer, yield)) +
+ggplot(crop_yield, aes(fertiliser, yield)) +
   geom_point() +
   theme_depictr()
 }

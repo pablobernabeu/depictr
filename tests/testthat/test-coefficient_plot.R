@@ -1,5 +1,5 @@
 test_that("coefficient_plot() returns a ggplot and drops the intercept by default", {
-  fit <- lm(yield ~ rainfall + fertilizer + treatment, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
   p <- coefficient_plot(fit)
   expect_s3_class(p, "ggplot")
   expect_false(any(grepl("Intercept", as.character(p$data$label))))
@@ -9,15 +9,15 @@ test_that("coefficient_plot() returns a ggplot and drops the intercept by defaul
 })
 
 test_that("coefficient_plot() orders terms by estimate", {
-  fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
   p <- coefficient_plot(fit, order = "ascending")
   est <- p$data$estimate
   expect_equal(est, sort(est))
 })
 
 test_that("coefficient_plot() accepts custom and named labels", {
-  fit <- lm(yield ~ rainfall + fertilizer, data = crop_yield)
-  p <- coefficient_plot(fit, labels = c(rainfall = "Rainfall", fertilizer = "Fert."))
+  fit <- lm(yield ~ rainfall + fertiliser, data = crop_yield)
+  p <- coefficient_plot(fit, labels = c(rainfall = "Rainfall", fertiliser = "Fert."))
   expect_true(all(c("Rainfall", "Fert.") %in% as.character(p$data$label)))
   expect_error(coefficient_plot(fit, labels = "only-one"), "length")
 })
@@ -28,8 +28,8 @@ test_that("compare_models() needs at least two sources", {
 })
 
 test_that("compare_models() combines sources", {
-  m1 <- lm(yield ~ rainfall + fertilizer, data = crop_yield)
-  m2 <- lm(yield ~ rainfall + fertilizer,
+  m1 <- lm(yield ~ rainfall + fertiliser, data = crop_yield)
+  m2 <- lm(yield ~ rainfall + fertiliser,
            data = crop_yield[crop_yield$treatment == "standard", ])
   p <- compare_models(A = m1, B = m2)
   expect_s3_class(p, "ggplot")

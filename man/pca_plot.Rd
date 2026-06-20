@@ -48,6 +48,6 @@ observations projected onto two components, with the variable loadings shown
 as arrows. Optionally colour the observations by a grouping variable.
 }
 \examples{
-pca_plot(crop_yield, cols = c("rainfall", "fertilizer", "soil_ph", "yield"),
+pca_plot(crop_yield, cols = c("rainfall", "fertiliser", "soil_ph", "yield"),
          group = "treatment")
 }

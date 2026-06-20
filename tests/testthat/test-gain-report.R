@@ -17,7 +17,7 @@ test_that("gain_table() captures all positives at full depth", {
 })
 
 test_that("model_report() returns a patchwork for lm and glm", {
-  fit <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment,
+  fit <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment,
             data = crop_yield)
   expect_s3_class(model_report(fit), "patchwork")
   expect_s3_class(model_report(fit, predictor = "rainfall"), "patchwork")

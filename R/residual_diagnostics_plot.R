@@ -37,7 +37,7 @@
 #' \insertRef{dunn1996}{depictr}
 #' @export
 #' @examples
-#' fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+#' fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
 #' residual_diagnostics_plot(fit)
 #' residual_diagnostics_plot(fit, which = c("resid_fitted", "qq"))
 #'

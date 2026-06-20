@@ -76,8 +76,8 @@
 #' regression, coefficient-plot, scatter-trend and interaction examples. The
 #' data-generating process contains a genuine fertiliser-by-treatment
 #' interaction: fertiliser raises yield far more under the `enhanced` treatment
-#' than under `standard`, so `interaction_plot(lm(yield ~ fertilizer *
-#' treatment + ..., crop_yield), "fertilizer", "treatment")` shows real,
+#' than under `standard`, so `interaction_plot(lm(yield ~ fertiliser *
+#' treatment + ..., crop_yield), "fertiliser", "treatment")` shows real,
 #' diverging slopes rather than noise. The main effects (rainfall, fertiliser,
 #' soil pH and treatment) are retained.
 #'
@@ -89,7 +89,7 @@
 #'   \item{field}{Field identifier.}
 #'   \item{treatment}{Management treatment (factor): `standard` or `enhanced`.}
 #'   \item{rainfall}{Seasonal rainfall, in millimetres.}
-#'   \item{fertilizer}{Fertiliser applied, in kilograms per hectare.}
+#'   \item{fertiliser}{Fertiliser applied, in kilograms per hectare.}
 #'   \item{soil_ph}{Soil pH.}
 #'   \item{yield}{Crop yield, in tonnes per hectare.}
 #' }

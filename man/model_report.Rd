@@ -7,7 +7,7 @@
 model_report(
   model,
   predictor = NULL,
-  standardize = TRUE,
+  standardise = TRUE,
   title = NULL,
   subtitle = NULL
 )
@@ -18,7 +18,7 @@ model_report(
 \item{predictor}{Focal predictor for the effect panel. If \code{NULL}, the first
 numeric predictor (or, failing that, the first predictor) is used.}
 
-\item{standardize}{Whether the coefficient panel shows standardised
+\item{standardise}{Whether the coefficient panel shows standardised
 coefficients (each scaled by its predictor's standard deviation). Defaults
 to \code{TRUE}, which keeps the panel readable in this compact overview by
 putting predictors on a common scale; set \code{FALSE} for raw estimates.}
@@ -40,7 +40,7 @@ plots with \code{\link[=arrange_plots]{arrange_plots()}}, and serves well for a 
 report appendix.
 }
 \examples{
-fit <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment,
+fit <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment,
           data = crop_yield)
 model_report(fit, title = "Crop-yield model")
 

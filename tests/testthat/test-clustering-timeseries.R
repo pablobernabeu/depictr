@@ -1,8 +1,8 @@
 test_that("cluster_plot() runs k-means and accepts supplied clusters", {
-  cols <- c("rainfall", "fertilizer", "soil_ph", "yield")
+  cols <- c("rainfall", "fertiliser", "soil_ph", "yield")
   expect_s3_class(cluster_plot(crop_yield, cols = cols, k = 3), "ggplot")
   expect_s3_class(
-    cluster_plot(crop_yield, cols = c("fertilizer", "yield"), k = 2,
+    cluster_plot(crop_yield, cols = c("fertiliser", "yield"), k = 2,
                  hulls = FALSE),
     "ggplot"
   )

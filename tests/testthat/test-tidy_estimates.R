@@ -1,5 +1,5 @@
 test_that("tidy_estimates() works on lm and glm", {
-  fit <- lm(yield ~ rainfall + fertilizer, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser, data = crop_yield)
   te <- tidy_estimates(fit)
   expect_s3_class(te, "data.frame")
   expect_named(te, c("term", "estimate", "std.error", "conf.low", "conf.high"))

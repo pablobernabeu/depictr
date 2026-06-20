@@ -1,5 +1,5 @@
 test_that("influence_plot() and qq_plot() return ggplots", {
-  fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
   expect_s3_class(influence_plot(fit), "ggplot")
   expect_s3_class(qq_plot(fit), "ggplot")
   expect_s3_class(qq_plot(rnorm(50)), "ggplot")

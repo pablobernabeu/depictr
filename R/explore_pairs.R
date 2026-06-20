@@ -22,9 +22,9 @@
 #' @return A 'patchwork' object (printable like a [ggplot2::ggplot]).
 #' @export
 #' @examples
-#' explore_pairs(crop_yield, cols = c("rainfall", "fertilizer", "yield"))
+#' explore_pairs(crop_yield, cols = c("rainfall", "fertiliser", "yield"))
 #' \donttest{
-#' explore_pairs(crop_yield, cols = c("rainfall", "fertilizer", "yield"),
+#' explore_pairs(crop_yield, cols = c("rainfall", "fertiliser", "yield"),
 #'               group = treatment, method = "spearman")
 #' }
 explore_pairs <- function(data, cols = NULL, group = NULL, max_cols = 8,

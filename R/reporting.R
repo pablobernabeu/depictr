@@ -117,7 +117,7 @@ palette_preview <- function(n = 8, type = c("qualitative", "sequential",
 #' @export
 #' @examples
 #' p1 <- explore_distribution(crop_yield, yield)
-#' p2 <- scatter_trend(crop_yield, fertilizer, yield)
+#' p2 <- scatter_trend(crop_yield, fertiliser, yield)
 #' arrange_plots(p1, p2, ncol = 2, title = "Crop yield", tag_levels = "A")
 arrange_plots <- function(..., ncol = NULL, nrow = NULL,
                           guides = c("collect", "keep"),
@@ -160,7 +160,7 @@ arrange_plots <- function(..., ncol = NULL, nrow = NULL,
 #' @return The `filename`, invisibly.
 #' @export
 #' @examples
-#' p <- scatter_trend(crop_yield, fertilizer, yield)
+#' p <- scatter_trend(crop_yield, fertiliser, yield)
 #' tmp <- file.path(tempdir(), "yield.png")
 #' save_plot(tmp, p)
 save_plot <- function(filename, plot = ggplot2::last_plot(),

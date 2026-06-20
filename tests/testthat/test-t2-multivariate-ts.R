@@ -30,7 +30,7 @@ test_that("scree_plot uses brand bars and the accent for the cumulative overlay"
 })
 
 test_that("pca_plot draws brand points and accent loadings (single-group)", {
-  cols <- c("rainfall", "fertilizer", "soil_ph", "yield")
+  cols <- c("rainfall", "fertiliser", "soil_ph", "yield")
   p <- pca_plot(crop_yield, cols = cols)
   expect_no_warning(b <- ggplot2::ggplot_build(p))
 
@@ -42,7 +42,7 @@ test_that("pca_plot draws brand points and accent loadings (single-group)", {
 })
 
 test_that("pca_plot grouped colours come from the qualitative palette", {
-  cols <- c("rainfall", "fertilizer", "soil_ph", "yield")
+  cols <- c("rainfall", "fertiliser", "soil_ph", "yield")
   p <- pca_plot(crop_yield, cols = cols, group = "treatment")
   expect_no_warning(b <- ggplot2::ggplot_build(p))
   n <- nlevels(as.factor(crop_yield$treatment))
@@ -82,7 +82,7 @@ test_that("decompose_plot panels are exactly the four-colour palette", {
 ## ---- clustering -----------------------------------------------------------
 
 test_that("cluster_plot routes colour and fill through the depictr palette", {
-  cols <- c("rainfall", "fertilizer", "soil_ph", "yield")
+  cols <- c("rainfall", "fertiliser", "soil_ph", "yield")
   p <- cluster_plot(crop_yield, cols = cols, k = 3, seed = 1)
   expect_no_warning(b <- ggplot2::ggplot_build(p))
   pal <- depictr_palette(3)
@@ -92,7 +92,7 @@ test_that("cluster_plot routes colour and fill through the depictr palette", {
 })
 
 test_that("cluster_plot honours a supplied palette through the canonical scale", {
-  cols <- c("rainfall", "fertilizer", "soil_ph", "yield")
+  cols <- c("rainfall", "fertiliser", "soil_ph", "yield")
   custom <- c("#111111", "#222222", "#333333")
   p <- cluster_plot(crop_yield, cols = cols, k = 3, seed = 1, palette = custom)
   expect_no_warning(b <- ggplot2::ggplot_build(p))

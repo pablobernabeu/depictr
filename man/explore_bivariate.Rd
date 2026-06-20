@@ -39,7 +39,7 @@ numeric variable by level; and two categorical variables as a filled bar
 chart of proportions.
 }
 \examples{
-explore_bivariate(crop_yield, fertilizer, yield)        # numeric ~ numeric
+explore_bivariate(crop_yield, fertiliser, yield)        # numeric ~ numeric
 explore_bivariate(lexical_decision, condition, RT)      # categorical ~ numeric
 explore_bivariate(wellbeing_survey, region, education)  # categorical ~ categorical
 }

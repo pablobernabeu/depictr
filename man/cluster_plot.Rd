@@ -76,10 +76,10 @@ labelled centroids. Projecting onto principal components means the plot works
 for any number of variables.
 }
 \examples{
-cluster_plot(crop_yield, cols = c("rainfall", "fertilizer", "soil_ph",
+cluster_plot(crop_yield, cols = c("rainfall", "fertiliser", "soil_ph",
                                   "yield"), k = 3, seed = 1)
 # Let a silhouette diagnostic choose k:
-cluster_plot(crop_yield, cols = c("rainfall", "fertilizer", "soil_ph",
+cluster_plot(crop_yield, cols = c("rainfall", "fertiliser", "soil_ph",
                                   "yield"), suggest_k = TRUE, k_range = 2:6,
              seed = 1)
 }

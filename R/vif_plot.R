@@ -39,11 +39,11 @@
 #' \emph{Journal of the American Statistical Association}, 87, 178-183.
 #' @export
 #' @examples
-#' fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+#' fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
 #' vif_plot(fit)
 #'
 #' # Multi-level factors get a single generalised VIF per term
-#' fit2 <- lm(yield ~ rainfall + fertilizer + treatment, data = crop_yield)
+#' fit2 <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
 #' vif_plot(fit2)
 vif_plot <- function(model, threshold = 5,
                      palette = depictr_palette(2), title = NULL) {

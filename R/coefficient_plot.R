@@ -33,19 +33,19 @@
 #' @param scales Either `"fixed"` (the default, a single shared x-axis) or
 #'   `"free"` (one free-scaled panel per term). When `facet = TRUE` this is
 #'   forced to `"free"`.
-#' @param standardize Whether to standardise the coefficients by multiplying
+#' @param standardise Whether to standardise the coefficients by multiplying
 #'   each by the standard deviation of its predictor column, putting them on a
 #'   common scale so their magnitudes are comparable (and removing the empty
 #'   band that otherwise appears when predictors are on very different scales).
 #'   Requires a fitted model (ignored, with a warning, for a tidy data frame).
 #'   Defaults to `FALSE`.
 #' @param title,subtitle,x_lab Plot title, subtitle and x-axis label. `x_lab`
-#'   defaults to "Estimate", or "Standardised estimate" when `standardize`.
+#'   defaults to "Estimate", or "Standardised estimate" when `standardise`.
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export
 #' @examples
-#' fit <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment,
+#' fit <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment,
 #'           data = crop_yield)
 #' coefficient_plot(fit)
 #'
@@ -57,7 +57,7 @@
 #' coefficient_plot(fit, intercept = TRUE, facet = TRUE)
 #'
 #' # Or put the coefficients on a common, comparable scale:
-#' coefficient_plot(fit, standardize = TRUE)
+#' coefficient_plot(fit, standardise = TRUE)
 coefficient_plot <- function(x,
                       conf_level = 0.95,
                       intercept = FALSE,
@@ -71,7 +71,7 @@ coefficient_plot <- function(x,
                       line_size = 0.7,
                       facet = FALSE,
                       scales = c("fixed", "free"),
-                      standardize = FALSE,
+                      standardise = FALSE,
                       title = NULL,
                       subtitle = NULL,
                       x_lab = NULL) {
@@ -86,10 +86,10 @@ coefficient_plot <- function(x,
   # multiplying it (and its interval) by the standard deviation of its
   # predictor column. This removes the dead band that appears when, say, a
   # per-mm rainfall slope sits next to a per-category treatment effect.
-  if (standardize) {
+  if (standardise) {
     est <- standardise_estimates(est, x)
   }
-  x_lab <- x_lab %||% if (standardize) "Standardised estimate" else "Estimate"
+  x_lab <- x_lab %||% if (standardise) "Standardised estimate" else "Estimate"
 
   # Prettify factor coefficient names by default (e.g. "conditionunrelated" ->
   # "condition: unrelated"); any user-supplied `labels` take precedence.
@@ -196,13 +196,13 @@ merge_pretty_labels <- function(user, auto) {
 #' @noRd
 standardise_estimates <- function(est, x) {
   if (inherits(x, "data.frame")) {
-    warning("`standardize` needs a fitted model, not a data frame; ignoring it.",
+    warning("`standardise` needs a fitted model, not a data frame; ignoring it.",
             call. = FALSE)
     return(est)
   }
   mm <- tryCatch(stats::model.matrix(x), error = function(e) NULL)
   if (is.null(mm)) {
-    warning("Could not obtain the model matrix; `standardize` ignored.",
+    warning("Could not obtain the model matrix; `standardise` ignored.",
             call. = FALSE)
     return(est)
   }

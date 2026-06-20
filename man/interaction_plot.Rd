@@ -47,6 +47,6 @@ response changes across the levels (or representative values) of a second,
 moderating predictor. Other predictors are held at typical values.
 }
 \examples{
-fit <- lm(yield ~ fertilizer * treatment + rainfall, data = crop_yield)
-interaction_plot(fit, "fertilizer", "treatment")
+fit <- lm(yield ~ fertiliser * treatment + rainfall, data = crop_yield)
+interaction_plot(fit, "fertiliser", "treatment")
 }

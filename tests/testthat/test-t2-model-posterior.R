@@ -72,9 +72,9 @@ test_that("power_curve_plot() uses brand blue for the curve and a neutral target
 test_that("effects_plot() defaults to brand blue for both factor and numeric predictors", {
   expect_identical(eval(formals(effects_plot)$colour), depictr_brand())
 
-  fit <- lm(yield ~ rainfall + fertilizer + treatment, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
 
-  pn <- effects_plot(fit, "fertilizer")        # numeric -> ribbon + line
+  pn <- effects_plot(fit, "fertiliser")        # numeric -> ribbon + line
   expect_no_warning(bn <- ggplot2::ggplot_build(pn))
   line_n <- bn$data[[2]]
   expect_identical(unique(line_n$colour), depictr_brand())
@@ -85,8 +85,8 @@ test_that("effects_plot() defaults to brand blue for both factor and numeric pre
 })
 
 test_that("interaction_plot() encodes the moderator via the canonical depictr palette", {
-  fit <- lm(yield ~ fertilizer * treatment + rainfall, data = crop_yield)
-  p <- interaction_plot(fit, "fertilizer", "treatment")
+  fit <- lm(yield ~ fertiliser * treatment + rainfall, data = crop_yield)
+  p <- interaction_plot(fit, "fertiliser", "treatment")
   expect_no_warning(b <- ggplot2::ggplot_build(p))
 
   # Two moderator levels -> first two palette colours, drawn from depictr_palette.
@@ -97,7 +97,7 @@ test_that("interaction_plot() encodes the moderator via the canonical depictr pa
   # An explicit palette override is still honoured (the canonical scale slices
   # the supplied vector rather than ignoring it).
   greens <- c("#111111", "#222222")
-  p2 <- interaction_plot(fit, "fertilizer", "treatment", palette = greens)
+  p2 <- interaction_plot(fit, "fertiliser", "treatment", palette = greens)
   b2 <- ggplot2::ggplot_build(p2)
   expect_setequal(sort(unique(b2$data[[2]]$colour)), sort(greens))
 })

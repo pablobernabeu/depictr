@@ -57,7 +57,7 @@ before. Set \code{glm_panels = FALSE} to force the classic \code{lm}-style panel
 \code{glm} as well.
 }
 \examples{
-fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
 residual_diagnostics_plot(fit)
 residual_diagnostics_plot(fit, which = c("resid_fitted", "qq"))
 

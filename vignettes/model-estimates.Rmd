@@ -66,12 +66,12 @@ coefficient_plot(
 
 Factor levels are given readable labels automatically (`conditionunrelated`
 becomes `condition: unrelated`); pass `labels` to override any of them. The
-slopes also sit on quite different scales, so `standardize = TRUE` rescales each
+slopes also sit on quite different scales, so `standardise = TRUE` rescales each
 coefficient by its predictor's standard deviation, putting them on one
 comparable axis:
 
 ```{r coef-std, eval = has_lmer}
-coefficient_plot(fit, standardize = TRUE, order = "ascending",
+coefficient_plot(fit, standardise = TRUE, order = "ascending",
                  title = "Standardised predictors of RT")
 ```
 
@@ -121,8 +121,8 @@ fertiliser-by-treatment effect: fertiliser raises yield far more under the
 `enhanced` treatment than under `standard`, so the slopes diverge.
 
 ```{r interaction}
-crop_fit <- lm(yield ~ fertilizer * treatment + rainfall, data = crop_yield)
-interaction_plot(crop_fit, "fertilizer", "treatment",
+crop_fit <- lm(yield ~ fertiliser * treatment + rainfall, data = crop_yield)
+interaction_plot(crop_fit, "fertiliser", "treatment",
                  title = "Fertiliser x treatment interaction")
 ```
 
@@ -233,7 +233,7 @@ subtitle) into a single figure for a rapid review or a report appendix. It works
 on `lm`/`glm` models; here we use the crop-yield model.
 
 ```{r report, fig.width = 9, fig.height = 7}
-full <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment,
+full <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment,
            data = crop_yield)
 model_report(full, title = "Crop-yield model")
 ```

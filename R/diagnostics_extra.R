@@ -19,7 +19,7 @@
 #' \insertRef{cook1977}{depictr}
 #' @export
 #' @examples
-#' fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+#' fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
 #' influence_plot(fit)
 influence_plot <- function(model, n_label = 3, colour = depictr_brand(),
                            title = NULL) {
@@ -90,7 +90,7 @@ influence_plot <- function(model, n_label = 3, colour = depictr_brand(),
 #' @examples
 #' qq_plot(rnorm(100))
 #' qq_plot(rt(100, df = 3), band_type = "simulate")
-#' fit <- lm(yield ~ rainfall + fertilizer, data = crop_yield)
+#' fit <- lm(yield ~ rainfall + fertiliser, data = crop_yield)
 #' qq_plot(fit)
 qq_plot <- function(x, colour = depictr_brand(), title = NULL,
                     x_lab = "Theoretical quantiles",

@@ -47,11 +47,11 @@ data: when every bar is comfortably below the threshold the line is reported
 in the caption rather than drawn into a wide empty band.
 }
 \examples{
-fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
 vif_plot(fit)
 
 # Multi-level factors get a single generalised VIF per term
-fit2 <- lm(yield ~ rainfall + fertilizer + treatment, data = crop_yield)
+fit2 <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
 vif_plot(fit2)
 }
 \references{

@@ -51,8 +51,8 @@ design matrix and \code{vcov()}. Works with \code{lm}, \code{glm} and \code{merM
 classes are attempted on a best-effort basis.
 }
 \examples{
-fit <- lm(yield ~ rainfall + fertilizer + treatment, data = crop_yield)
-effects_plot(fit, "fertilizer")
+fit <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
+effects_plot(fit, "fertiliser")
 effects_plot(fit, "treatment")
 
 gfit <- glm(accuracy ~ word_frequency + condition,

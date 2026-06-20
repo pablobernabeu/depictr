@@ -52,10 +52,10 @@ package is installed, and otherwise with an equivalent base-R implementation,
 so the function works with no extra dependency.
 }
 \examples{
-cl <- kmeans(scale(crop_yield[c("rainfall", "fertilizer", "soil_ph",
+cl <- kmeans(scale(crop_yield[c("rainfall", "fertiliser", "soil_ph",
                                 "yield")]), 3)$cluster
 silhouette_plot(crop_yield, cl,
-                cols = c("rainfall", "fertilizer", "soil_ph", "yield"))
+                cols = c("rainfall", "fertiliser", "soil_ph", "yield"))
 }
 \references{
 Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the interpretation

@@ -10,7 +10,7 @@ test_that("explore_categorical() handles counts, proportions and groups", {
 })
 
 test_that("explore_bivariate() dispatches on variable types", {
-  expect_s3_class(explore_bivariate(crop_yield, fertilizer, yield), "ggplot")
+  expect_s3_class(explore_bivariate(crop_yield, fertiliser, yield), "ggplot")
   expect_s3_class(explore_bivariate(lexical_decision, condition, RT), "ggplot")
   expect_s3_class(explore_bivariate(wellbeing_survey, region, education),
                   "ggplot")
@@ -18,13 +18,13 @@ test_that("explore_bivariate() dispatches on variable types", {
 
 test_that("explore_pairs() needs numeric columns and respects max_cols", {
   expect_s3_class(
-    explore_pairs(crop_yield, cols = c("rainfall", "fertilizer", "yield")),
+    explore_pairs(crop_yield, cols = c("rainfall", "fertiliser", "yield")),
     "patchwork"
   )
   expect_error(explore_pairs(crop_yield, cols = c("yield", "treatment")),
                "numeric")
   expect_error(
-    explore_pairs(crop_yield, cols = c("rainfall", "fertilizer", "yield"),
+    explore_pairs(crop_yield, cols = c("rainfall", "fertiliser", "yield"),
                   max_cols = 2),
     "Too many"
   )

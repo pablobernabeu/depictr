@@ -37,7 +37,7 @@ figures in papers and reports: a moderate size, 300 dpi, and the output
 directory created if needed. The device is inferred from the file extension.
 }
 \examples{
-p <- scatter_trend(crop_yield, fertilizer, yield)
+p <- scatter_trend(crop_yield, fertiliser, yield)
 tmp <- file.path(tempdir(), "yield.png")
 save_plot(tmp, p)
 }

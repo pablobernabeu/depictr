@@ -72,7 +72,7 @@ be used without 'lme4'.
 set.seed(1)
 df <- expand.grid(
   optimizer = c("bobyqa", "Nelder_Mead", "nlminbwrap"),
-  term = c("(Intercept)", "rainfall", "fertilizer")
+  term = c("(Intercept)", "rainfall", "fertiliser")
 )
 df$value <- c(5, 5.01, 4.99, 0.3, 0.31, 0.29, -0.2, -0.18, -0.21)
 optimizer_fixef_plot(df)

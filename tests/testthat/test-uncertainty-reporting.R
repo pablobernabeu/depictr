@@ -11,14 +11,14 @@ test_that("posterior_plot() accepts wide and long draws", {
 
 test_that("palette_preview() and arrange_plots() return objects", {
   expect_s3_class(palette_preview(4), "ggplot")
-  p1 <- scatter_trend(crop_yield, fertilizer, yield)
+  p1 <- scatter_trend(crop_yield, fertiliser, yield)
   p2 <- explore_distribution(crop_yield, yield)
   expect_s3_class(arrange_plots(p1, p2, ncol = 2, title = "t"), "patchwork")
   expect_s3_class(arrange_plots(list(p1, p2)), "patchwork")
 })
 
 test_that("save_plot() writes a file", {
-  p <- scatter_trend(crop_yield, fertilizer, yield)
+  p <- scatter_trend(crop_yield, fertiliser, yield)
   f <- file.path(tempdir(), "depictr-test.png")
   if (file.exists(f)) unlink(f)
   save_plot(f, p, width = 4, height = 3)

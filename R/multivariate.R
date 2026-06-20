@@ -23,7 +23,7 @@
 #' @return A [ggplot2::ggplot] object.
 #' @export
 #' @examples
-#' pca_plot(crop_yield, cols = c("rainfall", "fertilizer", "soil_ph", "yield"),
+#' pca_plot(crop_yield, cols = c("rainfall", "fertiliser", "soil_ph", "yield"),
 #'          group = "treatment")
 pca_plot <- function(x, cols = NULL, group = NULL, components = c(1, 2),
                      scale = TRUE, loadings = TRUE, point_alpha = 0.7,
@@ -161,8 +161,14 @@ scree_plot <- function(x, cols = NULL, scale = TRUE, n = NULL, title = NULL) {
                         colour = depictr_accent(), size = 1.8) +
     ggplot2::scale_y_continuous(
       labels = scales::percent_format(accuracy = 1),
-      sec.axis = ggplot2::dup_axis(name = "Cumulative")
+      sec.axis = ggplot2::dup_axis(name = "Cumulative (line)")
     ) +
-    ggplot2::labs(x = NULL, y = "Variance explained", title = title) +
-    theme_depictr(grid = "y")
+    ggplot2::labs(x = NULL, y = "Variance explained (bars)", title = title) +
+    theme_depictr(grid = "y") +
+    # Colour each axis title to match its geom -- brand-blue bars on the left,
+    # accent cumulative line on the right -- so the dual axes are unambiguous.
+    ggplot2::theme(
+      axis.title.y.left = ggplot2::element_text(colour = depictr_brand()),
+      axis.title.y.right = ggplot2::element_text(colour = depictr_accent())
+    )
 }

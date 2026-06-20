@@ -184,15 +184,19 @@ test_that("log-rank fallback handles three groups (vs survdiff)", {
   expect_equal(res$p, ref_p, tolerance = 1e-6)
 })
 
-test_that("log-rank subtitle is a single readable ASCII string", {
+test_that("log-rank subtitle is a plotmath expression (chi^2, italic p)", {
   data(clinical_trial)
   km <- depictr:::km_input(clinical_trial$time, clinical_trial$event,
                            clinical_trial$arm, 0.95)
   lab <- depictr:::logrank_label(km$counts)
-  expect_length(lab, 1L)
-  expect_match(lab, "^Log-rank chi-sq\\(1\\)")
-  # ASCII only (Windows mbcs PDF devices choke on a Unicode chi).
-  expect_false(grepl("[^ -~]", lab))
+  expect_true(is.call(lab))
+  txt <- paste(deparse(lab), collapse = " ")
+  expect_match(txt, "Log-rank")
+  expect_match(txt, "chi\\^2")
+  expect_match(txt, "italic\\(p\\)")
+  # Still ASCII-only (the chi is plotmath, not a Unicode glyph that mbcs PDF
+  # devices choke on).
+  expect_false(grepl("[^ -~]", txt))
 })
 
 test_that("built curve panel carries the median guide and subtitle", {
@@ -200,7 +204,7 @@ test_that("built curve panel carries the median guide and subtitle", {
   p <- survival_plot(clinical_trial$time, clinical_trial$event,
                      group = clinical_trial$arm, median_line = TRUE,
                      logrank = TRUE)
-  expect_match(p$labels$subtitle, "Log-rank")
+  expect_match(paste(deparse(p$labels$subtitle), collapse = " "), "Log-rank")
   b <- ggplot2::ggplot_build(p)
   segs <- Filter(
     function(d) all(c("x", "xend", "yend") %in% names(d)) &&

@@ -93,7 +93,7 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
   picks each label's colour from the tile luminance; `gain_plot()`/`lift_plot()`
   label their reference lines; `timeseries_plot()` shows a single legend; and
   `k_diagnostic()` now returns the diagnostic curve as a plot.
-* `coefficient_plot()` gains `standardize`, scaling each coefficient by its
+* `coefficient_plot()` gains `standardise`, scaling each coefficient by its
   predictor's standard deviation so magnitudes are comparable; `model_report()`
   uses it by default, removing the empty band in its coefficient panel.
 * `vif_plot()` shows the ordinary VIF (not its square root) for single-df terms,
@@ -114,7 +114,7 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
 
 * Five reproducibly simulated datasets: `lexical_decision` (counterbalanced
   priming experiment), `wellbeing_survey` (with realistic missingness),
-  `crop_yield` (a fertilizer-by-treatment field trial), `clinical_trial`
+  `crop_yield` (a fertiliser-by-treatment field trial), `clinical_trial`
   (right-censored survival with a rare adverse event) and `monthly_sales`
   (two seasonal retail series).
 

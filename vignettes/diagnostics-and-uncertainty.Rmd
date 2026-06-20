@@ -24,7 +24,7 @@ and `qq_plot()` zoom in on particular checks. We fit a linear model to the
 crop-yield trial.
 
 ```{r}
-fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
 ```
 
 ```{r, fig.height = 6}
@@ -155,7 +155,7 @@ A confusion-matrix heatmap completes the picture. Passing `threshold = "youden"`
 reuses the same operating point the ROC curve marks, so the two agree:
 
 ```{r, fig.width = 5, fig.height = 4.5}
-confusion_matrix_plot(gfit, threshold = "youden", normalize = "row")
+confusion_matrix_plot(gfit, threshold = "youden", normalise = "row")
 ```
 
 ## Uncertainty

@@ -19,8 +19,8 @@
 #' @return A [ggplot2::ggplot] object.
 #' @export
 #' @examples
-#' scatter_trend(crop_yield, fertilizer, yield)
-#' scatter_trend(crop_yield, fertilizer, yield, group = treatment,
+#' scatter_trend(crop_yield, fertiliser, yield)
+#' scatter_trend(crop_yield, fertiliser, yield, group = treatment,
 #'                    method = "lm")
 scatter_trend <- function(data, x, y, group = NULL, method = "lm",
                                se = TRUE, point_alpha = 0.6, palette = NULL,

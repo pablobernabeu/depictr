@@ -62,6 +62,6 @@ approximation.
 \examples{
 qq_plot(rnorm(100))
 qq_plot(rt(100, df = 3), band_type = "simulate")
-fit <- lm(yield ~ rainfall + fertilizer, data = crop_yield)
+fit <- lm(yield ~ rainfall + fertiliser, data = crop_yield)
 qq_plot(fit)
 }

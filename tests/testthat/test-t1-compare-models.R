@@ -68,7 +68,7 @@ test_that("compare_models() completes the term x source grid for dodging", {
 
 test_that("coefficient_plot() handles data-frame and model input identically", {
   # The if/else branches were byte-identical; both paths must still work.
-  fit <- lm(yield ~ rainfall + fertilizer, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser, data = crop_yield)
   p_model <- coefficient_plot(fit)
   expect_s3_class(p_model, "ggplot")
 

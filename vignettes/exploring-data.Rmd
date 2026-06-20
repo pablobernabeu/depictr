@@ -65,7 +65,7 @@ trial has a real fertiliser-by-treatment interaction, visible here as two
 diverging slopes.
 
 ```{r}
-scatter_trend(crop_yield, fertilizer, yield, group = treatment)
+scatter_trend(crop_yield, fertiliser, yield, group = treatment)
 ```
 
 ## Many variables at once
@@ -74,7 +74,7 @@ scatter_trend(crop_yield, fertilizer, yield, group = treatment)
 the same information into a single coloured grid.
 
 ```{r, fig.height = 6}
-explore_pairs(crop_yield, cols = c("rainfall", "fertilizer", "soil_ph", "yield"))
+explore_pairs(crop_yield, cols = c("rainfall", "fertiliser", "soil_ph", "yield"))
 ```
 
 ```{r, fig.height = 5}
@@ -188,7 +188,7 @@ tweaks with the usual `+`:
 ```{r}
 library(ggplot2)
 
-scatter_trend(crop_yield, fertilizer, yield, group = treatment) +
+scatter_trend(crop_yield, fertiliser, yield, group = treatment) +
   labs(title = "Yield rises with fertiliser",
        subtitle = "More steeply under the enhanced treatment") +
   theme(legend.position = "bottom")
@@ -205,5 +205,5 @@ ecdf_plot(lexical_decision, RT, group = condition) +
 Many functions also expose layout controls directly. `explore_distribution(facet
 = TRUE)` and `ridgeline_plot()` separate groups, `correlation_heatmap(reorder =
 TRUE)` clusters variables, and the model-estimate plots take `facet` and
-`standardize` to keep coefficients on very different scales legible -- see
+`standardise` to keep coefficients on very different scales legible -- see
 `vignette("model-estimates")`.

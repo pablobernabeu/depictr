@@ -28,7 +28,7 @@ loadings as arrows. `scree_plot()` shows how much variance each component
 explains.
 
 ```{r}
-num <- c("rainfall", "fertilizer", "soil_ph", "yield")
+num <- c("rainfall", "fertiliser", "soil_ph", "yield")
 pca_plot(crop_yield, cols = num, group = "treatment",
          title = "Crop-yield PCA")
 ```

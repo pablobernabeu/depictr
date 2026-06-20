@@ -130,7 +130,22 @@ survival_plot <- function(time, status = NULL, group = NULL, conf_level = 0.95,
     ggplot2::scale_y_continuous(limits = c(0, 1),
                                 labels = scales::percent_format(accuracy = 1)) +
     ggplot2::labs(x = x_lab, y = y_lab, title = title, subtitle = subtitle) +
-    theme_depictr()
+    theme_depictr() +
+    # The y tick labels are short percentages, so tighten the gap between them
+    # and the axis title.
+    ggplot2::theme(axis.title.y = ggplot2::element_text(
+      margin = ggplot2::margin(r = 2)))
+
+  # Tuck the group legend into the bottom-left of the panel, which a
+  # monotone-decreasing survival curve always leaves empty, rather than spending
+  # a whole column on it beside the plot.
+  if (multi) {
+    p <- p + ggplot2::theme(
+      legend.position = "inside",
+      legend.position.inside = c(0.015, 0.04),
+      legend.justification = c(0, 0)
+    )
+  }
 
   if (!risk_table) return(p)
 
@@ -431,9 +446,10 @@ add_median_guides <- function(p, medians, multi, col_map) {
       linetype = 2, linewidth = 0.4, colour = ref, inherit.aes = FALSE
     )
   }
-  # Label each median value just above the x-axis at the crossing time.
+  # Label each median value just above the x-axis at the crossing time, naming
+  # it "median" so the dashed drop-line is unambiguous.
   lab <- data.frame(x = est$median, group = est$group,
-                    label = format_median(est$median))
+                    label = paste0("median ", format_median(est$median)))
   if (multi) {
     p <- p + ggplot2::geom_text(
       data = lab,
@@ -620,13 +636,21 @@ base_logrank <- function(counts) {
 }
 
 #' A short subtitle reporting the log-rank chi-squared and p-value
+#'
+#' Returns a plotmath expression so the statistic renders as a proper
+#' chi-squared symbol and the p is italic, with no reliance on a Unicode glyph
+#' (which fails on some Windows mbcs devices).
 #' @noRd
 logrank_label <- function(counts) {
   res <- logrank_test(counts)
   if (is.null(res) || is.na(res$chisq)) return(NULL)
-  p_txt <- if (res$p < 1e-4) "p < 0.0001" else
-    paste0("p = ", formatC(res$p, digits = 3, format = "g"))
-  # ASCII only: a Unicode chi keeps failing to render on Windows mbcs devices.
-  sprintf("Log-rank chi-sq(%d) = %s, %s",
-          res$df, formatC(res$chisq, digits = 3, format = "g"), p_txt)
+  chi <- formatC(res$chisq, digits = 3, format = "g")
+  if (res$p < 1e-4) {
+    bquote("Log-rank " * chi^2 * "(" * .(res$df) * ") = " * .(chi) *
+             ", " * italic(p) * " < 0.0001")
+  } else {
+    pv <- formatC(res$p, digits = 3, format = "g")
+    bquote("Log-rank " * chi^2 * "(" * .(res$df) * ") = " * .(chi) *
+             ", " * italic(p) * " = " * .(pv))
+  }
 }

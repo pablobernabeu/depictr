@@ -37,8 +37,8 @@
 #' @return A [ggplot2::ggplot] object.
 #' @export
 #' @examples
-#' m1 <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
-#' m2 <- lm(yield ~ rainfall + fertilizer + soil_ph,
+#' m1 <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
+#' m2 <- lm(yield ~ rainfall + fertiliser + soil_ph,
 #'          data = crop_yield[crop_yield$treatment == "standard", ])
 #' compare_models(`All fields` = m1, `Standard only` = m2,
 #'                        title = "Estimates by subset")

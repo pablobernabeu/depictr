@@ -50,7 +50,7 @@ the Tibshirani et al. heuristic).
 }
 \examples{
 p <- k_diagnostic(crop_yield, k_range = 2:6,
-                  cols = c("rainfall", "fertilizer", "soil_ph", "yield"))
+                  cols = c("rainfall", "fertiliser", "soil_ph", "yield"))
 attr(p, "suggested")
 }
 \references{

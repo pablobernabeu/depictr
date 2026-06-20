@@ -10,7 +10,7 @@ A data frame with 200 rows and 6 variables:
 \item{field}{Field identifier.}
 \item{treatment}{Management treatment (factor): \code{standard} or \code{enhanced}.}
 \item{rainfall}{Seasonal rainfall, in millimetres.}
-\item{fertilizer}{Fertiliser applied, in kilograms per hectare.}
+\item{fertiliser}{Fertiliser applied, in kilograms per hectare.}
 \item{soil_ph}{Soil pH.}
 \item{yield}{Crop yield, in tonnes per hectare.}
 }
@@ -27,7 +27,7 @@ rainfall, fertiliser, soil pH and a management treatment. Used for the
 regression, coefficient-plot, scatter-trend and interaction examples. The
 data-generating process contains a genuine fertiliser-by-treatment
 interaction: fertiliser raises yield far more under the \code{enhanced} treatment
-than under \code{standard}, so \code{interaction_plot(lm(yield ~ fertilizer * treatment + ..., crop_yield), "fertilizer", "treatment")} shows real,
+than under \code{standard}, so \code{interaction_plot(lm(yield ~ fertiliser * treatment + ..., crop_yield), "fertiliser", "treatment")} shows real,
 diverging slopes rather than noise. The main effects (rainfall, fertiliser,
 soil pH and treatment) are retained.
 }

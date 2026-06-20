@@ -57,7 +57,7 @@ test_that("format_terms() keeps NA as NA and strips prefixes per component", {
 })
 
 test_that("coefficient_plot() renders horizontal error bars without geom_errorbarh warning", {
-  fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
   p <- coefficient_plot(fit)
   expect_no_warning(b <- ggplot2::ggplot_build(p))
   # Horizontal bars: xmin/xmax span the interval, the y position is constant
@@ -68,8 +68,8 @@ test_that("coefficient_plot() renders horizontal error bars without geom_errorba
 })
 
 test_that("compare_models() renders horizontal error bars without geom_errorbarh warning", {
-  m1 <- lm(yield ~ rainfall + fertilizer, data = crop_yield)
-  m2 <- lm(yield ~ rainfall + fertilizer,
+  m1 <- lm(yield ~ rainfall + fertiliser, data = crop_yield)
+  m2 <- lm(yield ~ rainfall + fertiliser,
            data = crop_yield[crop_yield$treatment == "standard", ])
   p <- compare_models(A = m1, B = m2)
   expect_no_warning(b <- ggplot2::ggplot_build(p))

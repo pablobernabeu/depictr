@@ -28,7 +28,7 @@
 #'   `estimate`, `std.error`, `conf.low` and `conf.high`.
 #' @export
 #' @examples
-#' fit <- lm(yield ~ rainfall + fertilizer + treatment, data = crop_yield)
+#' fit <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
 #' tidy_estimates(fit)
 #'
 #' # A data frame of pre-computed estimates is standardised, not re-fitted:

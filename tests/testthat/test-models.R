@@ -20,7 +20,7 @@ test_that("optimizer_fixef_plot() works from a data frame", {
 })
 
 test_that("residual_diagnostics_plot() returns a patchwork", {
-  fit <- lm(yield ~ rainfall + fertilizer, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser, data = crop_yield)
   p <- residual_diagnostics_plot(fit)
   expect_s3_class(p, "patchwork")
   p2 <- residual_diagnostics_plot(fit, which = c("resid_fitted", "qq"))

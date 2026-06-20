@@ -105,7 +105,7 @@ test_that("residual_diagnostics_plot() is glm-aware but lm is unchanged", {
   expect_equal(pgc[[2]]$labels$y, "Standardised residuals")
 
   # lm behaviour: classic panels, builds cleanly.
-  fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
   pl <- residual_diagnostics_plot(fit)
   expect_s3_class(pl, "patchwork")
   expect_equal(pl[[1]]$labels$x, "Fitted values")
@@ -130,7 +130,7 @@ test_that("qq_plot() draws a band and keeps working without one", {
   expect_true(has_ribbon(qq_plot(rnorm(80))))
   expect_false(has_ribbon(qq_plot(rnorm(80), band = FALSE)))
 
-  fit <- lm(yield ~ rainfall + fertilizer, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser, data = crop_yield)
   expect_silent(ggplot2::ggplot_build(qq_plot(fit)))
   expect_error(qq_plot(letters), "numeric")
 })

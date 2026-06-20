@@ -19,7 +19,7 @@
 #' @return A [ggplot2::ggplot] object.
 #' @export
 #' @examples
-#' explore_bivariate(crop_yield, fertilizer, yield)        # numeric ~ numeric
+#' explore_bivariate(crop_yield, fertiliser, yield)        # numeric ~ numeric
 #' explore_bivariate(lexical_decision, condition, RT)      # categorical ~ numeric
 #' explore_bivariate(wellbeing_survey, region, education)  # categorical ~ categorical
 explore_bivariate <- function(data, x, y, method = "lm", palette = NULL,

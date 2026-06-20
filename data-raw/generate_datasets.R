@@ -183,7 +183,7 @@ wellbeing_survey$life_satisfaction[sample(n, 7)] <- NA
 #    A simulated agronomy field trial: yield as a function of rainfall,
 #    fertiliser, soil pH and a management treatment. For regression,
 #    coefficient and scatter-trend examples. The data-generating process now
-#    contains a GENUINE fertilizer x treatment interaction: fertiliser pays off
+#    contains a GENUINE fertiliser x treatment interaction: fertiliser pays off
 #    far more under the enhanced treatment, so interaction_plot() shows real
 #    crossing slopes rather than noise. Main effects are retained.
 # ---------------------------------------------------------------------------
@@ -194,16 +194,16 @@ field     <- sprintf("F%03d", seq_len(n))
 treatment <- factor(sample(c("standard", "enhanced"), n, replace = TRUE),
                     levels = c("standard", "enhanced"))
 rainfall   <- round(stats::rnorm(n, 520, 80))             # mm per season
-fertilizer <- round(stats::runif(n, 0, 150))             # kg per hectare
+fertiliser <- round(stats::runif(n, 0, 150))             # kg per hectare
 soil_ph    <- round(stats::rnorm(n, 6.4, 0.5), 2)
 
 enhanced <- treatment == "enhanced"
 yield <- 2.0 +
   0.004 * (rainfall - 520) +
-  0.006 * fertilizer +                       # fertiliser slope under standard
+  0.006 * fertiliser +                       # fertiliser slope under standard
   0.9 * (soil_ph - 6.4) +
   ifelse(enhanced, 0.5, 0) +                  # treatment main effect
-  0.012 * fertilizer * enhanced +            # INTERACTION: extra payoff when enhanced
+  0.012 * fertiliser * enhanced +            # INTERACTION: extra payoff when enhanced
   -0.00004 * (rainfall - 520)^2 +
   stats::rnorm(n, 0, 0.6)
 yield <- round(pmax(yield, 0.2), 2)                       # tonnes per hectare
@@ -212,7 +212,7 @@ crop_yield <- data.frame(
   field = field,
   treatment = treatment,
   rainfall = rainfall,
-  fertilizer = fertilizer,
+  fertiliser = fertiliser,
   soil_ph = soil_ph,
   yield = yield,
   stringsAsFactors = FALSE

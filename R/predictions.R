@@ -27,8 +27,8 @@
 #' @return A [ggplot2::ggplot] object.
 #' @export
 #' @examples
-#' fit <- lm(yield ~ rainfall + fertilizer + treatment, data = crop_yield)
-#' effects_plot(fit, "fertilizer")
+#' fit <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
+#' effects_plot(fit, "fertiliser")
 #' effects_plot(fit, "treatment")
 #'
 #' gfit <- glm(accuracy ~ word_frequency + condition,
@@ -104,8 +104,8 @@ effects_plot <- function(model, predictor, conf_level = 0.95, n = 100,
 #' @return A [ggplot2::ggplot] object.
 #' @export
 #' @examples
-#' fit <- lm(yield ~ fertilizer * treatment + rainfall, data = crop_yield)
-#' interaction_plot(fit, "fertilizer", "treatment")
+#' fit <- lm(yield ~ fertiliser * treatment + rainfall, data = crop_yield)
+#' interaction_plot(fit, "fertiliser", "treatment")
 interaction_plot <- function(model, predictor, moderator,
                              moderator_values = NULL, conf_level = 0.95,
                              n = 80, band = TRUE, palette = NULL,

@@ -45,9 +45,9 @@ above the diagonal. Optionally colour everything by a grouping variable.
 Built with 'patchwork', so it shares the package theme and palette.
 }
 \examples{
-explore_pairs(crop_yield, cols = c("rainfall", "fertilizer", "yield"))
+explore_pairs(crop_yield, cols = c("rainfall", "fertiliser", "yield"))
 \donttest{
-explore_pairs(crop_yield, cols = c("rainfall", "fertilizer", "yield"),
+explore_pairs(crop_yield, cols = c("rainfall", "fertiliser", "yield"),
               group = treatment, method = "spearman")
 }
 }

@@ -34,10 +34,10 @@
 #' Mathematics*, 20, 53-65. \doi{10.1016/0377-0427(87)90125-7}
 #' @export
 #' @examples
-#' cl <- kmeans(scale(crop_yield[c("rainfall", "fertilizer", "soil_ph",
+#' cl <- kmeans(scale(crop_yield[c("rainfall", "fertiliser", "soil_ph",
 #'                                 "yield")]), 3)$cluster
 #' silhouette_plot(crop_yield, cl,
-#'                 cols = c("rainfall", "fertilizer", "soil_ph", "yield"))
+#'                 cols = c("rainfall", "fertiliser", "soil_ph", "yield"))
 silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
                             distance = "euclidean", palette = NULL,
                             title = NULL) {
@@ -158,7 +158,7 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
 #' @export
 #' @examples
 #' p <- k_diagnostic(crop_yield, k_range = 2:6,
-#'                   cols = c("rainfall", "fertilizer", "soil_ph", "yield"))
+#'                   cols = c("rainfall", "fertiliser", "soil_ph", "yield"))
 #' attr(p, "suggested")
 k_diagnostic <- function(data, k_range = 2:8,
                          method = c("silhouette", "wss", "gap"),

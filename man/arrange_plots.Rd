@@ -37,6 +37,6 @@ title and subtitle, and automatic panel tags (A, B, C, ...).
 }
 \examples{
 p1 <- explore_distribution(crop_yield, yield)
-p2 <- scatter_trend(crop_yield, fertilizer, yield)
+p2 <- scatter_trend(crop_yield, fertiliser, yield)
 arrange_plots(p1, p2, ncol = 2, title = "Crop yield", tag_levels = "A")
 }

@@ -45,7 +45,7 @@ Plots \code{y} against \code{x} with an optional fitted trend line and confidenc
 band, optionally split by a grouping variable.
 }
 \examples{
-scatter_trend(crop_yield, fertilizer, yield)
-scatter_trend(crop_yield, fertilizer, yield, group = treatment,
+scatter_trend(crop_yield, fertiliser, yield)
+scatter_trend(crop_yield, fertiliser, yield, group = treatment,
                    method = "lm")
 }

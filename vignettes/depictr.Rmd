@@ -51,14 +51,14 @@ Begin with the data. `explore_bivariate()` chooses a suitable plot for any pair
 of variables -- a scatter with a trend here, because both are numeric.
 
 ```{r}
-explore_bivariate(crop_yield, fertilizer, yield)
+explore_bivariate(crop_yield, fertiliser, yield)
 ```
 
 Turn next to the model. After fitting it, `coefficient_plot()` draws a forest
 plot of the estimates.
 
 ```{r}
-fit <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment, data = crop_yield)
+fit <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment, data = crop_yield)
 coefficient_plot(fit, order = "descending", title = "Drivers of crop yield")
 ```
 
@@ -66,7 +66,7 @@ To see what the model implies, `effects_plot()` traces the predicted response as
 one predictor varies.
 
 ```{r}
-effects_plot(fit, "fertilizer")
+effects_plot(fit, "fertiliser")
 ```
 
 `residual_diagnostics_plot()` gathers the usual checks of the fit into one
@@ -106,7 +106,7 @@ own plots too:
 
 ```{r}
 library(ggplot2)
-ggplot(crop_yield, aes(fertilizer, yield, colour = treatment)) +
+ggplot(crop_yield, aes(fertiliser, yield, colour = treatment)) +
   geom_point(alpha = 0.7) +
   scale_colour_depictr() +
   theme_depictr()

@@ -10,13 +10,13 @@ test_that("explore_distribution() handles strings, names and groups", {
 })
 
 test_that("scatter_trend() works with and without a group", {
-  expect_s3_class(scatter_trend(crop_yield, fertilizer, yield), "ggplot")
+  expect_s3_class(scatter_trend(crop_yield, fertiliser, yield), "ggplot")
   expect_s3_class(
-    scatter_trend(crop_yield, fertilizer, yield, group = treatment),
+    scatter_trend(crop_yield, fertiliser, yield, group = treatment),
     "ggplot"
   )
   expect_s3_class(
-    scatter_trend(crop_yield, fertilizer, yield, method = NULL), "ggplot"
+    scatter_trend(crop_yield, fertiliser, yield, method = NULL), "ggplot"
   )
 })
 

@@ -18,7 +18,7 @@ coefficient_plot(
   line_size = 0.7,
   facet = FALSE,
   scales = c("fixed", "free"),
-  standardize = FALSE,
+  standardise = FALSE,
   title = NULL,
   subtitle = NULL,
   x_lab = NULL
@@ -63,7 +63,7 @@ convenience alias for \code{scales = "free"}.}
 \code{"free"} (one free-scaled panel per term). When \code{facet = TRUE} this is
 forced to \code{"free"}.}
 
-\item{standardize}{Whether to standardise the coefficients by multiplying
+\item{standardise}{Whether to standardise the coefficients by multiplying
 each by the standard deviation of its predictor column, putting them on a
 common scale so their magnitudes are comparable (and removing the empty
 band that otherwise appears when predictors are on very different scales).
@@ -71,7 +71,7 @@ Requires a fitted model (ignored, with a warning, for a tidy data frame).
 Defaults to \code{FALSE}.}
 
 \item{title, subtitle, x_lab}{Plot title, subtitle and x-axis label. \code{x_lab}
-defaults to "Estimate", or "Standardised estimate" when \code{standardize}.}
+defaults to "Estimate", or "Standardised estimate" when \code{standardise}.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
@@ -82,7 +82,7 @@ The input can be a fitted model (anything \code{\link[=tidy_estimates]{tidy_esti
 a data frame of pre-computed estimates.
 }
 \examples{
-fit <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment,
+fit <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment,
           data = crop_yield)
 coefficient_plot(fit)
 
@@ -94,5 +94,5 @@ coefficient_plot(fit, order = "descending", title = "Drivers of crop yield")
 coefficient_plot(fit, intercept = TRUE, facet = TRUE)
 
 # Or put the coefficients on a common, comparable scale:
-coefficient_plot(fit, standardize = TRUE)
+coefficient_plot(fit, standardise = TRUE)
 }

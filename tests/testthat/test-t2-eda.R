@@ -5,7 +5,7 @@
 # removed, and check the new `method` argument of explore_pairs().
 
 test_that("scatter_trend uses brand points and the accent smoother", {
-  b <- ggplot2::ggplot_build(scatter_trend(crop_yield, fertilizer, yield))
+  b <- ggplot2::ggplot_build(scatter_trend(crop_yield, fertiliser, yield))
   point_layer <- b$data[[1]]
   smooth_layer <- b$data[[2]]
   expect_identical(unique(point_layer$colour), depictr_brand())
@@ -15,7 +15,7 @@ test_that("scatter_trend uses brand points and the accent smoother", {
 })
 
 test_that("scatter_trend grouped palette routes through depictr scales", {
-  p <- scatter_trend(crop_yield, fertilizer, yield, group = treatment,
+  p <- scatter_trend(crop_yield, fertiliser, yield, group = treatment,
                      method = "lm")
   b <- ggplot2::ggplot_build(p)
   cols <- unique(b$data[[1]]$colour)

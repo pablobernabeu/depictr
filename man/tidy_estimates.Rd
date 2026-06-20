@@ -38,7 +38,7 @@ a data frame with your own intervals (for example profiled or posterior
 intervals) to override this.
 }
 \examples{
-fit <- lm(yield ~ rainfall + fertilizer + treatment, data = crop_yield)
+fit <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
 tidy_estimates(fit)
 
 # A data frame of pre-computed estimates is standardised, not re-fitted:

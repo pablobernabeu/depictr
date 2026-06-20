@@ -6,12 +6,12 @@
 #       with residual df, so bands did not match predict.lm()/confint().
 
 test_that("lm prediction bands use a t multiplier and match predict.lm()", {
-  fit <- lm(yield ~ rainfall + fertilizer + treatment, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
 
   # numeric focal predictor
-  p <- effects_plot(fit, "fertilizer")
+  p <- effects_plot(fit, "fertiliser")
   d <- p$data
-  nd <- d[, c("rainfall", "fertilizer", "treatment")]
+  nd <- d[, c("rainfall", "fertiliser", "treatment")]
   ref <- predict(fit, newdata = nd, interval = "confidence", level = 0.95)
   expect_equal(d$lwr, unname(ref[, "lwr"]), tolerance = 1e-8)
   expect_equal(d$upr, unname(ref[, "upr"]), tolerance = 1e-8)
@@ -29,7 +29,7 @@ test_that("lm prediction bands use a t multiplier and match predict.lm()", {
   # factor focal predictor also matches predict.lm()
   pf <- effects_plot(fit, "treatment")
   df <- pf$data
-  ndf <- df[, c("rainfall", "fertilizer", "treatment")]
+  ndf <- df[, c("rainfall", "fertiliser", "treatment")]
   reff <- predict(fit, newdata = ndf, interval = "confidence", level = 0.95)
   expect_equal(df$lwr, unname(reff[, "lwr"]), tolerance = 1e-8)
   expect_equal(df$upr, unname(reff[, "upr"]), tolerance = 1e-8)

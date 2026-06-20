@@ -67,17 +67,17 @@ test_that("lexical_decision accuracy is not derived from RT", {
 
 ## ---- crop_yield -----------------------------------------------------------
 
-test_that("crop_yield has a genuine fertilizer x treatment interaction", {
+test_that("crop_yield has a genuine fertiliser x treatment interaction", {
   expect_identical(dim(crop_yield), c(200L, 6L))
-  fit <- lm(yield ~ fertilizer * treatment + rainfall + soil_ph,
+  fit <- lm(yield ~ fertiliser * treatment + rainfall + soil_ph,
             data = crop_yield)
   co <- summary(fit)$coefficients
-  ix <- "fertilizer:treatmentenhanced"
+  ix <- "fertiliser:treatmentenhanced"
   expect_true(ix %in% rownames(co))
   expect_lt(co[ix, "Pr(>|t|)"], 0.01)        # significant interaction
   expect_gt(co[ix, "Estimate"], 0)            # fertiliser pays off more enhanced
   # Main effects retained and signed sensibly.
-  expect_gt(co["fertilizer", "Estimate"], 0)
+  expect_gt(co["fertiliser", "Estimate"], 0)
   expect_gt(co["soil_ph", "Estimate"], 0)
 })
 

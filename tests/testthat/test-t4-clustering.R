@@ -1,4 +1,4 @@
-cols <- c("rainfall", "fertilizer", "soil_ph", "yield")
+cols <- c("rainfall", "fertiliser", "soil_ph", "yield")
 
 test_that("silhouette_plot() returns a ggplot that builds cleanly", {
   set.seed(1)

@@ -135,7 +135,7 @@ test_that("affected classification plots build without warnings", {
   g <- make_glm()
   for (p in list(roc_curve_plot(g), calibration_plot(g, bins = 6),
                  confusion_matrix_plot(g, threshold = 0.5),
-                 confusion_matrix_plot(g, normalize = "row"),
+                 confusion_matrix_plot(g, normalise = "row"),
                  pr_curve_plot(g), gain_plot(g), lift_plot(g))) {
     expect_no_warning(ggplot2::ggplot_build(p))
   }

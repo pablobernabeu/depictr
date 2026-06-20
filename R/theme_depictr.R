@@ -146,7 +146,7 @@ scale_fill_depictr <- function(n = NULL, palette = NULL,
 #' @export
 #' @examples
 #' library(ggplot2)
-#' ggplot(crop_yield, aes(fertilizer, yield)) +
+#' ggplot(crop_yield, aes(fertiliser, yield)) +
 #'   geom_point() +
 #'   theme_depictr()
 theme_depictr <- function(base_size = depictr_opt("base_size"),

@@ -8,7 +8,7 @@ confusion_matrix_plot(
   x,
   predicted = NULL,
   threshold = 0.5,
-  normalize = c("none", "row", "col"),
+  normalise = c("none", "row", "col"),
   title = NULL
 )
 }
@@ -24,7 +24,7 @@ positive class. As well as a number in \verb{[0, 1]}, you may pass the string
 point \code{\link[=roc_curve_plot]{roc_curve_plot()}} marks), so the confusion matrix and the ROC curve
 agree on the cut-off.}
 
-\item{normalize}{One of \code{"none"}, \code{"row"} (by actual class) or \code{"col"} (by
+\item{normalise}{One of \code{"none"}, \code{"row"} (by actual class) or \code{"col"} (by
 predicted class); controls the fill shading and the cell annotation.}
 
 \item{title}{Plot title.}

@@ -2,7 +2,7 @@
 
 test_that("arrange_plots() title uses the canonical brand colour", {
   p1 <- explore_distribution(crop_yield, yield)
-  p2 <- scatter_trend(crop_yield, fertilizer, yield)
+  p2 <- scatter_trend(crop_yield, fertiliser, yield)
   combined <- arrange_plots(p1, p2, ncol = 2, title = "Crop yield",
                             tag_levels = "A")
 
@@ -60,7 +60,7 @@ test_that("palette_preview() builds for every type without warnings", {
 
 test_that("arrange_plots() builds without deprecation warnings", {
   p1 <- explore_distribution(crop_yield, yield)
-  p2 <- scatter_trend(crop_yield, fertilizer, yield)
+  p2 <- scatter_trend(crop_yield, fertiliser, yield)
   combined <- arrange_plots(p1, p2, title = "T", subtitle = "S")
   expect_no_warning(print(combined))
 })

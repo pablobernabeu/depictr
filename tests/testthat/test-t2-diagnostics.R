@@ -1,7 +1,7 @@
 # Tier-2 diagnostics colour / scale / quality refactor -----------------------
 
 test_that("residual_diagnostics_plot() builds with no warnings and on-palette colours", {
-  fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
   p <- residual_diagnostics_plot(fit)
   expect_no_warning(b <- ggplot2::ggplot_build(p))
 
@@ -20,7 +20,7 @@ test_that("residual_diagnostics_plot() builds with no warnings and on-palette co
 })
 
 test_that("residual_diagnostics_plot() loess smoother and QQ line use the reference grey", {
-  fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
   # Scale-location panel carries a loess smoother; QQ panel carries the QQ line.
   p <- residual_diagnostics_plot(fit, which = c("resid_fitted", "qq"))
   expect_no_warning(b <- ggplot2::ggplot_build(p))
@@ -34,7 +34,7 @@ test_that("residual_diagnostics_plot() loess smoother and QQ line use the refere
 })
 
 test_that("influence_plot() uses brand bubbles, grey references and accent labels", {
-  fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
   p <- influence_plot(fit)
   expect_no_warning(b <- ggplot2::ggplot_build(p))
 
@@ -48,7 +48,7 @@ test_that("influence_plot() uses brand bubbles, grey references and accent label
 
 test_that("qq_plot() builds for vectors and models without the off-palette red", {
   expect_no_warning(b1 <- ggplot2::ggplot_build(qq_plot(rnorm(100))))
-  fit <- lm(yield ~ rainfall + fertilizer, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser, data = crop_yield)
   expect_no_warning(b2 <- ggplot2::ggplot_build(qq_plot(fit)))
   cols <- unique(c(
     unlist(lapply(b1$data, function(d) d$colour)),
@@ -60,7 +60,7 @@ test_that("qq_plot() builds for vectors and models without the off-palette red",
 })
 
 test_that("vif_plot() builds and uses the colourblind-safe palette pair", {
-  fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
   p <- vif_plot(fit)
   expect_no_warning(b <- ggplot2::ggplot_build(p))
 
@@ -78,14 +78,14 @@ test_that("vif_plot() draws a neutral-grey threshold line under collinearity", {
   set.seed(1)
   d <- crop_yield
   d$rain2 <- d$rainfall + stats::rnorm(nrow(d), 0, 5)
-  p <- vif_plot(lm(yield ~ rainfall + rain2 + fertilizer, data = d))
+  p <- vif_plot(lm(yield ~ rainfall + rain2 + fertiliser, data = d))
   b <- ggplot2::ggplot_build(p)
   line_cols <- unique(unlist(lapply(b$data[-1], function(dd) dd$colour)))
   expect_true("grey40" %in% line_cols)
 })
 
 test_that("gvif_terms() reduces to ordinary VIF for single-df terms", {
-  fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+  fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
 
   # Independent base-R VIF computation for comparison.
   X <- stats::model.matrix(fit)
@@ -98,7 +98,7 @@ test_that("gvif_terms() reduces to ordinary VIF for single-df terms", {
 
   res <- gvif_terms(fit)
   # One row per term, every term has df = 1 here.
-  expect_setequal(res$term, c("rainfall", "fertilizer", "soil_ph"))
+  expect_setequal(res$term, c("rainfall", "fertiliser", "soil_ph"))
   expect_true(all(res$df == 1))
 
   # GVIF == ordinary VIF for single-df terms, and the adjusted value is sqrt().

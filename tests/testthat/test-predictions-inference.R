@@ -1,6 +1,6 @@
 test_that("effects_plot() works for numeric and factor predictors and glm", {
-  fit <- lm(yield ~ rainfall + fertilizer + treatment, data = crop_yield)
-  expect_s3_class(effects_plot(fit, "fertilizer"), "ggplot")
+  fit <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
+  expect_s3_class(effects_plot(fit, "fertiliser"), "ggplot")
   expect_s3_class(effects_plot(fit, "treatment"), "ggplot")
   expect_error(effects_plot(fit, "not_a_var"), "predictor")
 
@@ -14,11 +14,11 @@ test_that("effects_plot() works for numeric and factor predictors and glm", {
 })
 
 test_that("interaction_plot() handles factor and numeric moderators", {
-  fit <- lm(yield ~ fertilizer * treatment + rainfall, data = crop_yield)
-  expect_s3_class(interaction_plot(fit, "fertilizer", "treatment"), "ggplot")
-  fit2 <- lm(yield ~ fertilizer * rainfall, data = crop_yield)
-  expect_s3_class(interaction_plot(fit2, "fertilizer", "rainfall"), "ggplot")
-  expect_error(interaction_plot(fit, "fertilizer", "nope"), "predictor")
+  fit <- lm(yield ~ fertiliser * treatment + rainfall, data = crop_yield)
+  expect_s3_class(interaction_plot(fit, "fertiliser", "treatment"), "ggplot")
+  fit2 <- lm(yield ~ fertiliser * rainfall, data = crop_yield)
+  expect_s3_class(interaction_plot(fit2, "fertiliser", "rainfall"), "ggplot")
+  expect_error(interaction_plot(fit, "fertiliser", "nope"), "predictor")
 })
 
 test_that("random_effects_plot() works from a data frame", {
@@ -31,7 +31,7 @@ test_that("random_effects_plot() works from a data frame", {
 
 test_that("model_fit_table() summarises several models", {
   m1 <- lm(yield ~ rainfall, data = crop_yield)
-  m2 <- lm(yield ~ rainfall + fertilizer, data = crop_yield)
+  m2 <- lm(yield ~ rainfall + fertiliser, data = crop_yield)
   tab <- model_fit_table(simple = m1, bigger = m2)
   expect_s3_class(tab, "data.frame")
   expect_equal(tab$model, c("simple", "bigger"))

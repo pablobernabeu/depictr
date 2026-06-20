@@ -17,8 +17,8 @@
 #' @export
 #' @examples
 #' m1 <- lm(yield ~ rainfall, data = crop_yield)
-#' m2 <- lm(yield ~ rainfall + fertilizer, data = crop_yield)
-#' m3 <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment,
+#' m2 <- lm(yield ~ rainfall + fertiliser, data = crop_yield)
+#' m3 <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment,
 #'          data = crop_yield)
 #' model_fit_table(simple = m1, medium = m2, full = m3)
 model_fit_table <- function(..., digits = 3) {

@@ -274,7 +274,7 @@ calibration_bins <- function(actual, score, bins) {
 #'   `"youden"` to reuse the Youden's J optimal threshold (the same operating
 #'   point [roc_curve_plot()] marks), so the confusion matrix and the ROC curve
 #'   agree on the cut-off.
-#' @param normalize One of `"none"`, `"row"` (by actual class) or `"col"` (by
+#' @param normalise One of `"none"`, `"row"` (by actual class) or `"col"` (by
 #'   predicted class); controls the fill shading and the cell annotation.
 #' @param title Plot title.
 #'
@@ -289,9 +289,9 @@ calibration_bins <- function(actual, score, bins) {
 #' # Reuse the Youden-optimal operating point.
 #' confusion_matrix_plot(gfit, threshold = "youden")
 confusion_matrix_plot <- function(x, predicted = NULL, threshold = 0.5,
-                                  normalize = c("none", "row", "col"),
+                                  normalise = c("none", "row", "col"),
                                   title = NULL) {
-  normalize <- match.arg(normalize)
+  normalise <- match.arg(normalise)
   used_threshold <- NA_real_
   if (inherits(x, "glm")) {
     resp <- stats::model.response(stats::model.frame(x))
@@ -333,11 +333,11 @@ confusion_matrix_plot <- function(x, predicted = NULL, threshold = 0.5,
   tab$Actual <- factor(tab$Actual, levels = rev(lvls))
   tab$Predicted <- factor(tab$Predicted, levels = lvls)
 
-  if (normalize == "row") {
+  if (normalise == "row") {
     denom <- stats::ave(tab$Freq, tab$Actual, FUN = sum)
     tab$shade <- ifelse(denom > 0, tab$Freq / denom, 0)
     tab$label <- sprintf("%d\n(%.0f%%)", tab$Freq, 100 * tab$shade)
-  } else if (normalize == "col") {
+  } else if (normalise == "col") {
     denom <- stats::ave(tab$Freq, tab$Predicted, FUN = sum)
     tab$shade <- ifelse(denom > 0, tab$Freq / denom, 0)
     tab$label <- sprintf("%d\n(%.0f%%)", tab$Freq, 100 * tab$shade)

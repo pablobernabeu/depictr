@@ -27,7 +27,7 @@ residuals and high-leverage points, and the most influential observations are
 labelled.
 }
 \examples{
-fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
 influence_plot(fit)
 }
 \references{
