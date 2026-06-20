@@ -64,9 +64,10 @@ coefficient_plot(
 )
 ```
 
-Factor levels are given readable labels automatically (`conditionunrelated`
-becomes `unrelated`); pass `labels` to override any of them. The
-slopes also sit on quite different scales, so `standardise = TRUE` rescales each
+Coefficient names are tidied to the effect (variable) name automatically
+(`conditionunrelated` becomes `condition`, `word_frequency` becomes `word
+frequency`); pass `labels` to override any of them. The slopes also sit on quite
+different scales, so `standardise = TRUE` rescales each
 coefficient by its predictor's standard deviation, putting them on one
 comparable axis:
 
@@ -175,8 +176,9 @@ slopes <- draws[c("conditionunrelated", "modalityauditory", "word_frequency")]
 
 posterior_plot(
   slopes, style = "halfeye", rope = c(-5, 5), pd = TRUE,
-  labels = c(conditionunrelated = "unrelated",
-             modalityauditory = "auditory"),
+  labels = c(conditionunrelated = "condition",
+             modalityauditory = "modality",
+             word_frequency = "word frequency"),
   title = "Fixed-effect posteriors (ms), with ROPE and pd"
 )
 ```
@@ -217,8 +219,9 @@ opt_long <- data.frame(
 
 optimizer_fixef_plot(
   opt_long, title = "Fixed effects across optimisers",
-  labels = c(conditionunrelated = "unrelated",
-             modalityauditory = "auditory")
+  labels = c(conditionunrelated = "condition",
+             modalityauditory = "modality",
+             word_frequency = "word frequency")
 )
 ```
 

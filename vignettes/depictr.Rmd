@@ -84,6 +84,9 @@ from a Bayesian fit of the lexical-decision model, shipped with the package.
 draws <- readRDS(system.file("extdata", "lexdec_draws.rds", package = "depictr"))
 posterior_plot(draws[c("conditionunrelated", "modalityauditory",
                        "word_frequency")],
+               labels = c(conditionunrelated = "condition",
+                          modalityauditory = "modality",
+                          word_frequency = "word frequency"),
                title = "Lexical-decision fixed effects (ms)")
 ```
 

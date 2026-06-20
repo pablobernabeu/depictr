@@ -33,13 +33,16 @@ A character vector the same length as \code{x}, with \code{NA} preserved.
 \description{
 Cleans up the term names produced by modelling functions so that they read
 well on a plot: the intercept is renamed, an optional \code{b_}/\code{bs_} Bayesian
-prefix is stripped, and interaction colons are converted to a chosen symbol.
-The \code{b_}/\code{bs_} prefix is stripped from \emph{each} component of an interaction
-(e.g. \code{b_x:b_y}), not just the leading term. Missing values (\code{NA}) are kept
-as \code{NA} rather than being rendered as the literal text \code{"NA"}.
+prefix is stripped, interaction colons are converted to a chosen symbol, and
+underscores are shown as spaces (e.g. \code{word_frequency} becomes
+\code{"word frequency"}). The \code{b_}/\code{bs_} prefix is stripped from \emph{each} component
+of an interaction (e.g. \code{b_x:b_y}), not just the leading term. Missing values
+(\code{NA}) are kept as \code{NA} rather than being rendered as the literal text
+\code{"NA"}.
 }
 \examples{
 format_terms(c("(Intercept)", "b_conditionB", "freq:condition"))
 format_terms("region:education:age", interaction = "asterisk")
+format_terms(c("word_frequency", "b_sleep_hours"))
 format_terms(c("b_x:b_y", NA))
 }

@@ -91,8 +91,8 @@ coefficient_plot <- function(x,
   }
   x_lab <- x_lab %||% if (standardise) "Standardised estimate" else "Estimate"
 
-  # Prettify factor coefficient names by default (e.g. "conditionunrelated" ->
-  # "unrelated"); any user-supplied `labels` take precedence.
+  # Prettify coefficient names to the effect (variable) name by default
+  # (e.g. "conditionunrelated" -> "condition"); user `labels` take precedence.
   labels <- merge_pretty_labels(labels, pretty_coef_map(x))
 
   if (!intercept) {
@@ -142,15 +142,18 @@ coefficient_plot <- function(x,
 
 # ---- internal helpers ------------------------------------------------------
 
-#' Build a raw-name -> level-name map for a model's factor coefficients
+#' Build a raw-name -> readable-effect-name map for a model's factor terms
 #'
 #' Turns the design-matrix names that R produces for factor levels (e.g.
-#' `conditionunrelated`) into the bare level name (`unrelated`) by matching each
-#' coefficient column to its model term and stripping the term prefix. The
-#' baseline level is the model's implicit reference, so it is not named.
-#' Continuous terms (column == term) and interactions are left for
-#' [format_terms()]. Returns a named character vector, or `NULL` when `x` is not
-#' a supported fitted model.
+#' `conditionunrelated`) into the readable *effect* (variable) name
+#' (`condition`). For a two-level factor the single coefficient is named by its
+#' variable alone -- the contrast against the implicit reference level is
+#' understood, so the level is not repeated. A factor with several non-reference
+#' levels keeps the level too (`region: South`) so the rows stay distinct. Each
+#' entry is also keyed under a `b_` prefix so a brms summary term aligns with its
+#' frequentist counterpart. Continuous terms and interactions are left to
+#' [format_terms()] (which tidies them and shows underscores as spaces).
+#' Returns a named character vector, or `NULL` when `x` is not a supported model.
 #' @noRd
 pretty_coef_map <- function(x) {
   if (!inherits(x, c("lm", "glm", "merMod", "lmerMod", "glmerMod",
@@ -163,18 +166,27 @@ pretty_coef_map <- function(x) {
   assign <- attr(mm, "assign")
   cols <- colnames(mm)
   if (is.null(assign) || length(assign) != length(cols)) return(NULL)
+  nice <- function(s) gsub("_", " ", s, fixed = TRUE)
   out <- character(0)
   for (i in seq_along(cols)) {
     a <- assign[i]
     if (a < 1 || a > length(tl)) next                 # intercept / unknown
     term <- tl[a]
+    if (grepl(":", term, fixed = TRUE)) next          # interactions: format_terms
     col <- cols[i]
-    # A single-variable factor level reads "<term><level>"; show just the level
-    # (the reference level is the implicit baseline, so it is not named).
-    if (!grepl(":", term, fixed = TRUE) &&
-        startsWith(col, term) && nchar(col) > nchar(term)) {
-      out[col] <- substring(col, nchar(term) + 1L)
+    if (startsWith(col, term) && nchar(col) > nchar(term)) {
+      # Factor level column: name it by the variable alone for a two-level
+      # factor, or "variable: level" when several levels share the variable.
+      val <- if (sum(assign == a) == 1L) {
+        nice(term)
+      } else {
+        nice(paste0(term, ": ", substring(col, nchar(term) + 1L)))
+      }
+      out[col] <- val
+      out[paste0("b_", col)] <- val   # align a brms b_-prefixed summary term
     }
+    # Continuous terms (col == term) are left to format_terms(), which also
+    # handles their b_-prefixed Bayesian counterparts, so the two still align.
   }
   if (length(out)) out else NULL
 }

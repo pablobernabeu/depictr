@@ -214,7 +214,7 @@ test_that("fbp distribution path aligns b_-prefixed terms with frequentist", {
   # Frequentist data carries the same canonical labels.
   freq_layer <- p$layers[[which(geom_classes(p) == "GeomPoint")[1]]]
   flabs <- as.character(freq_layer$data$label)
-  expect_true(all(c("stress", "sleep_hours") %in% flabs))
+  expect_true(all(c("stress", "sleep hours") %in% flabs))
   expect_equal(anyDuplicated(flabs), 0L)
 })
 
@@ -231,7 +231,7 @@ test_that("fbp summary-only path keeps the two-source forest overlay", {
   # No posterior slab on the summary path.
   expect_false("GeomSlabinterval" %in% geom_classes(p))
   expect_setequal(levels(p$data$label),
-                  c("Intercept", "stress", "sleep_hours"))
+                  c("Intercept", "stress", "sleep hours"))
   b <- ggplot2::ggplot_build(p)
   expect_setequal(sort(unique(b$data[[2]]$colour)), sort(depictr_palette(2)))
 })

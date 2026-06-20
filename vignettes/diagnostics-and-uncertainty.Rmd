@@ -168,6 +168,9 @@ of the lexical-decision model, shown as point-and-interval forests.
 draws <- readRDS(system.file("extdata", "lexdec_draws.rds", package = "depictr"))
 posterior_plot(draws[c("conditionunrelated", "modalityauditory",
                        "word_frequency")],
+               labels = c(conditionunrelated = "condition",
+                          modalityauditory = "modality",
+                          word_frequency = "word frequency"),
                style = "interval", title = "Posterior estimates (ms)")
 ```
 

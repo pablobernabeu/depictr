@@ -31,8 +31,8 @@
 #'   outer width is used for the caption and the displayed interval mass.
 #' @param interaction Passed to [format_terms()] for the parameter labels.
 #' @param labels Optional named character vector renaming parameters, e.g.
-#'   `c(conditionunrelated = "unrelated")`. Unmatched parameters fall
-#'   back to [format_terms()].
+#'   `c(conditionunrelated = "condition")`. Unmatched parameters fall back to
+#'   [format_terms()].
 #' @param reference_line Position of a vertical reference line, or `NULL`/`NA`
 #'   to omit it. There is no universally meaningful reference for every
 #'   parameter, so this defaults to `0` (the usual "no effect" line for

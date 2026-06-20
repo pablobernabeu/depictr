@@ -189,10 +189,12 @@ theme_depictr <- function(base_size = depictr_opt("base_size"),
 #'
 #' Cleans up the term names produced by modelling functions so that they read
 #' well on a plot: the intercept is renamed, an optional `b_`/`bs_` Bayesian
-#' prefix is stripped, and interaction colons are converted to a chosen symbol.
-#' The `b_`/`bs_` prefix is stripped from *each* component of an interaction
-#' (e.g. `b_x:b_y`), not just the leading term. Missing values (`NA`) are kept
-#' as `NA` rather than being rendered as the literal text `"NA"`.
+#' prefix is stripped, interaction colons are converted to a chosen symbol, and
+#' underscores are shown as spaces (e.g. `word_frequency` becomes
+#' `"word frequency"`). The `b_`/`bs_` prefix is stripped from *each* component
+#' of an interaction (e.g. `b_x:b_y`), not just the leading term. Missing values
+#' (`NA`) are kept as `NA` rather than being rendered as the literal text
+#' `"NA"`.
 #'
 #' @param x Character vector of term names.
 #' @param interaction How to render interaction colons: `"times"` (the default,
@@ -209,6 +211,7 @@ theme_depictr <- function(base_size = depictr_opt("base_size"),
 #' @examples
 #' format_terms(c("(Intercept)", "b_conditionB", "freq:condition"))
 #' format_terms("region:education:age", interaction = "asterisk")
+#' format_terms(c("word_frequency", "b_sleep_hours"))
 #' format_terms(c("b_x:b_y", NA))
 format_terms <- function(x,
                          interaction = c("times", "asterisk", "colon", "space"),
@@ -242,6 +245,9 @@ format_terms <- function(x,
   if (interaction != "colon") {
     x <- stringr::str_replace_all(x, ":", sep)
   }
+  # Show underscores as spaces for readability (e.g. word_frequency ->
+  # "word frequency"); gsub leaves NA untouched.
+  x <- gsub("_", " ", x, fixed = TRUE)
   if (!is.null(wrap)) {
     x <- vapply(
       x,

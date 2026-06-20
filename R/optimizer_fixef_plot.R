@@ -21,9 +21,9 @@
 #' @param interaction Passed to [format_terms()] for the panel titles.
 #' @param labels Optional named character vector renaming the term panels, e.g.
 #'   `c(conditionunrelated = "Unrelated priming")`. When `x` is a raw
-#'   [lme4::allFit()] object, factor levels are prettified automatically (e.g.
-#'   `conditionunrelated` to `unrelated`) and these labels override
-#'   that default.
+#'   [lme4::allFit()] object, names are prettified to the effect (variable) name
+#'   automatically (e.g. `conditionunrelated` to `condition`) and these labels
+#'   override that default.
 #' @param number_optimizers Whether to prefix each optimiser name with a
 #'   number, so that the legend doubles as an index.
 #' @param free_y Whether to give each panel its own y-axis range. This is
@@ -70,10 +70,11 @@ optimizer_fixef_plot <- function(x,
   interaction <- match.arg(interaction)
   df <- allfit_to_long(x)
 
-  # When given a raw allFit() object (a list of fitted models), prettify factor
-  # coefficient names by default (e.g. "conditionunrelated" -> "condition:
-  # unrelated"); user-supplied `labels` take precedence. A summarised allFit or a
-  # plain data frame carries no model, so there `labels` is used as given.
+  # When given a raw allFit() object (a list of fitted models), prettify the
+  # coefficient names to the effect (variable) name by default (e.g.
+  # "conditionunrelated" -> "condition"); user-supplied `labels` take
+  # precedence. A summarised allFit or a plain data frame carries no model, so
+  # there `labels` is used as given.
   if (inherits(x, "allFit") && length(x)) {
     labels <- merge_pretty_labels(labels, pretty_coef_map(x[[1]]))
   }

@@ -30,10 +30,10 @@ test_that("frequentist_bayesian_plot() handles brms b_-prefixed term names", {
   )
   expect_no_error(p <- frequentist_bayesian_plot(freq, bayes))
   expect_s3_class(p, "ggplot")
-  # Frequentist "stress"/"sleep_hours" align with Bayesian "b_stress"/etc., so
+  # Frequentist "stress"/"sleep hours" align with Bayesian "b_stress"/etc., so
   # no label is duplicated and each concept appears once per source.
   expect_setequal(levels(p$data$label),
-                  c("Intercept", "stress", "sleep_hours"))
+                  c("Intercept", "stress", "sleep hours"))
   expect_equal(anyDuplicated(levels(p$data$label)), 0L)
   # Both sources are present for the shared "stress" term.
   stress_sources <- p$data$source[p$data$label == "stress" &
