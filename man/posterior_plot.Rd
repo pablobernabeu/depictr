@@ -105,9 +105,9 @@ function falls back to the point-and-nested-interval display (equivalent to
 # Wide draws: one column per parameter
 set.seed(1)
 draws <- data.frame(
-  intercept = rnorm(600, 5, 0.3),
-  slope = rnorm(600, 0.8, 0.15),
-  `slope:group` = rnorm(600, -0.2, 0.2),
+  intercept = rnorm(400, 5, 0.3),
+  slope = rnorm(400, 0.8, 0.15),
+  `slope:group` = rnorm(400, -0.2, 0.2),
   check.names = FALSE
 )
 posterior_plot(draws)
@@ -116,5 +116,7 @@ posterior_plot(draws)
 posterior_plot(draws, rope = c(-0.1, 0.1), pd = TRUE)
 
 # When one parameter dwarfs the others, give each its own free-scaled panel:
+\donttest{
 posterior_plot(draws, facet = TRUE)
+}
 }

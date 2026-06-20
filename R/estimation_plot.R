@@ -71,11 +71,14 @@
 #' @export
 #' @examples
 #' set.seed(1)
-#' estimation_plot(lexical_decision, RT, condition)
+#' # n_boot is kept small here for speed; use the default for real work.
+#' estimation_plot(lexical_decision, RT, condition, n_boot = 1000)
+#' \donttest{
 #' estimation_plot(crop_yield, yield, treatment)
 #' # More than two groups: differences vs a chosen reference
 #' estimation_plot(wellbeing_survey, life_satisfaction, region,
 #'                 reference = "North")
+#' }
 estimation_plot <- function(data, y, group, reference = NULL,
                             conf_level = 0.95, n_boot = 5000,
                             effsize = c("hedges_g", "cohens_d", "none"),

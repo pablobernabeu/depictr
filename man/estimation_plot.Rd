@@ -90,11 +90,14 @@ issued in both cases.
 }
 \examples{
 set.seed(1)
-estimation_plot(lexical_decision, RT, condition)
+# n_boot is kept small here for speed; use the default for real work.
+estimation_plot(lexical_decision, RT, condition, n_boot = 1000)
+\donttest{
 estimation_plot(crop_yield, yield, treatment)
 # More than two groups: differences vs a chosen reference
 estimation_plot(wellbeing_survey, life_satisfaction, region,
                 reference = "North")
+}
 }
 \references{
 Cumming, G. (2012). \emph{Understanding the new statistics: Effect sizes,
