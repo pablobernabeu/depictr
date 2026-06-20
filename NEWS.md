@@ -109,6 +109,17 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
   `labels` take precedence.
 * Redundant cluster legends are dropped: `silhouette_plot()` (the bands are
   labelled in place) and `cluster_plot()` when the centroids are labelled.
+* `survival_plot()`: the log-rank annotation now renders a proper chi-squared
+  and an italic *p*; the median guide is labelled "median <value>"; the group
+  legend sits inside the (always-empty) bottom-left of the panel; and the y-axis
+  title margin is tighter.
+* `scree_plot()` colour-matches and names its dual axes -- "Variance explained
+  (bars)" on the left, "Cumulative (line)" on the right.
+* Statistical letters are italic in annotations: the log-rank *p*,
+  `model_report()`'s *n* and *R*, and `estimation_plot()`'s *g* / *d*.
+* British (en-GB) spelling throughout: the `crop_yield` column is now
+  `fertiliser`, `coefficient_plot()`/`model_report()` take `standardise`, and
+  `confusion_matrix_plot()` takes `normalise`.
 
 ## Data
 
