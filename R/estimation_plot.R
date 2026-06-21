@@ -237,8 +237,10 @@ estimation_plot <- function(data, y, group, reference = NULL,
           parse = TRUE,
           inherit.aes = FALSE, vjust = -0.9, colour = "grey25", size = 3
         ) +
+        # The label is drawn above the interval cap, so reserve enough headroom
+        # at the top that it is never clipped by the (often short) lower panel.
         ggplot2::scale_y_continuous(
-          expand = ggplot2::expansion(mult = c(0.08, 0.18))
+          expand = ggplot2::expansion(mult = c(0.08, 0.32))
         )
     }
   }

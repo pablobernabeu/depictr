@@ -114,11 +114,16 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
   and an italic *p*; the median guide is labelled "median <value>"; the group
   legend sits inside the (always-empty) bottom-left of the panel; and the y-axis
   title margin is tighter.
-* More legends move into the plotting area where a corner is reliably empty by
+* Many legends move into the plotting area, over a semi-transparent background,
+  where a corner is reliably empty -- reclaiming the right-hand margin. By
   construction: the multi-model `roc_curve_plot()`, `gain_plot()` and
-  `lift_plot()` legends, and the grouped `ecdf_plot()` legend, now sit over a
-  semi-transparent background in that structurally vacant corner instead of in a
-  right-hand margin.
+  `lift_plot()` legends, the grouped `ecdf_plot()` legend, and `missingness_map()`
+  (whose variables are sorted most- to least-missing, so the rightmost cells are
+  always the most complete). For the typical shape: the overlaid
+  `explore_distribution()` density/histogram legend (top-right, clear of the
+  interior peak) and the `dumbbell_plot()` legend.
+* `estimation_plot()` reserves more headroom above the lower panel so the
+  effect-size annotation (Hedges' *g* / Cohen's *d*) is never clipped.
 * `scree_plot()` colour-matches and names its dual axes -- "Variance explained
   (bars)" on the left, "Cumulative (line)" on the right.
 * Statistical letters are italic in annotations: the log-rank *p*,

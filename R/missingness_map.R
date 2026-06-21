@@ -49,7 +49,7 @@ missingness_map <- function(data, cols = NULL, sort = TRUE, show_pct = TRUE,
   overall <- mean(miss)
   subtitle <- sprintf("%.1f%% of all values are missing", 100 * overall)
 
-  ggplot2::ggplot(
+  p <- ggplot2::ggplot(
     long, ggplot2::aes(x = .data$variable, y = .data$row, fill = .data$missing)
   ) +
     ggplot2::geom_raster() +
@@ -66,4 +66,12 @@ missingness_map <- function(data, cols = NULL, sort = TRUE, show_pct = TRUE,
       axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
       panel.grid.major = ggplot2::element_blank()
     )
+  # Variables are ordered most- to least-missing left-to-right, so the rightmost
+  # columns are the most complete (solid "Present"): a two-item legend tucked
+  # into the top-right covers only those uninformative cells, never a "Missing"
+  # mark. Keep it in the right margin when the columns are left unsorted.
+  if (sort) {
+    p <- p + legend_inside(c(0.99, 0.99), c(1, 1))
+  }
+  p
 }

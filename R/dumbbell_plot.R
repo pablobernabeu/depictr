@@ -96,5 +96,9 @@ dumbbell_plot <- function(data, category, value, group,
     ggplot2::labs(x = x_lab %||% value, y = y_lab %||% category,
                   title = title) +
     theme_depictr(grid = "x")
+  # With the default gap sort the shortest dumbbell sits at the top, so the
+  # top-right corner is usually clear: place the two-group legend there over a
+  # semi-transparent background instead of in a right-hand margin.
+  p <- p + legend_inside(c(0.98, 0.98), c(1, 1))
   p
 }

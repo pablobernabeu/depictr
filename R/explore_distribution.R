@@ -94,6 +94,11 @@ explore_distribution <- function(data, x, group = NULL,
     if (facet) {
       p <- p + ggplot2::facet_wrap(ggplot2::vars(.data[[group]])) +
         ggplot2::theme(legend.position = "none")
+    } else {
+      # Overlaid groups: a unimodal histogram/density peaks in the interior and
+      # tapers to the axes, leaving the upper corners empty, so tuck the colour
+      # legend into the top-right of the panel rather than a right-hand margin.
+      p <- p + legend_inside(c(0.98, 0.98), c(1, 1))
     }
   }
   p
