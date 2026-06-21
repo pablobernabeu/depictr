@@ -15,6 +15,10 @@
 #'   \[0, 1\] to mark with light horizontal guides (e.g. `c(0.25, 0.5, 0.75)`);
 #'   `NULL` (the default) draws none.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
+#' @param legend_inside When `TRUE` (and a `group` is given), draw the legend
+#'   inside the panel -- in the bottom-right corner the ECDF leaves empty once it
+#'   saturates -- over a translucent background, instead of in a right-hand
+#'   margin. Defaults to `FALSE`.
 #' @param title,x_lab,y_lab Plot title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -24,8 +28,8 @@
 #' ecdf_plot(lexical_decision, RT, group = condition,
 #'           reference_quantiles = c(0.25, 0.5, 0.75))
 ecdf_plot <- function(data, x, group = NULL, reference_quantiles = NULL,
-                      palette = NULL, title = NULL, x_lab = NULL,
-                      y_lab = "Cumulative proportion") {
+                      palette = NULL, legend_inside = FALSE, title = NULL,
+                      x_lab = NULL, y_lab = "Cumulative proportion") {
   x <- resolve_var(data, rlang::enquo(x), "x")
   group <- resolve_var(data, rlang::enquo(group), "group")
   if (!is.numeric(data[[x]])) stop("`x` must be numeric.", call. = FALSE)
@@ -66,7 +70,9 @@ ecdf_plot <- function(data, x, group = NULL, reference_quantiles = NULL,
     ggplot2::labs(x = x_lab, y = y_lab, title = title) +
     theme_depictr()
   # An ECDF saturates to 100% before the right edge, leaving the bottom-right
-  # corner free: put the group legend there rather than in a right-hand margin.
-  if (!is.null(group)) p <- p + legend_inside(c(0.98, 0.02), c(1, 0))
+  # corner free: when asked, put the group legend there rather than in a margin.
+  if (legend_inside && !is.null(group)) {
+    p <- p + legend_inside_theme(c(0.98, 0.02), c(1, 0))
+  }
   p
 }

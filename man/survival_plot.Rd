@@ -15,6 +15,7 @@ survival_plot(
   logrank = FALSE,
   risk_breaks = NULL,
   palette = NULL,
+  legend_inside = FALSE,
   title = NULL,
   x_lab = "Time",
   y_lab = "Survival probability"
@@ -49,6 +50,11 @@ subtitle (two or more groups only). Defaults to \code{FALSE}.}
 number at risk. Defaults to the curve's x-axis breaks.}
 
 \item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
+
+\item{legend_inside}{When \code{TRUE} (and there are several groups), draw the
+group legend inside the panel -- in the bottom-left corner a
+monotone-decreasing survival curve always leaves empty -- over a translucent
+background, instead of in a right-hand margin. Defaults to \code{FALSE}.}
 
 \item{title, x_lab, y_lab}{Title and axis labels.}
 }

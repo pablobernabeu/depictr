@@ -16,6 +16,10 @@
 #'   probabilities (or a list of them for the multi-model case).
 #' @param colour Curve colour for the single-model case. Defaults to the depictr
 #'   brand blue. Ignored when several models are overlaid.
+#' @param legend_inside When `TRUE` (and several models are overlaid), draw the
+#'   legend inside the panel -- in the bottom-right triangle the concave curve
+#'   leaves empty -- over a translucent background, instead of in a right-hand
+#'   margin. Defaults to `FALSE`.
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -29,7 +33,8 @@
 #' reduced <- glm(accuracy ~ word_frequency, data = lexical_decision,
 #'                family = binomial)
 #' gain_plot(list(Full = gfit, Reduced = reduced))
-gain_plot <- function(x, score = NULL, colour = depictr_brand(), title = NULL) {
+gain_plot <- function(x, score = NULL, colour = depictr_brand(),
+                      legend_inside = FALSE, title = NULL) {
   models <- as_model_list(x, score)
   multi <- attr(models, "multi")
 
@@ -78,8 +83,8 @@ gain_plot <- function(x, score = NULL, colour = depictr_brand(), title = NULL) {
                   title = title) +
     theme_depictr()
   # A gains curve is concave (above the diagonal), so the bottom-right triangle
-  # is always empty: place the multi-model legend there.
-  if (multi) p <- p + legend_inside(c(0.98, 0.02), c(1, 0))
+  # is always empty: when asked, place the multi-model legend there.
+  if (legend_inside && multi) p <- p + legend_inside_theme(c(0.98, 0.02), c(1, 0))
   p
 }
 
@@ -105,7 +110,8 @@ gain_plot <- function(x, score = NULL, colour = depictr_brand(), title = NULL) {
 #' reduced <- glm(accuracy ~ word_frequency, data = lexical_decision,
 #'                family = binomial)
 #' lift_plot(list(Full = gfit, Reduced = reduced))
-lift_plot <- function(x, score = NULL, colour = depictr_brand(), title = NULL) {
+lift_plot <- function(x, score = NULL, colour = depictr_brand(),
+                      legend_inside = FALSE, title = NULL) {
   models <- as_model_list(x, score)
   multi <- attr(models, "multi")
 
@@ -152,9 +158,9 @@ lift_plot <- function(x, score = NULL, colour = depictr_brand(), title = NULL) {
                   title = title) +
     theme_depictr()
   # Lift decays towards the baseline (1) as the targeted share grows, so the
-  # top-right corner stays empty regardless of model strength: anchor the
-  # multi-model legend there.
-  if (multi) p <- p + legend_inside(c(0.98, 0.98), c(1, 1))
+  # top-right corner stays empty regardless of model strength: when asked, anchor
+  # the multi-model legend there.
+  if (legend_inside && multi) p <- p + legend_inside_theme(c(0.98, 0.98), c(1, 1))
   p
 }
 

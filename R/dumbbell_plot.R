@@ -23,6 +23,10 @@
 #' @param point_size Size of the end points.
 #' @param palette Length-2 colours for the two groups; defaults to
 #'   [depictr_palette()].
+#' @param legend_inside When `TRUE`, draw the two-group legend inside the panel
+#'   -- in the top-right corner, which the default gap sort (shortest dumbbell on
+#'   top) usually leaves clear -- over a translucent background, instead of in a
+#'   right-hand margin. Defaults to `FALSE`.
 #' @param title,x_lab,y_lab Plot title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -33,7 +37,7 @@
 #' dumbbell_plot(wb, region, life_satisfaction, age_group)
 dumbbell_plot <- function(data, category, value, group,
                           sort = c("gap", "value", "none"),
-                          point_size = 3, palette = NULL,
+                          point_size = 3, palette = NULL, legend_inside = FALSE,
                           title = NULL, x_lab = NULL, y_lab = NULL) {
   sort <- match.arg(sort)
   category <- resolve_var(data, rlang::enquo(category), "category")
@@ -97,8 +101,8 @@ dumbbell_plot <- function(data, category, value, group,
                   title = title) +
     theme_depictr(grid = "x")
   # With the default gap sort the shortest dumbbell sits at the top, so the
-  # top-right corner is usually clear: place the two-group legend there over a
-  # semi-transparent background instead of in a right-hand margin.
-  p <- p + legend_inside(c(0.98, 0.98), c(1, 1))
+  # top-right corner is usually clear: when asked, place the two-group legend
+  # there over a semi-transparent background instead of in a right-hand margin.
+  if (legend_inside) p <- p + legend_inside_theme(c(0.98, 0.98), c(1, 1))
   p
 }

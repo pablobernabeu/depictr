@@ -14,6 +14,7 @@ explore_distribution(
   position = NULL,
   palette = NULL,
   facet = FALSE,
+  legend_inside = FALSE,
   title = NULL,
   x_lab = NULL
 )
@@ -44,6 +45,11 @@ otherwise.}
 overlaying them. This is much clearer than an overlay once there are more
 than two or three groups (overlaid histograms in particular become hard to
 read). Defaults to \code{FALSE}. Ignored when there is no \code{group}.}
+
+\item{legend_inside}{When \code{TRUE} (and a \code{group} is given without \code{facet}),
+draw the colour legend inside the panel -- in the top-right corner a
+unimodal histogram/density leaves empty -- over a translucent background,
+instead of in a right-hand margin. Defaults to \code{FALSE}.}
 
 \item{title, x_lab}{Plot title and x-axis label (defaults to the variable
 name).}

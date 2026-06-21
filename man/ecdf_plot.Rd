@@ -10,6 +10,7 @@ ecdf_plot(
   group = NULL,
   reference_quantiles = NULL,
   palette = NULL,
+  legend_inside = FALSE,
   title = NULL,
   x_lab = NULL,
   y_lab = "Cumulative proportion"
@@ -28,6 +29,11 @@ colour, giving one ECDF per group.}
 \code{NULL} (the default) draws none.}
 
 \item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
+
+\item{legend_inside}{When \code{TRUE} (and a \code{group} is given), draw the legend
+inside the panel -- in the bottom-right corner the ECDF leaves empty once it
+saturates -- over a translucent background, instead of in a right-hand
+margin. Defaults to \code{FALSE}.}
 
 \item{title, x_lab, y_lab}{Plot title and axis labels.}
 }

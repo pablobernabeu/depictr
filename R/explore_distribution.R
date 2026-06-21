@@ -22,6 +22,10 @@
 #'   overlaying them. This is much clearer than an overlay once there are more
 #'   than two or three groups (overlaid histograms in particular become hard to
 #'   read). Defaults to `FALSE`. Ignored when there is no `group`.
+#' @param legend_inside When `TRUE` (and a `group` is given without `facet`),
+#'   draw the colour legend inside the panel -- in the top-right corner a
+#'   unimodal histogram/density leaves empty -- over a translucent background,
+#'   instead of in a right-hand margin. Defaults to `FALSE`.
 #' @param title,x_lab Plot title and x-axis label (defaults to the variable
 #'   name).
 #'
@@ -37,6 +41,7 @@ explore_distribution <- function(data, x, group = NULL,
                               type = c("histogram", "density", "both"),
                               bins = 30, alpha = 0.6, position = NULL,
                               palette = NULL, facet = FALSE,
+                              legend_inside = FALSE,
                               title = NULL, x_lab = NULL) {
   type <- match.arg(type)
   x <- resolve_var(data, rlang::enquo(x), "x")
@@ -94,11 +99,11 @@ explore_distribution <- function(data, x, group = NULL,
     if (facet) {
       p <- p + ggplot2::facet_wrap(ggplot2::vars(.data[[group]])) +
         ggplot2::theme(legend.position = "none")
-    } else {
+    } else if (legend_inside) {
       # Overlaid groups: a unimodal histogram/density peaks in the interior and
-      # tapers to the axes, leaving the upper corners empty, so tuck the colour
-      # legend into the top-right of the panel rather than a right-hand margin.
-      p <- p + legend_inside(c(0.98, 0.98), c(1, 1))
+      # tapers to the axes, leaving the upper corners empty, so (when asked) tuck
+      # the colour legend into the top-right rather than a right-hand margin.
+      p <- p + legend_inside_theme(c(0.98, 0.98), c(1, 1))
     }
   }
   p

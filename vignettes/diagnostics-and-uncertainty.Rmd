@@ -107,8 +107,12 @@ reduced <- glm(adverse_event ~ biomarker, data = clinical_trial,
 models <- list(Full = gfit, `Biomarker only` = reduced)
 ```
 
+Because an ROC curve hugs the top-left, the bottom-right corner is always free,
+so `legend_inside = TRUE` tucks the per-model legend there and reclaims the
+right-hand margin:
+
 ```{r, fig.width = 5, fig.height = 5}
-roc_curve_plot(models, youden = TRUE)
+roc_curve_plot(models, youden = TRUE, legend_inside = TRUE)
 ```
 
 ```{r, fig.width = 5, fig.height = 5}
@@ -120,11 +124,11 @@ many positive cases are captured as more of the score-ordered population is
 targeted -- again overlaying both models:
 
 ```{r, fig.width = 5, fig.height = 5}
-gain_plot(models)
+gain_plot(models, legend_inside = TRUE)
 ```
 
 ```{r, fig.height = 3.6}
-lift_plot(models)
+lift_plot(models, legend_inside = TRUE)
 ```
 
 ### Choosing an operating point

@@ -11,6 +11,7 @@ roc_curve_plot(
   ci = FALSE,
   conf_level = 0.95,
   youden = FALSE,
+  legend_inside = FALSE,
   title = NULL
 )
 }
@@ -35,6 +36,11 @@ sets the number of resamples. Ignored when several models are overlaid.}
 
 \item{youden}{Logical; if \code{TRUE}, mark the Youden's J operating point (the
 threshold maximising sensitivity + specificity - 1) on each curve.}
+
+\item{legend_inside}{When \code{TRUE} (and several models are overlaid), draw the
+legend inside the panel -- in the bottom-right corner the curve leaves empty
+-- over a translucent background, instead of in a right-hand margin.
+Defaults to \code{FALSE}.}
 
 \item{title}{Plot title.}
 }

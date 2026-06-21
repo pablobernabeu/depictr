@@ -4,7 +4,13 @@
 \alias{lift_plot}
 \title{Cumulative lift chart}
 \usage{
-lift_plot(x, score = NULL, colour = depictr_brand(), title = NULL)
+lift_plot(
+  x,
+  score = NULL,
+  colour = depictr_brand(),
+  legend_inside = FALSE,
+  title = NULL
+)
 }
 \arguments{
 \item{x}{A binomial \code{glm}; the vector of observed outcomes (0/1, logical or a
@@ -16,6 +22,11 @@ probabilities (or a list of them for the multi-model case).}
 
 \item{colour}{Curve colour for the single-model case. Defaults to the depictr
 brand blue. Ignored when several models are overlaid.}
+
+\item{legend_inside}{When \code{TRUE} (and several models are overlaid), draw the
+legend inside the panel -- in the bottom-right triangle the concave curve
+leaves empty -- over a translucent background, instead of in a right-hand
+margin. Defaults to \code{FALSE}.}
 
 \item{title}{Plot title.}
 }

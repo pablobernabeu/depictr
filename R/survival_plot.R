@@ -43,6 +43,10 @@
 #' @param risk_breaks Optional numeric vector of times at which to report the
 #'   number at risk. Defaults to the curve's x-axis breaks.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
+#' @param legend_inside When `TRUE` (and there are several groups), draw the
+#'   group legend inside the panel -- in the bottom-left corner a
+#'   monotone-decreasing survival curve always leaves empty -- over a translucent
+#'   background, instead of in a right-hand margin. Defaults to `FALSE`.
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object, or - when `risk_table = TRUE` - a
@@ -74,7 +78,8 @@
 survival_plot <- function(time, status = NULL, group = NULL, conf_level = 0.95,
                           censor_marks = TRUE, risk_table = FALSE,
                           median_line = FALSE, logrank = FALSE,
-                          risk_breaks = NULL, palette = NULL, title = NULL,
+                          risk_breaks = NULL, palette = NULL,
+                          legend_inside = FALSE, title = NULL,
                           x_lab = "Time", y_lab = "Survival probability") {
   km <- km_input(time, status, group, conf_level)
   has_ci <- !is.na(conf_level) && all(c("lower", "upper") %in% names(km$curve))
@@ -136,15 +141,11 @@ survival_plot <- function(time, status = NULL, group = NULL, conf_level = 0.95,
     ggplot2::theme(axis.title.y = ggplot2::element_text(
       margin = ggplot2::margin(r = 2)))
 
-  # Tuck the group legend into the bottom-left of the panel, which a
-  # monotone-decreasing survival curve always leaves empty, rather than spending
-  # a whole column on it beside the plot.
-  if (multi) {
-    p <- p + ggplot2::theme(
-      legend.position = "inside",
-      legend.position.inside = c(0.015, 0.04),
-      legend.justification = c(0, 0)
-    )
+  # A monotone-decreasing survival curve always leaves the bottom-left empty;
+  # when asked, tuck the group legend there rather than spending a whole column
+  # on it beside the plot.
+  if (legend_inside && multi) {
+    p <- p + legend_inside_theme(c(0.015, 0.04), c(0, 0))
   }
 
   if (!risk_table) return(p)

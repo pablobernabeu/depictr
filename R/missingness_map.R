@@ -15,6 +15,10 @@
 #' @param colours Length-2 vector: colours for present and missing cells.
 #'   Defaults to a muted grey for present cells and the colourblind-safe
 #'   [depictr_palette()] accent for missing cells.
+#' @param legend_inside When `TRUE` (and `sort = TRUE`), draw the legend inside
+#'   the panel, in the top-right -- where the most-complete columns put a solid
+#'   "Present" block, so it hides no "Missing" mark -- instead of in a right-hand
+#'   margin. Defaults to `FALSE`.
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -23,7 +27,7 @@
 #' missingness_map(wellbeing_survey)
 missingness_map <- function(data, cols = NULL, sort = TRUE, show_pct = TRUE,
                              colours = c("grey85", depictr_accent()),
-                             title = NULL) {
+                             legend_inside = FALSE, title = NULL) {
   if (!is.data.frame(data)) stop("`data` must be a data frame.", call. = FALSE)
   if (is.null(cols)) cols <- names(data) else check_columns(data, cols)
   if (length(colours) != 2) {
@@ -69,9 +73,9 @@ missingness_map <- function(data, cols = NULL, sort = TRUE, show_pct = TRUE,
   # Variables are ordered most- to least-missing left-to-right, so the rightmost
   # columns are the most complete (solid "Present"): a two-item legend tucked
   # into the top-right covers only those uninformative cells, never a "Missing"
-  # mark. Keep it in the right margin when the columns are left unsorted.
-  if (sort) {
-    p <- p + legend_inside(c(0.99, 0.99), c(1, 1))
+  # mark. Only offered when the columns are sorted.
+  if (legend_inside && sort) {
+    p <- p + legend_inside_theme(c(0.99, 0.99), c(1, 1))
   }
   p
 }

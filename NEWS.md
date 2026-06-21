@@ -111,17 +111,16 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
 * Redundant cluster legends are dropped: `silhouette_plot()` (the bands are
   labelled in place) and `cluster_plot()` when the centroids are labelled.
 * `survival_plot()`: the log-rank annotation now renders a proper chi-squared
-  and an italic *p*; the median guide is labelled "median <value>"; the group
-  legend sits inside the (always-empty) bottom-left of the panel; and the y-axis
-  title margin is tighter.
-* Many legends move into the plotting area, over a semi-transparent background,
-  where a corner is reliably empty -- reclaiming the right-hand margin. By
-  construction: the multi-model `roc_curve_plot()`, `gain_plot()` and
-  `lift_plot()` legends, the grouped `ecdf_plot()` legend, and `missingness_map()`
-  (whose variables are sorted most- to least-missing, so the rightmost cells are
-  always the most complete). For the typical shape: the overlaid
-  `explore_distribution()` density/histogram legend (top-right, clear of the
-  interior peak) and the `dumbbell_plot()` legend.
+  and an italic *p*; the median guide is labelled "median <value>"; and the
+  y-axis title margin is tighter.
+* A `legend_inside` argument (off by default) draws the legend inside the panel,
+  over a semi-transparent background, in a corner the plot usually leaves empty
+  -- reclaiming the right-hand margin. It is offered by `roc_curve_plot()`,
+  `gain_plot()`, `lift_plot()` (bottom-right / top-right of the curve),
+  `ecdf_plot()`, `survival_plot()`, `explore_distribution()`, `dumbbell_plot()`
+  and `missingness_map()`. For any other plot the same is one `theme()` call;
+  `vignette("exploring-data")` shows how, alongside tidying and centring legend
+  titles.
 * `estimation_plot()` reserves more headroom above the lower panel so the
   effect-size annotation (Hedges' *g* / Cohen's *d*) is never clipped.
 * `scree_plot()` colour-matches and names its dual axes -- "Variance explained

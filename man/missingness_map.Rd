@@ -10,6 +10,7 @@ missingness_map(
   sort = TRUE,
   show_pct = TRUE,
   colours = c("grey85", depictr_accent()),
+  legend_inside = FALSE,
   title = NULL
 )
 }
@@ -25,6 +26,11 @@ missingness_map(
 \item{colours}{Length-2 vector: colours for present and missing cells.
 Defaults to a muted grey for present cells and the colourblind-safe
 \code{\link[=depictr_palette]{depictr_palette()}} accent for missing cells.}
+
+\item{legend_inside}{When \code{TRUE} (and \code{sort = TRUE}), draw the legend inside
+the panel, in the top-right -- where the most-complete columns put a solid
+"Present" block, so it hides no "Missing" mark -- instead of in a right-hand
+margin. Defaults to \code{FALSE}.}
 
 \item{title}{Plot title.}
 }

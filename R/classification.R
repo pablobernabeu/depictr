@@ -26,6 +26,10 @@
 #' @param conf_level Confidence level for the bootstrap band.
 #' @param youden Logical; if `TRUE`, mark the Youden's J operating point (the
 #'   threshold maximising sensitivity + specificity - 1) on each curve.
+#' @param legend_inside When `TRUE` (and several models are overlaid), draw the
+#'   legend inside the panel -- in the bottom-right corner the curve leaves empty
+#'   -- over a translucent background, instead of in a right-hand margin.
+#'   Defaults to `FALSE`.
 #' @param title Plot title.
 #'
 #' @details
@@ -52,7 +56,7 @@
 #' roc_curve_plot(list(Full = gfit, Reduced = reduced))
 roc_curve_plot <- function(x, score = NULL, colour = depictr_brand(),
                            ci = FALSE, conf_level = 0.95, youden = FALSE,
-                           title = NULL) {
+                           legend_inside = FALSE, title = NULL) {
   models <- as_model_list(x, score)
   multi <- attr(models, "multi")
 
@@ -145,9 +149,9 @@ roc_curve_plot <- function(x, score = NULL, colour = depictr_brand(),
     ggplot2::labs(x = "False positive rate", y = "True positive rate",
                   title = title) +
     theme_depictr()
-  # The curve hugs the top-left, so the bottom-right corner is always free: tuck
-  # the multi-model legend in there instead of using a right-hand margin.
-  if (multi) p <- p + legend_inside(c(0.98, 0.02), c(1, 0))
+  # The curve hugs the top-left, so the bottom-right corner is always free: when
+  # asked, tuck the multi-model legend there instead of using a right-hand margin.
+  if (legend_inside && multi) p <- p + legend_inside_theme(c(0.98, 0.02), c(1, 0))
 
   attr(p, "auc") <- if (multi) stats::setNames(aucs, names(models)) else aucs[[1]]
   if (isTRUE(youden)) {
