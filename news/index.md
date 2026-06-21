@@ -204,6 +204,16 @@ out of, and generalises, three earlier plotting functions
   *p*; the median guide is labelled “median ”; the group legend sits
   inside the (always-empty) bottom-left of the panel; and the y-axis
   title margin is tighter.
+- More legends move into the plotting area where a corner is reliably
+  empty by construction: the multi-model
+  [`roc_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/roc_curve_plot.md),
+  [`gain_plot()`](https://pablobernabeu.github.io/depictr/reference/gain_plot.md)
+  and
+  [`lift_plot()`](https://pablobernabeu.github.io/depictr/reference/lift_plot.md)
+  legends, and the grouped
+  [`ecdf_plot()`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot.md)
+  legend, now sit over a semi-transparent background in that
+  structurally vacant corner instead of in a right-hand margin.
 - [`scree_plot()`](https://pablobernabeu.github.io/depictr/reference/scree_plot.md)
   colour-matches and names its dual axes – “Variance explained (bars)”
   on the left, “Cumulative (line)” on the right.
