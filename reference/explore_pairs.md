@@ -15,6 +15,7 @@ explore_pairs(
   group = NULL,
   max_cols = 8,
   point_alpha = 0.5,
+  method = c("pearson", "spearman", "kendall"),
   palette = NULL,
   title = NULL
 )
@@ -43,6 +44,12 @@ explore_pairs(
 
   Point transparency in the scatter panels.
 
+- method:
+
+  Correlation method for the upper-triangle coefficients, passed to
+  [`stats::cor()`](https://rdrr.io/r/stats/cor.html): `"pearson"`,
+  `"spearman"` or `"kendall"`.
+
 - palette:
 
   Colours for the groups; defaults to
@@ -60,11 +67,11 @@ A 'patchwork' object (printable like a
 ## Examples
 
 ``` r
-explore_pairs(crop_yield, cols = c("rainfall", "fertilizer", "yield"))
+explore_pairs(crop_yield, cols = c("rainfall", "fertiliser", "yield"))
 
 # \donttest{
-explore_pairs(crop_yield, cols = c("rainfall", "fertilizer", "yield"),
-              group = treatment)
+explore_pairs(crop_yield, cols = c("rainfall", "fertiliser", "yield"),
+              group = treatment, method = "spearman")
 
 # }
 ```

@@ -28,7 +28,8 @@ explore_categorical(
 
 - x:
 
-  The categorical variable (string or unquoted name).
+  The categorical variable (string or unquoted name). Numeric columns
+  are accepted only when they have at most 20 distinct values.
 
 - group:
 
@@ -65,6 +66,14 @@ explore_categorical(
 
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
 object.
+
+## Details
+
+A continuous numeric column (more than 20 distinct values) is rejected
+with an error, since coercing it to a factor would draw one bar per
+value; use
+[`explore_distribution()`](https://pablobernabeu.github.io/depictr/reference/explore_distribution.md)
+for such variables instead.
 
 ## Examples
 

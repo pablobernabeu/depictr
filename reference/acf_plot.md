@@ -36,7 +36,8 @@ acf_plot(
 
 - conf_level:
 
-  Confidence level for the significance bounds.
+  Confidence level for the significance bounds; a single number strictly
+  between 0 and 1.
 
 - title, x_lab, y_lab:
 

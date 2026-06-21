@@ -55,7 +55,7 @@ The `filename`, invisibly.
 ## Examples
 
 ``` r
-p <- scatter_trend(crop_yield, fertilizer, yield)
+p <- scatter_trend(crop_yield, fertiliser, yield)
 tmp <- file.path(tempdir(), "yield.png")
 save_plot(tmp, p)
 ```

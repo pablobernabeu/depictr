@@ -185,6 +185,8 @@ edition. Springer, Cham, Switzerland. ISBN 978-3-319-24277-4.
 
 Useful links:
 
+- <https://pablobernabeu.github.io/depictr/>
+
 - <https://github.com/pablobernabeu/depictr>
 
 - Report bugs at <https://github.com/pablobernabeu/depictr/issues>

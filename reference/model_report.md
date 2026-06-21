@@ -11,7 +11,13 @@ and serves well for a rapid model review or a report appendix.
 ## Usage
 
 ``` r
-model_report(model, predictor = NULL, title = NULL, subtitle = NULL)
+model_report(
+  model,
+  predictor = NULL,
+  standardise = TRUE,
+  title = NULL,
+  subtitle = NULL
+)
 ```
 
 ## Arguments
@@ -24,6 +30,13 @@ model_report(model, predictor = NULL, title = NULL, subtitle = NULL)
 
   Focal predictor for the effect panel. If `NULL`, the first numeric
   predictor (or, failing that, the first predictor) is used.
+
+- standardise:
+
+  Whether the coefficient panel shows standardised coefficients (each
+  scaled by its predictor's standard deviation). Defaults to `TRUE`,
+  which keeps the panel readable in this compact overview by putting
+  predictors on a common scale; set `FALSE` for raw estimates.
 
 - title:
 
@@ -42,14 +55,12 @@ A 'patchwork' object (printable like a
 ## Examples
 
 ``` r
-fit <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment,
+fit <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment,
           data = crop_yield)
 model_report(fit, title = "Crop-yield model")
-#> `height` was translated to `width`.
 
 
 gfit <- glm(accuracy ~ word_frequency + RT + condition,
             data = lexical_decision, family = binomial)
 model_report(gfit)
-#> `height` was translated to `width`.
 ```

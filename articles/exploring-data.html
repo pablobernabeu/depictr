@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Exploring data • depictr</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -77,9 +82,12 @@
 
     
     
-<p>depictr provides a coherent set of exploratory plots and a
-descriptive table, all sharing the package theme and palette. Column
-names can be given quoted or unquoted.</p>
+<p>depictr provides a coherent set of exploratory plots, estimation
+plots and a descriptive table, all sharing the package theme and
+palette. Column names can be given quoted or unquoted. The examples use
+the bundled <code>lexical_decision</code>, <code>wellbeing_survey</code>
+and <code>crop_yield</code> datasets. A closing section shows how to
+customise any of these plots with ordinary ggplot2 code.</p>
 <div class="section level2">
 <h2 id="one-variable">One variable<a class="anchor" aria-label="anchor" href="#one-variable"></a>
 </h2>
@@ -88,10 +96,24 @@ names can be given quoted or unquoted.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/explore_distribution.html">explore_distribution</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">RT</span>, group <span class="op">=</span> <span class="va">condition</span>, type <span class="op">=</span> <span class="st">"density"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="exploring-data_files/figure-html/unnamed-chunk-1-1.png" class="r-plt" alt="" width="672"></p>
+<p>An overlay gets crowded once there are several groups, so
+<code>facet = TRUE</code> gives each group its own panel:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/explore_distribution.html">explore_distribution</a></span><span class="op">(</span><span class="va">wellbeing_survey</span>, <span class="va">life_satisfaction</span>, group <span class="op">=</span> <span class="va">region</span>,</span>
+<span>                     type <span class="op">=</span> <span class="st">"both"</span>, facet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" alt="" width="672"></p>
+<p><code><a href="../reference/ecdf_plot.html">ecdf_plot()</a></code> is a bin-free alternative: the empirical
+cumulative distribution lets you read medians and quantiles straight off
+the curve and makes a shift between groups obvious (here the related
+condition is faster throughout).</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ecdf_plot.html">ecdf_plot</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">RT</span>, group <span class="op">=</span> <span class="va">condition</span>,</span>
+<span>          reference_quantiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="672"></p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/explore_categorical.html">explore_categorical</a></span><span class="op">(</span><span class="va">wellbeing_survey</span>, <span class="va">education</span>, group <span class="op">=</span> <span class="va">region</span>,</span>
 <span>                    proportion <span class="op">=</span> <span class="cn">TRUE</span>, position <span class="op">=</span> <span class="st">"dodge"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="exploring-data_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="two-variables-any-types">Two variables, any types<a class="anchor" aria-label="anchor" href="#two-variables-any-types"></a>
@@ -100,14 +122,16 @@ names can be given quoted or unquoted.</p>
 automatically: a scatter plot for two numeric variables, box plots for a
 numeric variable against a categorical one, and a filled bar chart for
 two categorical variables.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/explore_bivariate.html">explore_bivariate</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">condition</span>, <span class="va">RT</span><span class="op">)</span></span></code></pre></div>
-<p><img src="exploring-data_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="672"></p>
 <p>For a focused scatter with a fitted trend, use
-<code><a href="../reference/scatter_trend.html">scatter_trend()</a></code>:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/scatter_trend.html">scatter_trend</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="va">fertilizer</span>, <span class="va">yield</span>, group <span class="op">=</span> <span class="va">treatment</span><span class="op">)</span></span></code></pre></div>
-<p><img src="exploring-data_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="672"></p>
+<code><a href="../reference/scatter_trend.html">scatter_trend()</a></code>. The crop-yield trial has a real
+fertiliser-by-treatment interaction, visible here as two diverging
+slopes.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/scatter_trend.html">scatter_trend</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="va">fertiliser</span>, <span class="va">yield</span>, group <span class="op">=</span> <span class="va">treatment</span><span class="op">)</span></span></code></pre></div>
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="many-variables-at-once">Many variables at once<a class="anchor" aria-label="anchor" href="#many-variables-at-once"></a>
@@ -115,12 +139,18 @@ two categorical variables.</p>
 <p><code><a href="../reference/explore_pairs.html">explore_pairs()</a></code> is a scatter-plot matrix;
 <code><a href="../reference/correlation_heatmap.html">correlation_heatmap()</a></code> condenses the same information into a
 single coloured grid.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/explore_pairs.html">explore_pairs</a></span><span class="op">(</span><span class="va">crop_yield</span>, cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rainfall"</span>, <span class="st">"fertilizer"</span>, <span class="st">"soil_ph"</span>, <span class="st">"yield"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="exploring-data_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="672"></p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/explore_pairs.html">explore_pairs</a></span><span class="op">(</span><span class="va">crop_yield</span>, cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rainfall"</span>, <span class="st">"fertiliser"</span>, <span class="st">"soil_ph"</span>, <span class="st">"yield"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="672"></p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/correlation_heatmap.html">correlation_heatmap</a></span><span class="op">(</span><span class="va">wellbeing_survey</span><span class="op">)</span></span></code></pre></div>
-<p><img src="exploring-data_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="672"></p>
+<p><code>reorder = TRUE</code> orders the variables by hierarchical
+clustering, so blocks of mutually correlated variables sit together and
+the structure is easier to read:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/correlation_heatmap.html">correlation_heatmap</a></span><span class="op">(</span><span class="va">wellbeing_survey</span>, reorder <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="distributions-across-groups">Distributions across groups<a class="anchor" aria-label="anchor" href="#distributions-across-groups"></a>
@@ -130,44 +160,98 @@ the raw points together, and <code><a href="../reference/group_comparison_plot.h
 the group means with confidence intervals over the raw data. By showing
 the estimate alongside its uncertainty, the latter conveys whether the
 groups differ more faithfully than a bar chart.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/raincloud_plot.html">raincloud_plot</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">RT</span>, group <span class="op">=</span> <span class="va">condition</span><span class="op">)</span></span></code></pre></div>
-<p><img src="exploring-data_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="672"></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="672"></p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/group_comparison_plot.html">group_comparison_plot</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">RT</span>, <span class="va">condition</span><span class="op">)</span></span></code></pre></div>
-<p><img src="exploring-data_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="672"></p>
+<p>To compare the <em>shape</em> of a distribution across several groups
+at once, <code><a href="../reference/ridgeline_plot.html">ridgeline_plot()</a></code> stacks one partially overlapping
+density per group:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ridgeline_plot.html">ridgeline_plot</a></span><span class="op">(</span><span class="va">wellbeing_survey</span>, <span class="va">life_satisfaction</span>, <span class="va">region</span><span class="op">)</span></span></code></pre></div>
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="672"></p>
+</div>
+<div class="section level2">
+<h2 id="estimation-plots-effect-size-not-just-a-p-value">Estimation plots: effect size, not just a p-value<a class="anchor" aria-label="anchor" href="#estimation-plots-effect-size-not-just-a-p-value"></a>
+</h2>
+<p>An <em>estimation plot</em> puts the effect size and its uncertainty
+at the centre of the comparison. <code><a href="../reference/estimation_plot.html">estimation_plot()</a></code> draws
+the classic Gardner-Altman two-group plot: the raw data with group means
+on top, and the <strong>mean difference</strong> with a bootstrap
+confidence interval beneath, aligned so a difference of zero sits under
+the reference group’s mean. With two groups it also annotates a
+standardised effect size (Hedges’ <em>g</em> by default).</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/estimation_plot.html">estimation_plot</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">RT</span>, <span class="va">condition</span>,</span>
+<span>                title <span class="op">=</span> <span class="st">"RT difference: unrelated vs. related priming"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="672"></p>
+<p><code>group_comparison_plot(differences = TRUE)</code> is the same
+idea reached from the group-means plot: it appends the difference panel,
+turning a means comparison into a full estimation plot. With more than
+two groups every other group is compared against a chosen reference (a
+Cumming plot).</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/group_comparison_plot.html">group_comparison_plot</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="va">yield</span>, <span class="va">treatment</span>, differences <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                      title <span class="op">=</span> <span class="st">"Yield difference: enhanced vs. standard"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="672"></p>
+</div>
+<div class="section level2">
+<h2 id="comparing-two-groups-across-categories">Comparing two groups across categories<a class="anchor" aria-label="anchor" href="#comparing-two-groups-across-categories"></a>
+</h2>
+<p><code><a href="../reference/dumbbell_plot.html">dumbbell_plot()</a></code> compares one value between two groups
+across a set of categories: the two group values per category are joined
+by a segment, so the size and direction of each gap is clear at a
+glance. Here it contrasts younger and older respondents’ life
+satisfaction by region.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">wb</span> <span class="op">&lt;-</span> <span class="va">wellbeing_survey</span></span>
+<span><span class="va">wb</span><span class="op">$</span><span class="va">age_group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">wb</span><span class="op">$</span><span class="va">age</span> <span class="op">&lt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">wb</span><span class="op">$</span><span class="va">age</span><span class="op">)</span>, <span class="st">"younger"</span>, <span class="st">"older"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/dumbbell_plot.html">dumbbell_plot</a></span><span class="op">(</span><span class="va">wb</span>, <span class="va">region</span>, <span class="va">life_satisfaction</span>, <span class="va">age_group</span><span class="op">)</span></span></code></pre></div>
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="data-quality-outliers-and-missingness">Data quality: outliers and missingness<a class="anchor" aria-label="anchor" href="#data-quality-outliers-and-missingness"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/outlier_plot.html">outlier_plot</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="va">yield</span><span class="op">)</span></span></code></pre></div>
-<p><img src="exploring-data_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="672"></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="672"></p>
+<p><code>wellbeing_survey</code> has <em>informative</em> missingness –
+income is missing more often at higher stress – so the missingness map
+is worth a look before modelling.</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/missingness_map.html">missingness_map</a></span><span class="op">(</span><span class="va">wellbeing_survey</span><span class="op">)</span></span></code></pre></div>
-<p><img src="exploring-data_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="a-descriptive-summary-table">A descriptive summary table<a class="anchor" aria-label="anchor" href="#a-descriptive-summary-table"></a>
 </h2>
 <p><code><a href="../reference/summary_table.html">summary_table()</a></code> builds a “Table 1”: mean (SD) for
 numeric variables, counts and percentages for categorical ones,
-optionally by group. It returns a plain data frame, ready for
+optionally by group. The first row always reports the sample size
+(<code>N</code>), and any variable with missing values gets a
+<code>Missing, n (%)</code> row – both visible here for the wellbeing
+survey. It returns a plain data frame, ready for
 <code><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">knitr::kable()</a></code>.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/summary_table.html">summary_table</a></span><span class="op">(</span><span class="va">wellbeing_survey</span>,</span>
-<span>                     vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"life_satisfaction"</span>, <span class="st">"stress"</span>, <span class="st">"education"</span><span class="op">)</span>,</span>
-<span>                     group <span class="op">=</span> <span class="st">"region"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/summary_table.html">summary_table</a></span><span class="op">(</span></span>
+<span>  <span class="va">wellbeing_survey</span>,</span>
+<span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"life_satisfaction"</span>, <span class="st">"income"</span>, <span class="st">"stress"</span>, <span class="st">"education"</span><span class="op">)</span>,</span>
+<span>  group <span class="op">=</span> <span class="st">"region"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">tab</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
-<col width="21%">
-<col width="17%">
+<col width="14%">
 <col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">variable</th>
@@ -180,13 +264,49 @@ optionally by group. It returns a plain data frame, ready for
 </tr></thead>
 <tbody>
 <tr class="odd">
+<td align="left">N</td>
+<td align="left"></td>
+<td align="left">300</td>
+<td align="left">69</td>
+<td align="left">82</td>
+<td align="left">67</td>
+<td align="left">82</td>
+</tr>
+<tr class="even">
 <td align="left">life_satisfaction</td>
 <td align="left">Mean (SD)</td>
-<td align="left">5.0 (1.1)</td>
-<td align="left">5.2 (1.0)</td>
-<td align="left">5.1 (1.1)</td>
+<td align="left">4.4 (1.0)</td>
 <td align="left">4.6 (1.0)</td>
-<td align="left">4.9 (1.1)</td>
+<td align="left">4.5 (1.1)</td>
+<td align="left">4.0 (1.0)</td>
+<td align="left">4.3 (1.0)</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left">Missing, n (%)</td>
+<td align="left">7 (2%)</td>
+<td align="left">1 (1%)</td>
+<td align="left">3 (4%)</td>
+<td align="left">1 (1%)</td>
+<td align="left">2 (2%)</td>
+</tr>
+<tr class="even">
+<td align="left">income</td>
+<td align="left">Mean (SD)</td>
+<td align="left">31126.9 (13354.8)</td>
+<td align="left">30960.9 (12789.8)</td>
+<td align="left">31706.4 (13884.6)</td>
+<td align="left">29459.5 (12954.0)</td>
+<td align="left">31955.4 (13700.7)</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left">Missing, n (%)</td>
+<td align="left">25 (8%)</td>
+<td align="left">7 (10%)</td>
+<td align="left">6 (7%)</td>
+<td align="left">8 (12%)</td>
+<td align="left">4 (5%)</td>
 </tr>
 <tr class="even">
 <td align="left">stress</td>
@@ -226,6 +346,36 @@ optionally by group. It returns a plain data frame, ready for
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section level2">
+<h2 id="customising-and-extending-the-plots">Customising and extending the plots<a class="anchor" aria-label="anchor" href="#customising-and-extending-the-plots"></a>
+</h2>
+<p>Every depictr function returns a plain <code>ggplot2</code> object
+(composite figures return a <code>patchwork</code>), so you can keep
+adding layers, scales, labels and theme tweaks with the usual
+<code>+</code>:</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/scatter_trend.html">scatter_trend</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="va">fertiliser</span>, <span class="va">yield</span>, group <span class="op">=</span> <span class="va">treatment</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Yield rises with fertiliser"</span>,</span>
+<span>       subtitle <span class="op">=</span> <span class="st">"More steeply under the enhanced treatment"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-19-1.png" class="r-plt" alt="" width="672"></p>
+<p>All the standard ggplot2 adjustments apply. A common one is reversing
+a colour legend so it reads in the same direction as the plotted
+curves:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ecdf_plot.html">ecdf_plot</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">RT</span>, group <span class="op">=</span> <span class="va">condition</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>reverse <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="exploring-data_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" alt="" width="672"></p>
+<p>Many functions also expose layout controls directly.
+<code>explore_distribution(facet = TRUE)</code> and
+<code><a href="../reference/ridgeline_plot.html">ridgeline_plot()</a></code> separate groups,
+<code>correlation_heatmap(reorder = TRUE)</code> clusters variables, and
+the model-estimate plots take <code>facet</code> and
+<code>standardise</code> to keep coefficients on very different scales
+legible – see <code><a href="../articles/model-estimates.html">vignette("model-estimates")</a></code>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -16,6 +16,9 @@ group_comparison_plot(
   conf_level = 0.95,
   show_points = TRUE,
   point_alpha = 0.25,
+  differences = FALSE,
+  reference = NULL,
+  n_boot = 5000,
   palette = NULL,
   title = NULL,
   x_lab = NULL,
@@ -49,6 +52,25 @@ group_comparison_plot(
 
   Transparency of the raw points.
 
+- differences:
+
+  If `TRUE`, append a lower panel showing the pairwise mean
+  difference(s) against a reference group, each with a bootstrap
+  confidence interval, turning the plot into a full estimation plot via
+  [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md).
+  The return value is then a 'patchwork' object. Defaults to `FALSE`
+  (the plain group-means plot, fully backward-compatible).
+
+- reference:
+
+  Reference group for the difference panel when `differences = TRUE`;
+  defaults to the first level of `group`. Ignored otherwise.
+
+- n_boot:
+
+  Number of bootstrap resamples for the difference intervals when
+  `differences = TRUE`. Ignored otherwise.
+
 - palette:
 
   Colours for the groups; defaults to
@@ -61,7 +83,13 @@ group_comparison_plot(
 ## Value
 
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
-object.
+object, or a 'patchwork' object when `differences = TRUE`.
+
+## Details
+
+A group with a single observation has no degrees of freedom for a
+t-based interval, so only its mean is drawn (no interval) and a warning
+is issued.
 
 ## Examples
 
@@ -69,4 +97,8 @@ object.
 group_comparison_plot(lexical_decision, RT, condition)
 
 group_comparison_plot(crop_yield, yield, treatment)
+
+# Append the pairwise mean-difference panel (an estimation plot):
+set.seed(1)
+group_comparison_plot(crop_yield, yield, treatment, differences = TRUE)
 ```

@@ -1,7 +1,8 @@
 # Multivariate analysis and survival
 
-Beyond regression, depictr covers two staples of applied data analysis:
-principal component analysis and survival curves.
+Beyond regression, depictr covers three staples of applied data
+analysis: principal component analysis, clustering (with quality
+diagnostics) and survival curves.
 
 ## Principal component analysis
 
@@ -14,7 +15,7 @@ shows how much variance each component explains.
 
 ``` r
 
-num <- c("rainfall", "fertilizer", "soil_ph", "yield")
+num <- c("rainfall", "fertiliser", "soil_ph", "yield")
 pca_plot(crop_yield, cols = num, group = "treatment",
          title = "Crop-yield PCA")
 ```
@@ -51,7 +52,8 @@ draws a hierarchical-clustering tree and can cut it into `k` groups.
 
 ``` r
 
-cluster_plot(crop_yield, cols = num, k = 3, title = "Crop-yield clusters")
+cluster_plot(crop_yield, cols = num, k = 3, seed = 1,
+             title = "Crop-yield clusters")
 ```
 
 ![](multivariate-and-survival_files/figure-html/unnamed-chunk-4-1.png)
@@ -68,6 +70,75 @@ dendrogram_plot(region_means[-1], k = 2, title = "Regions clustered")
 
 ![](multivariate-and-survival_files/figure-html/unnamed-chunk-5-1.png)
 
+## How many clusters? Quality diagnostics
+
+Choosing `k` should not be guesswork.
+[`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
+evaluates a cluster-quality criterion across a range of `k` and suggests
+a value – by the average silhouette width (the default, after Rousseeuw,
+1987), the within-sum-of-squares elbow, or the gap statistic
+(Tibshirani, Walther & Hastie, 2001). See
+[`?k_diagnostic`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
+for the references.
+
+``` r
+
+kd <- k_diagnostic(crop_yield, k_range = 2:6, cols = num,
+                   method = "silhouette")
+kd  # the diagnostic curve, with the suggested k marked
+```
+
+![](multivariate-and-survival_files/figure-html/unnamed-chunk-6-1.png)
+
+The suggested `k` and the underlying table are attached as attributes:
+
+``` r
+
+attr(kd, "suggested")
+#> [1] 2
+knitr::kable(attr(kd, "k_table"), digits = 3)
+```
+
+|   k | avg_silhouette |
+|----:|---------------:|
+|   2 |          0.242 |
+|   3 |          0.240 |
+|   4 |          0.220 |
+|   5 |          0.230 |
+|   6 |          0.221 |
+
+[`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md)
+then shows the quality of an actual clustering, one bar per observation
+grouped by cluster, with the average silhouette width per cluster and
+overall (the dashed line). Wide positive bars are well-placed
+observations; negative bars may belong to a neighbouring cluster.
+
+``` r
+
+cl <- kmeans(scale(crop_yield[num]), centers = attr(kd, "suggested"),
+             nstart = 10)$cluster
+silhouette_plot(crop_yield, cl, cols = num,
+                title = "Silhouette widths by cluster")
+```
+
+![](multivariate-and-survival_files/figure-html/unnamed-chunk-8-1.png)
+
+The same diagnostics apply to the wellbeing survey’s numeric profile:
+
+``` r
+
+wb_num <- c("age", "income", "stress", "sleep_hours",
+            "exercise_days", "life_satisfaction")
+wkd <- k_diagnostic(wellbeing_survey, k_range = 2:6, cols = wb_num,
+                    method = "wss")
+wcl <- kmeans(scale(na.omit(wellbeing_survey[wb_num])),
+              centers = attr(wkd, "suggested"), nstart = 10)$cluster
+silhouette_plot(na.omit(wellbeing_survey[wb_num]), wcl,
+                title = sprintf("Wellbeing survey, k = %d", attr(wkd, "suggested")))
+```
+
+![](multivariate-and-survival_files/figure-html/unnamed-chunk-9-1.png)
+
 ## Survival curves
 
 [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
@@ -79,21 +150,28 @@ times and an event indicator directly, a data frame, or a
 [`survival::survfit`](https://rdrr.io/pkg/survival/man/survfit.html)
 object.
 
+The `clinical_trial` dataset has two arms with a real survival
+difference – the treatment arm has a lower hazard – so the curves
+separate. Turning on the three publication annotations gives a
+survminer-style figure: a **number-at-risk table** beneath the curves,
+dashed guides to each arm’s **median survival**, and the **log-rank
+test** of the difference as a subtitle.
+
 ``` r
 
-set.seed(1)
-n <- 250
-group <- sample(c("control", "treated"), n, replace = TRUE)
-event_time <- rexp(n, rate = ifelse(group == "treated", 0.05, 0.1))
-censor_time <- runif(n, 0, 30)
-observed <- pmin(event_time, censor_time)
-event <- as.integer(event_time <= censor_time)
-
-survival_plot(observed, event, group = group,
-              title = "Survival by treatment")
+survival_plot(
+  clinical_trial$time, clinical_trial$event, group = clinical_trial$arm,
+  risk_table = TRUE, median_line = TRUE, logrank = TRUE,
+  x_lab = "Months", title = "Overall survival by arm"
+)
 ```
 
-![](multivariate-and-survival_files/figure-html/unnamed-chunk-6-1.png)
+![](multivariate-and-survival_files/figure-html/unnamed-chunk-10-1.png)
+
+The log-rank p-value is tiny and the median survival is clearly longer
+in the treatment arm – and because its event times are longer, that arm
+is more often right-censored at the 36-month study end, visible as the
+denser run of censoring marks.
 
 ## References
 

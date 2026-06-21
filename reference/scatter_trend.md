@@ -67,8 +67,8 @@ object.
 ## Examples
 
 ``` r
-scatter_trend(crop_yield, fertilizer, yield)
+scatter_trend(crop_yield, fertiliser, yield)
 
-scatter_trend(crop_yield, fertilizer, yield, group = treatment,
+scatter_trend(crop_yield, fertiliser, yield, group = treatment,
                    method = "lm")
 ```

@@ -13,8 +13,9 @@ explore_distribution(
   type = c("histogram", "density", "both"),
   bins = 30,
   alpha = 0.6,
-  position = "identity",
+  position = NULL,
   palette = NULL,
+  facet = FALSE,
   title = NULL,
   x_lab = NULL
 )
@@ -51,12 +52,21 @@ explore_distribution(
 - position:
 
   Histogram position adjustment, e.g. `"identity"`, `"stack"` or
-  `"dodge"`.
+  `"dodge"`. The default (`NULL`) chooses `"dodge"` when `group` is set
+  (so overlapping bars stay readable) and `"identity"` otherwise.
 
 - palette:
 
   Colours for the groups; defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
+
+- facet:
+
+  When a `group` is given, draw one panel per group instead of
+  overlaying them. This is much clearer than an overlay once there are
+  more than two or three groups (overlaid histograms in particular
+  become hard to read). Defaults to `FALSE`. Ignored when there is no
+  `group`.
 
 - title, x_lab:
 
@@ -73,4 +83,8 @@ object.
 explore_distribution(lexical_decision, RT)
 
 explore_distribution(lexical_decision, RT, group = condition, type = "density")
+
+# One panel per group keeps many groups legible:
+explore_distribution(wellbeing_survey, life_satisfaction, group = region,
+                     type = "both", facet = TRUE)
 ```

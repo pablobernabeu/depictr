@@ -15,6 +15,7 @@ optimizer_fixef_plot(
   intercept = TRUE,
   select_terms = NULL,
   interaction = c("times", "asterisk", "colon", "space"),
+  labels = NULL,
   number_optimizers = TRUE,
   free_y = TRUE,
   ncol = NULL,
@@ -48,6 +49,15 @@ optimizer_fixef_plot(
   Passed to
   [`format_terms()`](https://pablobernabeu.github.io/depictr/reference/format_terms.md)
   for the panel titles.
+
+- labels:
+
+  Optional named character vector renaming the term panels, e.g.
+  `c(conditionunrelated = "Unrelated priming")`. When `x` is a raw
+  [`lme4::allFit()`](https://rdrr.io/pkg/lme4/man/allFit.html) object,
+  names are prettified to the effect (variable) name automatically (e.g.
+  `conditionunrelated` to `condition`) and these labels override that
+  default.
 
 - number_optimizers:
 
@@ -96,7 +106,7 @@ it can be used without 'lme4'.
 set.seed(1)
 df <- expand.grid(
   optimizer = c("bobyqa", "Nelder_Mead", "nlminbwrap"),
-  term = c("(Intercept)", "rainfall", "fertilizer")
+  term = c("(Intercept)", "rainfall", "fertiliser")
 )
 df$value <- c(5, 5.01, 4.99, 0.3, 0.31, 0.29, -0.2, -0.18, -0.21)
 optimizer_fixef_plot(df)

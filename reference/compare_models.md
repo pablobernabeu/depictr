@@ -24,6 +24,8 @@ compare_models(
   palette = NULL,
   point_size = 2.2,
   line_size = 0.7,
+  facet = FALSE,
+  scales = c("fixed", "free"),
   legend_title = "Source",
   legend_ncol = 1,
   title = NULL,
@@ -85,6 +87,20 @@ compare_models(
 
   Point and interval-line sizes.
 
+- facet:
+
+  Whether to give each term its own panel with a free x-axis, laid out
+  one per row, so that terms on very different scales (for example a
+  large intercept alongside small slopes) stay legible. The source
+  overlay and its single legend are preserved within the faceted layout.
+  Defaults to `FALSE`. A convenience alias for `scales = "free"`.
+
+- scales:
+
+  Either `"fixed"` (the default, a single shared x-axis) or `"free"`
+  (one free-scaled panel per term). When `facet = TRUE` this is forced
+  to `"free"`.
+
 - legend_title, legend_ncol:
 
   Legend title and number of columns.
@@ -101,10 +117,14 @@ object.
 ## Examples
 
 ``` r
-m1 <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
-m2 <- lm(yield ~ rainfall + fertilizer + soil_ph,
+m1 <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
+m2 <- lm(yield ~ rainfall + fertiliser + soil_ph,
          data = crop_yield[crop_yield$treatment == "standard", ])
 compare_models(`All fields` = m1, `Standard only` = m2,
                        title = "Estimates by subset")
-#> `height` was translated to `width`.
+
+
+# Keep the intercept legible alongside the slopes:
+compare_models(`All fields` = m1, `Standard only` = m2,
+               intercept = TRUE, facet = TRUE)
 ```

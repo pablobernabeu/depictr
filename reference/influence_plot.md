@@ -9,7 +9,7 @@ observations are labelled.
 ## Usage
 
 ``` r
-influence_plot(model, n_label = 3, colour = "#005b96", title = NULL)
+influence_plot(model, n_label = 3, colour = depictr_brand(), title = NULL)
 ```
 
 ## Arguments
@@ -24,7 +24,7 @@ influence_plot(model, n_label = 3, colour = "#005b96", title = NULL)
 
 - colour:
 
-  Bubble colour.
+  Bubble colour. Defaults to the depictr brand blue.
 
 - title:
 
@@ -45,6 +45,6 @@ Regression.” *Technometrics*, **19**(1), 15–18.
 ## Examples
 
 ``` r
-fit <- lm(yield ~ rainfall + fertilizer + soil_ph, data = crop_yield)
+fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
 influence_plot(fit)
 ```

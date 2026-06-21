@@ -19,6 +19,7 @@ dendrogram_plot(
   scale = TRUE,
   k = NULL,
   horizontal = FALSE,
+  labels = NULL,
   palette = NULL,
   title = NULL
 )
@@ -51,11 +52,21 @@ dendrogram_plot(
 
 - k:
 
-  Optional number of clusters to highlight.
+  Optional number of clusters to highlight (between 1 and the number of
+  leaves). The cut-height line is drawn only when `2 <= k < n`.
 
 - horizontal:
 
   Whether to draw the tree horizontally.
+
+- labels:
+
+  Whether to print the leaf labels. `NULL` (the default) chooses
+  automatically: labels are shown for small trees (up to 40 leaves) and
+  suppressed for larger ones, where they would otherwise collapse into
+  an unreadable smear. `TRUE`/`FALSE` force them on or off. When labels
+  are hidden and `k` is set, the cluster membership is instead conveyed
+  by a coloured strip of leaf ticks along the bottom of the tree.
 
 - palette:
 

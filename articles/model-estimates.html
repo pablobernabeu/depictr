@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Visualising model estimates • depictr</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -77,39 +82,78 @@
 
     
     
-<p>This vignette covers the model-result plots: coefficients, model
-comparison, predicted values, interactions, random effects and
-goodness-of-fit.</p>
+<p>This is the flagship article. It works through depictr’s model-result
+plots – coefficients, model comparison, predicted values, interactions,
+random effects and goodness-of-fit – and then reaches the capability the
+package is named for: showing a <strong>frequentist</strong> estimate
+and a <strong>full Bayesian posterior</strong> for the same model on one
+figure.</p>
+<p>The running example is <code>lexical_decision</code>, a
+counterbalanced, crossed lexical-decision experiment (24 participants,
+40 items, 960 trials). We model reaction time on correct trials as a
+function of priming <code>condition</code> (related/unrelated),
+presentation <code>modality</code> (visual/auditory) and item
+<code>word_frequency</code>, with crossed random intercepts for
+participant and item. The design is counterbalanced, so neither fixed
+factor is collinear with the item random effect – a clean fit for a
+mixed model.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">correct</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">accuracy</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">lmerTest</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span></span>
+<span>  <span class="va">RT</span> <span class="op">~</span> <span class="va">condition</span> <span class="op">+</span> <span class="va">modality</span> <span class="op">+</span> <span class="va">word_frequency</span> <span class="op">+</span></span>
+<span>    <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">participant</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">item</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">correct</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="coefficient-forest-plots">Coefficient (forest) plots<a class="anchor" aria-label="anchor" href="#coefficient-forest-plots"></a>
 </h2>
-<p><code><a href="../reference/coefficient_plot.html">coefficient_plot()</a></code> accepts any model
-<code><a href="../reference/tidy_estimates.html">tidy_estimates()</a></code> understands, or a tidy data frame.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">stress</span> <span class="op">+</span> <span class="va">sleep_hours</span> <span class="op">+</span> <span class="va">exercise_days</span>,</span>
-<span>          data <span class="op">=</span> <span class="va">wellbeing_survey</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/coefficient_plot.html">coefficient_plot</a></span><span class="op">(</span><span class="va">fit</span>, order <span class="op">=</span> <span class="st">"ascending"</span>,</span>
-<span>                 labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>stress <span class="op">=</span> <span class="st">"Stress"</span>, sleep_hours <span class="op">=</span> <span class="st">"Sleep (h)"</span>,</span>
-<span>                            exercise_days <span class="op">=</span> <span class="st">"Exercise (days)"</span><span class="op">)</span>,</span>
-<span>                 title <span class="op">=</span> <span class="st">"Predictors of life satisfaction"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `height` was translated to `width`.</span></span></code></pre></div>
-<p><img src="model-estimates_files/figure-html/unnamed-chunk-1-1.png" class="r-plt" alt="" width="672"></p>
+<p><code><a href="../reference/coefficient_plot.html">coefficient_plot()</a></code> reads the fitted mixed model directly
+(through <code><a href="../reference/tidy_estimates.html">tidy_estimates()</a></code>) and draws a horizontal
+point-and-interval (“forest”) plot. Unrelated primes and auditory
+presentation both slow responses, while more frequent words speed them
+up.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/coefficient_plot.html">coefficient_plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">fit</span>, order <span class="op">=</span> <span class="st">"ascending"</span>,</span>
+<span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>conditionunrelated <span class="op">=</span> <span class="st">"Unrelated priming"</span>,</span>
+<span>             modalityauditory <span class="op">=</span> <span class="st">"Auditory modality"</span>,</span>
+<span>             word_frequency <span class="op">=</span> <span class="st">"Word frequency (Zipf)"</span><span class="op">)</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"Predictors of lexical-decision RT (ms)"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="model-estimates_files/figure-html/coef-1.png" class="r-plt" alt="" width="672"></p>
+<p>Coefficient names are tidied to the effect (variable) name
+automatically (<code>conditionunrelated</code> becomes
+<code>condition</code>, <code>word_frequency</code> becomes
+<code>word frequency</code>); pass <code>labels</code> to override any
+of them. The slopes also sit on quite different scales, so
+<code>standardise = TRUE</code> rescales each coefficient by its
+predictor’s standard deviation, putting them on one comparable axis:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/coefficient_plot.html">coefficient_plot</a></span><span class="op">(</span><span class="va">fit</span>, standardise <span class="op">=</span> <span class="cn">TRUE</span>, order <span class="op">=</span> <span class="st">"ascending"</span>,</span>
+<span>                 title <span class="op">=</span> <span class="st">"Standardised predictors of RT"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="model-estimates_files/figure-html/coef-std-1.png" class="r-plt" alt="" width="672"></p>
+<p>To keep the raw units instead – including a large intercept that
+would otherwise squash the slopes – <code>facet = TRUE</code> gives each
+term its own free-scaled panel (the layout the frequentist-vs-Bayesian
+comparison below uses by default).</p>
 </div>
 <div class="section level2">
 <h2 id="comparing-models">Comparing models<a class="anchor" aria-label="anchor" href="#comparing-models"></a>
 </h2>
 <p><code><a href="../reference/compare_models.html">compare_models()</a></code> overlays the estimates from several
-models, and <code><a href="../reference/model_fit_table.html">model_fit_table()</a></code> summarises their fit.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">rainfall</span> <span class="op">+</span> <span class="va">fertilizer</span>, data <span class="op">=</span> <span class="va">crop_yield</span><span class="op">)</span></span>
-<span><span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">rainfall</span> <span class="op">+</span> <span class="va">fertilizer</span> <span class="op">+</span> <span class="va">soil_ph</span>, data <span class="op">=</span> <span class="va">crop_yield</span><span class="op">)</span></span>
-<span><span class="va">m3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">rainfall</span> <span class="op">+</span> <span class="va">fertilizer</span> <span class="op">+</span> <span class="va">soil_ph</span> <span class="op">+</span> <span class="va">treatment</span>, data <span class="op">=</span> <span class="va">crop_yield</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/compare_models.html">compare_models</a></span><span class="op">(</span>small <span class="op">=</span> <span class="va">m1</span>, medium <span class="op">=</span> <span class="va">m2</span>, full <span class="op">=</span> <span class="va">m3</span>, order <span class="op">=</span> <span class="st">"descending"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `height` was translated to `width`.</span></span></code></pre></div>
-<p><img src="model-estimates_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" alt="" width="672"></p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="../reference/model_fit_table.html">model_fit_table</a></span><span class="op">(</span>small <span class="op">=</span> <span class="va">m1</span>, medium <span class="op">=</span> <span class="va">m2</span>, full <span class="op">=</span> <span class="va">m3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+models so you can see how a coefficient moves as the specification
+changes. Here a reduced model (dropping <code>modality</code>) is
+compared with the full model; <code><a href="../reference/model_fit_table.html">model_fit_table()</a></code> summarises
+their fit.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">reduced</span> <span class="op">&lt;-</span> <span class="fu">lmerTest</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span></span>
+<span>  <span class="va">RT</span> <span class="op">~</span> <span class="va">condition</span> <span class="op">+</span> <span class="va">word_frequency</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">participant</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">item</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">correct</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/compare_models.html">compare_models</a></span><span class="op">(</span>Reduced <span class="op">=</span> <span class="va">reduced</span>, Full <span class="op">=</span> <span class="va">fit</span>, order <span class="op">=</span> <span class="st">"descending"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="model-estimates_files/figure-html/compare-1.png" class="r-plt" alt="" width="672"></p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="../reference/model_fit_table.html">model_fit_table</a></span><span class="op">(</span>Reduced <span class="op">=</span> <span class="va">reduced</span>, Full <span class="op">=</span> <span class="va">fit</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">model</th>
@@ -123,34 +167,24 @@ models, and <code><a href="../reference/model_fit_table.html">model_fit_table()<
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">small</td>
-<td align="right">200</td>
-<td align="right">4</td>
-<td align="right">526.072</td>
-<td align="right">539.266</td>
-<td align="right">-259.036</td>
-<td align="right">0.348</td>
-<td align="right">0.884</td>
+<td align="left">Reduced</td>
+<td align="right">902</td>
+<td align="right">6</td>
+<td align="right">11338.03</td>
+<td align="right">11366.85</td>
+<td align="right">-5663.014</td>
+<td align="right">NA</td>
+<td align="right">118.790</td>
 </tr>
 <tr class="even">
-<td align="left">medium</td>
-<td align="right">200</td>
-<td align="right">5</td>
-<td align="right">454.182</td>
-<td align="right">470.674</td>
-<td align="right">-222.091</td>
-<td align="right">0.549</td>
-<td align="right">0.735</td>
-</tr>
-<tr class="odd">
-<td align="left">full</td>
-<td align="right">200</td>
-<td align="right">6</td>
-<td align="right">406.816</td>
-<td align="right">426.606</td>
-<td align="right">-197.408</td>
-<td align="right">0.648</td>
-<td align="right">0.649</td>
+<td align="left">Full</td>
+<td align="right">902</td>
+<td align="right">7</td>
+<td align="right">11324.31</td>
+<td align="right">11357.94</td>
+<td align="right">-5655.153</td>
+<td align="right">NA</td>
+<td align="right">118.129</td>
 </tr>
 </tbody>
 </table>
@@ -159,81 +193,147 @@ McFadden’s pseudo-R-squared <span class="citation">(<a href="#ref-mcfadden1974
 ordinary coefficient of determination.</p>
 </div>
 <div class="section level2">
-<h2 id="frequentist-and-bayesian-estimates-together">Frequentist and Bayesian estimates together<a class="anchor" aria-label="anchor" href="#frequentist-and-bayesian-estimates-together"></a>
-</h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">freq</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">stress</span> <span class="op">+</span> <span class="va">sleep_hours</span> <span class="op">+</span> <span class="va">exercise_days</span>,</span>
-<span>            data <span class="op">=</span> <span class="va">wellbeing_survey</span><span class="op">)</span></span>
-<span><span class="va">bayes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tidy_estimates.html">tidy_estimates</a></span><span class="op">(</span><span class="va">freq</span><span class="op">)</span></span>
-<span><span class="va">bayes</span><span class="op">$</span><span class="va">estimate</span>  <span class="op">&lt;-</span> <span class="va">bayes</span><span class="op">$</span><span class="va">estimate</span> <span class="op">*</span> <span class="fl">0.92</span>      <span class="co"># stand-in posterior means</span></span>
-<span><span class="va">bayes</span><span class="op">$</span><span class="va">conf.low</span>  <span class="op">&lt;-</span> <span class="va">bayes</span><span class="op">$</span><span class="va">conf.low</span> <span class="op">*</span> <span class="fl">0.92</span></span>
-<span><span class="va">bayes</span><span class="op">$</span><span class="va">conf.high</span> <span class="op">&lt;-</span> <span class="va">bayes</span><span class="op">$</span><span class="va">conf.high</span> <span class="op">*</span> <span class="fl">0.92</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/frequentist_bayesian_plot.html">frequentist_bayesian_plot</a></span><span class="op">(</span><span class="va">freq</span>, <span class="va">bayes</span>, note_frequentist_no_prior <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                          title <span class="op">=</span> <span class="st">"Frequentist and Bayesian estimates"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `height` was translated to `width`.</span></span></code></pre></div>
-<p><img src="model-estimates_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="672"></p>
-</div>
-<div class="section level2">
 <h2 id="predicted-values-and-interactions">Predicted values and interactions<a class="anchor" aria-label="anchor" href="#predicted-values-and-interactions"></a>
 </h2>
 <p><code><a href="../reference/effects_plot.html">effects_plot()</a></code> shows what the model predicts as one
-predictor varies; <code><a href="../reference/interaction_plot.html">interaction_plot()</a></code> shows how that
-relationship changes across a second predictor.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">fertilizer</span> <span class="op">*</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">rainfall</span>, data <span class="op">=</span> <span class="va">crop_yield</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/effects_plot.html">effects_plot</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"rainfall"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="model-estimates_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="672"></p>
+predictor varies, holding the others at typical values. It now works on
+the mixed model: predictions use the fixed effects only
+(<code>re.form = NA</code>) and the band is built from the fixed-effect
+design matrix and <code><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov()</a></code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/interaction_plot.html">interaction_plot</a></span><span class="op">(</span><span class="va">fit2</span>, <span class="st">"fertilizer"</span>, <span class="st">"treatment"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="model-estimates_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="672"></p>
-<p>For a binomial <code>glm</code>, predictions are shown on the
-probability scale:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/effects_plot.html">effects_plot</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"word_frequency"</span>,</span>
+<span>             title <span class="op">=</span> <span class="st">"Predicted RT across word frequency"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="model-estimates_files/figure-html/effects-1.png" class="r-plt" alt="" width="672"></p>
+<p><code><a href="../reference/interaction_plot.html">interaction_plot()</a></code> shows how a relationship changes
+across a second predictor. The lexical-decision model is additive, so
+for a <em>genuine</em> interaction we switch to <code>crop_yield</code>,
+whose data-generating process contains a real fertiliser-by-treatment
+effect: fertiliser raises yield far more under the <code>enhanced</code>
+treatment than under <code>standard</code>, so the slopes diverge.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">gfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">accuracy</span> <span class="op">~</span> <span class="va">word_frequency</span> <span class="op">+</span> <span class="va">condition</span>, data <span class="op">=</span> <span class="va">lexical_decision</span>,</span>
-<span>            family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/effects_plot.html">effects_plot</a></span><span class="op">(</span><span class="va">gfit</span>, <span class="st">"word_frequency"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="model-estimates_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="672"></p>
+<code class="sourceCode R"><span><span class="va">crop_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">fertiliser</span> <span class="op">*</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">rainfall</span>, data <span class="op">=</span> <span class="va">crop_yield</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/interaction_plot.html">interaction_plot</a></span><span class="op">(</span><span class="va">crop_fit</span>, <span class="st">"fertiliser"</span>, <span class="st">"treatment"</span>,</span>
+<span>                 title <span class="op">=</span> <span class="st">"Fertiliser x treatment interaction"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="model-estimates_files/figure-html/interaction-1.png" class="r-plt" alt="" width="672"></p>
+</div>
+<div class="section level2">
+<h2 id="frequentist-and-bayesian-estimates-together">Frequentist and Bayesian estimates together<a class="anchor" aria-label="anchor" href="#frequentist-and-bayesian-estimates-together"></a>
+</h2>
+<p>This is the package’s namesake capability. Given the frequentist fit
+<strong>and</strong> a set of Bayesian posterior <strong>draws</strong>,
+<code><a href="../reference/frequentist_bayesian_plot.html">frequentist_bayesian_plot()</a></code> draws the <em>full posterior
+distribution</em> for each term (a ‘ggdist’ half-eye) and overlays the
+frequentist <strong>point and confidence interval</strong> at the same
+position. You see the entire shape of the posterior – not just a point
+and two limits – next to the frequentist estimate, with the two sources
+in the two leading colourblind-safe palette colours.</p>
+<p>The draws here are the real fixed-effect posterior from a
+<code>brms</code> fit of the same model (1000 draws x 4 parameters),
+shipped with the package so the slow MCMC need not be re-run. Terms are
+matched by canonical label, so the <code>brms</code> parameter names
+line up with the frequentist ones automatically.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"lexdec_draws.rds"</span>, package <span class="op">=</span> <span class="st">"depictr"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/frequentist_bayesian_plot.html">frequentist_bayesian_plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">fit</span>, <span class="va">draws</span>,</span>
+<span>  intercept <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  note_frequentist_no_prior <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"Frequentist estimate over the full Bayesian posterior"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="model-estimates_files/figure-html/fbp-1.png" class="r-plt" alt="" width="672"></p>
+<p>The frequentist confidence interval and the bulk of the Bayesian
+posterior land in the same place – reassuring agreement between the two
+paradigms – but only the posterior shows the density, the skew and the
+mass on either side of zero.</p>
+<p>If <code>ggdist</code> is unavailable the function falls back to a
+point-and-interval forest plot of the two sources, and when the Bayesian
+side is supplied as a <em>summary</em> table instead of draws (for
+instance the <code>Estimate</code>/<code>Q2.5</code>/<code>Q97.5</code>
+of <code>brms::fixef()</code>) it draws the familiar two-source forest
+plot.</p>
+</div>
+<div class="section level2">
+<h2 id="posterior-distributions-on-their-own">Posterior distributions on their own<a class="anchor" aria-label="anchor" href="#posterior-distributions-on-their-own"></a>
+</h2>
+<p><code><a href="../reference/posterior_plot.html">posterior_plot()</a></code> summarises any draws (posterior,
+bootstrap or simulation) as a distribution per parameter. With
+<code>style = "halfeye"</code> it shows the density slab and a
+point-and-interval; a region of practical equivalence (ROPE) can be
+shaded and each parameter annotated with its probability of direction
+(the posterior mass on its majority side of the reference line).</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"lexdec_draws.rds"</span>, package <span class="op">=</span> <span class="st">"depictr"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">slopes</span> <span class="op">&lt;-</span> <span class="va">draws</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"conditionunrelated"</span>, <span class="st">"modalityauditory"</span>, <span class="st">"word_frequency"</span><span class="op">)</span><span class="op">]</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/posterior_plot.html">posterior_plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">slopes</span>, style <span class="op">=</span> <span class="st">"halfeye"</span>, rope <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>, pd <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>conditionunrelated <span class="op">=</span> <span class="st">"condition"</span>,</span>
+<span>             modalityauditory <span class="op">=</span> <span class="st">"modality"</span>,</span>
+<span>             word_frequency <span class="op">=</span> <span class="st">"word frequency"</span><span class="op">)</span>,</span>
+<span>  title <span class="op">=</span> <span class="st">"Fixed-effect posteriors (ms), with ROPE and pd"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="model-estimates_files/figure-html/posterior-1.png" class="r-plt" alt="" width="672"></p>
+<p>The probability of direction for <code>word_frequency</code> and
+<code>conditionunrelated</code> is effectively 100%: the posterior sits
+almost entirely on one side of zero.</p>
 </div>
 <div class="section level2">
 <h2 id="random-effects">Random effects<a class="anchor" aria-label="anchor" href="#random-effects"></a>
 </h2>
-<p><code><a href="../reference/random_effects_plot.html">random_effects_plot()</a></code> draws a caterpillar plot. It reads
-an ‘lme4’ model directly, or a data frame of by-group estimates:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">re</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"site_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span>,</span>
-<span>                 estimate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">12</span>, <span class="fl">0</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                 std.error <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">12</span>, <span class="fl">0.1</span>, <span class="fl">0.3</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/random_effects_plot.html">random_effects_plot</a></span><span class="op">(</span><span class="va">re</span>, title <span class="op">=</span> <span class="st">"By-site departures"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `height` was translated to `width`.</span></span></code></pre></div>
-<p><img src="model-estimates_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="672"></p>
+<p><code><a href="../reference/random_effects_plot.html">random_effects_plot()</a></code> draws a caterpillar plot of the
+conditional modes (“BLUPs”). Reading the fitted model directly, it shows
+the by-item and by-participant departures from the average, sorted, with
+their uncertainty – the usual way to spot unusual groups.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/random_effects_plot.html">random_effects_plot</a></span><span class="op">(</span><span class="va">fit</span>, title <span class="op">=</span> <span class="st">"By-group departures (random intercepts)"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="model-estimates_files/figure-html/ranef-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="optimiser-checks">Optimiser checks<a class="anchor" aria-label="anchor" href="#optimiser-checks"></a>
 </h2>
-<p>When a mixed model is fitted by several optimisers (via
-<code><a href="https://rdrr.io/pkg/lme4/man/allFit.html" class="external-link">lme4::allFit()</a></code>), <code><a href="../reference/optimizer_fixef_plot.html">optimizer_fixef_plot()</a></code> shows
-whether they agree. Without ‘lme4’ you can build the input directly:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">opt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>optimizer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bobyqa"</span>, <span class="st">"Nelder_Mead"</span>, <span class="st">"nlminbwrap"</span><span class="op">)</span>,</span>
-<span>                   term <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"(Intercept)"</span>, <span class="st">"stress"</span>, <span class="st">"sleep_hours"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">opt</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4.5</span>, <span class="fl">4.51</span>, <span class="fl">4.49</span>, <span class="op">-</span><span class="fl">0.45</span>, <span class="op">-</span><span class="fl">0.44</span>, <span class="op">-</span><span class="fl">0.46</span>, <span class="fl">0.25</span>, <span class="fl">0.24</span>, <span class="fl">0.26</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/optimizer_fixef_plot.html">optimizer_fixef_plot</a></span><span class="op">(</span><span class="va">opt</span><span class="op">)</span></span></code></pre></div>
-<p><img src="model-estimates_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="672"></p>
+<p>A mixed-model fit should be stable across optimisers.
+<code><a href="https://rdrr.io/pkg/lme4/man/allFit.html" class="external-link">lme4::allFit()</a></code> refits the model with every available
+optimiser; <code><a href="../reference/optimizer_fixef_plot.html">optimizer_fixef_plot()</a></code> then shows the fixed
+effects side by side, one panel per term. Tight clusters mean the fit
+has settled; scatter would signal a fragile solution.</p>
+<p>The package ships the <code>allFit()</code> summary for this model,
+so we can plot it without re-running the (slow) refits. The plot accepts
+a tidy data frame of optimiser-by-term values, which we read straight
+off the stored summary.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">af</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"allfit_lexdec.rds"</span>, package <span class="op">=</span> <span class="st">"depictr"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">fx</span> <span class="op">&lt;-</span> <span class="va">af</span><span class="op">$</span><span class="va">fixef</span>    <span class="co"># optimisers x fixed effects</span></span>
+<span><span class="va">opt_long</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  optimizer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">fx</span><span class="op">)</span>, times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">fx</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  term      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">fx</span><span class="op">)</span>, each <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">fx</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  value     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">fx</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/optimizer_fixef_plot.html">optimizer_fixef_plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">opt_long</span>, title <span class="op">=</span> <span class="st">"Fixed effects across optimisers"</span>,</span>
+<span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>conditionunrelated <span class="op">=</span> <span class="st">"condition"</span>,</span>
+<span>             modalityauditory <span class="op">=</span> <span class="st">"modality"</span>,</span>
+<span>             word_frequency <span class="op">=</span> <span class="st">"word frequency"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="model-estimates_files/figure-html/optim-1.png" class="r-plt" alt="" width="672"></p>
+<p>Every optimiser lands on the same estimate for each term – the points
+coincide within each panel – so this fit is rock solid.</p>
 </div>
 <div class="section level2">
 <h2 id="a-one-figure-model-report">A one-figure model report<a class="anchor" aria-label="anchor" href="#a-one-figure-model-report"></a>
 </h2>
-<p><code><a href="../reference/model_report.html">model_report()</a></code> composes several of these views (the
-coefficients, the effect of a focal predictor, the residuals against
-fitted values and a Q-Q plot, with a fit-statistics subtitle) into a
-single figure for a rapid review or a report appendix.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">full</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">rainfall</span> <span class="op">+</span> <span class="va">fertilizer</span> <span class="op">+</span> <span class="va">soil_ph</span> <span class="op">+</span> <span class="va">treatment</span>,</span>
+<p><code><a href="../reference/model_report.html">model_report()</a></code> composes several views (coefficients, the
+effect of a focal predictor, residuals against fitted values and a Q-Q
+plot, with a fit-statistics subtitle) into a single figure for a rapid
+review or a report appendix. It works on
+<code>lm</code>/<code>glm</code> models; here we use the crop-yield
+model.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">full</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">rainfall</span> <span class="op">+</span> <span class="va">fertiliser</span> <span class="op">+</span> <span class="va">soil_ph</span> <span class="op">+</span> <span class="va">treatment</span>,</span>
 <span>           data <span class="op">=</span> <span class="va">crop_yield</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/model_report.html">model_report</a></span><span class="op">(</span><span class="va">full</span>, title <span class="op">=</span> <span class="st">"Crop-yield model"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `height` was translated to `width`.</span></span></code></pre></div>
-<p><img src="model-estimates_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="864"></p>
+<span><span class="fu"><a href="../reference/model_report.html">model_report</a></span><span class="op">(</span><span class="va">full</span>, title <span class="op">=</span> <span class="st">"Crop-yield model"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="model-estimates_files/figure-html/report-1.png" class="r-plt" alt="" width="864"></p>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

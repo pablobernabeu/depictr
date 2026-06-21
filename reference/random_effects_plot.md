@@ -12,7 +12,7 @@ random_effects_plot(
   x,
   conf_level = 0.95,
   sort = TRUE,
-  point_colour = "#005b96",
+  point_colour = depictr_brand(),
   title = NULL,
   x_lab = "Random effect"
 )
@@ -58,7 +58,6 @@ re <- data.frame(
   std.error = runif(10, 0.2, 0.5)
 )
 random_effects_plot(re)
-#> `height` was translated to `width`.
 
 
 # \donttest{
@@ -66,7 +65,6 @@ if (requireNamespace("lme4", quietly = TRUE)) {
   m <- lme4::lmer(RT ~ condition + (1 | participant), data = lexical_decision)
   random_effects_plot(m)
 }
-#> `height` was translated to `width`.
 
 # }
 ```

@@ -15,7 +15,7 @@ effects_plot(
   conf_level = 0.95,
   n = 100,
   rug = TRUE,
-  colour = "#005b96",
+  colour = depictr_brand(),
   title = NULL,
   x_lab = NULL,
   y_lab = NULL
@@ -26,7 +26,7 @@ effects_plot(
 
 - model:
 
-  A fitted model (`lm`, `glm`, ...).
+  A fitted model (`lm`, `glm`, `merMod`, ...).
 
 - predictor:
 
@@ -47,7 +47,8 @@ effects_plot(
 
 - colour:
 
-  Colour for the line/points and band.
+  Colour for the line/points and band. Defaults to the depictr brand
+  blue.
 
 - title, x_lab, y_lab:
 
@@ -63,14 +64,19 @@ object.
 Predictions and standard errors come from
 [`stats::predict()`](https://rdrr.io/r/stats/predict.html); `glm`
 predictions are formed on the link scale and back-transformed, so a
-binomial model shows predicted probabilities. Works with `lm` and `glm`;
-other model classes are attempted on a best-effort basis.
+binomial model shows predicted probabilities. Mixed models fitted with
+[`lme4::lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html)/[`lme4::glmer()`](https://rdrr.io/pkg/lme4/man/glmer.html)
+are supported too: predictions use only the fixed effects
+(`re.form = NA`) and standard errors come from the fixed-effect design
+matrix and [`vcov()`](https://rdrr.io/r/stats/vcov.html). Works with
+`lm`, `glm` and `merMod`; other model classes are attempted on a
+best-effort basis.
 
 ## Examples
 
 ``` r
-fit <- lm(yield ~ rainfall + fertilizer + treatment, data = crop_yield)
-effects_plot(fit, "fertilizer")
+fit <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
+effects_plot(fit, "fertiliser")
 
 effects_plot(fit, "treatment")
 

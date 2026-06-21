@@ -54,13 +54,13 @@ profiled or posterior intervals) to override this.
 ## Examples
 
 ``` r
-fit <- lm(yield ~ rainfall + fertilizer + treatment, data = crop_yield)
+fit <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
 tidy_estimates(fit)
 #>                term     estimate    std.error     conf.low   conf.high
-#> 1       (Intercept) -0.275272372 0.3918770683 -1.048109292 0.497564549
-#> 2          rainfall  0.004354379 0.0007256674  0.002923260 0.005785498
-#> 3        fertilizer  0.010805426 0.0013182990  0.008205554 0.013405297
-#> 4 treatmentenhanced  0.667003840 0.1185220609  0.433261598 0.900746082
+#> 1       (Intercept) -0.764921362 0.3933784207 -1.540719161 0.010876437
+#> 2          rainfall  0.004527229 0.0007284476  0.003090628 0.005963831
+#> 3        fertiliser  0.010488592 0.0013233496  0.007878760 0.013098424
+#> 4 treatmentenhanced  1.290135752 0.1189761405  1.055498001 1.524773503
 
 # A data frame of pre-computed estimates is standardised, not re-fitted:
 df <- data.frame(

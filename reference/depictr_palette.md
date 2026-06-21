@@ -19,8 +19,8 @@ depictr_palette(n = NULL, type = c("qualitative", "sequential", "diverging"))
 
   Number of colours to return. If `NULL` (the default) the full
   qualitative palette is returned. For the qualitative palette an `n`
-  larger than the eight base colours is interpolated; the sequential and
-  diverging palettes are ramps and accept any `n`.
+  larger than the available base colours is interpolated; the sequential
+  and diverging palettes are ramps and accept any `n`.
 
 - type:
 
@@ -31,6 +31,15 @@ depictr_palette(n = NULL, type = c("qualitative", "sequential", "diverging"))
 ## Value
 
 A character vector of hex colour codes.
+
+## Details
+
+The qualitative palette can be overridden globally with
+`options(depictr.palette = )` (see
+[`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md));
+when set, that custom palette replaces the built-in Okabe-Ito set and is
+interpolated when more colours are requested than it provides. The
+sequential and diverging ramps are unaffected.
 
 ## References
 

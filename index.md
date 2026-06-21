@@ -28,6 +28,7 @@ remotes::install_github("pablobernabeu/depictr")
 
 **Explore data**:
 [`explore_distribution()`](https://pablobernabeu.github.io/depictr/reference/explore_distribution.md),
+[`ecdf_plot()`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot.md),
 [`explore_categorical()`](https://pablobernabeu.github.io/depictr/reference/explore_categorical.md),
 [`explore_bivariate()`](https://pablobernabeu.github.io/depictr/reference/explore_bivariate.md),
 [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md),
@@ -35,7 +36,10 @@ remotes::install_github("pablobernabeu/depictr")
 [`missingness_map()`](https://pablobernabeu.github.io/depictr/reference/missingness_map.md),
 [`outlier_plot()`](https://pablobernabeu.github.io/depictr/reference/outlier_plot.md),
 [`raincloud_plot()`](https://pablobernabeu.github.io/depictr/reference/raincloud_plot.md),
+[`ridgeline_plot()`](https://pablobernabeu.github.io/depictr/reference/ridgeline_plot.md),
 [`group_comparison_plot()`](https://pablobernabeu.github.io/depictr/reference/group_comparison_plot.md),
+[`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md),
+[`dumbbell_plot()`](https://pablobernabeu.github.io/depictr/reference/dumbbell_plot.md),
 [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md),
 [`summary_table()`](https://pablobernabeu.github.io/depictr/reference/summary_table.md).
 
@@ -43,13 +47,17 @@ remotes::install_github("pablobernabeu/depictr")
 [`pca_plot()`](https://pablobernabeu.github.io/depictr/reference/pca_plot.md),
 [`scree_plot()`](https://pablobernabeu.github.io/depictr/reference/scree_plot.md),
 [`cluster_plot()`](https://pablobernabeu.github.io/depictr/reference/cluster_plot.md),
+[`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md),
+[`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md),
 [`dendrogram_plot()`](https://pablobernabeu.github.io/depictr/reference/dendrogram_plot.md),
 [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md).
 
 **Time series**:
 [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md),
 [`acf_plot()`](https://pablobernabeu.github.io/depictr/reference/acf_plot.md),
-[`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md).
+[`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md),
+[`seasonal_plot()`](https://pablobernabeu.github.io/depictr/reference/seasonal_plot.md),
+[`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md).
 
 **Model estimates & inference**:
 [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md),
@@ -64,6 +72,7 @@ remotes::install_github("pablobernabeu/depictr")
 
 **Diagnostics & classification**:
 [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md),
+[`binned_residual_plot()`](https://pablobernabeu.github.io/depictr/reference/binned_residual_plot.md),
 [`influence_plot()`](https://pablobernabeu.github.io/depictr/reference/influence_plot.md),
 [`qq_plot()`](https://pablobernabeu.github.io/depictr/reference/qq_plot.md),
 [`vif_plot()`](https://pablobernabeu.github.io/depictr/reference/vif_plot.md),
@@ -72,6 +81,7 @@ remotes::install_github("pablobernabeu/depictr")
 [`gain_plot()`](https://pablobernabeu.github.io/depictr/reference/gain_plot.md),
 [`lift_plot()`](https://pablobernabeu.github.io/depictr/reference/lift_plot.md),
 [`calibration_plot()`](https://pablobernabeu.github.io/depictr/reference/calibration_plot.md),
+[`threshold_plot()`](https://pablobernabeu.github.io/depictr/reference/threshold_plot.md),
 [`confusion_matrix_plot()`](https://pablobernabeu.github.io/depictr/reference/confusion_matrix_plot.md).
 
 **Uncertainty & power**:
@@ -87,7 +97,8 @@ remotes::install_github("pablobernabeu/depictr")
 [`format_terms()`](https://pablobernabeu.github.io/depictr/reference/format_terms.md),
 [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md),
 [`arrange_plots()`](https://pablobernabeu.github.io/depictr/reference/arrange_plots.md),
-[`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md).
+[`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md),
+[`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md).
 
 Heavier modelling back-ends (`lme4`, `broom`, `simr`) are optional (in
 `Suggests`) and used only when present; the core functions, examples,
@@ -100,15 +111,15 @@ tests and vignettes run on base `lm`/`glm` and the bundled data alone.
 library(depictr)
 
 # Explore
-explore_bivariate(crop_yield, fertilizer, yield)
+explore_bivariate(crop_yield, fertiliser, yield)
 correlation_heatmap(wellbeing_survey)
 
 # Model
-fit <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment, data = crop_yield)
+fit <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment, data = crop_yield)
 coefficient_plot(fit, order = "descending")
-effects_plot(fit, "fertilizer")
-interaction_plot(lm(yield ~ fertilizer * treatment, data = crop_yield),
-                 "fertilizer", "treatment")
+effects_plot(fit, "fertiliser")
+interaction_plot(lm(yield ~ fertiliser * treatment, data = crop_yield),
+                 "fertiliser", "treatment")
 
 # Diagnose & classify
 residual_diagnostics_plot(fit)
@@ -122,10 +133,13 @@ arrange_plots(qq_plot(fit), influence_plot(fit), ncol = 2, tag_levels = "A")
 
 ## Bundled data
 
-Three reproducibly simulated datasets ship with the package and power
-every example and vignette: `lexical_decision` (a psycholinguistic
-experiment), `wellbeing_survey` (a survey with realistic missingness)
-and `crop_yield` (an agronomy field trial). They are generated by
+Five reproducibly simulated datasets ship with the package and power
+every example and vignette: `lexical_decision` (a counterbalanced
+psycholinguistic experiment), `wellbeing_survey` (a survey with
+realistic missingness), `crop_yield` (an agronomy field trial with a
+fertiliser-by-treatment interaction), `clinical_trial` (right-censored
+survival times with a rare adverse event) and `monthly_sales` (two
+seasonal retail series). They are generated by
 [`data-raw/generate_datasets.R`](https://pablobernabeu.github.io/depictr/data-raw/generate_datasets.R)
 with fixed seeds.
 
@@ -134,11 +148,16 @@ with fixed seeds.
 - [`vignette("depictr")`](https://pablobernabeu.github.io/depictr/articles/depictr.md):
   getting started
 - [`vignette("exploring-data")`](https://pablobernabeu.github.io/depictr/articles/exploring-data.md):
-  exploratory plots and tables
+  exploratory plots, estimation statistics and tables
 - [`vignette("model-estimates")`](https://pablobernabeu.github.io/depictr/articles/model-estimates.md):
-  estimates, comparison, predictions, random effects
+  estimates, comparison, predictions, random effects, and Bayesian
+  posteriors
 - [`vignette("diagnostics-and-uncertainty")`](https://pablobernabeu.github.io/depictr/articles/diagnostics-and-uncertainty.md):
   diagnostics, classification, posteriors, power
+- [`vignette("multivariate-and-survival")`](https://pablobernabeu.github.io/depictr/articles/multivariate-and-survival.md):
+  PCA, clustering with diagnostics, survival curves
+- [`vignette("time-series")`](https://pablobernabeu.github.io/depictr/articles/time-series.md):
+  trends, autocorrelation, decomposition, seasonality and forecasts
 
 ## How depictr relates to other packages
 

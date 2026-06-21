@@ -13,7 +13,7 @@ outlier_plot(
   group = NULL,
   type = c("box", "violin", "both"),
   flag = TRUE,
-  outlier_colour = "#e23b3b",
+  outlier_colour = depictr_accent(),
   palette = NULL,
   title = NULL,
   y_lab = NULL

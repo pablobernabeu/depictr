@@ -59,6 +59,12 @@ raincloud_plot(
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
 object.
 
+## Details
+
+Groups with fewer than two observations cannot have a density estimated,
+so their half-violin is omitted (the points and box are still drawn) and
+a warning is issued.
+
 ## Examples
 
 ``` r

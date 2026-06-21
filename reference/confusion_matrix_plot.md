@@ -12,7 +12,7 @@ confusion_matrix_plot(
   x,
   predicted = NULL,
   threshold = 0.5,
-  normalize = c("none", "row", "col"),
+  normalise = c("none", "row", "col"),
   title = NULL
 )
 ```
@@ -30,8 +30,13 @@ confusion_matrix_plot(
 - threshold:
 
   When `x` is a `glm`, the probability threshold for the positive class.
+  As well as a number in `[0, 1]`, you may pass the string `"youden"` to
+  reuse the Youden's J optimal threshold (the same operating point
+  [`roc_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/roc_curve_plot.md)
+  marks), so the confusion matrix and the ROC curve agree on the
+  cut-off.
 
-- normalize:
+- normalise:
 
   One of `"none"`, `"row"` (by actual class) or `"col"` (by predicted
   class); controls the fill shading and the cell annotation.
@@ -43,7 +48,8 @@ confusion_matrix_plot(
 ## Value
 
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
-object.
+object. The threshold actually used is stored in
+`attr(plot, "threshold")`.
 
 ## Examples
 
@@ -51,4 +57,8 @@ object.
 gfit <- glm(accuracy ~ word_frequency + RT + condition,
             data = lexical_decision, family = binomial)
 confusion_matrix_plot(gfit, threshold = 0.5)
+
+
+# Reuse the Youden-optimal operating point.
+confusion_matrix_plot(gfit, threshold = "youden")
 ```

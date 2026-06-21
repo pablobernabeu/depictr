@@ -1,9 +1,10 @@
 # Plot frequentist and Bayesian estimates together
 
-Presents the estimates from a frequentist model and a Bayesian model
-side by side on one forest plot, in the familiar red (frequentist) and
-blue (Bayesian) styling. The function is a convenience wrapper around
-[`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md).
+Presents the estimates from a frequentist model and a Bayesian model on
+one plot, with the two sources distinguished by the first two colours of
+the colourblind-safe
+[`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
+(brand blue and orange).
 
 ## Usage
 
@@ -15,6 +16,8 @@ frequentist_bayesian_plot(
   labels = NULL,
   interaction = c("times", "asterisk", "colon", "space"),
   intercept = TRUE,
+  facet = TRUE,
+  scales = c("free", "fixed"),
   note_frequentist_no_prior = FALSE,
   vertical_line_at_x = 0,
   title = NULL,
@@ -34,7 +37,8 @@ frequentist_bayesian_plot(
 
 - bayesian:
 
-  A Bayesian model or a tidy data frame of posterior summaries.
+  A Bayesian model, a `posterior` draws object, a draws matrix/data
+  frame, or a tidy data frame of posterior summaries.
 
 - conf_level:
 
@@ -46,6 +50,15 @@ frequentist_bayesian_plot(
   [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md).
   `intercept` defaults to `TRUE` here, matching the original behaviour.
 
+- facet, scales:
+
+  Layout controls. Because a Bayesian model almost always carries a
+  large intercept alongside small slopes, the comparison defaults to a
+  faceted, free-scaled layout (`facet = TRUE`): each term gets its own
+  panel and free x-axis, so every posterior and its frequentist overlay
+  stay legible. Pass `facet = FALSE` (or `scales = "fixed"`) for the
+  classic single shared-axis plot.
+
 - note_frequentist_no_prior:
 
   If `TRUE`, append "(no prior)" to the frequentist legend label, which
@@ -53,7 +66,7 @@ frequentist_bayesian_plot(
 
 - vertical_line_at_x:
 
-  Position of the vertical reference line.
+  Position of the vertical reference line (`NA` to omit).
 
 - title, subtitle, x_lab:
 
@@ -62,7 +75,8 @@ frequentist_bayesian_plot(
 - ...:
 
   Further arguments passed to
-  [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md).
+  [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md)
+  on the summary path (ignored on the distribution path).
 
 ## Value
 
@@ -71,26 +85,42 @@ object.
 
 ## Details
 
-It is a modernised, self-contained successor to the original
-`frequentist_bayesian_plot()` gist. The Bayesian estimates may be
-supplied as a fitted model or, more commonly, as a tidy data frame of
-posterior summaries (with columns such as `term`, `estimate` and
-`conf.low`/`conf.high`, or the `Estimate`, `l-95% CI` and `u-95% CI`
-produced by `brms::fixef()`). Terms are aligned by name, so any small
-differences in naming between the two sources need only be reconciled in
-the term labels.
+This is the modernised successor to the original
+`frequentist_bayesian_plot()` gist, which built on `brms::mcmc_plot()`
+to show the full Bayesian posterior with the frequentist estimate
+overlaid. That namesake behaviour is restored here: when `bayesian`
+carries posterior *draws* (a `brms`/`rstanarm` fit, a `posterior` draws
+object, a draws matrix, or a long/wide draws data frame), the full
+posterior **distribution** is drawn per term (a 'ggdist' half-eye) and
+the frequentist **point and confidence interval** is overlaid at the
+same position. When `bayesian` is only a tidy table of posterior
+*summaries* (columns such as `term`, `estimate`, `conf.low`/`conf.high`,
+or the `Estimate`, `l-95% CI`, `u-95% CI` of `brms::fixef()`), the
+function shows the familiar two-source forest plot via
+[`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md).
+
+Terms are aligned by their canonical display label, so the `brms`-style
+`b_` prefix is reconciled automatically against the frequentist term
+names.
 
 ## Examples
 
 ``` r
-# Same model fitted two ways here purely so the example is self-contained;
-# in practice `bayesian` would come from brms, rstanarm, etc.
+# Summary path: a tidy "Bayesian" summary as a data frame.
 freq <- lm(life_satisfaction ~ stress + sleep_hours + exercise_days,
            data = wellbeing_survey)
-# A stand-in "Bayesian" summary as a tidy data frame:
 bayes <- tidy_estimates(freq)
 bayes$estimate <- bayes$estimate * 0.95
 frequentist_bayesian_plot(freq, bayes,
                           title = "Frequentist vs. Bayesian estimates")
-#> `height` was translated to `width`.
+
+
+# Distribution path: simulated posterior draws (one column per term) drawn as
+# full posteriors with the frequentist point + CI overlaid.
+set.seed(1)
+co <- coef(freq)
+draws <- as.data.frame(lapply(co, function(m) rnorm(400, m, abs(m) * 0.1 + 0.05)))
+names(draws) <- names(co)
+frequentist_bayesian_plot(freq, draws,
+                          title = "Posterior with frequentist overlay")
 ```

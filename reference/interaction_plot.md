@@ -27,7 +27,7 @@ interaction_plot(
 
 - model:
 
-  A fitted model (`lm`, `glm`, ...).
+  A fitted model (`lm`, `glm`, `merMod`, ...).
 
 - predictor:
 
@@ -71,6 +71,6 @@ object.
 ## Examples
 
 ``` r
-fit <- lm(yield ~ fertilizer * treatment + rainfall, data = crop_yield)
-interaction_plot(fit, "fertilizer", "treatment")
+fit <- lm(yield ~ fertiliser * treatment + rainfall, data = crop_yield)
+interaction_plot(fit, "fertiliser", "treatment")
 ```

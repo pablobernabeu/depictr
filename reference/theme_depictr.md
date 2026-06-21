@@ -8,18 +8,22 @@ with subtle gridlines, centred titles and comfortable margins.
 ## Usage
 
 ``` r
-theme_depictr(base_size = 11, base_family = "", grid = "xy")
+theme_depictr(
+  base_size = depictr_opt("base_size"),
+  base_family = depictr_opt("base_family"),
+  grid = "xy"
+)
 ```
 
 ## Arguments
 
 - base_size:
 
-  Base font size, in points.
+  Base font size, in points. Defaults to the `depictr.base_size` option.
 
 - base_family:
 
-  Base font family.
+  Base font family. Defaults to the `depictr.base_family` option.
 
 - grid:
 
@@ -29,11 +33,20 @@ theme_depictr(base_size = 11, base_family = "", grid = "xy")
 
 A ggplot2 theme object.
 
+## Details
+
+The default `base_size` and `base_family` come from the global options
+`depictr.base_size` and `depictr.base_family` (see
+[`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md)),
+so the package-wide font size can be set once; passing the arguments
+explicitly overrides them. The title colour is the resolved
+`depictr_brand()`, which in turn honours `options(depictr.brand = )`.
+
 ## Examples
 
 ``` r
 library(ggplot2)
-ggplot(crop_yield, aes(fertilizer, yield)) +
+ggplot(crop_yield, aes(fertiliser, yield)) +
   geom_point() +
   theme_depictr()
 ```

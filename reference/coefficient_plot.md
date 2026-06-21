@@ -15,14 +15,17 @@ coefficient_plot(
   order = c("none", "ascending", "descending"),
   labels = NULL,
   interaction = c("times", "asterisk", "colon", "space"),
-  point_colour = "#005b96",
-  reference_colour = "grey60",
+  point_colour = depictr_brand(),
+  reference_colour = depictr_reference(),
   reference_line = 0,
   point_size = 2.2,
   line_size = 0.7,
+  facet = FALSE,
+  scales = c("fixed", "free"),
+  standardise = FALSE,
   title = NULL,
   subtitle = NULL,
-  x_lab = "Estimate"
+  x_lab = NULL
 )
 ```
 
@@ -77,9 +80,33 @@ coefficient_plot(
 
   Size of the points and interval lines.
 
+- facet:
+
+  Whether to give each term its own panel with a free x-axis, laid out
+  one per row. This removes the squish that occurs when terms live on
+  very different scales (for example a large intercept alongside small
+  slopes). Defaults to `FALSE`, preserving the shared-axis layout. A
+  convenience alias for `scales = "free"`.
+
+- scales:
+
+  Either `"fixed"` (the default, a single shared x-axis) or `"free"`
+  (one free-scaled panel per term). When `facet = TRUE` this is forced
+  to `"free"`.
+
+- standardise:
+
+  Whether to standardise the coefficients by multiplying each by the
+  standard deviation of its predictor column, putting them on a common
+  scale so their magnitudes are comparable (and removing the empty band
+  that otherwise appears when predictors are on very different scales).
+  Requires a fitted model (ignored, with a warning, for a tidy data
+  frame). Defaults to `FALSE`.
+
 - title, subtitle, x_lab:
 
-  Plot title, subtitle and x-axis label.
+  Plot title, subtitle and x-axis label. `x_lab` defaults to "Estimate",
+  or "Standardised estimate" when `standardise`.
 
 ## Value
 
@@ -89,13 +116,20 @@ object.
 ## Examples
 
 ``` r
-fit <- lm(yield ~ rainfall + fertilizer + soil_ph + treatment,
+fit <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment,
           data = crop_yield)
 coefficient_plot(fit)
-#> `height` was translated to `width`.
 
 
 # Order terms and add a title
 coefficient_plot(fit, order = "descending", title = "Drivers of crop yield")
-#> `height` was translated to `width`.
+
+
+# When an intercept or large term squishes the rest, give each term its own
+# free-scaled panel:
+coefficient_plot(fit, intercept = TRUE, facet = TRUE)
+
+
+# Or put the coefficients on a common, comparable scale:
+coefficient_plot(fit, standardise = TRUE)
 ```

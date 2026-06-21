@@ -2,7 +2,13 @@
 
 A reproducibly simulated agronomy field trial relating crop yield to
 rainfall, fertiliser, soil pH and a management treatment. Used for the
-regression, coefficient-plot and scatter-trend examples.
+regression, coefficient-plot, scatter-trend and interaction examples.
+The data-generating process contains a genuine fertiliser-by-treatment
+interaction: fertiliser raises yield far more under the `enhanced`
+treatment than under `standard`, so
+`interaction_plot(lm(yield ~ fertiliser * treatment + ..., crop_yield), "fertiliser", "treatment")`
+shows real, diverging slopes rather than noise. The main effects
+(rainfall, fertiliser, soil pH and treatment) are retained.
 
 ## Usage
 
@@ -20,13 +26,13 @@ A data frame with 200 rows and 6 variables:
 
 - treatment:
 
-  Management treatment: `standard` or `enhanced`.
+  Management treatment (factor): `standard` or `enhanced`.
 
 - rainfall:
 
   Seasonal rainfall, in millimetres.
 
-- fertilizer:
+- fertiliser:
 
   Fertiliser applied, in kilograms per hectare.
 

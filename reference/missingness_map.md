@@ -14,7 +14,7 @@ missingness_map(
   cols = NULL,
   sort = TRUE,
   show_pct = TRUE,
-  colours = c("grey85", "#b2182b"),
+  colours = c("grey85", depictr_accent()),
   title = NULL
 )
 ```
@@ -39,7 +39,10 @@ missingness_map(
 
 - colours:
 
-  Length-2 vector: colours for present and missing cells.
+  Length-2 vector: colours for present and missing cells. Defaults to a
+  muted grey for present cells and the colourblind-safe
+  [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
+  accent for missing cells.
 
 - title:
 

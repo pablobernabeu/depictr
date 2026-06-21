@@ -1,8 +1,14 @@
 # Simulated wellbeing survey
 
-A reproducibly simulated cross-sectional wellbeing survey with realistic
-missing values (income is missing more often at higher stress). Used for
-the descriptive, correlation and missing-data examples.
+A reproducibly simulated cross-sectional wellbeing survey for
+descriptive, correlation, regression and missing-data examples.
+`life_satisfaction` responds meaningfully to its predictors: higher
+stress lowers it, more sleep and exercise raise it, log-income has a
+real positive effect (about +0.4 per natural-log unit), and age has a
+mild inverted-U (peaking in mid-life). `education` is an ordered factor.
+Income is missing more often at higher stress (missing at random);
+because income now genuinely predicts the outcome, this missingness is
+informative for the missing-data examples.
 
 ## Usage
 
@@ -28,11 +34,12 @@ A data frame with 300 rows and 9 variables:
 
 - education:
 
-  Highest education level (ordered factor).
+  Highest education level (ordered factor: `secondary` \<
+  `undergraduate` \< `postgraduate`).
 
 - income:
 
-  Annual income; contains missing values.
+  Annual income; contains missing values (more at high stress).
 
 - stress:
 

@@ -74,6 +74,6 @@ object.
 ## Examples
 
 ``` r
-pca_plot(crop_yield, cols = c("rainfall", "fertilizer", "soil_ph", "yield"),
+pca_plot(crop_yield, cols = c("rainfall", "fertiliser", "soil_ph", "yield"),
          group = "treatment")
 ```
