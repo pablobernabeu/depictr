@@ -76,7 +76,9 @@ pca_plot <- function(x, cols = NULL, group = NULL, components = c(1, 2),
   if (loadings) {
     rot <- as.data.frame(pca$rotation[, ci, drop = FALSE])
     names(rot) <- c("PCx", "PCy")
-    rot$varname <- rownames(rot)
+    # Show underscores in the loading labels as spaces, matching the package's
+    # display convention (e.g. soil_ph -> "soil ph").
+    rot$varname <- gsub("_", " ", rownames(rot), fixed = TRUE)
     span <- max(abs(range(scores[c("PCx", "PCy")])))
     mult <- span / max(abs(as.matrix(rot[c("PCx", "PCy")]))) * 0.75
     rot$PCx <- rot$PCx * mult

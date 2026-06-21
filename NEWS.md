@@ -107,7 +107,8 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
   `word frequency` -- in `coefficient_plot()`, `compare_models()`
   and `frequentist_bayesian_plot()` (read from the model); `optimizer_fixef_plot()`
   and `posterior_plot()` gain a `labels` argument for the same. Any user-supplied
-  `labels` take precedence.
+  `labels` take precedence. `pca_plot()` likewise shows underscores in its
+  loading-arrow labels as spaces (`soil_ph` -> `soil ph`).
 * Redundant cluster legends are dropped: `silhouette_plot()` (the bands are
   labelled in place) and `cluster_plot()` when the centroids are labelled.
 * `survival_plot()`: the log-rank annotation now renders a proper chi-squared
