@@ -169,7 +169,9 @@ theme_depictr <- function(base_size = depictr_opt("base_size"),
       panel.grid.minor = ggplot2::element_blank(),
       panel.grid.major = ggplot2::element_line(colour = "grey90"),
       legend.background = ggplot2::element_rect(colour = "grey85", fill = "white"),
-      legend.title = ggplot2::element_text(face = "bold"),
+      # Centre the (bold) legend title over its keys; tidier than ggplot2's
+      # default left alignment, especially for an inside or top/bottom legend.
+      legend.title = ggplot2::element_text(face = "bold", hjust = 0.5),
       strip.background = ggplot2::element_rect(fill = "grey96", colour = NA),
       strip.text = ggplot2::element_text(
         margin = ggplot2::margin(t = 4, b = 4)

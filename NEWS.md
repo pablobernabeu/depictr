@@ -119,8 +119,10 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
   `gain_plot()`, `lift_plot()` (bottom-right / top-right of the curve),
   `ecdf_plot()`, `survival_plot()`, `explore_distribution()`, `dumbbell_plot()`
   and `missingness_map()`. For any other plot the same is one `theme()` call;
-  `vignette("exploring-data")` shows how, alongside tidying and centring legend
-  titles.
+  `vignette("exploring-data")` shows how, alongside tidying legend titles.
+* `theme_depictr()` now centres legend titles over their keys, which reads more
+  tidily than ggplot2's default left alignment -- especially for an inside or a
+  top/bottom legend.
 * `estimation_plot()` reserves more headroom above the lower panel so the
   effect-size annotation (Hedges' *g* / Cohen's *d*) is never clipped.
 * `scree_plot()` colour-matches and names its dual axes -- "Variance explained
