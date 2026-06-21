@@ -467,7 +467,7 @@ theme_depictr()              # now uses base_size 14
 #>   ..@ fontwidth    : num NA
 #>   ..@ colour       : NULL
 #>   ..@ size         : NULL
-#>   ..@ hjust        : num 0
+#>   ..@ hjust        : num 0.5
 #>   ..@ vjust        : NULL
 #>   ..@ angle        : NULL
 #>   ..@ lineheight   : NULL

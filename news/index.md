@@ -220,7 +220,11 @@ out of, and generalises, three earlier plotting functions
   For any other plot the same is one
   [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) call;
   [`vignette("exploring-data")`](https://pablobernabeu.github.io/depictr/articles/exploring-data.md)
-  shows how, alongside tidying and centring legend titles.
+  shows how, alongside tidying legend titles.
+- [`theme_depictr()`](https://pablobernabeu.github.io/depictr/reference/theme_depictr.md)
+  now centres legend titles over their keys, which reads more tidily
+  than ggplot2’s default left alignment – especially for an inside or a
+  top/bottom legend.
 - [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md)
   reserves more headroom above the lower panel so the effect-size
   annotation (Hedges’ *g* / Cohen’s *d*) is never clipped.
