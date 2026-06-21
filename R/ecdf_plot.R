@@ -60,9 +60,13 @@ ecdf_plot <- function(data, x, group = NULL, reference_quantiles = NULL,
     }
   }
 
-  p +
+  p <- p +
     ggplot2::scale_y_continuous(labels = scales::percent_format(accuracy = 1),
                                 limits = c(0, 1)) +
     ggplot2::labs(x = x_lab, y = y_lab, title = title) +
     theme_depictr()
+  # An ECDF saturates to 100% before the right edge, leaving the bottom-right
+  # corner free: put the group legend there rather than in a right-hand margin.
+  if (!is.null(group)) p <- p + legend_inside(c(0.98, 0.02), c(1, 0))
+  p
 }

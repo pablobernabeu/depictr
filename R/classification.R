@@ -145,6 +145,9 @@ roc_curve_plot <- function(x, score = NULL, colour = depictr_brand(),
     ggplot2::labs(x = "False positive rate", y = "True positive rate",
                   title = title) +
     theme_depictr()
+  # The curve hugs the top-left, so the bottom-right corner is always free: tuck
+  # the multi-model legend in there instead of using a right-hand margin.
+  if (multi) p <- p + legend_inside(c(0.98, 0.02), c(1, 0))
 
   attr(p, "auc") <- if (multi) stats::setNames(aucs, names(models)) else aucs[[1]]
   if (isTRUE(youden)) {

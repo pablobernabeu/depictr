@@ -70,13 +70,17 @@ gain_plot <- function(x, score = NULL, colour = depictr_brand(), title = NULL) {
                         colour = "grey40", size = 3, fontface = "italic")
   }
 
-  p +
+  p <- p +
     ggplot2::scale_x_continuous(labels = scales::percent_format(accuracy = 1)) +
     ggplot2::scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
     ggplot2::coord_equal() +
     ggplot2::labs(x = "Population targeted", y = "Positive cases captured",
                   title = title) +
     theme_depictr()
+  # A gains curve is concave (above the diagonal), so the bottom-right triangle
+  # is always empty: place the multi-model legend there.
+  if (multi) p <- p + legend_inside(c(0.98, 0.02), c(1, 0))
+  p
 }
 
 #' Cumulative lift chart
@@ -141,12 +145,17 @@ lift_plot <- function(x, score = NULL, colour = depictr_brand(), title = NULL) {
                         size = 3, fontface = "italic")
   }
 
-  p +
+  p <- p +
     ggplot2::scale_x_continuous(labels = scales::percent_format(accuracy = 1)) +
     ggplot2::expand_limits(y = 1) +
     ggplot2::labs(x = "Population targeted", y = "Cumulative lift",
                   title = title) +
     theme_depictr()
+  # Lift decays towards the baseline (1) as the targeted share grows, so the
+  # top-right corner stays empty regardless of model strength: anchor the
+  # multi-model legend there.
+  if (multi) p <- p + legend_inside(c(0.98, 0.98), c(1, 1))
+  p
 }
 
 # ---- internal helper -------------------------------------------------------

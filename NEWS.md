@@ -114,6 +114,11 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
   and an italic *p*; the median guide is labelled "median <value>"; the group
   legend sits inside the (always-empty) bottom-left of the panel; and the y-axis
   title margin is tighter.
+* More legends move into the plotting area where a corner is reliably empty by
+  construction: the multi-model `roc_curve_plot()`, `gain_plot()` and
+  `lift_plot()` legends, and the grouped `ecdf_plot()` legend, now sit over a
+  semi-transparent background in that structurally vacant corner instead of in a
+  right-hand margin.
 * `scree_plot()` colour-matches and names its dual axes -- "Variance explained
   (bars)" on the left, "Cumulative (line)" on the right.
 * Statistical letters are italic in annotations: the log-rank *p*,
