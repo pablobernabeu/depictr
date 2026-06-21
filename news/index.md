@@ -194,6 +194,9 @@ out of, and generalises, three earlier plotting functions
   [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
   gain a `labels` argument for the same. Any user-supplied `labels` take
   precedence.
+  [`pca_plot()`](https://pablobernabeu.github.io/depictr/reference/pca_plot.md)
+  likewise shows underscores in its loading-arrow labels as spaces
+  (`soil_ph` -\> `soil ph`).
 - Redundant cluster legends are dropped:
   [`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md)
   (the bands are labelled in place) and
