@@ -287,6 +287,14 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
       ggplot2::facet_wrap(ggplot2::vars(.data$label), ncol = 1,
                           scales = "free", strip.position = "top",
                           labeller = ggplot2::label_wrap_gen(width = 28)) +
+      # Each panel holds a single row whose half-eye slab rises upward from the
+      # baseline and whose frequentist overlay sits just below it, so the default
+      # discrete expansion (add = 0.6 each side) leaves a wide empty band down to
+      # the x-axis. Tighten the lower expansion (and trim the upper) so the geoms
+      # sit snugly above the axis.
+      ggplot2::scale_y_discrete(
+        expand = ggplot2::expansion(add = c(0.18, 0.45))
+      ) +
       ggplot2::theme(axis.text.y = ggplot2::element_blank(),
                      axis.ticks.y = ggplot2::element_blank(),
                      panel.spacing.y = ggplot2::unit(2, "pt"))
