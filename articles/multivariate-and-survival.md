@@ -155,13 +155,15 @@ difference – the treatment arm has a lower hazard – so the curves
 separate. Turning on the three publication annotations gives a
 survminer-style figure: a **number-at-risk table** beneath the curves,
 dashed guides to each arm’s **median survival**, and the **log-rank
-test** of the difference as a subtitle.
+test** of the difference as a subtitle. A survival curve is
+monotone-decreasing, so its bottom-left corner is always empty –
+`legend_inside = TRUE` puts the group legend there.
 
 ``` r
 
 survival_plot(
   clinical_trial$time, clinical_trial$event, group = clinical_trial$arm,
-  risk_table = TRUE, median_line = TRUE, logrank = TRUE,
+  risk_table = TRUE, median_line = TRUE, logrank = TRUE, legend_inside = TRUE,
   x_lab = "Months", title = "Overall survival by arm"
 )
 ```

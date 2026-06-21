@@ -20,6 +20,7 @@ survival_plot(
   logrank = FALSE,
   risk_breaks = NULL,
   palette = NULL,
+  legend_inside = FALSE,
   title = NULL,
   x_lab = "Time",
   y_lab = "Survival probability"
@@ -78,6 +79,13 @@ survival_plot(
 
   Colours for the groups; defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
+
+- legend_inside:
+
+  When `TRUE` (and there are several groups), draw the group legend
+  inside the panel – in the bottom-left corner a monotone-decreasing
+  survival curve always leaves empty – over a translucent background,
+  instead of in a right-hand margin. Defaults to `FALSE`.
 
 - title, x_lab, y_lab:
 

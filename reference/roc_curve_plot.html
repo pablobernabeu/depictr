@@ -81,6 +81,7 @@ operating point can be marked.</p>
 <span>  ci <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  conf_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  youden <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  legend_inside <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -120,6 +121,13 @@ sets the number of resamples. Ignored when several models are overlaid.</p></dd>
 <dt id="arg-youden">youden<a class="anchor" aria-label="anchor" href="#arg-youden"></a></dt>
 <dd><p>Logical; if <code>TRUE</code>, mark the Youden's J operating point (the
 threshold maximising sensitivity + specificity - 1) on each curve.</p></dd>
+
+
+<dt id="arg-legend-inside">legend_inside<a class="anchor" aria-label="anchor" href="#arg-legend-inside"></a></dt>
+<dd><p>When <code>TRUE</code> (and several models are overlaid), draw the
+legend inside the panel – in the bottom-right corner the curve leaves empty
+– over a translucent background, instead of in a right-hand margin.
+Defaults to <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>

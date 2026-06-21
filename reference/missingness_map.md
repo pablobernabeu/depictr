@@ -15,6 +15,7 @@ missingness_map(
   sort = TRUE,
   show_pct = TRUE,
   colours = c("grey85", depictr_accent()),
+  legend_inside = FALSE,
   title = NULL
 )
 ```
@@ -43,6 +44,13 @@ missingness_map(
   muted grey for present cells and the colourblind-safe
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
   accent for missing cells.
+
+- legend_inside:
+
+  When `TRUE` (and `sort = TRUE`), draw the legend inside the panel, in
+  the top-right – where the most-complete columns put a solid "Present"
+  block, so it hides no "Missing" mark – instead of in a right-hand
+  margin. Defaults to `FALSE`.
 
 - title:
 

@@ -12,11 +12,16 @@ with ordinary ggplot2 code.
 [`explore_distribution()`](https://pablobernabeu.github.io/depictr/reference/explore_distribution.md)
 for a numeric variable,
 [`explore_categorical()`](https://pablobernabeu.github.io/depictr/reference/explore_categorical.md)
-for a categorical one.
+for a categorical one. A unimodal density leaves its upper corners
+empty, so `legend_inside = TRUE` tucks the colour legend into the
+top-right rather than spending a right-hand margin on it. Several plots
+take this argument; it is off by default because the empty corner
+depends on the data.
 
 ``` r
 
-explore_distribution(lexical_decision, RT, group = condition, type = "density")
+explore_distribution(lexical_decision, RT, group = condition, type = "density",
+                     legend_inside = TRUE)
 ```
 
 ![](exploring-data_files/figure-html/unnamed-chunk-1-1.png)
@@ -41,7 +46,7 @@ throughout).
 ``` r
 
 ecdf_plot(lexical_decision, RT, group = condition,
-          reference_quantiles = c(0.25, 0.5, 0.75))
+          reference_quantiles = c(0.25, 0.5, 0.75), legend_inside = TRUE)
 ```
 
 ![](exploring-data_files/figure-html/unnamed-chunk-3-1.png)
@@ -193,7 +198,7 @@ and older respondents’ life satisfaction by region.
 
 wb <- wellbeing_survey
 wb$age_group <- ifelse(wb$age < median(wb$age), "younger", "older")
-dumbbell_plot(wb, region, life_satisfaction, age_group)
+dumbbell_plot(wb, region, life_satisfaction, age_group, legend_inside = TRUE)
 ```
 
 ![](exploring-data_files/figure-html/unnamed-chunk-15-1.png)
@@ -213,7 +218,7 @@ before modelling.
 
 ``` r
 
-missingness_map(wellbeing_survey)
+missingness_map(wellbeing_survey, legend_inside = TRUE)
 ```
 
 ![](exploring-data_files/figure-html/unnamed-chunk-17-1.png)
@@ -268,16 +273,58 @@ scatter_trend(crop_yield, fertiliser, yield, group = treatment) +
 
 ![](exploring-data_files/figure-html/unnamed-chunk-19-1.png)
 
-All the standard ggplot2 adjustments apply. A common one is reversing a
-colour legend so it reads in the same direction as the plotted curves:
+### Tidying the legend
+
+When the levels speak for themselves the legend *title* is just clutter
+– drop it by mapping the title to `NULL`. Reversing a discrete colour
+legend at the same time makes it read top-to-bottom in the order the
+curves are stacked:
 
 ``` r
 
 ecdf_plot(lexical_decision, RT, group = condition) +
+  labs(colour = NULL) +
   guides(colour = guide_legend(reverse = TRUE))
 ```
 
 ![](exploring-data_files/figure-html/unnamed-chunk-20-1.png)
+
+When you do keep a legend title, centring it over the keys often looks
+tidier than ggplot2’s default left alignment:
+
+``` r
+
+correlation_heatmap(wellbeing_survey) +
+  theme(legend.position = "top") +
+  guides(fill = guide_colourbar(title.position = "top", title.hjust = 0.5))
+```
+
+![](exploring-data_files/figure-html/unnamed-chunk-21-1.png)
+
+### Moving the legend into the plot
+
+Several plots take `legend_inside = TRUE` to tuck the legend into a
+corner they usually leave empty (see
+e.g. [`?ecdf_plot`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot.md)).
+For any plot that does not, the same move is one
+[`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) call. A
+dodged bar chart, for instance, leaves the top-right clear when the
+right-most category is short, so the `region` legend fits there – and we
+centre its title while we are at it:
+
+``` r
+
+explore_categorical(wellbeing_survey, education, group = region,
+                    proportion = TRUE, position = "dodge") +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.98, 0.98),
+        legend.justification = c(1, 1),
+        legend.title = element_text(hjust = 0.5))
+```
+
+![](exploring-data_files/figure-html/unnamed-chunk-22-1.png)
+
+### Built-in layout controls
 
 Many functions also expose layout controls directly.
 `explore_distribution(facet = TRUE)` and

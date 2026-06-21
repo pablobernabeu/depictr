@@ -218,11 +218,13 @@ curves separate. Turning on the three publication annotations gives a
 survminer-style figure: a <strong>number-at-risk table</strong> beneath
 the curves, dashed guides to each arm’s <strong>median
 survival</strong>, and the <strong>log-rank test</strong> of the
-difference as a subtitle.</p>
+difference as a subtitle. A survival curve is monotone-decreasing, so
+its bottom-left corner is always empty –
+<code>legend_inside = TRUE</code> puts the group legend there.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/survival_plot.html">survival_plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">clinical_trial</span><span class="op">$</span><span class="va">time</span>, <span class="va">clinical_trial</span><span class="op">$</span><span class="va">event</span>, group <span class="op">=</span> <span class="va">clinical_trial</span><span class="op">$</span><span class="va">arm</span>,</span>
-<span>  risk_table <span class="op">=</span> <span class="cn">TRUE</span>, median_line <span class="op">=</span> <span class="cn">TRUE</span>, logrank <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  risk_table <span class="op">=</span> <span class="cn">TRUE</span>, median_line <span class="op">=</span> <span class="cn">TRUE</span>, logrank <span class="op">=</span> <span class="cn">TRUE</span>, legend_inside <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  x_lab <span class="op">=</span> <span class="st">"Months"</span>, title <span class="op">=</span> <span class="st">"Overall survival by arm"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="multivariate-and-survival_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="672"></p>

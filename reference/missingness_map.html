@@ -71,6 +71,7 @@ attention before modelling.</p>
 <span>  sort <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  show_pct <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grey85"</span>, <span class="fu">depictr_accent</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  legend_inside <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -99,6 +100,13 @@ attention before modelling.</p>
 <dd><p>Length-2 vector: colours for present and missing cells.
 Defaults to a muted grey for present cells and the colourblind-safe
 <code><a href="depictr_palette.html">depictr_palette()</a></code> accent for missing cells.</p></dd>
+
+
+<dt id="arg-legend-inside">legend_inside<a class="anchor" aria-label="anchor" href="#arg-legend-inside"></a></dt>
+<dd><p>When <code>TRUE</code> (and <code>sort = TRUE</code>), draw the legend inside
+the panel, in the top-right – where the most-complete columns put a solid
+"Present" block, so it hides no "Missing" mark – instead of in a right-hand
+margin. Defaults to <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>

@@ -162,8 +162,11 @@ model is compared with a biomarker-only model.</p>
 <code class="sourceCode R"><span><span class="va">reduced</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">adverse_event</span> <span class="op">~</span> <span class="va">biomarker</span>, data <span class="op">=</span> <span class="va">clinical_trial</span>,</span>
 <span>               family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span>
 <span><span class="va">models</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Full <span class="op">=</span> <span class="va">gfit</span>, `Biomarker only` <span class="op">=</span> <span class="va">reduced</span><span class="op">)</span></span></code></pre></div>
+<p>Because an ROC curve hugs the top-left, the bottom-right corner is
+always free, so <code>legend_inside = TRUE</code> tucks the per-model
+legend there and reclaims the right-hand margin:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/roc_curve_plot.html">roc_curve_plot</a></span><span class="op">(</span><span class="va">models</span>, youden <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/roc_curve_plot.html">roc_curve_plot</a></span><span class="op">(</span><span class="va">models</span>, youden <span class="op">=</span> <span class="cn">TRUE</span>, legend_inside <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="480"></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pr_curve_plot.html">pr_curve_plot</a></span><span class="op">(</span><span class="va">models</span>, f1 <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -172,10 +175,10 @@ model is compared with a biomarker-only model.</p>
 show how many positive cases are captured as more of the score-ordered
 population is targeted – again overlaying both models:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/gain_plot.html">gain_plot</a></span><span class="op">(</span><span class="va">models</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/gain_plot.html">gain_plot</a></span><span class="op">(</span><span class="va">models</span>, legend_inside <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="480"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/lift_plot.html">lift_plot</a></span><span class="op">(</span><span class="va">models</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/lift_plot.html">lift_plot</a></span><span class="op">(</span><span class="va">models</span>, legend_inside <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level3">

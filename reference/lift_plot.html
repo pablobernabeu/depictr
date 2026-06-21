@@ -68,7 +68,13 @@ curves with a legend.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">lift_plot</span><span class="op">(</span><span class="va">x</span>, score <span class="op">=</span> <span class="cn">NULL</span>, colour <span class="op">=</span> <span class="fu">depictr_brand</span><span class="op">(</span><span class="op">)</span>, title <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">lift_plot</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  score <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  colour <span class="op">=</span> <span class="fu">depictr_brand</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  legend_inside <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -89,6 +95,13 @@ probabilities (or a list of them for the multi-model case).</p></dd>
 <dt id="arg-colour">colour<a class="anchor" aria-label="anchor" href="#arg-colour"></a></dt>
 <dd><p>Curve colour for the single-model case. Defaults to the depictr
 brand blue. Ignored when several models are overlaid.</p></dd>
+
+
+<dt id="arg-legend-inside">legend_inside<a class="anchor" aria-label="anchor" href="#arg-legend-inside"></a></dt>
+<dd><p>When <code>TRUE</code> (and several models are overlaid), draw the
+legend inside the panel – in the bottom-right triangle the concave curve
+leaves empty – over a translucent background, instead of in a right-hand
+margin. Defaults to <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>

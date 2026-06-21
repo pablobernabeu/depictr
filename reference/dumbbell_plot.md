@@ -17,6 +17,7 @@ dumbbell_plot(
   sort = c("gap", "value", "none"),
   point_size = 3,
   palette = NULL,
+  legend_inside = FALSE,
   title = NULL,
   x_lab = NULL,
   y_lab = NULL
@@ -57,6 +58,13 @@ dumbbell_plot(
 
   Length-2 colours for the two groups; defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
+
+- legend_inside:
+
+  When `TRUE`, draw the two-group legend inside the panel – in the
+  top-right corner, which the default gap sort (shortest dumbbell on
+  top) usually leaves clear – over a translucent background, instead of
+  in a right-hand margin. Defaults to `FALSE`.
 
 - title, x_lab, y_lab:
 

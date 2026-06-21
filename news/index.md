@@ -201,19 +201,29 @@ out of, and generalises, three earlier plotting functions
   when the centroids are labelled.
 - [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md):
   the log-rank annotation now renders a proper chi-squared and an italic
-  *p*; the median guide is labelled “median ”; the group legend sits
-  inside the (always-empty) bottom-left of the panel; and the y-axis
-  title margin is tighter.
-- More legends move into the plotting area where a corner is reliably
-  empty by construction: the multi-model
+  *p*; the median guide is labelled “median ”; and the y-axis title
+  margin is tighter.
+- A `legend_inside` argument (off by default) draws the legend inside
+  the panel, over a semi-transparent background, in a corner the plot
+  usually leaves empty – reclaiming the right-hand margin. It is offered
+  by
   [`roc_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/roc_curve_plot.md),
-  [`gain_plot()`](https://pablobernabeu.github.io/depictr/reference/gain_plot.md)
-  and
+  [`gain_plot()`](https://pablobernabeu.github.io/depictr/reference/gain_plot.md),
   [`lift_plot()`](https://pablobernabeu.github.io/depictr/reference/lift_plot.md)
-  legends, and the grouped
-  [`ecdf_plot()`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot.md)
-  legend, now sit over a semi-transparent background in that
-  structurally vacant corner instead of in a right-hand margin.
+  (bottom-right / top-right of the curve),
+  [`ecdf_plot()`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot.md),
+  [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md),
+  [`explore_distribution()`](https://pablobernabeu.github.io/depictr/reference/explore_distribution.md),
+  [`dumbbell_plot()`](https://pablobernabeu.github.io/depictr/reference/dumbbell_plot.md)
+  and
+  [`missingness_map()`](https://pablobernabeu.github.io/depictr/reference/missingness_map.md).
+  For any other plot the same is one
+  [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) call;
+  [`vignette("exploring-data")`](https://pablobernabeu.github.io/depictr/articles/exploring-data.md)
+  shows how, alongside tidying and centring legend titles.
+- [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md)
+  reserves more headroom above the lower panel so the effect-size
+  annotation (Hedges’ *g* / Cohen’s *d*) is never clipped.
 - [`scree_plot()`](https://pablobernabeu.github.io/depictr/reference/scree_plot.md)
   colour-matches and names its dual axes – “Variance explained (bars)”
   on the left, “Cumulative (line)” on the right.

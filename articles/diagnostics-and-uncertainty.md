@@ -125,9 +125,13 @@ reduced <- glm(adverse_event ~ biomarker, data = clinical_trial,
 models <- list(Full = gfit, `Biomarker only` = reduced)
 ```
 
+Because an ROC curve hugs the top-left, the bottom-right corner is
+always free, so `legend_inside = TRUE` tucks the per-model legend there
+and reclaims the right-hand margin:
+
 ``` r
 
-roc_curve_plot(models, youden = TRUE)
+roc_curve_plot(models, youden = TRUE, legend_inside = TRUE)
 ```
 
 ![](diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-11-1.png)
@@ -145,14 +149,14 @@ population is targeted – again overlaying both models:
 
 ``` r
 
-gain_plot(models)
+gain_plot(models, legend_inside = TRUE)
 ```
 
 ![](diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-13-1.png)
 
 ``` r
 
-lift_plot(models)
+lift_plot(models, legend_inside = TRUE)
 ```
 
 ![](diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-14-1.png)

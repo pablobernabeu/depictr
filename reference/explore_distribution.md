@@ -16,6 +16,7 @@ explore_distribution(
   position = NULL,
   palette = NULL,
   facet = FALSE,
+  legend_inside = FALSE,
   title = NULL,
   x_lab = NULL
 )
@@ -67,6 +68,13 @@ explore_distribution(
   more than two or three groups (overlaid histograms in particular
   become hard to read). Defaults to `FALSE`. Ignored when there is no
   `group`.
+
+- legend_inside:
+
+  When `TRUE` (and a `group` is given without `facet`), draw the colour
+  legend inside the panel – in the top-right corner a unimodal
+  histogram/density leaves empty – over a translucent background,
+  instead of in a right-hand margin. Defaults to `FALSE`.
 
 - title, x_lab:
 

@@ -14,6 +14,7 @@ ecdf_plot(
   group = NULL,
   reference_quantiles = NULL,
   palette = NULL,
+  legend_inside = FALSE,
   title = NULL,
   x_lab = NULL,
   y_lab = "Cumulative proportion"
@@ -45,6 +46,13 @@ ecdf_plot(
 
   Colours for the groups; defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
+
+- legend_inside:
+
+  When `TRUE` (and a `group` is given), draw the legend inside the panel
+  – in the bottom-right corner the ECDF leaves empty once it saturates –
+  over a translucent background, instead of in a right-hand margin.
+  Defaults to `FALSE`.
 
 - title, x_lab, y_lab:
 

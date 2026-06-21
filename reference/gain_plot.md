@@ -11,7 +11,13 @@ colour-coded gains curves with a legend.
 ## Usage
 
 ``` r
-gain_plot(x, score = NULL, colour = depictr_brand(), title = NULL)
+gain_plot(
+  x,
+  score = NULL,
+  colour = depictr_brand(),
+  legend_inside = FALSE,
+  title = NULL
+)
 ```
 
 ## Arguments
@@ -31,6 +37,13 @@ gain_plot(x, score = NULL, colour = depictr_brand(), title = NULL)
 
   Curve colour for the single-model case. Defaults to the depictr brand
   blue. Ignored when several models are overlaid.
+
+- legend_inside:
+
+  When `TRUE` (and several models are overlaid), draw the legend inside
+  the panel – in the bottom-right triangle the concave curve leaves
+  empty – over a translucent background, instead of in a right-hand
+  margin. Defaults to `FALSE`.
 
 - title:
 
