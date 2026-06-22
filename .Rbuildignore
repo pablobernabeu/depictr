@@ -14,3 +14,4 @@
 ^Rplots\.pdf$
 ^figure$
 ^\.gitignore$
+^CRAN-SUBMISSION$
