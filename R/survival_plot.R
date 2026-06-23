@@ -56,8 +56,7 @@
 #'
 #' \insertRef{greenwood1926}{depictr}
 #'
-#' The log-rank test follows Mantel (1966,
-#' \doi{10.1002/0471667196.ess1530.pub2}).
+#' The log-rank test follows Mantel (1966).
 #' @export
 #' @examples
 #' set.seed(1)

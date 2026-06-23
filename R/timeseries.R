@@ -441,7 +441,7 @@ ts_forecast <- function(x, h = 12, frequency = NULL, level = 0.95) {
 #' Accepts either an integer horizon (dispatching to [ts_forecast()] on the
 #' original `ts`/numeric input) or a pre-computed data frame with at least
 #' `time` and `fit` columns. The data frame is prepended with the last observed
-#' point so the overlaid forecast line joins the history seamlessly.
+#' point so the overlaid forecast line joins the history without a gap.
 #' @noRd
 resolve_forecast <- function(forecast, x, df, frequency = NULL, level = 0.95) {
   if (is.data.frame(forecast)) {
