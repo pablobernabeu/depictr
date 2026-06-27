@@ -21,6 +21,20 @@ It grew out of three focused plotting functions
 [powercurvePlot](https://github.com/pablobernabeu/powercurvePlot)), generalised
 and unified into one coherent package.
 
+A Python sibling, [depictr-py](https://github.com/pablobernabeu/depictr-py),
+mirrors the same design on top of [plotnine](https://plotnine.org) and is on
+[PyPI](https://pypi.org/project/depictr/) (`pip install depictr`).
+
+## Gallery
+
+A grouped density (the default palette is the colourblind-safe Okabe-Ito set) and
+Kaplan-Meier survival curves with confidence bands and a number-at-risk table,
+each from a single function call:
+
+![Grouped density of response times by priming condition, in the Okabe-Ito palette](man/figures/README-distribution.png)
+
+![Kaplan-Meier survival curves by treatment arm, with confidence bands, censoring marks, a log-rank test and a number-at-risk table](man/figures/README-survival.png)
+
 ## Installation
 
 ```r
