@@ -1,3 +1,10 @@
+# depictr 0.1.0.9000 (development version)
+
+* `survival_plot()`: the log-rank *p*-value now follows APA style -- no leading
+  zero, and reported as *p* < .001 below that threshold. The colour legend and
+  the number-at-risk table list the groups in the same order, following the
+  group factor's levels.
+
 # depictr 0.1.0
 
 First release. depictr is a unified, consistent toolkit of publication-ready

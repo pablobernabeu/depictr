@@ -83,6 +83,11 @@ survival_plot <- function(time, status = NULL, group = NULL, conf_level = 0.95,
   km <- km_input(time, status, group, conf_level)
   has_ci <- !is.na(conf_level) && all(c("lower", "upper") %in% names(km$curve))
   groups <- unique(km$curve$group)
+  # Use one factor order so the colour legend and the risk-table rows match.
+  km$curve$group <- factor(km$curve$group, levels = groups)
+  if (nrow(km$censor) > 0) {
+    km$censor$group <- factor(km$censor$group, levels = groups)
+  }
   multi <- length(groups) > 1
   pal <- palette %||% depictr_palette(length(groups))
   # Stable group -> colour map shared by the curve and the risk table.
@@ -191,9 +196,11 @@ km_input <- function(time, status, group, conf_level) {
     sv <- status
     gv <- group
   }
+  # Respect a user-set factor order; otherwise use first appearance. This order
+  # is shared by the colour legend and the risk-table rows.
+  glevels <- if (!is.null(gv) && is.factor(gv)) levels(droplevels(gv)) else NULL
   gv <- if (is.null(gv)) rep("all", length(tv)) else as.character(gv)
-
-  groups <- unique(gv)
+  groups <- if (!is.null(glevels)) glevels else unique(gv)
   curves <- list()
   censors <- list()
   counts <- list()
@@ -645,11 +652,11 @@ logrank_label <- function(counts) {
   res <- logrank_test(counts)
   if (is.null(res) || is.na(res$chisq)) return(NULL)
   chi <- formatC(res$chisq, digits = 3, format = "g")
-  if (res$p < 1e-4) {
+  if (res$p < 0.001) {
     bquote("Log-rank " * chi^2 * "(" * .(res$df) * ") = " * .(chi) *
-             ", " * italic(p) * " < 0.0001")
+             ", " * italic(p) * " < .001")
   } else {
-    pv <- formatC(res$p, digits = 3, format = "g")
+    pv <- sub("^0", "", formatC(res$p, digits = 3, format = "f"))
     bquote("Log-rank " * chi^2 * "(" * .(res$df) * ") = " * .(chi) *
              ", " * italic(p) * " = " * .(pv))
   }
