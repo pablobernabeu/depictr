@@ -16,7 +16,11 @@ authors:
 navbar:
   structure:
     left: [intro, reference, articles, news]
-    right: [search, github, lightswitch]
+    right: [about, search, github, lightswitch]
+  components:
+    about:
+      text: About
+      href: articles/about.html
 
 figures:
   dpi: 96
