@@ -132,9 +132,7 @@ Greenwood M (1926). *The Natural Duration of Cancer*, volume 33 of
 *Reports on Public Health and Medical Subjects*. His Majesty's
 Stationery Office, London.
 
-The log-rank test follows Mantel (1966,
-[doi:10.1002/0471667196.ess1530.pub2](https://doi.org/10.1002/0471667196.ess1530.pub2)
-).
+The log-rank test follows Mantel (1966).
 
 ## Examples
 
