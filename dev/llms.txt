@@ -10,16 +10,9 @@ of label conventions. Every plotting function returns a
 [patchwork](https://patchwork.data-imaginist.com) for composite panels),
 so a plot can be refined further with the usual `+` syntax.
 
-It grew out of three focused plotting functions
-([frequentist_bayesian_plot](https://github.com/pablobernabeu/frequentist_bayesian_plot),
-[plot.fixef.allFit](https://github.com/pablobernabeu/plot.fixef.allFit)
-and [powercurvePlot](https://github.com/pablobernabeu/powercurvePlot)),
-generalised and unified into one coherent package.
-
 A Python sibling,
 [depictr-py](https://github.com/pablobernabeu/depictr-py), mirrors the
-same design on top of [plotnine](https://plotnine.org) and is on
-[PyPI](https://pypi.org/project/depictr/) (`pip install depictr`).
+same design.
 
 ## Gallery
 
