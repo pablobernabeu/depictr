@@ -7,6 +7,18 @@
   reported as *p* \< .001 below that threshold. The colour legend and
   the number-at-risk table list the groups in the same order, following
   the group factor’s levels.
+- `cluster_plot(seed = ...)` no longer leaves the caller’s random number
+  generator stream perturbed after the call returns; the state is now
+  restored on exit, matching the pattern already used elsewhere in the
+  package (e.g. `quantile_residuals()`).
+- Internal refactor:
+  [`raincloud_plot()`](https://pablobernabeu.github.io/depictr/dev/reference/raincloud_plot.md),
+  [`ridgeline_plot()`](https://pablobernabeu.github.io/depictr/dev/reference/ridgeline_plot.md),
+  [`group_comparison_plot()`](https://pablobernabeu.github.io/depictr/dev/reference/group_comparison_plot.md)
+  and
+  [`estimation_plot()`](https://pablobernabeu.github.io/depictr/dev/reference/estimation_plot.md)
+  no longer use the `<<-` superassignment operator to collect
+  sparse-group warnings; no user-facing change.
 
 ## depictr 0.1.0
 
