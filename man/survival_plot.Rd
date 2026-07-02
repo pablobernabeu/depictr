@@ -109,5 +109,5 @@ survival_plot(clinical_trial$time, clinical_trial$event,
 
 \insertRef{greenwood1926}{depictr}
 
-The log-rank test follows Mantel (1966).
+\insertRef{mantel1966}{depictr}
 }
