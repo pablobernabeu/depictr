@@ -145,3 +145,6 @@ articles:
   - diagnostics-and-uncertainty
   - multivariate-and-survival
   - time-series
+- title: About
+  contents:
+  - articles/about
