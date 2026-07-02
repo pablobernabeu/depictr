@@ -38,22 +38,24 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
   groups <- levels(d$.g)
   pos <- stats::setNames(seq_along(groups), groups)
 
-  sparse <- character(0)
-  dens <- do.call(rbind, lapply(groups, function(g) {
+  # Each element carries its density row (NULL if too sparse to estimate) and,
+  # for a sparse group, its name -- read back below rather than accumulated
+  # with `<<-`, so the loop body cannot leak or mutate a parent-frame variable.
+  res <- lapply(groups, function(g) {
     v <- d[[y]][d$.g == g]
     # stats::density() needs at least two points to pick a bandwidth, so a
     # group with fewer is shown as points + box only (no half-violin).
-    if (length(v) < 2) {
-      sparse <<- c(sparse, g)
-      return(NULL)
-    }
+    if (length(v) < 2) return(list(row = NULL, sparse = g))
     de <- stats::density(v)
     w <- de$y / max(de$y) * width
-    data.frame(g = factor(g, levels = groups),
-               x = c(pos[[g]] + w, rep(pos[[g]], length(w))),
-               yy = c(de$x, rev(de$x)),
-               stringsAsFactors = FALSE)
-  }))
+    list(row = data.frame(g = factor(g, levels = groups),
+                          x = c(pos[[g]] + w, rep(pos[[g]], length(w))),
+                          yy = c(de$x, rev(de$x)),
+                          stringsAsFactors = FALSE),
+        sparse = NULL)
+  })
+  dens <- do.call(rbind, lapply(res, `[[`, "row"))
+  sparse <- unlist(lapply(res, `[[`, "sparse"))
   if (length(sparse)) {
     warning("No half-violin drawn for group(s) with n < 2: ",
             paste(sparse, collapse = ", "),
@@ -170,23 +172,27 @@ group_comparison_plot <- function(data, y, group, conf_level = 0.95,
   d[[group]] <- as.factor(d[[group]])
   groups <- levels(d[[group]])
 
-  sparse <- character(0)
-  summ <- do.call(rbind, lapply(groups, function(g) {
+  # Each element carries its summary row and, for a sparse group, its name --
+  # read back below rather than accumulated with `<<-`.
+  res <- lapply(groups, function(g) {
     v <- d[[y]][d[[group]] == g]
     nv <- length(v)
     m <- mean(v)
     if (nv < 2) {
       # A single observation has no degrees of freedom for a t interval
       # (qt(df = 0) is NaN), so draw the mean only and flag the group.
-      sparse <<- c(sparse, g)
-      return(data.frame(group = g, mean = m, lower = m, upper = m,
-                        stringsAsFactors = FALSE))
+      return(list(row = data.frame(group = g, mean = m, lower = m, upper = m,
+                                   stringsAsFactors = FALSE),
+                 sparse = g))
     }
     se <- stats::sd(v) / sqrt(nv)
     tc <- stats::qt(1 - (1 - conf_level) / 2, df = nv - 1)
-    data.frame(group = g, mean = m, lower = m - tc * se,
-               upper = m + tc * se, stringsAsFactors = FALSE)
-  }))
+    list(row = data.frame(group = g, mean = m, lower = m - tc * se,
+                          upper = m + tc * se, stringsAsFactors = FALSE),
+        sparse = NULL)
+  })
+  summ <- do.call(rbind, lapply(res, `[[`, "row"))
+  sparse <- unlist(lapply(res, `[[`, "sparse"))
   if (length(sparse)) {
     warning("No confidence interval drawn for group(s) with n < 2: ",
             paste(sparse, collapse = ", "), "; showing the mean only.",

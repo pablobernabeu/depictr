@@ -50,16 +50,19 @@ ridgeline_plot <- function(data, x, group, overlap = 1.4, alpha = 0.85,
   groups <- levels(g)
   pos <- stats::setNames(seq_along(groups), groups)
 
-  sparse <- character(0)
-  dens <- do.call(rbind, lapply(groups, function(gg) {
+  # Each element carries its density row (NULL if too sparse to estimate) and,
+  # for a sparse group, its name -- read back below rather than accumulated
+  # with `<<-`.
+  res <- lapply(groups, function(gg) {
     v <- d[[x]][as.character(g) == gg]
-    if (length(v) < 2) {
-      sparse <<- c(sparse, gg)
-      return(NULL)
-    }
+    if (length(v) < 2) return(list(row = NULL, sparse = gg))
     de <- stats::density(v)
-    data.frame(group = gg, x = de$x, h = de$y, stringsAsFactors = FALSE)
-  }))
+    list(row = data.frame(group = gg, x = de$x, h = de$y,
+                          stringsAsFactors = FALSE),
+        sparse = NULL)
+  })
+  dens <- do.call(rbind, lapply(res, `[[`, "row"))
+  sparse <- unlist(lapply(res, `[[`, "sparse"))
   if (length(sparse)) {
     warning("No ridge drawn for group(s) with n < 2: ",
             paste(sparse, collapse = ", "), ".", call. = FALSE)

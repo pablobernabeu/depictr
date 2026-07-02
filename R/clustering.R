@@ -57,6 +57,18 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
   else check_columns(data, cols)
   if (length(cols) < 2) stop("Need at least two numeric columns.", call. = FALSE)
 
+  if (!is.null(seed)) {
+    if (!is.numeric(seed) || length(seed) != 1) {
+      stop("`seed` must be a single number or NULL.", call. = FALSE)
+    }
+    # Restore the caller's RNG state on exit, however the function returns, so
+    # a reproducible `seed` here has no side effect on their random stream.
+    if (exists(".Random.seed", envir = .GlobalEnv)) {
+      old_seed <- get(".Random.seed", envir = .GlobalEnv)
+      on.exit(assign(".Random.seed", old_seed, envir = .GlobalEnv), add = TRUE)
+    }
+  }
+
   cc <- stats::complete.cases(data[cols])
   mat <- as.matrix(data[cc, cols, drop = FALSE])
   X <- if (scale) scale(mat) else mat
@@ -66,12 +78,7 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
   if (is.null(clusters) && !is.null(suggest_k) &&
       !identical(suggest_k, FALSE)) {
     method <- if (isTRUE(suggest_k)) "silhouette" else suggest_k
-    if (!is.null(seed)) {
-      if (!is.numeric(seed) || length(seed) != 1) {
-        stop("`seed` must be a single number or NULL.", call. = FALSE)
-      }
-      set.seed(seed)
-    }
+    if (!is.null(seed)) set.seed(seed)
     kd <- k_diagnostic_data(data, k_range = k_range, method = method,
                             cols = cols, scale = scale, nstart = nstart)
     k <- kd$suggested
@@ -79,12 +86,10 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
   }
 
   if (is.null(clusters)) {
-    if (!is.null(seed)) {
-      if (!is.numeric(seed) || length(seed) != 1) {
-        stop("`seed` must be a single number or NULL.", call. = FALSE)
-      }
-      set.seed(seed)
-    }
+    # Re-applied here (already validated above) so the final clustering
+    # depends only on `seed` and `k`, not on how many `k` values the
+    # suggest_k diagnostic searched beforehand.
+    if (!is.null(seed)) set.seed(seed)
     km <- stats::kmeans(X, centers = k, nstart = nstart, iter.max = iter.max)
     cl <- km$cluster
   } else {

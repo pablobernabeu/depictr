@@ -115,21 +115,25 @@ estimation_plot <- function(data, y, group, reference = NULL,
                           groups)
 
   # ---- group means and t-based intervals (upper panel) ---------------------
-  sparse <- character(0)
-  summ <- do.call(rbind, lapply(groups, function(g) {
+  # Each element carries its summary row and, for a sparse group, its name --
+  # read back below rather than accumulated with `<<-`.
+  summ_res <- lapply(groups, function(g) {
     v <- vals[[g]]
     nv <- length(v)
     m <- mean(v)
     if (nv < 2) {
-      sparse <<- c(sparse, g)
-      return(data.frame(group = g, mean = m, lower = m, upper = m,
-                        stringsAsFactors = FALSE))
+      return(list(row = data.frame(group = g, mean = m, lower = m, upper = m,
+                                   stringsAsFactors = FALSE),
+                 sparse = g))
     }
     se <- stats::sd(v) / sqrt(nv)
     tc <- stats::qt(1 - (1 - conf_level) / 2, df = nv - 1)
-    data.frame(group = g, mean = m, lower = m - tc * se, upper = m + tc * se,
-               stringsAsFactors = FALSE)
-  }))
+    list(row = data.frame(group = g, mean = m, lower = m - tc * se,
+                          upper = m + tc * se, stringsAsFactors = FALSE),
+        sparse = NULL)
+  })
+  summ <- do.call(rbind, lapply(summ_res, `[[`, "row"))
+  sparse <- unlist(lapply(summ_res, `[[`, "sparse"))
   if (length(sparse)) {
     warning("No confidence interval drawn for group(s) with n < 2: ",
             paste(sparse, collapse = ", "), "; showing the mean only.",
@@ -141,18 +145,22 @@ estimation_plot <- function(data, y, group, reference = NULL,
   # ---- pairwise differences vs reference with bootstrap CIs (lower panel) --
   others <- setdiff(groups, ref)
   ref_vals <- vals[[ref]]
-  boot_sparse <- character(0)
-  diffs <- do.call(rbind, lapply(others, function(g) {
+  # Each element carries its difference row and, when the bootstrap interval
+  # is NA, the group name -- read back below rather than accumulated with
+  # `<<-`.
+  diffs_res <- lapply(others, function(g) {
     gv <- vals[[g]]
     md <- mean(gv) - mean(ref_vals)
     ci <- boot_diff_ci(gv, ref_vals, conf_level, n_boot)
-    if (is.na(ci[1])) boot_sparse <<- c(boot_sparse, g)
     es <- effsize_diff(gv, ref_vals)
-    data.frame(group = g, reference = ref, diff = md,
-               lower = ci[1], upper = ci[2],
-               cohens_d = es[["cohens_d"]], hedges_g = es[["hedges_g"]],
-               stringsAsFactors = FALSE)
-  }))
+    list(row = data.frame(group = g, reference = ref, diff = md,
+                          lower = ci[1], upper = ci[2],
+                          cohens_d = es[["cohens_d"]], hedges_g = es[["hedges_g"]],
+                          stringsAsFactors = FALSE),
+        sparse = if (is.na(ci[1])) g else NULL)
+  })
+  diffs <- do.call(rbind, lapply(diffs_res, `[[`, "row"))
+  boot_sparse <- unlist(lapply(diffs_res, `[[`, "sparse"))
   if (length(boot_sparse)) {
     warning("No bootstrap interval for difference(s) involving group(s) ",
             "with n < 2: ", paste(boot_sparse, collapse = ", "),
