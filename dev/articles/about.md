@@ -4,19 +4,23 @@
 
 To cite depictr in publications, use `citation("depictr")`, which gives:
 
-> Bernabeu, P. (2026). *depictr: A Unified Toolkit for Visualising
-> Statistical Models and Data*. R package version 0.1.0.
+> Bernabeu, P. (2026). depictr: A Unified Toolkit for Visualising
+> Statistical Models and Data. R package version 0.1.0.9000.
 > <https://github.com/pablobernabeu/depictr>
 
 ``` bibtex
 @Manual{depictr,
-  title  = {depictr: A Unified Toolkit for Visualising Statistical Models and Data},
+  title = {{depictr}: A Unified Toolkit for Visualising Statistical Models and Data},
   author = {Pablo Bernabeu},
-  year   = {2026},
-  note   = {R package version 0.1.0},
-  url    = {https://github.com/pablobernabeu/depictr}
+  year = {2026},
+  note = {R package version 0.1.0.9000},
+  url = {https://github.com/pablobernabeu/depictr},
 }
 ```
+
+(Printed from the installed package’s own
+[`citation()`](https://rdrr.io/r/utils/citation.html), so the version
+always matches the one you have.)
 
 ## The developer
 
