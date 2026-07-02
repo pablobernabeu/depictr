@@ -6,19 +6,20 @@ title: "About"
 
 To cite depictr in publications, use `citation("depictr")`, which gives:
 
-> Bernabeu, P. (2026). *depictr: A Unified Toolkit for Visualising Statistical
-> Models and Data*. R package version 0.1.0.
-> <https://github.com/pablobernabeu/depictr>
+```{r, echo=FALSE, results='asis'}
+cit <- citation("depictr")
+tv <- sub("(https://\\S+)$", "<\\1>", trimws(cit$textVersion))
+cat("> ", tv, "\n\n", sep = "")
 
-```bibtex
-@Manual{depictr,
-  title  = {depictr: A Unified Toolkit for Visualising Statistical Models and Data},
-  author = {Pablo Bernabeu},
-  year   = {2026},
-  note   = {R package version 0.1.0},
-  url    = {https://github.com/pablobernabeu/depictr}
-}
+bib <- toBibtex(cit)
+bib[1] <- sub("^@Manual\\{,", "@Manual{depictr,", bib[1])
+cat("```bibtex\n")
+cat(bib, sep = "\n")
+cat("\n```\n")
 ```
+
+(Printed from the installed package's own `citation()`, so the version always
+matches the one you have.)
 
 ## The developer
 

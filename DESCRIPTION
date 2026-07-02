@@ -47,7 +47,6 @@ Suggests:
     survival,
     ggdist,
     posterior,
-    distributional,
     boot,
     cluster,
     testthat (>= 3.0.0),
