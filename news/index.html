@@ -24,9 +24,12 @@
     <li><a class="dropdown-item" href="../articles/diagnostics-and-uncertainty.html">Diagnostics, classification and uncertainty</a></li>
     <li><a class="dropdown-item" href="../articles/multivariate-and-survival.html">Multivariate analysis and survival</a></li>
     <li><a class="dropdown-item" href="../articles/time-series.html">Time series</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
-      </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
+      </ul><ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="../articles/about.html">About</a></li>
+<li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/pablobernabeu/depictr/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item dropdown">
@@ -118,7 +121,7 @@
 <li>Factor coefficient names are prettified by default to the effect (variable) name – <code>conditionunrelated</code> becomes <code>condition</code>, <code>word_frequency</code> becomes <code>word frequency</code> – in <code><a href="../reference/coefficient_plot.html">coefficient_plot()</a></code>, <code><a href="../reference/compare_models.html">compare_models()</a></code> and <code><a href="../reference/frequentist_bayesian_plot.html">frequentist_bayesian_plot()</a></code> (read from the model); <code><a href="../reference/optimizer_fixef_plot.html">optimizer_fixef_plot()</a></code> and <code><a href="../reference/posterior_plot.html">posterior_plot()</a></code> gain a <code>labels</code> argument for the same. Any user-supplied <code>labels</code> take precedence. <code><a href="../reference/pca_plot.html">pca_plot()</a></code> likewise shows underscores in its loading-arrow labels as spaces (<code>soil_ph</code> -&gt; <code>soil ph</code>).</li>
 <li>Redundant cluster legends are dropped: <code><a href="../reference/silhouette_plot.html">silhouette_plot()</a></code> (the bands are labelled in place) and <code><a href="../reference/cluster_plot.html">cluster_plot()</a></code> when the centroids are labelled.</li>
 <li>
-<code><a href="../reference/survival_plot.html">survival_plot()</a></code>: the log-rank annotation now renders a proper chi-squared and an italic <em>p</em>; the median guide is labelled “median <value>”; and the y-axis title margin is tighter.</value></li>
+<code><a href="../reference/survival_plot.html">survival_plot()</a></code>: the log-rank annotation renders a proper chi-squared and an italic <em>p</em>, formatted APA style (no leading zero, <em>p</em> &lt; .001 below that threshold); the median guide is labelled “median <value>”; the y-axis title margin is tighter; and the colour legend and the number-at-risk table list the groups in the same order, following the group factor’s levels.</value></li>
 <li>A <code>legend_inside</code> argument (off by default) draws the legend inside the panel, over a semi-transparent background, in a corner the plot usually leaves empty – reclaiming the right-hand margin. It is offered by <code><a href="../reference/roc_curve_plot.html">roc_curve_plot()</a></code>, <code><a href="../reference/gain_plot.html">gain_plot()</a></code>, <code><a href="../reference/lift_plot.html">lift_plot()</a></code> (bottom-right / top-right of the curve), <code><a href="../reference/ecdf_plot.html">ecdf_plot()</a></code>, <code><a href="../reference/survival_plot.html">survival_plot()</a></code>, <code><a href="../reference/explore_distribution.html">explore_distribution()</a></code>, <code><a href="../reference/dumbbell_plot.html">dumbbell_plot()</a></code> and <code><a href="../reference/missingness_map.html">missingness_map()</a></code>. For any other plot the same is one <code><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme()</a></code> call; <code><a href="../articles/exploring-data.html">vignette("exploring-data")</a></code> shows how, alongside tidying legend titles.</li>
 <li>
 <code><a href="../reference/theme_depictr.html">theme_depictr()</a></code> now centres legend titles over their keys, which reads more tidily than ggplot2’s default left alignment – especially for an inside or a top/bottom legend.</li>
@@ -140,6 +143,7 @@
 <div class="section level3">
 <h3 id="notes-0-1-0">Notes<a class="anchor" aria-label="anchor" href="#notes-0-1-0"></a></h3>
 <ul><li>Heavier modelling back-ends (<code>lme4</code>, <code>broom</code>, <code>simr</code>, <code>survival</code>, <code>brms</code>, <code>posterior</code>, <code>ggdist</code>, <code>cluster</code>, <code>boot</code>) are in <code>Suggests</code> and used only when available, so the package installs and checks without them. Vignettes draw on small precomputed model fits shipped in <code>inst/extdata/</code>, so they knit without a Bayesian or mixed-model toolchain.</li>
+<li>Functions with an optional <code>seed</code> (<code><a href="../reference/cluster_plot.html">cluster_plot()</a></code>, <code><a href="../reference/qq_plot.html">qq_plot()</a></code> and <code><a href="../reference/residual_diagnostics_plot.html">residual_diagnostics_plot()</a></code>) restore the caller’s random number generator state afterward, so passing one for reproducibility has no side effect on your own subsequent random draws.</li>
 </ul></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

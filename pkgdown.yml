@@ -2,13 +2,14 @@ pandoc: 3.8.3
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
+  articles/about: about.html
   depictr: depictr.html
   diagnostics-and-uncertainty: diagnostics-and-uncertainty.html
   exploring-data: exploring-data.html
   model-estimates: model-estimates.html
   multivariate-and-survival: multivariate-and-survival.html
   time-series: time-series.html
-last_built: 2026-06-27T14:10Z
+last_built: 2026-07-03T06:29Z
 urls:
   reference: https://pablobernabeu.github.io/depictr/reference
   article: https://pablobernabeu.github.io/depictr/articles

@@ -104,8 +104,8 @@ knitr::kable(attr(kd, "k_table"), digits = 3)
 |   2 |          0.242 |
 |   3 |          0.240 |
 |   4 |          0.220 |
-|   5 |          0.230 |
-|   6 |          0.221 |
+|   5 |          0.227 |
+|   6 |          0.213 |
 
 [`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md)
 then shows the quality of an actual clustering, one bar per observation

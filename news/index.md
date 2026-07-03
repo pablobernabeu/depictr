@@ -203,9 +203,12 @@ out of, and generalises, three earlier plotting functions
   [`cluster_plot()`](https://pablobernabeu.github.io/depictr/reference/cluster_plot.md)
   when the centroids are labelled.
 - [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md):
-  the log-rank annotation now renders a proper chi-squared and an italic
-  *p*; the median guide is labelled “median ”; and the y-axis title
-  margin is tighter.
+  the log-rank annotation renders a proper chi-squared and an italic
+  *p*, formatted APA style (no leading zero, *p* \< .001 below that
+  threshold); the median guide is labelled “median ”; the y-axis title
+  margin is tighter; and the colour legend and the number-at-risk table
+  list the groups in the same order, following the group factor’s
+  levels.
 - A `legend_inside` argument (off by default) draws the legend inside
   the panel, over a semi-transparent background, in a corner the plot
   usually leaves empty – reclaiming the right-hand margin. It is offered
@@ -273,3 +276,11 @@ out of, and generalises, three earlier plotting functions
   without them. Vignettes draw on small precomputed model fits shipped
   in `inst/extdata/`, so they knit without a Bayesian or mixed-model
   toolchain.
+- Functions with an optional `seed`
+  ([`cluster_plot()`](https://pablobernabeu.github.io/depictr/reference/cluster_plot.md),
+  [`qq_plot()`](https://pablobernabeu.github.io/depictr/reference/qq_plot.md)
+  and
+  [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md))
+  restore the caller’s random number generator state afterward, so
+  passing one for reproducibility has no side effect on your own
+  subsequent random draws.
