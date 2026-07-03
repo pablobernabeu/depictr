@@ -5,7 +5,8 @@ Version: 0.1.0
 Authors@R: person(given = "Pablo",
                   family = "Bernabeu",
                   email = "pcbernabeu@gmail.com",
-                  role = c("aut", "cre"))
+                  role = c("aut", "cre"),
+                  comment = c(ORCID = "0000-0003-1083-2460"))
 Description: A cohesive, publication-ready toolkit of plots that span the whole
     analysis workflow with one consistent look. It covers exploratory data
     analysis (distributions, categorical summaries, bivariate plots, scatter-plot
