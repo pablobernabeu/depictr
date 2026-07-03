@@ -1,18 +1,3 @@
-# depictr 0.1.0.9000 (development version)
-
-* `survival_plot()`: the log-rank *p*-value now follows APA style -- no leading
-  zero, and reported as *p* < .001 below that threshold. The colour legend and
-  the number-at-risk table list the groups in the same order, following the
-  group factor's levels.
-* `cluster_plot(seed = ...)` no longer leaves the caller's random number
-  generator stream perturbed after the call returns; the state is now
-  restored on exit, matching the pattern already used elsewhere in the
-  package (e.g. `quantile_residuals()`).
-* Internal refactor: `raincloud_plot()`, `ridgeline_plot()`,
-  `group_comparison_plot()` and `estimation_plot()` no longer use the `<<-`
-  superassignment operator to collect sparse-group warnings; no user-facing
-  change.
-
 # depictr 0.1.0
 
 First release. depictr is a unified, consistent toolkit of publication-ready
@@ -126,9 +111,11 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
   loading-arrow labels as spaces (`soil_ph` -> `soil ph`).
 * Redundant cluster legends are dropped: `silhouette_plot()` (the bands are
   labelled in place) and `cluster_plot()` when the centroids are labelled.
-* `survival_plot()`: the log-rank annotation now renders a proper chi-squared
-  and an italic *p*; the median guide is labelled "median <value>"; and the
-  y-axis title margin is tighter.
+* `survival_plot()`: the log-rank annotation renders a proper chi-squared and
+  an italic *p*, formatted APA style (no leading zero, *p* < .001 below that
+  threshold); the median guide is labelled "median <value>"; the y-axis title
+  margin is tighter; and the colour legend and the number-at-risk table list
+  the groups in the same order, following the group factor's levels.
 * A `legend_inside` argument (off by default) draws the legend inside the panel,
   over a semi-transparent background, in a corner the plot usually leaves empty
   -- reclaiming the right-hand margin. It is offered by `roc_curve_plot()`,
@@ -172,3 +159,7 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
   when available, so the package installs and checks without them. Vignettes
   draw on small precomputed model fits shipped in `inst/extdata/`, so they
   knit without a Bayesian or mixed-model toolchain.
+* Functions with an optional `seed` (`cluster_plot()`, `qq_plot()` and
+  `residual_diagnostics_plot()`) restore the caller's random number generator
+  state afterward, so passing one for reproducibility has no side effect on
+  your own subsequent random draws.

@@ -1,7 +1,7 @@
 Package: depictr
 Type: Package
 Title: A Unified Toolkit for Visualising Statistical Models and Data
-Version: 0.1.0.9000
+Version: 0.1.0
 Authors@R: person(given = "Pablo",
                   family = "Bernabeu",
                   email = "pcbernabeu@gmail.com",
