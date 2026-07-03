@@ -15,7 +15,7 @@ plotting function returns a [ggplot2](https://ggplot2.tidyverse.org) object (or 
 [patchwork](https://patchwork.data-imaginist.com) for composite panels), so a
 plot can be refined further with the usual `+` syntax.
 
-A Python sibling, [depictr-py](https://github.com/pablobernabeu/depictr-py),
+A Python sibling, [depictr-py](https://pablobernabeu.github.io/depictr-py/),
 mirrors the same design.
 
 ## Gallery
