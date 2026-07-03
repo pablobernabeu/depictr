@@ -15,9 +15,22 @@ authors:
 
 navbar:
   structure:
-    left: [intro, reference, articles, news]
-    right: [about, search, github, lightswitch]
+    left: [intro, reference, articles, news, about]
+    right: [search, github, lightswitch]
   components:
+    articles:
+      text: Articles
+      menu:
+      - text: Exploring data
+        href: articles/exploring-data.html
+      - text: Visualising model estimates
+        href: articles/model-estimates.html
+      - text: Diagnostics, classification and uncertainty
+        href: articles/diagnostics-and-uncertainty.html
+      - text: Multivariate analysis and survival
+        href: articles/multivariate-and-survival.html
+      - text: Time series
+        href: articles/time-series.html
     about:
       text: About
       href: articles/about.html
