@@ -1,0 +1,10 @@
+/* depictr pkgdown site: spacing tweaks. */
+
+/* Give a standalone README image (pandoc wraps one in a bare <div class="float">)
+   room and centre it, instead of sitting flush against the surrounding text. */
+.float img {
+    margin: 1.4rem auto;
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
