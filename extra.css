@@ -1,10 +1,28 @@
 /* depictr pkgdown site: spacing tweaks. */
 
-/* Give a standalone README image (pandoc wraps one in a bare <div class="float">)
-   room and centre it, instead of sitting flush against the surrounding text. */
+/* Pandoc wraps a standalone README image in <div class="float"><img>...
+   <div class="figcaption">ALT TEXT</div></div>. Give the whole block room
+   instead of sitting flush against the surrounding text, and style the
+   caption properly -- unstyled, it inherits the plain body text/background,
+   which under the dark theme reads as a stark full-width bar. */
+.float {
+    margin: 1.4rem auto 2rem;
+    text-align: center;
+}
+
 .float img {
-    margin: 1.4rem auto;
+    margin: 0 auto 0.6rem;
     max-width: 100%;
     height: auto;
     display: block;
+}
+
+.float .figcaption {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--bs-secondary-color, #6c757d);
+    text-align: center;
+    padding: 0 1rem;
+    margin: 0 auto 1.4rem;
+    max-width: 90%;
 }

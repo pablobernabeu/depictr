@@ -11,7 +11,7 @@ of label conventions. Every plotting function returns a
 so a plot can be refined further with the usual `+` syntax.
 
 A Python sibling,
-[depictr-py](https://github.com/pablobernabeu/depictr-py), mirrors the
+[depictr-py](https://pablobernabeu.github.io/depictr-py/), mirrors the
 same design.
 
 ## Gallery
