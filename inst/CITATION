@@ -6,10 +6,11 @@ bibentry(
   author   = person("Pablo", "Bernabeu"),
   year     = "2026",
   note     = sprintf("R package version %s", meta$Version),
-  url      = "https://github.com/pablobernabeu/depictr",
+  doi      = "10.5281/zenodo.21266308",
+  url      = "https://doi.org/10.5281/zenodo.21266308",
   textVersion = paste0(
     "Bernabeu, P. (2026). depictr: A Unified Toolkit for Visualising ",
     "Statistical Models and Data. R package version ", meta$Version, ". ",
-    "https://github.com/pablobernabeu/depictr"
+    "https://doi.org/10.5281/zenodo.21266308"
   )
 )

@@ -8,7 +8,7 @@ If you use depictr in published work, please cite it.
 
 > Bernabeu, P. (2026). depictr: A Unified Toolkit for Visualising Statistical
 > Models and Data. R package version `r packageVersion("depictr")`.
-> https://github.com/pablobernabeu/depictr
+> https://doi.org/10.5281/zenodo.21266308
 
 ```{r bibtex, echo = FALSE, results = "asis"}
 # Build the BibTeX entry from the installed version so it never drifts, then
@@ -22,7 +22,8 @@ bib <- paste(
   "  author = {Pablo Bernabeu},",
   "  year   = {2026},",
   sprintf("  note   = {R package version %s},", ver),
-  "  url    = {https://github.com/pablobernabeu/depictr},",
+  "  doi    = {10.5281/zenodo.21266308},",
+  "  url    = {https://doi.org/10.5281/zenodo.21266308},",
   "}",
   sep = "\n"
 )
