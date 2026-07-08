@@ -5,7 +5,8 @@ as a *distribution* per parameter, in the style of a half-eye (a density
 slab with a point-and-interval beneath it), an interval-only forest
 plot, a gradient interval or a dotplot. The full shape of the posterior
 is shown, so skew, multimodality and the relative mass on either side of
-a reference value are all visible – not just a point and two limits.
+a reference value are all visible, rather than a point and two limits
+alone.
 
 ## Usage
 
@@ -83,7 +84,7 @@ posterior_plot(
 - pd:
 
   If `TRUE`, annotate each parameter with its probability of direction
-  relative to `reference_line` – the posterior probability that the
+  relative to `reference_line`, the posterior probability that the
   parameter lies on its majority side of the reference (a value in
   \[0.5, 1\]). Requires a finite `reference_line`.
 

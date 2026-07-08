@@ -79,13 +79,13 @@ as well.
 
 ## References
 
-Gelman A, Hill J (2007). *Data Analysis Using Regression and
-Multilevel/Hierarchical Models*. Cambridge University Press, Cambridge,
+Gelman A, Hill J (2007). *Data analysis using regression and
+multilevel/hierarchical models*. Cambridge University Press, Cambridge,
 UK. ISBN 978-0-521-68689-1.
 [doi:10.1017/CBO9780511790942](https://doi.org/10.1017/CBO9780511790942)
 .
 
-Dunn PK, Smyth GK (1996). “Randomized Quantile Residuals.” *Journal of
+Dunn PK, Smyth GK (1996). “Randomized quantile residuals.” *Journal of
 Computational and Graphical Statistics*, **5**(3), 236–244.
 [doi:10.1080/10618600.1996.10474708](https://doi.org/10.1080/10618600.1996.10474708)
 .

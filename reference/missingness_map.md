@@ -48,8 +48,8 @@ missingness_map(
 - legend_inside:
 
   When `TRUE` (and `sort = TRUE`), draw the legend inside the panel, in
-  the top-right – where the most-complete columns put a solid "Present"
-  block, so it hides no "Missing" mark – instead of in a right-hand
+  the top-right (where the most-complete columns put a solid "Present"
+  block, so it hides no "Missing" mark) instead of in a right-hand
   margin. Defaults to `FALSE`.
 
 - title:

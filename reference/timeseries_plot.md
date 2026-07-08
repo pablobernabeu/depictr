@@ -58,8 +58,7 @@ timeseries_plot(
   STL + seasonal-naive-with-drift method (see
   [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)),
   or a pre-computed forecast supplied as a data frame with columns
-  `time`, `fit` and (optionally) `lwr`/`upr` – for instance from a
-  fitted
+  `time`, `fit` and (optionally) `lwr`/`upr`, for instance from a fitted
   [`forecast::forecast()`](https://generics.r-lib.org/reference/forecast.html)
   object. The point forecast continues the line and a shaded
   prediction-interval ribbon, which widens with the horizon, is drawn

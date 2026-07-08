@@ -51,8 +51,8 @@ groups would still be told apart by a colourblind reader.
 
 ## References
 
-Machado GM, Oliveira MM, Fernandes LAF (2009). “A Physiologically-Based
-Model for Simulation of Color Vision Deficiency.” *IEEE Transactions on
+Machado GM, Oliveira MM, Fernandes LAF (2009). “A physiologically-based
+model for simulation of color vision deficiency.” *IEEE Transactions on
 Visualization and Computer Graphics*, **15**(6), 1291–1298.
 [doi:10.1109/TVCG.2009.113](https://doi.org/10.1109/TVCG.2009.113) .
 

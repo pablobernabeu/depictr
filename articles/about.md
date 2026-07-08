@@ -4,13 +4,13 @@
 
 If you use depictr in published work, please cite it.
 
-> Bernabeu, P. (2026). depictr: A Unified Toolkit for Visualising
-> Statistical Models and Data. R package version 0.1.1.
+> Bernabeu, P. (2026). depictr: A unified toolkit for visualising
+> statistical models and data. R package version 0.1.1.
 > <https://doi.org/10.5281/zenodo.21266308>
 
 ```
 @Manual{depictr,
-  title  = {{depictr}: A Unified Toolkit for Visualising Statistical Models and Data},
+  title  = {{depictr}: A unified toolkit for visualising statistical models and data},
   author = {Pablo Bernabeu},
   year   = {2026},
   note   = {R package version 0.1.1},
@@ -20,7 +20,7 @@ If you use depictr in published work, please cite it.
 ```
 
 Copy BibTeX [Download
-.bib](data:application/x-bibtex;charset=utf-8,%40Manual%7Bdepictr%2C%0A%20%20title%20%20%3D%20%7B%7Bdepictr%7D%3A%20A%20Unified%20Toolkit%20for%20Visualising%20Statistical%20Models%20and%20Data%7D%2C%0A%20%20author%20%3D%20%7BPablo%20Bernabeu%7D%2C%0A%20%20year%20%20%20%3D%20%7B2026%7D%2C%0A%20%20note%20%20%20%3D%20%7BR%20package%20version%200.1.1%7D%2C%0A%20%20doi%20%20%20%20%3D%20%7B10.5281%2Fzenodo.21266308%7D%2C%0A%20%20url%20%20%20%20%3D%20%7Bhttps%3A%2F%2Fdoi.org%2F10.5281%2Fzenodo.21266308%7D%2C%0A%7D)
+.bib](data:application/x-bibtex;charset=utf-8,%40Manual%7Bdepictr%2C%0A%20%20title%20%20%3D%20%7B%7Bdepictr%7D%3A%20A%20unified%20toolkit%20for%20visualising%20statistical%20models%20and%20data%7D%2C%0A%20%20author%20%3D%20%7BPablo%20Bernabeu%7D%2C%0A%20%20year%20%20%20%3D%20%7B2026%7D%2C%0A%20%20note%20%20%20%3D%20%7BR%20package%20version%200.1.1%7D%2C%0A%20%20doi%20%20%20%20%3D%20%7B10.5281%2Fzenodo.21266308%7D%2C%0A%20%20url%20%20%20%20%3D%20%7Bhttps%3A%2F%2Fdoi.org%2F10.5281%2Fzenodo.21266308%7D%2C%0A%7D)
 
 R users can also retrieve this citation directly with
 `citation("depictr")`.
@@ -43,3 +43,31 @@ More about his work is at
 
 A sibling [Python package](https://pablobernabeu.github.io/depictr-py/),
 available on PyPI, shares the same design.
+
+## Licence
+
+depictr is released under the [MIT
+licence](https://pablobernabeu.github.io/depictr/LICENSE.md), a short
+permissive licence that allows use, modification and redistribution in
+both open and closed projects, provided the copyright notice is
+retained. The full text is on the site’s licence page.
+
+## Versioning and archival
+
+Releases are tagged on
+[GitHub](https://github.com/pablobernabeu/depictr/releases) and archived
+on Zenodo. The concept DOI
+[10.5281/zenodo.21266308](https://doi.org/10.5281/zenodo.21266308)
+always resolves to the latest archived version, so a citation using it
+stays current as the package evolves. What changed in each release is
+recorded in the
+[changelog](https://pablobernabeu.github.io/depictr/news/index.md).
+
+## Contributing and support
+
+Bugs and feature requests are best reported on the [GitHub issues
+page](https://github.com/pablobernabeu/depictr/issues), ideally with a
+small reproducible example. The [contributing
+guide](https://pablobernabeu.github.io/depictr/CONTRIBUTING.md) explains
+how to set up for development and what to check before opening a pull
+request.

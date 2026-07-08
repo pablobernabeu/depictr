@@ -91,12 +91,12 @@ to show the full Bayesian posterior with the frequentist estimate
 overlaid. That namesake behaviour is restored here: when `bayesian`
 carries posterior *draws* (a `brms`/`rstanarm` fit, a `posterior` draws
 object, a draws matrix, or a long/wide draws data frame), the full
-posterior **distribution** is drawn per term (a 'ggdist' half-eye) and
-the frequentist **point and confidence interval** is overlaid at the
-same position. When `bayesian` is only a tidy table of posterior
-*summaries* (columns such as `term`, `estimate`, `conf.low`/`conf.high`,
-or the `Estimate`, `l-95% CI`, `u-95% CI` of `brms::fixef()`), the
-function shows the familiar two-source forest plot via
+posterior *distribution* is drawn per term (a 'ggdist' half-eye) and the
+frequentist point and confidence interval is overlaid at the same
+position. When `bayesian` is only a tidy table of posterior *summaries*
+(columns such as `term`, `estimate`, `conf.low`/`conf.high`, or the
+`Estimate`, `l-95% CI`, `u-95% CI` of `brms::fixef()`), the function
+shows the familiar two-source forest plot via
 [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md).
 
 Terms are aligned by their canonical display label, so the `brms`-style

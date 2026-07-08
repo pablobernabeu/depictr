@@ -1,10 +1,10 @@
 # Visualising model estimates
 
 This is the flagship article. It works through depictr’s model-result
-plots – coefficients, model comparison, predicted values, interactions,
-random effects and goodness-of-fit – and then reaches the capability the
-package is named for: showing a **frequentist** estimate and a **full
-Bayesian posterior** for the same model on one figure.
+plots (coefficients, model comparison, predicted values, interactions,
+random effects and goodness-of-fit) and then reaches the capability the
+package is named for: showing a frequentist estimate and a full Bayesian
+posterior for the same model on one figure.
 
 The running example is `lexical_decision`, a counterbalanced, crossed
 lexical-decision experiment (24 participants, 40 items, 960 trials). We
@@ -12,7 +12,7 @@ model reaction time on correct trials as a function of priming
 `condition` (related/unrelated), presentation `modality`
 (visual/auditory) and item `word_frequency`, with crossed random
 intercepts for participant and item. The design is counterbalanced, so
-neither fixed factor is collinear with the item random effect – a clean
+neither fixed factor is collinear with the item random effect, a clean
 fit for a mixed model.
 
 ``` r
@@ -62,8 +62,8 @@ coefficient_plot(fit, standardise = TRUE, order = "ascending",
 
 ![](model-estimates_files/figure-html/coef-std-1.png)
 
-To keep the raw units instead – including a large intercept that would
-otherwise squash the slopes – `facet = TRUE` gives each term its own
+To keep the raw units instead, including a large intercept that would
+otherwise squash the slopes, `facet = TRUE` gives each term its own
 free-scaled panel (the layout the frequentist-vs-Bayesian comparison
 below uses by default).
 
@@ -136,13 +136,13 @@ interaction_plot(crop_fit, "fertiliser", "treatment",
 
 ## Frequentist and Bayesian estimates together
 
-This is the package’s namesake capability. Given the frequentist fit
-**and** a set of Bayesian posterior **draws**,
+This is the package’s namesake capability. Given the frequentist fit and
+a set of Bayesian posterior draws,
 [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
 draws the *full posterior distribution* for each term (a ‘ggdist’
-half-eye) and overlays the frequentist **point and confidence interval**
-at the same position. You see the entire shape of the posterior – not
-just a point and two limits – next to the frequentist estimate, with the
+half-eye) and overlays the frequentist point and confidence interval at
+the same position. The entire shape of the posterior appears next to the
+frequentist estimate, rather than a point and two limits alone, with the
 two sources in the two leading colourblind-safe palette colours.
 
 The draws here are the real fixed-effect posterior from a `brms` fit of
@@ -166,8 +166,8 @@ frequentist_bayesian_plot(
 ![](model-estimates_files/figure-html/fbp-1.png)
 
 The frequentist confidence interval and the bulk of the Bayesian
-posterior land in the same place – reassuring agreement between the two
-paradigms – but only the posterior shows the density, the skew and the
+posterior land in the same place (reassuring agreement between the two
+paradigms), but only the posterior shows the density, the skew and the
 mass on either side of zero.
 
 If `ggdist` is unavailable the function falls back to a
@@ -211,7 +211,7 @@ entirely on one side of zero.
 [`random_effects_plot()`](https://pablobernabeu.github.io/depictr/reference/random_effects_plot.md)
 draws a caterpillar plot of the conditional modes (“BLUPs”). Reading the
 fitted model directly, it shows the by-item and by-participant
-departures from the average, sorted, with their uncertainty – the usual
+departures from the average, sorted, with their uncertainty, the usual
 way to spot unusual groups.
 
 ``` r
@@ -256,8 +256,8 @@ optimizer_fixef_plot(
 
 ![](model-estimates_files/figure-html/optim-1.png)
 
-Every optimiser lands on the same estimate for each term – the points
-coincide within each panel – so this fit is rock solid.
+Every optimiser lands on the same estimate for each term (the points
+coincide within each panel), so this fit is stable.
 
 ## A one-figure model report
 

@@ -110,7 +110,7 @@ is computed, so unsorted input is handled correctly.</p></dd>
 Either an integer horizon (number of future steps) to forecast with the
 built-in STL + seasonal-naive-with-drift method (see <code><a href="ts_forecast.html">ts_forecast()</a></code>), or a
 pre-computed forecast supplied as a data frame with columns <code>time</code>, <code>fit</code>
-and (optionally) <code>lwr</code>/<code>upr</code> – for instance from a fitted
+and (optionally) <code>lwr</code>/<code>upr</code>, for instance from a fitted
 <code><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast::forecast()</a></code> object. The point forecast continues the line and a
 shaded prediction-interval ribbon, which widens with the horizon, is drawn
 behind it.</p></dd>

@@ -3,11 +3,11 @@
 Plots the receiver operating characteristic (ROC) curve for a binary
 classifier and reports the area under the curve (AUC). The input can be
 a fitted binomial `glm`, a pair of vectors (observed binary outcome and
-a continuous score), or - to **compare several models** - a *named list*
-of models or of (actual, score) pairs, which are overlaid as
-colour-coded curves with a legend and a per-curve AUC. An optional
-bootstrap confidence band can be drawn for the (single-model) curve and
-its AUC, and the Youden's J operating point can be marked.
+a continuous score), or, to compare several models, a *named list* of
+models or of (actual, score) pairs, which are overlaid as colour-coded
+curves with a legend and a per-curve AUC. An optional bootstrap
+confidence band can be drawn for the (single-model) curve and its AUC,
+and the Youden's J operating point can be marked.
 
 ## Usage
 
@@ -64,7 +64,7 @@ roc_curve_plot(
 - legend_inside:
 
   When `TRUE` (and several models are overlaid), draw the legend inside
-  the panel – in the bottom-right corner the curve leaves empty – over a
+  the panel (in the bottom-right corner the curve leaves empty) over a
   translucent background, instead of in a right-hand margin. Defaults to
   `FALSE`.
 

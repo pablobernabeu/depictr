@@ -142,8 +142,8 @@ distribution):</p>
 <p>The adverse-event outcome is imbalanced, which is exactly when the
 precision-recall, gains and lift charts earn their keep. depictr’s
 classification plots each read a binomial <code>glm</code> directly, a
-pair of vectors, or – to <em>compare several models</em> – a
-<strong>named list</strong> of models.</p>
+pair of vectors or, to compare several models, a named list of
+models.</p>
 <p>The ROC curve reports the AUC. Passing <code>youden = TRUE</code>
 marks the Youden’s J operating point (the threshold maximising
 sensitivity + specificity - 1):</p>
@@ -178,7 +178,7 @@ legend there and reclaims the right-hand margin:</p>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="480"></p>
 <p>For ranking and targeting tasks, the cumulative gains and lift charts
 show how many positive cases are captured as more of the score-ordered
-population is targeted – again overlaying both models:</p>
+population is targeted, again overlaying both models:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/gain_plot.html">gain_plot</a></span><span class="op">(</span><span class="va">models</span>, legend_inside <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="480"></p>
@@ -209,8 +209,8 @@ the natural companion to the ROC and PR curves for actually
 <p><code><a href="../reference/calibration_plot.html">calibration_plot()</a></code> checks whether predicted
 probabilities match observed frequencies. Each bin’s observed rate
 carries a Wilson binomial confidence interval, so bins backed by few
-observations – common in the sparse upper tail when the outcome is rare
-– are not over-interpreted.</p>
+observations (common in the sparse upper tail when the outcome is rare)
+are not over-interpreted.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/calibration_plot.html">calibration_plot</a></span><span class="op">(</span><span class="va">gfit</span>, bins <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></code></pre></div>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="480"></p>

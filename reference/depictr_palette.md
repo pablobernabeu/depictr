@@ -43,8 +43,8 @@ sequential and diverging ramps are unaffected.
 
 ## References
 
-Okabe M, Ito K (2008). “Color Universal Design (CUD): How to Make
-Figures and Presentations That Are Friendly to Colorblind People.”
+Okabe M, Ito K (2008). “Color Universal Design (CUD): How to make
+figures and presentations that are friendly to colorblind people.”
 <https://jfly.uni-koeln.de/color/>. Accessed 2026-06-14.
 
 ## Examples

@@ -75,8 +75,8 @@ dendrogram_plot(region_means[-1], k = 2, title = "Regions clustered")
 Choosing `k` should not be guesswork.
 [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
 evaluates a cluster-quality criterion across a range of `k` and suggests
-a value – by the average silhouette width (the default, after Rousseeuw,
-1987), the within-sum-of-squares elbow, or the gap statistic
+a value, using the average silhouette width (the default, after
+Rousseeuw, 1987), the within-sum-of-squares elbow or the gap statistic
 (Tibshirani, Walther & Hastie, 2001). See
 [`?k_diagnostic`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
 for the references.
@@ -151,13 +151,13 @@ times and an event indicator directly, a data frame, or a
 object.
 
 The `clinical_trial` dataset has two arms with a real survival
-difference – the treatment arm has a lower hazard – so the curves
+difference (the treatment arm has a lower hazard), so the curves
 separate. Turning on the three publication annotations gives a
-survminer-style figure: a **number-at-risk table** beneath the curves,
-dashed guides to each arm’s **median survival**, and the **log-rank
-test** of the difference as a subtitle. A survival curve is
-monotone-decreasing, so its bottom-left corner is always empty –
-`legend_inside = TRUE` puts the group legend there.
+survminer-style figure: a number-at-risk table beneath the curves,
+dashed guides to each arm’s median survival and the log-rank test of the
+difference as a subtitle. A survival curve is monotone-decreasing, so
+its bottom-left corner is always empty; `legend_inside = TRUE` puts the
+group legend there.
 
 ``` r
 
@@ -171,8 +171,8 @@ survival_plot(
 ![](multivariate-and-survival_files/figure-html/unnamed-chunk-10-1.png)
 
 The log-rank p-value is tiny and the median survival is clearly longer
-in the treatment arm – and because its event times are longer, that arm
-is more often right-censored at the 36-month study end, visible as the
+in the treatment arm. Because its event times are longer, that arm is
+more often right-censored at the 36-month study end, visible as the
 denser run of censoring marks.
 
 ## References

@@ -185,15 +185,15 @@ density per group:</p>
 <p><img src="exploring-data_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
-<h2 id="estimation-plots-effect-size-not-just-a-p-value">Estimation plots: effect size, not just a p-value<a class="anchor" aria-label="anchor" href="#estimation-plots-effect-size-not-just-a-p-value"></a>
+<h2 id="estimation-plots-effect-size-rather-than-a-p-value">Estimation plots: effect size rather than a p-value<a class="anchor" aria-label="anchor" href="#estimation-plots-effect-size-rather-than-a-p-value"></a>
 </h2>
 <p>An <em>estimation plot</em> puts the effect size and its uncertainty
 at the centre of the comparison. <code><a href="../reference/estimation_plot.html">estimation_plot()</a></code> draws
 the classic Gardner-Altman two-group plot: the raw data with group means
-on top, and the <strong>mean difference</strong> with a bootstrap
-confidence interval beneath, aligned so a difference of zero sits under
-the reference group’s mean. With two groups it also annotates a
-standardised effect size (Hedges’ <em>g</em> by default).</p>
+on top, and the mean difference with a bootstrap confidence interval
+beneath, aligned so a difference of zero sits under the reference
+group’s mean. With two groups it also annotates a standardised effect
+size (Hedges’ <em>g</em> by default).</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/estimation_plot.html">estimation_plot</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">RT</span>, <span class="va">condition</span>,</span>
@@ -230,8 +230,8 @@ satisfaction by region.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/outlier_plot.html">outlier_plot</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="va">yield</span><span class="op">)</span></span></code></pre></div>
 <p><img src="exploring-data_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="672"></p>
-<p><code>wellbeing_survey</code> has <em>informative</em> missingness –
-income is missing more often at higher stress – so the missingness map
+<p><code>wellbeing_survey</code> has <em>informative</em> missingness
+(income is missing more often at higher stress), so the missingness map
 is worth a look before modelling.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/missingness_map.html">missingness_map</a></span><span class="op">(</span><span class="va">wellbeing_survey</span>, legend_inside <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -244,7 +244,7 @@ is worth a look before modelling.</p>
 numeric variables, counts and percentages for categorical ones,
 optionally by group. The first row always reports the sample size
 (<code>N</code>), and any variable with missing values gets a
-<code>Missing, n (%)</code> row – both visible here for the wellbeing
+<code>Missing, n (%)</code> row, both visible here for the wellbeing
 survey. It returns a plain data frame, ready for
 <code><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">knitr::kable()</a></code>.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
@@ -377,10 +377,10 @@ adding layers, scales, labels and theme tweaks with the usual
 <h3 id="tidying-the-legend">Tidying the legend<a class="anchor" aria-label="anchor" href="#tidying-the-legend"></a>
 </h3>
 <p>depictr centres a legend title over its keys by default. When the
-levels speak for themselves, though, the title is just clutter – drop it
-by mapping it to <code>NULL</code>. Reversing a discrete colour legend
-at the same time makes it read top-to-bottom in the order the curves are
-stacked:</p>
+levels speak for themselves, though, the title is just clutter, so drop
+it by mapping it to <code>NULL</code>. Reversing a discrete colour
+legend at the same time makes it read top-to-bottom in the order the
+curves are stacked:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ecdf_plot.html">ecdf_plot</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">RT</span>, group <span class="op">=</span> <span class="va">condition</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">+</span></span>
@@ -395,7 +395,7 @@ legend into a corner they usually leave empty (see
 e.g. <code><a href="../reference/ecdf_plot.html">?ecdf_plot</a></code>). For any plot that does not, the same move
 is one <code><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme()</a></code> call. A dodged bar chart, for instance,
 leaves the top-right clear when the right-most category is short, so the
-legend fits there – and because the regions are self-evident we drop the
+legend fits there. Because the regions are self-evident, we drop the
 title too (with <code><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank()</a></code>, since this plot sets the
 legend name on its fill scale):</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
@@ -416,7 +416,7 @@ legend name on its fill scale):</p>
 <code>correlation_heatmap(reorder = TRUE)</code> clusters variables, and
 the model-estimate plots take <code>facet</code> and
 <code>standardise</code> to keep coefficients on very different scales
-legible – see <code><a href="../articles/model-estimates.html">vignette("model-estimates")</a></code>.</p>
+legible (see <code><a href="../articles/model-estimates.html">vignette("model-estimates")</a></code>).</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -141,8 +141,8 @@ gist, which built on <code>brms::mcmc_plot()</code> to show the full Bayesian po
 with the frequentist estimate overlaid. That namesake behaviour is restored
 here: when <code>bayesian</code> carries posterior <em>draws</em> (a <code>brms</code>/<code>rstanarm</code> fit, a
 <code>posterior</code> draws object, a draws matrix, or a long/wide draws data frame),
-the full posterior <strong>distribution</strong> is drawn per term (a 'ggdist' half-eye)
-and the frequentist <strong>point and confidence interval</strong> is overlaid at the same
+the full posterior <em>distribution</em> is drawn per term (a 'ggdist' half-eye)
+and the frequentist point and confidence interval is overlaid at the same
 position. When <code>bayesian</code> is only a tidy table of posterior <em>summaries</em>
 (columns such as <code>term</code>, <code>estimate</code>, <code>conf.low</code>/<code>conf.high</code>, or the
 <code>Estimate</code>, <code>l-95% CI</code>, <code>u-95% CI</code> of <code>brms::fixef()</code>), the function shows the

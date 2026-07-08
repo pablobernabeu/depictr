@@ -75,7 +75,7 @@ draws a seasonal-subseries (cycle) plot: one small panel per month, with
 the value traced across successive years and a reference line at each
 month’s mean. This shows the seasonal shape (differences *between*
 panels) and the year-on-year trend within each month (the slope *inside*
-each panel) at the same time – something a single overlaid line cannot
+each panel) at the same time, something a single overlaid line cannot
 do.
 
 ``` r

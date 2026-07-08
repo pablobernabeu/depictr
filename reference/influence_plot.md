@@ -37,8 +37,8 @@ object.
 
 ## References
 
-Cook RD (1977). “Detection of Influential Observation in Linear
-Regression.” *Technometrics*, **19**(1), 15–18.
+Cook RD (1977). “Detection of influential observation in linear
+regression.” *Technometrics*, **19**(1), 15–18.
 [doi:10.1080/00401706.1977.10489493](https://doi.org/10.1080/00401706.1977.10489493)
 .
 

@@ -3,7 +3,7 @@
 An estimation plot puts the *effect size* and its uncertainty at the
 centre of the comparison, rather than a p-value. The upper panel shows
 each group's raw data (jittered) with its mean and confidence interval;
-the lower panel shows the pairwise **mean difference(s)** against a
+the lower panel shows the pairwise mean difference(s) against a
 reference group, each with a bootstrap confidence interval. The two
 panels share an aligned outcome axis and are stacked with 'patchwork',
 so a difference of zero in the lower panel lines up with the reference
@@ -108,7 +108,7 @@ Hedges' *g*; Hedges, 1981). With more than two groups it becomes a
 with the reference group, each difference carrying its own bootstrap
 interval.
 
-The lower-panel interval is a non-parametric **bootstrap** of the mean
+The lower-panel interval is a non-parametric *bootstrap* of the mean
 difference: the two groups are resampled with replacement `n_boot` times
 and the requested percentile interval is read off the resampled
 differences. This makes no normality assumption about the sampling
@@ -128,14 +128,17 @@ confidence intervals, and meta-analysis*. Routledge.
 Gardner, M. J., & Altman, D. G. (1986). Confidence intervals rather than
 P values: Estimation rather than hypothesis testing. *BMJ*, 292(6522),
 746-750.
+[doi:10.1136/bmj.292.6522.746](https://doi.org/10.1136/bmj.292.6522.746)
 
 Hedges, L. V. (1981). Distribution theory for Glass's estimator of
 effect size and related estimators. *Journal of Educational Statistics*,
 6(2), 107-128.
+[doi:10.3102/10769986006002107](https://doi.org/10.3102/10769986006002107)
 
 Ho, J., Tumkaya, T., Aryal, S., Choi, H., & Claridge-Chang, A. (2019).
 Moving beyond P values: Data analysis with estimation graphics. *Nature
 Methods*, 16(7), 565-566.
+[doi:10.1038/s41592-019-0470-3](https://doi.org/10.1038/s41592-019-0470-3)
 
 ## Examples
 

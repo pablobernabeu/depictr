@@ -14,6 +14,9 @@ one colourblind-aware palette and one set of label conventions.
 - [`explore_distribution()`](https://pablobernabeu.github.io/depictr/reference/explore_distribution.md):
   histograms / densities of one variable.
 
+- [`ecdf_plot()`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot.md):
+  empirical cumulative distribution, optionally by group.
+
 - [`explore_categorical()`](https://pablobernabeu.github.io/depictr/reference/explore_categorical.md):
   bar charts of a categorical variable.
 
@@ -35,8 +38,17 @@ one colourblind-aware palette and one set of label conventions.
 - [`raincloud_plot()`](https://pablobernabeu.github.io/depictr/reference/raincloud_plot.md):
   half-violin, box and raw points together.
 
+- [`ridgeline_plot()`](https://pablobernabeu.github.io/depictr/reference/ridgeline_plot.md):
+  overlapping per-group densities.
+
 - [`group_comparison_plot()`](https://pablobernabeu.github.io/depictr/reference/group_comparison_plot.md):
   group means with confidence intervals.
+
+- [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md):
+  group differences with bootstrap intervals.
+
+- [`dumbbell_plot()`](https://pablobernabeu.github.io/depictr/reference/dumbbell_plot.md):
+  a two-group comparison across categories.
 
 - [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md):
   scatter plot with a fitted trend.
@@ -55,6 +67,12 @@ one colourblind-aware palette and one set of label conventions.
 - [`cluster_plot()`](https://pablobernabeu.github.io/depictr/reference/cluster_plot.md):
   k-means clusters on principal-component axes.
 
+- [`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md):
+  silhouette widths of a clustering.
+
+- [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md):
+  suggest a number of clusters.
+
 - [`dendrogram_plot()`](https://pablobernabeu.github.io/depictr/reference/dendrogram_plot.md):
   hierarchical-clustering dendrogram.
 
@@ -71,6 +89,12 @@ one colourblind-aware palette and one set of label conventions.
 
 - [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md):
   trend / seasonal / remainder decomposition.
+
+- [`seasonal_plot()`](https://pablobernabeu.github.io/depictr/reference/seasonal_plot.md):
+  seasonal subseries across cycles.
+
+- [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md):
+  a simple forecast with prediction intervals.
 
 ## Model estimates and inference
 
@@ -106,6 +130,9 @@ one colourblind-aware palette and one set of label conventions.
 - [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md):
   residual-diagnostic panel.
 
+- [`binned_residual_plot()`](https://pablobernabeu.github.io/depictr/reference/binned_residual_plot.md):
+  binned residuals for logistic and other GLMs.
+
 - [`influence_plot()`](https://pablobernabeu.github.io/depictr/reference/influence_plot.md):
   influence and leverage.
 
@@ -129,6 +156,9 @@ one colourblind-aware palette and one set of label conventions.
 
 - [`calibration_plot()`](https://pablobernabeu.github.io/depictr/reference/calibration_plot.md):
   calibration of predicted probabilities.
+
+- [`threshold_plot()`](https://pablobernabeu.github.io/depictr/reference/threshold_plot.md):
+  classification metrics across decision thresholds.
 
 - [`confusion_matrix_plot()`](https://pablobernabeu.github.io/depictr/reference/confusion_matrix_plot.md):
   confusion matrix as a heatmap.
@@ -165,18 +195,23 @@ one colourblind-aware palette and one set of label conventions.
 - [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md):
   save a plot with publication-ready defaults.
 
+- [`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md):
+  set package-wide defaults once.
+
 ## Bundled data
 
 [lexical_decision](https://pablobernabeu.github.io/depictr/reference/lexical_decision.md),
-[wellbeing_survey](https://pablobernabeu.github.io/depictr/reference/wellbeing_survey.md)
+[wellbeing_survey](https://pablobernabeu.github.io/depictr/reference/wellbeing_survey.md),
+[crop_yield](https://pablobernabeu.github.io/depictr/reference/crop_yield.md),
+[clinical_trial](https://pablobernabeu.github.io/depictr/reference/clinical_trial.md)
 and
-[crop_yield](https://pablobernabeu.github.io/depictr/reference/crop_yield.md)
+[monthly_sales](https://pablobernabeu.github.io/depictr/reference/monthly_sales.md)
 are reproducibly simulated datasets used throughout the examples and
 vignettes.
 
 ## References
 
-Wickham H (2016). *ggplot2: Elegant Graphics for Data Analysis*, 2nd
+Wickham H (2016). *ggplot2: Elegant graphics for data analysis*, 2nd
 edition. Springer, Cham, Switzerland. ISBN 978-3-319-24277-4.
 [doi:10.1007/978-3-319-24277-4](https://doi.org/10.1007/978-3-319-24277-4)
 .
@@ -194,7 +229,9 @@ Useful links:
 ## Author
 
 **Maintainer**: Pablo Bernabeu <pcbernabeu@gmail.com>
+([ORCID](https://orcid.org/0000-0003-1083-2460))
 
 Authors:
 
 - Pablo Bernabeu <pcbernabeu@gmail.com>
+  ([ORCID](https://orcid.org/0000-0003-1083-2460))

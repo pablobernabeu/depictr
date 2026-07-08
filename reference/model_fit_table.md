@@ -29,8 +29,8 @@ A data frame with one row per model and columns `model`, `n`, `df`,
 
 ## References
 
-McFadden D (1974). “Conditional Logit Analysis of Qualitative Choice
-Behavior.” In Zarembka P (ed.), *Frontiers in Econometrics*, 105–142.
+McFadden D (1974). “Conditional logit analysis of qualitative choice
+behavior.” In Zarembka P (ed.), *Frontiers in econometrics*, 105–142.
 Academic Press, New York, NY.
 
 ## Examples

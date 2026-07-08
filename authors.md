@@ -10,12 +10,12 @@
 Source:
 [`inst/CITATION`](https://github.com/pablobernabeu/depictr/blob/main/inst/CITATION)
 
-Bernabeu, P. (2026). depictr: A Unified Toolkit for Visualising
-Statistical Models and Data. R package version 0.1.1.
+Bernabeu, P. (2026). depictr: A unified toolkit for visualising
+statistical models and data. R package version 0.1.1.
 https://doi.org/10.5281/zenodo.21266308
 
     @Manual{,
-      title = {{depictr}: A Unified Toolkit for Visualising Statistical Models and Data},
+      title = {{depictr}: A unified toolkit for visualising statistical models and data},
       author = {Pablo Bernabeu},
       year = {2026},
       note = {R package version 0.1.1},

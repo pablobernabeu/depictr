@@ -21,27 +21,27 @@ names
 (e.g. [`?lexical_decision`](https://pablobernabeu.github.io/depictr/reference/lexical_decision.md))
 and load with [`data()`](https://rdrr.io/r/utils/data.html):
 
-- `lexical_decision` – a counterbalanced, crossed reaction-time/accuracy
+- `lexical_decision`: a counterbalanced, crossed reaction-time/accuracy
   experiment (participant, item, condition, modality, word frequency).
   For mixed models and the classification plots.
-- `wellbeing_survey` – a cross-sectional survey (life satisfaction,
+- `wellbeing_survey`: a cross-sectional survey (life satisfaction,
   stress, sleep, income, age, ordered education, region) with
   *informative* missingness. For descriptives, correlations, regression
   and missing data.
-- `crop_yield` – a field trial with a genuine fertiliser-by-treatment
+- `crop_yield`: a field trial with a genuine fertiliser-by-treatment
   interaction. For regression, scatter-trend and interaction plots.
-- `clinical_trial` – a two-arm trial with separating survival curves and
+- `clinical_trial`: a two-arm trial with separating survival curves and
   a rare adverse-event outcome. For survival and imbalanced
   classification.
-- `monthly_sales` – two seasonal monthly series (indoor/outdoor). For
-  the time-series plots.
+- `monthly_sales`: two seasonal monthly series (indoor/outdoor). For the
+  time-series plots.
 
 ## A tour by task
 
 Begin with the data.
 [`explore_bivariate()`](https://pablobernabeu.github.io/depictr/reference/explore_bivariate.md)
-chooses a suitable plot for any pair of variables – a scatter with a
-trend here, because both are numeric.
+chooses a suitable plot for any pair of variables, here a scatter with a
+trend because both are numeric.
 
 ``` r
 
@@ -217,7 +217,7 @@ cover the remaining methods.
 
 ## References
 
-Okabe, M., & Ito, K. (2008). *Color universal design (CUD): How to make
+Okabe, M., & Ito, K. (2008). *Color Universal Design (CUD): How to make
 figures and presentations that are friendly to colorblind people*.
 <https://jfly.uni-koeln.de/color/>.
 

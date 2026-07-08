@@ -139,9 +139,9 @@ can cut it into <code>k</code> groups.</p>
 </h2>
 <p>Choosing <code>k</code> should not be guesswork.
 <code><a href="../reference/k_diagnostic.html">k_diagnostic()</a></code> evaluates a cluster-quality criterion across
-a range of <code>k</code> and suggests a value – by the average
+a range of <code>k</code> and suggests a value, using the average
 silhouette width (the default, after Rousseeuw, 1987), the
-within-sum-of-squares elbow, or the gap statistic (Tibshirani, Walther
+within-sum-of-squares elbow or the gap statistic (Tibshirani, Walther
 &amp; Hastie, 2001). See <code><a href="../reference/k_diagnostic.html">?k_diagnostic</a></code> for the
 references.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -218,13 +218,12 @@ R, so no modelling package is needed; you can pass follow-up times and
 an event indicator directly, a data frame, or a
 <code><a href="https://rdrr.io/pkg/survival/man/survfit.html" class="external-link">survival::survfit</a></code> object.</p>
 <p>The <code>clinical_trial</code> dataset has two arms with a real
-survival difference – the treatment arm has a lower hazard – so the
+survival difference (the treatment arm has a lower hazard), so the
 curves separate. Turning on the three publication annotations gives a
-survminer-style figure: a <strong>number-at-risk table</strong> beneath
-the curves, dashed guides to each arm’s <strong>median
-survival</strong>, and the <strong>log-rank test</strong> of the
+survminer-style figure: a number-at-risk table beneath the curves,
+dashed guides to each arm’s median survival and the log-rank test of the
 difference as a subtitle. A survival curve is monotone-decreasing, so
-its bottom-left corner is always empty –
+its bottom-left corner is always empty;
 <code>legend_inside = TRUE</code> puts the group legend there.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/survival_plot.html">survival_plot</a></span><span class="op">(</span></span>
@@ -234,9 +233,9 @@ its bottom-left corner is always empty –
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="multivariate-and-survival_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="672"></p>
 <p>The log-rank p-value is tiny and the median survival is clearly
-longer in the treatment arm – and because its event times are longer,
-that arm is more often right-censored at the 36-month study end, visible
-as the denser run of censoring marks.</p>
+longer in the treatment arm. Because its event times are longer, that
+arm is more often right-censored at the 36-month study end, visible as
+the denser run of censoring marks.</p>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

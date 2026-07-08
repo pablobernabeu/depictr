@@ -151,13 +151,13 @@ ridgeline_plot(wellbeing_survey, life_satisfaction, region)
 
 ![](exploring-data_files/figure-html/unnamed-chunk-12-1.png)
 
-## Estimation plots: effect size, not just a p-value
+## Estimation plots: effect size rather than a p-value
 
 An *estimation plot* puts the effect size and its uncertainty at the
 centre of the comparison.
 [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md)
 draws the classic Gardner-Altman two-group plot: the raw data with group
-means on top, and the **mean difference** with a bootstrap confidence
+means on top, and the mean difference with a bootstrap confidence
 interval beneath, aligned so a difference of zero sits under the
 reference group’s mean. With two groups it also annotates a standardised
 effect size (Hedges’ *g* by default).
@@ -212,9 +212,9 @@ outlier_plot(crop_yield, yield)
 
 ![](exploring-data_files/figure-html/unnamed-chunk-16-1.png)
 
-`wellbeing_survey` has *informative* missingness – income is missing
-more often at higher stress – so the missingness map is worth a look
-before modelling.
+`wellbeing_survey` has *informative* missingness (income is missing more
+often at higher stress), so the missingness map is worth a look before
+modelling.
 
 ``` r
 
@@ -229,7 +229,7 @@ missingness_map(wellbeing_survey, legend_inside = TRUE)
 builds a “Table 1”: mean (SD) for numeric variables, counts and
 percentages for categorical ones, optionally by group. The first row
 always reports the sample size (`N`), and any variable with missing
-values gets a `Missing, n (%)` row – both visible here for the wellbeing
+values gets a `Missing, n (%)` row, both visible here for the wellbeing
 survey. It returns a plain data frame, ready for
 [`knitr::kable()`](https://rdrr.io/pkg/knitr/man/kable.html).
 
@@ -276,7 +276,7 @@ scatter_trend(crop_yield, fertiliser, yield, group = treatment) +
 ### Tidying the legend
 
 depictr centres a legend title over its keys by default. When the levels
-speak for themselves, though, the title is just clutter – drop it by
+speak for themselves, though, the title is just clutter, so drop it by
 mapping it to `NULL`. Reversing a discrete colour legend at the same
 time makes it read top-to-bottom in the order the curves are stacked:
 
@@ -297,8 +297,8 @@ e.g. [`?ecdf_plot`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot
 For any plot that does not, the same move is one
 [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) call. A
 dodged bar chart, for instance, leaves the top-right clear when the
-right-most category is short, so the legend fits there – and because the
-regions are self-evident we drop the title too (with
+right-most category is short, so the legend fits there. Because the
+regions are self-evident, we drop the title too (with
 [`element_blank()`](https://ggplot2.tidyverse.org/reference/element.html),
 since this plot sets the legend name on its fill scale):
 
@@ -321,5 +321,5 @@ Many functions also expose layout controls directly.
 [`ridgeline_plot()`](https://pablobernabeu.github.io/depictr/reference/ridgeline_plot.md)
 separate groups, `correlation_heatmap(reorder = TRUE)` clusters
 variables, and the model-estimate plots take `facet` and `standardise`
-to keep coefficients on very different scales legible – see
-[`vignette("model-estimates")`](https://pablobernabeu.github.io/depictr/articles/model-estimates.md).
+to keep coefficients on very different scales legible (see
+[`vignette("model-estimates")`](https://pablobernabeu.github.io/depictr/articles/model-estimates.md)).

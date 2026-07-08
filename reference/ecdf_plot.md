@@ -1,7 +1,7 @@
 # Empirical cumulative distribution function (ECDF) plot
 
-Draws the empirical CDF of a numeric variable – the proportion of
-observations at or below each value – optionally split by a grouping
+Draws the empirical CDF of a numeric variable (the proportion of
+observations at or below each value), optionally split by a grouping
 variable. Unlike a histogram it needs no bin-width choice and makes
 quantiles, medians and group shifts easy to read directly off the curve.
 
@@ -50,7 +50,7 @@ ecdf_plot(
 - legend_inside:
 
   When `TRUE` (and a `group` is given), draw the legend inside the panel
-  – in the bottom-right corner the ECDF leaves empty once it saturates –
+  (in the bottom-right corner the ECDF leaves empty once it saturates)
   over a translucent background, instead of in a right-hand margin.
   Defaults to `FALSE`.
 

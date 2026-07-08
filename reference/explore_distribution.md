@@ -72,9 +72,9 @@ explore_distribution(
 - legend_inside:
 
   When `TRUE` (and a `group` is given without `facet`), draw the colour
-  legend inside the panel – in the top-right corner a unimodal
-  histogram/density leaves empty – over a translucent background,
-  instead of in a right-hand margin. Defaults to `FALSE`.
+  legend inside the panel (in the top-right corner a unimodal
+  histogram/density leaves empty) over a translucent background, instead
+  of in a right-hand margin. Defaults to `FALSE`.
 
 - title, x_lab:
 

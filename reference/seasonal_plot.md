@@ -76,7 +76,7 @@ object.
 ## Details
 
 Two layouts are offered. With `style = "subseries"` (the default) the
-panels are faceted side by side, each tracing one season across cycles –
+panels are faceted side by side, each tracing one season across cycles:
 the classic Cleveland cycle plot, matching `feasts::gg_subseries()`.
 With `style = "season"` every cycle is drawn as its own line over the
 seasons on a shared axis (the seasonal-plot layout of

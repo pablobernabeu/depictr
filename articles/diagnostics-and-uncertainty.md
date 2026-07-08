@@ -87,7 +87,7 @@ residual_diagnostics_plot(gfit, title = "Adverse-event model")
 The adverse-event outcome is imbalanced, which is exactly when the
 precision-recall, gains and lift charts earn their keep. depictr’s
 classification plots each read a binomial `glm` directly, a pair of
-vectors, or – to *compare several models* – a **named list** of models.
+vectors or, to compare several models, a named list of models.
 
 The ROC curve reports the AUC. Passing `youden = TRUE` marks the
 Youden’s J operating point (the threshold maximising sensitivity +
@@ -145,7 +145,7 @@ pr_curve_plot(models, f1 = TRUE)
 
 For ranking and targeting tasks, the cumulative gains and lift charts
 show how many positive cases are captured as more of the score-ordered
-population is targeted – again overlaying both models:
+population is targeted, again overlaying both models:
 
 ``` r
 
@@ -189,8 +189,8 @@ attr(tp, "thresholds")   # the Youden and max-F1 thresholds
 [`calibration_plot()`](https://pablobernabeu.github.io/depictr/reference/calibration_plot.md)
 checks whether predicted probabilities match observed frequencies. Each
 bin’s observed rate carries a Wilson binomial confidence interval, so
-bins backed by few observations – common in the sparse upper tail when
-the outcome is rare – are not over-interpreted.
+bins backed by few observations (common in the sparse upper tail when
+the outcome is rare) are not over-interpreted.
 
 ``` r
 

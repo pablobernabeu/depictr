@@ -76,6 +76,7 @@ conventions.</p>
 
 
 <ul><li><p><code><a href="explore_distribution.html">explore_distribution()</a></code>: histograms / densities of one variable.</p></li>
+<li><p><code><a href="ecdf_plot.html">ecdf_plot()</a></code>: empirical cumulative distribution, optionally by group.</p></li>
 <li><p><code><a href="explore_categorical.html">explore_categorical()</a></code>: bar charts of a categorical variable.</p></li>
 <li><p><code><a href="explore_bivariate.html">explore_bivariate()</a></code>: a suitable plot for any pair of variables.</p></li>
 <li><p><code><a href="explore_pairs.html">explore_pairs()</a></code>: a scatter-plot matrix.</p></li>
@@ -83,7 +84,10 @@ conventions.</p>
 <li><p><code><a href="missingness_map.html">missingness_map()</a></code>: a map of missing values.</p></li>
 <li><p><code><a href="outlier_plot.html">outlier_plot()</a></code>: box / violin plots flagging outliers.</p></li>
 <li><p><code><a href="raincloud_plot.html">raincloud_plot()</a></code>: half-violin, box and raw points together.</p></li>
+<li><p><code><a href="ridgeline_plot.html">ridgeline_plot()</a></code>: overlapping per-group densities.</p></li>
 <li><p><code><a href="group_comparison_plot.html">group_comparison_plot()</a></code>: group means with confidence intervals.</p></li>
+<li><p><code><a href="estimation_plot.html">estimation_plot()</a></code>: group differences with bootstrap intervals.</p></li>
+<li><p><code><a href="dumbbell_plot.html">dumbbell_plot()</a></code>: a two-group comparison across categories.</p></li>
 <li><p><code><a href="scatter_trend.html">scatter_trend()</a></code>: scatter plot with a fitted trend.</p></li>
 <li><p><code><a href="summary_table.html">summary_table()</a></code>: a "Table 1" style descriptive summary.</p></li>
 </ul></div>
@@ -94,6 +98,8 @@ conventions.</p>
 <ul><li><p><code><a href="pca_plot.html">pca_plot()</a></code>: principal-component biplot.</p></li>
 <li><p><code><a href="scree_plot.html">scree_plot()</a></code>: variance explained by each component.</p></li>
 <li><p><code><a href="cluster_plot.html">cluster_plot()</a></code>: k-means clusters on principal-component axes.</p></li>
+<li><p><code><a href="silhouette_plot.html">silhouette_plot()</a></code>: silhouette widths of a clustering.</p></li>
+<li><p><code><a href="k_diagnostic.html">k_diagnostic()</a></code>: suggest a number of clusters.</p></li>
 <li><p><code><a href="dendrogram_plot.html">dendrogram_plot()</a></code>: hierarchical-clustering dendrogram.</p></li>
 <li><p><code><a href="survival_plot.html">survival_plot()</a></code>: Kaplan-Meier survival curves.</p></li>
 </ul></div>
@@ -104,6 +110,8 @@ conventions.</p>
 <ul><li><p><code><a href="timeseries_plot.html">timeseries_plot()</a></code>: one or more series over time.</p></li>
 <li><p><code><a href="acf_plot.html">acf_plot()</a></code>: autocorrelation / partial autocorrelation.</p></li>
 <li><p><code><a href="decompose_plot.html">decompose_plot()</a></code>: trend / seasonal / remainder decomposition.</p></li>
+<li><p><code><a href="seasonal_plot.html">seasonal_plot()</a></code>: seasonal subseries across cycles.</p></li>
+<li><p><code><a href="ts_forecast.html">ts_forecast()</a></code>: a simple forecast with prediction intervals.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="model-estimates-and-inference">Model estimates and inference<a class="anchor" aria-label="anchor" href="#model-estimates-and-inference"></a></h2>
@@ -124,6 +132,7 @@ conventions.</p>
 
 
 <ul><li><p><code><a href="residual_diagnostics_plot.html">residual_diagnostics_plot()</a></code>: residual-diagnostic panel.</p></li>
+<li><p><code><a href="binned_residual_plot.html">binned_residual_plot()</a></code>: binned residuals for logistic and other GLMs.</p></li>
 <li><p><code><a href="influence_plot.html">influence_plot()</a></code>: influence and leverage.</p></li>
 <li><p><code><a href="qq_plot.html">qq_plot()</a></code>: normal quantile-quantile plot.</p></li>
 <li><p><code><a href="vif_plot.html">vif_plot()</a></code>: multicollinearity (variance inflation factors).</p></li>
@@ -132,6 +141,7 @@ conventions.</p>
 <li><p><code><a href="gain_plot.html">gain_plot()</a></code>: cumulative gains chart.</p></li>
 <li><p><code><a href="lift_plot.html">lift_plot()</a></code>: cumulative lift chart.</p></li>
 <li><p><code><a href="calibration_plot.html">calibration_plot()</a></code>: calibration of predicted probabilities.</p></li>
+<li><p><code><a href="threshold_plot.html">threshold_plot()</a></code>: classification metrics across decision thresholds.</p></li>
 <li><p><code><a href="confusion_matrix_plot.html">confusion_matrix_plot()</a></code>: confusion matrix as a heatmap.</p></li>
 </ul></div>
     <div class="section level2">
@@ -152,18 +162,20 @@ conventions.</p>
 <li><p><code><a href="model_report.html">model_report()</a></code>: a one-figure overview of a fitted model.</p></li>
 <li><p><code><a href="arrange_plots.html">arrange_plots()</a></code>: compose plots with a shared legend and title.</p></li>
 <li><p><code><a href="save_plot.html">save_plot()</a></code>: save a plot with publication-ready defaults.</p></li>
+<li><p><code><a href="depictr_options.html">depictr_options()</a></code>: set package-wide defaults once.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="bundled-data">Bundled data<a class="anchor" aria-label="anchor" href="#bundled-data"></a></h2>
 
 
-<p><a href="lexical_decision.html">lexical_decision</a>, <a href="wellbeing_survey.html">wellbeing_survey</a> and <a href="crop_yield.html">crop_yield</a> are reproducibly
-simulated datasets used throughout the examples and vignettes.</p>
+<p><a href="lexical_decision.html">lexical_decision</a>, <a href="wellbeing_survey.html">wellbeing_survey</a>, <a href="crop_yield.html">crop_yield</a>, <a href="clinical_trial.html">clinical_trial</a> and
+<a href="monthly_sales.html">monthly_sales</a> are reproducibly simulated datasets used throughout the
+examples and vignettes.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Wickham H (2016).
-<em>ggplot2: Elegant Graphics for Data Analysis</em>, 2nd edition.
+<em>ggplot2: Elegant graphics for data analysis</em>, 2nd edition.
 Springer, Cham, Switzerland.
 ISBN 978-3-319-24277-4.
 <a href="https://doi.org/10.1007/978-3-319-24277-4" class="external-link">doi:10.1007/978-3-319-24277-4</a>
@@ -178,8 +190,8 @@ ISBN 978-3-319-24277-4.
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
-    <p><strong>Maintainer</strong>: Pablo Bernabeu <a href="mailto:pcbernabeu@gmail.com">pcbernabeu@gmail.com</a></p>
-<p>Authors:</p><ul><li><p>Pablo Bernabeu <a href="mailto:pcbernabeu@gmail.com">pcbernabeu@gmail.com</a></p></li>
+    <p><strong>Maintainer</strong>: Pablo Bernabeu <a href="mailto:pcbernabeu@gmail.com">pcbernabeu@gmail.com</a> (<a href="https://orcid.org/0000-0003-1083-2460" class="external-link">ORCID</a>)</p>
+<p>Authors:</p><ul><li><p>Pablo Bernabeu <a href="mailto:pcbernabeu@gmail.com">pcbernabeu@gmail.com</a> (<a href="https://orcid.org/0000-0003-1083-2460" class="external-link">ORCID</a>)</p></li>
 </ul></div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

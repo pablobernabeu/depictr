@@ -83,8 +83,8 @@ survival_plot(
 - legend_inside:
 
   When `TRUE` (and there are several groups), draw the group legend
-  inside the panel – in the bottom-left corner a monotone-decreasing
-  survival curve always leaves empty – over a translucent background,
+  inside the panel (in the bottom-left corner a monotone-decreasing
+  survival curve always leaves empty) over a translucent background,
   instead of in a right-hand margin. Defaults to `FALSE`.
 
 - title, x_lab, y_lab:
@@ -94,8 +94,8 @@ survival_plot(
 ## Value
 
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
-object, or - when `risk_table = TRUE` - a 'patchwork' object stacking
-the curves above the risk table.
+object or, when `risk_table = TRUE`, a 'patchwork' object stacking the
+curves above the risk table.
 
 ## Details
 
@@ -122,18 +122,18 @@ argument and off by default so existing behaviour is unchanged:
 
 ## References
 
-Kaplan EL, Meier P (1958). “Nonparametric Estimation from Incomplete
-Observations.” *Journal of the American Statistical Association*,
+Kaplan EL, Meier P (1958). “Nonparametric estimation from incomplete
+observations.” *Journal of the American Statistical Association*,
 **53**(282), 457–481.
 [doi:10.1080/01621459.1958.10501452](https://doi.org/10.1080/01621459.1958.10501452)
 .
 
-Greenwood M (1926). *The Natural Duration of Cancer*, volume 33 of
+Greenwood M (1926). *The natural duration of cancer*, volume 33 of
 *Reports on Public Health and Medical Subjects*. His Majesty's
 Stationery Office, London.
 
-Mantel N (1966). “Evaluation of Survival Data and Two New Rank Order
-Statistics Arising in Its Consideration.” *Cancer Chemotherapy Reports*,
+Mantel N (1966). “Evaluation of survival data and two new rank order
+statistics arising in its consideration.” *Cancer Chemotherapy Reports*,
 **50**(3), 163–170.
 
 ## Examples

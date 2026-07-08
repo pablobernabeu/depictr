@@ -61,10 +61,10 @@ dumbbell_plot(
 
 - legend_inside:
 
-  When `TRUE`, draw the two-group legend inside the panel – in the
-  top-right corner, which the default gap sort (shortest dumbbell on
-  top) usually leaves clear – over a translucent background, instead of
-  in a right-hand margin. Defaults to `FALSE`.
+  When `TRUE`, draw the two-group legend inside the panel (in the
+  top-right corner, which the default gap sort with the shortest
+  dumbbell on top usually leaves clear) over a translucent background,
+  instead of in a right-hand margin. Defaults to `FALSE`.
 
 - title, x_lab, y_lab:
 

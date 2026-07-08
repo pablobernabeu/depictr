@@ -59,8 +59,8 @@ object. The per-bin summary (mean fitted, mean residual, SE bound and an
 
 ## References
 
-Gelman A, Hill J (2007). *Data Analysis Using Regression and
-Multilevel/Hierarchical Models*. Cambridge University Press, Cambridge,
+Gelman A, Hill J (2007). *Data analysis using regression and
+multilevel/hierarchical models*. Cambridge University Press, Cambridge,
 UK. ISBN 978-0-521-68689-1.
 [doi:10.1017/CBO9780511790942](https://doi.org/10.1017/CBO9780511790942)
 .

@@ -62,8 +62,9 @@ band.
 
 ## References
 
-Fox, J. and Monette, G. (1992) Generalized collinearity diagnostics.
-*Journal of the American Statistical Association*, 87, 178-183.
+Fox, J., & Monette, G. (1992). Generalized collinearity diagnostics.
+*Journal of the American Statistical Association*, 87(417), 178-183.
+[doi:10.1080/01621459.1992.10475190](https://doi.org/10.1080/01621459.1992.10475190)
 
 ## Examples
 
