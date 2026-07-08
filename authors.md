@@ -2,7 +2,7 @@
 
 ## Authors
 
-- **[Pablo Bernabeu](https://github.com/pablobernabeu)**. Author,
+- **[Pablo Bernabeu](https://pablobernabeu.github.io/)**. Author,
   maintainer. [](https://orcid.org/0000-0003-1083-2460)
 
 ## Citation
