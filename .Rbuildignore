@@ -2,6 +2,7 @@
 ^\.Rproj\.user$
 ^data-raw$
 ^cran-comments\.md$
+^CITATION\.cff$
 ^\.github$
 ^_pkgdown\.yml$
 ^docs$

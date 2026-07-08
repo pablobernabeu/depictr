@@ -59,12 +59,14 @@ before. Set \code{glm_panels = FALSE} to force the classic \code{lm}-style panel
 \examples{
 fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
 residual_diagnostics_plot(fit)
+\donttest{
 residual_diagnostics_plot(fit, which = c("resid_fitted", "qq"))
 
 # A logistic GLM gets binned and quantile-residual panels automatically:
 gfit <- glm(adverse_event ~ biomarker + age + arm,
             data = clinical_trial, family = binomial)
 residual_diagnostics_plot(gfit)
+}
 }
 \references{
 \insertRef{gelman2007}{depictr}

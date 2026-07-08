@@ -39,12 +39,14 @@
 #' @examples
 #' fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
 #' residual_diagnostics_plot(fit)
+#' \donttest{
 #' residual_diagnostics_plot(fit, which = c("resid_fitted", "qq"))
 #'
 #' # A logistic GLM gets binned and quantile-residual panels automatically:
 #' gfit <- glm(adverse_event ~ biomarker + age + arm,
 #'             data = clinical_trial, family = binomial)
 #' residual_diagnostics_plot(gfit)
+#' }
 residual_diagnostics_plot <- function(model,
                                       which = c("resid_fitted", "qq",
                                                 "scale_location",
