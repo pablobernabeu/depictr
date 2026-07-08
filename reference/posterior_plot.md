@@ -151,13 +151,12 @@ draws <- data.frame(
 )
 posterior_plot(draws)
 
-
+# \donttest{
 # A region of practical equivalence and a probability-of-direction label
 posterior_plot(draws, rope = c(-0.1, 0.1), pd = TRUE)
 
 
 # When one parameter dwarfs the others, give each its own free-scaled panel:
-# \donttest{
 posterior_plot(draws, facet = TRUE)
 
 # }

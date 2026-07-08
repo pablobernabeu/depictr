@@ -151,6 +151,7 @@ ISBN 978-0-521-68689-1.
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">rainfall</span> <span class="op">+</span> <span class="va">fertiliser</span> <span class="op">+</span> <span class="va">soil_ph</span>, data <span class="op">=</span> <span class="va">crop_yield</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">residual_diagnostics_plot</span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="residual_diagnostics_plot-1.png" alt="" width="672" height="432"></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu">residual_diagnostics_plot</span><span class="op">(</span><span class="va">fit</span>, which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"resid_fitted"</span>, <span class="st">"qq"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="residual_diagnostics_plot-2.png" alt="" width="672" height="432"></span>
 <span class="r-in"><span></span></span>
@@ -159,6 +160,7 @@ ISBN 978-0-521-68689-1.
 <span class="r-in"><span>            data <span class="op">=</span> <span class="va">clinical_trial</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">residual_diagnostics_plot</span><span class="op">(</span><span class="va">gfit</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="residual_diagnostics_plot-3.png" alt="" width="672" height="432"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

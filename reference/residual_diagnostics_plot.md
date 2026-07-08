@@ -96,6 +96,7 @@ Computational and Graphical Statistics*, **5**(3), 236–244.
 fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
 residual_diagnostics_plot(fit)
 
+# \donttest{
 residual_diagnostics_plot(fit, which = c("resid_fitted", "qq"))
 
 
@@ -103,4 +104,6 @@ residual_diagnostics_plot(fit, which = c("resid_fitted", "qq"))
 gfit <- glm(adverse_event ~ biomarker + age + arm,
             data = clinical_trial, family = binomial)
 residual_diagnostics_plot(gfit)
+
+# }
 ```
