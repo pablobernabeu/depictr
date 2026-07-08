@@ -1,5 +1,15 @@
 # Changelog
 
+## depictr 0.1.1
+
+- Documentation and packaging polish, with no change to the plotting
+  API.
+- The documentation site adopts the shared house style used across the
+  package family, with a citation page carrying a copyable and
+  downloadable BibTeX entry.
+- Consolidated to a single `LICENSE` file, and added community and
+  contribution files.
+
 ## depictr 0.1.0
 
 First release. depictr is a unified, consistent toolkit of
