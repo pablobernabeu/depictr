@@ -1,0 +1,361 @@
+// ---------------------------------------------------------------------------
+// Meridian — the shared documentation brand for Pablo Bernabeu's packages (depictr accent: blue + coral).
+//
+// An editorial, academic-press identity layered on top of pkgdown's Bootstrap 5
+// scaffolding: a deep-navy ink, a teal primary, a warm amber accent and a warm
+// paper background, with a Spectral / Inter / JetBrains Mono type system. The
+// data-figure palette (viridis) is deliberately left alone.
+//
+// This file is additive. It sets brand tokens as CSS custom properties, maps
+// them onto Bootstrap's own --bs-* variables so the existing components inherit
+// them, and restyles a few surfaces (navbar, hero, cards, footer). It does not
+// remove or rename any pkgdown structure. The twin mkdocs site carries the same
+// tokens in docs/stylesheets/brand.css.
+//
+// Per-package accent: override --brand-primary / --brand-primary-ink below (for
+// example depictr's blue) to retune the family without touching the layout.
+// ---------------------------------------------------------------------------
+
+:root {
+  // Core palette (sampled from the hex logos: navy ground, teal edge, warm accent)
+  --brand-ink:          #0E2A44;  // deep navy — navbar, footer, dark ground
+  --brand-ink-raised:   #15395B;  // raised navy surface
+  --brand-teal:         #1F6FA8;  // brand teal — borders, edges, dark-mode links
+  --brand-primary:      #005B96;  // accessible deep teal — links, buttons (light)
+  --brand-primary-ink:  #00456F;  // pressed
+  --brand-teal-light:   #6FB4E0;  // teal for dark backgrounds
+  --brand-amber:        #EF6C6C;  // warm accent — the App link, hover, rules
+  --brand-amber-light:  #F6928F;
+  --brand-amber-dark:   #B23A3A;  // AA-contrast amber for link hover on light paper
+  --brand-paper:        #FBFAF6;  // warm off-white page
+  --brand-card:         #FFFFFF;
+  --brand-border:       #E4E6EA;  // warm hairline
+  --brand-body:         #1D2A32;  // ink body text
+  --brand-muted:        #5A6771;
+
+  // Type system
+  --bs-body-font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                          Roboto, Helvetica, Arial, sans-serif;
+  --bs-font-monospace:   "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo,
+                          Consolas, "Liberation Mono", monospace;
+  --brand-heading-font:  "Spectral", Georgia, "Times New Roman", serif;
+}
+
+// --- Light mode surface -----------------------------------------------------
+[data-bs-theme="light"] {
+  --bs-body-bg:          var(--brand-paper);
+  --bs-body-color:       var(--brand-body);
+  --bs-secondary-color:  var(--brand-muted);
+  --bs-link-color:       var(--brand-primary);
+  --bs-link-color-rgb:   0, 91, 150;
+  --bs-link-hover-color: var(--brand-amber-dark);
+  --bs-border-color:     var(--brand-border);
+  --bs-emphasis-color:   var(--brand-ink);
+}
+
+// --- Dark mode surface ------------------------------------------------------
+[data-bs-theme="dark"] {
+  --brand-paper:  #0A1B2E;
+  --brand-card:   #10314C;
+  --brand-border: #234563;
+  --brand-body:   #D7E2EC;
+  --brand-muted:  #8CA6BC;
+
+  --bs-body-bg:          #0A1B2E;
+  --bs-body-color:       #D7E2EC;
+  --bs-secondary-color:  #8CA6BC;
+  --bs-link-color:       var(--brand-teal-light);
+  --bs-link-color-rgb:   111, 180, 224;
+  --bs-link-hover-color: var(--brand-amber-light);
+  --bs-border-color:     #234563;
+  --bs-emphasis-color:   #FFFFFF;
+}
+
+body {
+  font-family: var(--bs-body-font-family);
+  font-size: 1.02rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+// --- Headings: Spectral, the editorial signal -------------------------------
+h1, h2, h3, h4, h5, h6,
+.navbar-brand,
+.template-home .page-header h1 {
+  font-family: var(--brand-heading-font);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--brand-ink);
+}
+[data-bs-theme="dark"] h1,
+[data-bs-theme="dark"] h2,
+[data-bs-theme="dark"] h3,
+[data-bs-theme="dark"] h4 { color: #EAF1F4; }
+// The home hero title carries a higher-specificity light-mode colour (below),
+// so its dark-mode colour must match that specificity to take effect; without
+// this the wordmark stays deep-navy on the dark page and all but disappears.
+[data-bs-theme="dark"] .template-home .page-header h1 { color: #EAF1F4; }
+
+h1 { font-size: 2.35rem; }
+h2 {
+  font-size: 1.6rem;
+  margin-top: 2.4rem;
+  padding-bottom: .3rem;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+h3 { font-size: 1.25rem; margin-top: 1.8rem; }
+
+// The parenthetical language tag in the hero title, e.g. "scopusflow (R)"
+.template-home .page-header h1 small,
+.template-home .page-header h1 .language-tag {
+  font-family: var(--bs-body-font-family);
+  font-weight: 400;
+  color: var(--brand-muted);
+  font-size: .55em;
+  letter-spacing: 0;
+}
+
+// ---------------------------------------------------------------------------
+// Navbar — always the deep-navy ink band with a teal underline, in both modes
+// ---------------------------------------------------------------------------
+.navbar {
+  background-color: var(--brand-ink) !important;
+  border-bottom: 3px solid var(--brand-teal);
+  --bs-navbar-color: rgba(255, 255, 255, .74);
+  --bs-navbar-hover-color: #ffffff;
+  --bs-navbar-active-color: #ffffff;
+  --bs-navbar-brand-color: #ffffff;
+  --bs-navbar-brand-hover-color: #ffffff;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .25);
+}
+.navbar .navbar-brand { color: #fff; font-weight: 600; letter-spacing: -0.01em; }
+.navbar .nav-link { color: rgba(255, 255, 255, .78); font-weight: 500; }
+.navbar .nav-link:hover,
+.navbar .nav-link:focus,
+.navbar .nav-link.active { color: #fff; }
+
+// Accent the App link (it carries the fa-play icon) in warm amber
+.navbar .nav-item:has(.fa-play) .nav-link,
+.navbar .nav-link:has(.fa-play) {
+  color: var(--brand-amber);
+  font-weight: 600;
+}
+.navbar .nav-item:has(.fa-play) .nav-link:hover,
+.navbar .nav-link:has(.fa-play):hover { color: var(--brand-amber-light); }
+// Give the App link room to breathe before the search box that follows it.
+.navbar .navbar-nav .nav-item:has(.fa-play) { margin-right: .9rem; }
+
+// The icon buttons on the right (search, github, light switch)
+.navbar .navbar-nav .nav-link .fa,
+.navbar #search-input { color: rgba(255, 255, 255, .85); }
+.navbar-nav .dropdown-menu { border-color: var(--bs-border-color); }
+// Dropdown rows: a clear brand-tinted hover, legible in both modes.
+.navbar .dropdown-menu {
+  --bs-dropdown-link-hover-bg: rgba(31, 111, 168, .14);
+  --bs-dropdown-link-hover-color: var(--brand-primary-ink);
+  --bs-dropdown-link-active-bg: var(--brand-primary);
+  --bs-dropdown-link-active-color: #fff;
+}
+[data-bs-theme="dark"] .navbar .dropdown-menu {
+  --bs-dropdown-link-hover-bg: rgba(111, 180, 224, .18);
+  --bs-dropdown-link-hover-color: #EAF1F4;
+}
+
+// ---------------------------------------------------------------------------
+// Home hero
+// ---------------------------------------------------------------------------
+.template-home .page-header {
+  border-bottom: none;
+  margin-bottom: 1.4rem;
+  padding-top: .5rem;
+}
+.template-home .page-header h1 { font-size: 2.9rem; margin-bottom: .2rem; }
+
+// The lead paragraph (first paragraph after the title) set larger and calmer
+.template-home main > .row > .col-md-9 > p:first-of-type,
+.template-home .contents > p:first-of-type {
+  font-size: 1.18rem;
+  line-height: 1.6;
+  color: var(--brand-muted);
+}
+
+// Badges row
+.template-home .contents .badge,
+.template-home img[src*="badge"] { margin: 0 .15rem .35rem 0; }
+
+// Logo in the hero
+.template-home .page-header img,
+img.logo { filter: drop-shadow(0 6px 18px rgba(14, 42, 68, .18)); }
+
+// ---------------------------------------------------------------------------
+// Sidebar (home + article table of contents)
+// ---------------------------------------------------------------------------
+#pkgdown-sidebar,
+aside {
+  font-size: .93rem;
+}
+#pkgdown-sidebar h2,
+aside h2 {
+  font-family: var(--bs-body-font-family);
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  font-weight: 600;
+  color: var(--brand-muted);
+  border-bottom: none;
+  margin-top: 1.4rem;
+}
+
+// ---------------------------------------------------------------------------
+// Reference index — treat each function group as a card
+// ---------------------------------------------------------------------------
+.template-reference-index .section {
+  background: var(--brand-card);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 12px;
+  padding: 1.1rem 1.3rem .4rem;
+  margin-bottom: 1.4rem;
+  box-shadow: 0 1px 2px rgba(14, 42, 68, .04);
+}
+.template-reference-index .section > h2 {
+  margin-top: .2rem;
+  border-bottom: none;
+  color: var(--brand-primary);
+}
+[data-bs-theme="dark"] .template-reference-index .section > h2 { color: var(--brand-teal-light); }
+.template-reference-index .section > h2::before {
+  content: "";
+  display: inline-block;
+  width: .55rem; height: .55rem;
+  margin-right: .55rem;
+  border-radius: 2px;
+  background: var(--brand-amber);
+  vertical-align: middle;
+}
+
+// ---------------------------------------------------------------------------
+// Code
+// ---------------------------------------------------------------------------
+code, pre, kbd, samp { font-family: var(--bs-font-monospace); }
+code { font-size: .875em; }
+pre {
+  background: var(--brand-ink);
+  color: #E7EDF0;
+  border-radius: 10px;
+  border: 1px solid rgba(31, 111, 168, .25);
+  padding: .85rem 1rem;
+  // Smaller than the prose so long output lines fit the column, and scroll
+  // inside the block rather than stretching it when they cannot.
+  font-size: .78rem;
+  line-height: 1.5;
+  overflow-x: auto;
+  max-width: 100%;
+}
+pre code { color: inherit; background: none; }
+:not(pre) > code {
+  background: rgba(31, 111, 168, .10);
+  color: var(--brand-primary-ink);
+  border-radius: 4px;
+  padding: .1rem .35rem;
+}
+[data-bs-theme="dark"] :not(pre) > code { color: var(--brand-teal-light); background: rgba(111, 180, 224, .12); }
+
+// The code block is deep-navy in BOTH modes, but pkgdown's light-mode syntax
+// colours are tuned for a light background and wash out on it (comments come
+// out near-black, for instance). Re-map the tokens to one high-contrast,
+// brand-coherent palette that reads the same in light and dark. The selector
+// `pre.sourceCode code span.X` matches pkgdown's dark rule specificity, and,
+// being appended after it, wins in both modes.
+pre.sourceCode code {
+  span.co, span.do { color: #8FA9B5; font-style: italic; }              // comments
+  span.st, span.sc, span.ss, span.vs, span.ch, span.bu,
+  span.im { color: #9DE0A6; }                                           // strings
+  span.fu { color: #F6928F; }                                           // function calls
+  span.kw, span.cf, span.dt { color: #F6928F; font-weight: 600; }       // keywords, control
+  span.op { color: #AAB7BF; }                                           // operators
+  span.dv, span.fl, span.bn, span.an, span.in { color: #CBD6A6; }       // numbers
+  span.cn, span.cv, span.at, span.ot { color: #6FD3D3; }                // constants (TRUE/NULL), args
+  span.va { color: #DCE6EC; }                                           // variables
+  span.al, span.er, span.wa { color: #F0888F; }                         // warnings, errors
+  span.pp { color: #D6C2E8; }                                           // preprocessor
+}
+
+// ---------------------------------------------------------------------------
+// Blockquotes / callouts (the Elsevier trademark disclaimer etc.)
+// ---------------------------------------------------------------------------
+blockquote {
+  border-left: 3px solid var(--brand-amber);
+  background: rgba(239, 108, 108, .07);
+  padding: .75rem 1rem;
+  border-radius: 0 8px 8px 0;
+  color: var(--brand-body);
+}
+blockquote p:last-child { margin-bottom: 0; }
+
+// ---------------------------------------------------------------------------
+// Tables
+// ---------------------------------------------------------------------------
+.contents table, table.table {
+  border: 1px solid var(--bs-border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.contents table thead th, table.table thead th {
+  background: var(--brand-ink);
+  color: #fff;
+  font-family: var(--bs-body-font-family);
+  font-weight: 600;
+  border-bottom: none;
+}
+.contents table td code, .contents table th code { white-space: nowrap; }
+
+// ---------------------------------------------------------------------------
+// Buttons / links inside content
+// ---------------------------------------------------------------------------
+.btn-primary {
+  --bs-btn-bg: var(--brand-primary);
+  --bs-btn-border-color: var(--brand-primary);
+  --bs-btn-hover-bg: var(--brand-primary-ink);
+  --bs-btn-hover-border-color: var(--brand-primary-ink);
+  --bs-btn-active-bg: var(--brand-primary-ink);
+}
+a { text-underline-offset: .15em; }
+// Content links: underline on hover so the highlight is unmistakable in both
+// modes, on top of the amber hover colour set through --bs-link-hover-color.
+main a:hover, .contents a:hover, #pkgdown-sidebar a:hover { text-decoration: underline; }
+
+// ---------------------------------------------------------------------------
+// Footer — the deep-navy signature band
+// ---------------------------------------------------------------------------
+footer {
+  margin-top: 3rem;
+  // Inset the content so it is not flush against the viewport edges, and lay
+  // the two columns out with room between them.
+  padding: 2rem clamp(1.25rem, 4vw, 4rem) 2.4rem;
+  background: var(--brand-ink);
+  border-top: 3px solid var(--brand-teal);
+  color: rgba(255, 255, 255, .78);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: .5rem 2.5rem;
+}
+footer a { color: var(--brand-amber-light); }
+footer a:hover { color: #fff; }
+footer .pkgdown-footer-left,
+footer .pkgdown-footer-right { font-size: .92rem; }
+
+// Keep inline code readable inside the dark footer
+footer :not(pre) > code { background: rgba(255, 255, 255, .10); color: #E7EDF0; }
+
+// ---------------------------------------------------------------------------
+// Citation tools — the copy/download controls under the BibTeX block (About)
+// ---------------------------------------------------------------------------
+.citation-bibtex-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-top: .75rem;
+}

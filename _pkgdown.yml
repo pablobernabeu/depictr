@@ -5,13 +5,32 @@ template:
   light-switch: true
   bslib:
     primary: "#005b96"
+  includes:
+    in_header: |
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Spectral:ital,wght@0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 development:
   mode: auto
 
 authors:
   Pablo Bernabeu:
-    href: https://github.com/pablobernabeu
+    href: https://pablobernabeu.github.io/
+
+footer:
+  structure:
+    left: [developed_by]
+    right: [legal, built_with]
+  components:
+    developed_by: >
+      Developed by [Pablo Bernabeu](https://pablobernabeu.github.io). Open,
+      reproducible research software in R and Python.
+    legal: "MIT licensed."
+
+home:
+  sidebar:
+    structure: [links, license, community, citation, authors, dev]
 
 navbar:
   structure:
