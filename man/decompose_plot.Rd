@@ -54,9 +54,11 @@ rather than a formal sampling-distribution interval.
 }
 \examples{
 decompose_plot(AirPassengers)
+\donttest{
 decompose_plot(AirPassengers, method = "classical")
 # Robust STL with a confidence ribbon on the trend
 decompose_plot(AirPassengers, robust = TRUE, confidence = TRUE)
+}
 }
 \seealso{
 \code{\link[=ts_forecast]{ts_forecast()}}, \code{\link[=seasonal_plot]{seasonal_plot()}}
