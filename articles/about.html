@@ -90,21 +90,38 @@
 <div class="section level2">
 <h2 id="citing-depictr">Citing depictr<a class="anchor" aria-label="anchor" href="#citing-depictr"></a>
 </h2>
-<p>To cite depictr in publications, use
-<code>citation("depictr")</code>, which gives:</p>
+<p>If you use depictr in published work, please cite it.</p>
 <blockquote>
 <p>Bernabeu, P. (2026). depictr: A Unified Toolkit for Visualising
 Statistical Models and Data. R package version 0.1.0. <a href="https://github.com/pablobernabeu/depictr" class="external-link uri">https://github.com/pablobernabeu/depictr</a></p>
 </blockquote>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bibtex"><code class="sourceCode bibtex"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="va">@Manual</span>{<span class="ot">depictr</span>,</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>  <span class="dt">title</span> = {{depictr}: A Unified Toolkit for Visualising Statistical Models and Data},</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>  <span class="dt">author</span> = {Pablo Bernabeu},</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  <span class="dt">year</span> = {2026},</span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>  <span class="dt">note</span> = {R package version 0.1.0},</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  <span class="dt">url</span> = {https://github.com/pablobernabeu/depictr},</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>}</span></code></pre></div>
-<p>(Printed from the installed package’s own <code><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation()</a></code>, so
-the version always matches the one you have.)</p>
+<div class="citation-bibtex">
+<pre id="depictr-bibtex"><code>@Manual{depictr,
+  title  = {{depictr}: A Unified Toolkit for Visualising Statistical Models and Data},
+  author = {Pablo Bernabeu},
+  year   = {2026},
+  note   = {R package version 0.1.0},
+  url    = {https://github.com/pablobernabeu/depictr},
+}</code></pre>
+<p class="citation-bibtex-actions">
+<button type="button" class="btn btn-primary btn-sm" onclick="depictrCopyBibtex(this)">
+Copy BibTeX
+</button>
+<a class="btn btn-outline-primary btn-sm" download="depictr.bib" href="data:application/x-bibtex;charset=utf-8,%40Manual%7Bdepictr%2C%0A%20%20title%20%20%3D%20%7B%7Bdepictr%7D%3A%20A%20Unified%20Toolkit%20for%20Visualising%20Statistical%20Models%20and%20Data%7D%2C%0A%20%20author%20%3D%20%7BPablo%20Bernabeu%7D%2C%0A%20%20year%20%20%20%3D%20%7B2026%7D%2C%0A%20%20note%20%20%20%3D%20%7BR%20package%20version%200.1.0%7D%2C%0A%20%20url%20%20%20%20%3D%20%7Bhttps%3A%2F%2Fgithub.com%2Fpablobernabeu%2Fdepictr%7D%2C%0A%7D">Download
+.bib</a>
+</p>
+</div>
+<script>
+function depictrCopyBibtex(btn) {
+  var code = document.getElementById("depictr-bibtex");
+  navigator.clipboard.writeText(code.innerText).then(function () {
+    var label = btn.textContent;
+    btn.textContent = "Copied";
+    setTimeout(function () { btn.textContent = label; }, 1500);
+  });
+}
+</script><p>R users can also retrieve this citation directly with
+<code>citation("depictr")</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="the-developer">The developer<a class="anchor" aria-label="anchor" href="#the-developer"></a>
@@ -134,7 +151,7 @@ available on PyPI, shares the same design.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>MIT licensed. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>MIT licence. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

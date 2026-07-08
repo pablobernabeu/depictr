@@ -14,7 +14,3 @@
   survival](https://pablobernabeu.github.io/depictr/articles/multivariate-and-survival.md):
 - [Time
   series](https://pablobernabeu.github.io/depictr/articles/time-series.md):
-
-### About
-
-- [About](https://pablobernabeu.github.io/depictr/articles/about.md):

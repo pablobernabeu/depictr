@@ -1,4 +1,4 @@
-# depictr
+# depictr (R)
 
 **depictr** is a single, consistent toolkit of publication-ready plots
 that span the whole analysis workflow, from a first look at the data,
@@ -231,7 +231,7 @@ Each scheduled workflow can also be run on demand from the repository’s
 package implements are cited in the relevant help pages and vignettes,
 drawing on a single bibliography at `inst/REFERENCES.bib`.
 
-## License
+## Licence
 
-MIT (c) Pablo Bernabeu. See
-[LICENSE.md](https://pablobernabeu.github.io/depictr/LICENSE.md).
+MIT (c) Pablo Bernabeu. See the
+[licence](https://pablobernabeu.github.io/depictr/LICENSE).

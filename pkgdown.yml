@@ -1,5 +1,5 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   articles/about: about.html
@@ -9,7 +9,7 @@ articles:
   model-estimates: model-estimates.html
   multivariate-and-survival: multivariate-and-survival.html
   time-series: time-series.html
-last_built: 2026-07-08T02:32Z
+last_built: 2026-07-08T16:14Z
 urls:
   reference: https://pablobernabeu.github.io/depictr/reference
   article: https://pablobernabeu.github.io/depictr/articles

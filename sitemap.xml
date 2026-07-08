@@ -1,7 +1,10 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://pablobernabeu.github.io/depictr/404.html</loc></url>
+<url><loc>https://pablobernabeu.github.io/depictr/CODE_OF_CONDUCT.html</loc></url>
+<url><loc>https://pablobernabeu.github.io/depictr/CONTRIBUTING.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/LICENSE-text.html</loc></url>
-<url><loc>https://pablobernabeu.github.io/depictr/LICENSE.html</loc></url>
+<url><loc>https://pablobernabeu.github.io/depictr/PULL_REQUEST_TEMPLATE.html</loc></url>
+<url><loc>https://pablobernabeu.github.io/depictr/SECURITY.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/articles/about.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/articles/depictr.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/articles/diagnostics-and-uncertainty.html</loc></url>
