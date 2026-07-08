@@ -69,9 +69,9 @@ dendrogram_plot(region_means[-1], k = 2, title = "Regions clustered")
 ## How many clusters? Quality diagnostics
 
 Choosing `k` should not be guesswork. `k_diagnostic()` evaluates a
-cluster-quality criterion across a range of `k` and suggests a value -- by the
+cluster-quality criterion across a range of `k` and suggests a value, using the
 average silhouette width (the default, after Rousseeuw, 1987), the
-within-sum-of-squares elbow, or the gap statistic (Tibshirani, Walther & Hastie,
+within-sum-of-squares elbow or the gap statistic (Tibshirani, Walther & Hastie,
 2001). See `?k_diagnostic` for the references.
 
 ```{r, fig.height = 3.5}
@@ -120,13 +120,13 @@ The estimate is computed in base R, so no modelling package is needed; you can
 pass follow-up times and an event indicator directly, a data frame, or a
 `survival::survfit` object.
 
-The `clinical_trial` dataset has two arms with a real survival difference -- the
-treatment arm has a lower hazard -- so the curves separate. Turning on the three
-publication annotations gives a survminer-style figure: a **number-at-risk
-table** beneath the curves, dashed guides to each arm's **median survival**, and
-the **log-rank test** of the difference as a subtitle. A survival curve is
-monotone-decreasing, so its bottom-left corner is always empty -- `legend_inside
-= TRUE` puts the group legend there.
+The `clinical_trial` dataset has two arms with a real survival difference (the
+treatment arm has a lower hazard), so the curves separate. Turning on the three
+publication annotations gives a survminer-style figure: a number-at-risk
+table beneath the curves, dashed guides to each arm's median survival and
+the log-rank test of the difference as a subtitle. A survival curve is
+monotone-decreasing, so its bottom-left corner is always empty;
+`legend_inside = TRUE` puts the group legend there.
 
 ```{r, fig.height = 6}
 survival_plot(
@@ -137,7 +137,7 @@ survival_plot(
 ```
 
 The log-rank p-value is tiny and the median survival is clearly longer in the
-treatment arm -- and because its event times are longer, that arm is more often
+treatment arm. Because its event times are longer, that arm is more often
 right-censored at the 36-month study end, visible as the denser run of censoring
 marks.
 

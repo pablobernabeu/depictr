@@ -35,8 +35,9 @@
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @references
-#' Fox, J. and Monette, G. (1992) Generalized collinearity diagnostics.
-#' \emph{Journal of the American Statistical Association}, 87, 178-183.
+#' Fox, J., & Monette, G. (1992). Generalized collinearity diagnostics.
+#' \emph{Journal of the American Statistical Association}, 87(417), 178-183.
+#' \doi{10.1080/01621459.1992.10475190}
 #' @export
 #' @examples
 #' fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)

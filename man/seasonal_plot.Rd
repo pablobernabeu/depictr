@@ -55,7 +55,7 @@ visible at the same time, which a single overlaid line cannot show.
 }
 \details{
 Two layouts are offered. With \code{style = "subseries"} (the default) the panels
-are faceted side by side, each tracing one season across cycles -- the
+are faceted side by side, each tracing one season across cycles: the
 classic Cleveland cycle plot, matching \code{feasts::gg_subseries()}. With
 \code{style = "season"} every cycle is drawn as its own line over the seasons on a
 shared axis (the seasonal-plot layout of \code{forecast::ggseasonplot()}), which is

@@ -66,8 +66,8 @@ gist, which built on \code{brms::mcmc_plot()} to show the full Bayesian posterio
 with the frequentist estimate overlaid. That namesake behaviour is restored
 here: when \code{bayesian} carries posterior \emph{draws} (a \code{brms}/\code{rstanarm} fit, a
 \code{posterior} draws object, a draws matrix, or a long/wide draws data frame),
-the full posterior \strong{distribution} is drawn per term (a 'ggdist' half-eye)
-and the frequentist \strong{point and confidence interval} is overlaid at the same
+the full posterior \emph{distribution} is drawn per term (a 'ggdist' half-eye)
+and the frequentist point and confidence interval is overlaid at the same
 position. When \code{bayesian} is only a tidy table of posterior \emph{summaries}
 (columns such as \code{term}, \code{estimate}, \code{conf.low}/\code{conf.high}, or the
 \code{Estimate}, \verb{l-95\% CI}, \verb{u-95\% CI} of \code{brms::fixef()}), the function shows the

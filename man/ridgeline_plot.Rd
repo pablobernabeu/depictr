@@ -44,7 +44,7 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 Shows the distribution of a numeric variable across the levels of a grouping
-variable as a column of partially overlapping density curves -- one ridge per
+variable as a column of partially overlapping density curves, one ridge per
 group, stacked up the y-axis. It compares many distributions in a compact
 space, making shifts in location and shape easy to follow, and is a clearer
 choice than many overlaid densities once there are several groups.

@@ -147,7 +147,7 @@ coefficient_plot <- function(x,
 #' Turns the design-matrix names that R produces for factor levels (e.g.
 #' `conditionunrelated`) into the readable *effect* (variable) name
 #' (`condition`). For a two-level factor the single coefficient is named by its
-#' variable alone -- the contrast against the implicit reference level is
+#' variable alone; the contrast against the implicit reference level is
 #' understood, so the level is not repeated. A factor with several non-reference
 #' levels keeps the level too (`region: South`) so the rows stay distinct. Each
 #' entry is also keyed under a `b_` prefix so a brms summary term aligns with its

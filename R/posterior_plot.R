@@ -7,7 +7,7 @@
 #' a point-and-interval beneath it), an interval-only forest plot, a gradient
 #' interval or a dotplot. The full shape of the posterior is shown, so skew,
 #' multimodality and the relative mass on either side of a reference value are
-#' all visible -- not just a point and two limits.
+#' all visible, rather than a point and two limits alone.
 #'
 #' Draws may be supplied in many shapes: a fitted Bayesian model (`brms` or
 #' `rstanarm`), a `posterior` *draws* object, a wide data frame or matrix with
@@ -40,7 +40,7 @@
 #' @param rope Optional length-2 numeric `c(lo, hi)` giving a region of
 #'   practical equivalence to shade behind the distributions.
 #' @param pd If `TRUE`, annotate each parameter with its probability of
-#'   direction relative to `reference_line` -- the posterior probability that
+#'   direction relative to `reference_line`, the posterior probability that
 #'   the parameter lies on its majority side of the reference (a value in
 #'   \[0.5, 1\]). Requires a finite `reference_line`.
 #' @param facet Whether to give each parameter its own panel with a free

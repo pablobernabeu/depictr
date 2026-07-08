@@ -6,8 +6,8 @@ title: "About"
 
 If you use depictr in published work, please cite it.
 
-> Bernabeu, P. (2026). depictr: A Unified Toolkit for Visualising Statistical
-> Models and Data. R package version `r packageVersion("depictr")`.
+> Bernabeu, P. (2026). depictr: A unified toolkit for visualising statistical
+> models and data. R package version `r packageVersion("depictr")`.
 > https://doi.org/10.5281/zenodo.21266308
 
 ```{r bibtex, echo = FALSE, results = "asis"}
@@ -18,7 +18,7 @@ If you use depictr in published work, please cite it.
 ver <- as.character(utils::packageVersion("depictr"))
 bib <- paste(
   "@Manual{depictr,",
-  "  title  = {{depictr}: A Unified Toolkit for Visualising Statistical Models and Data},",
+  "  title  = {{depictr}: A unified toolkit for visualising statistical models and data},",
   "  author = {Pablo Bernabeu},",
   "  year   = {2026},",
   sprintf("  note   = {R package version %s},", ver),
@@ -75,3 +75,27 @@ on [GitHub](https://github.com/pablobernabeu), and via
 
 A sibling [Python package](https://pablobernabeu.github.io/depictr-py/),
 available on PyPI, shares the same design.
+
+## Licence
+
+depictr is released under the [MIT licence](../LICENSE.html), a short
+permissive licence that allows use, modification and redistribution in both
+open and closed projects, provided the copyright notice is retained. The full
+text is on the site's licence page.
+
+## Versioning and archival
+
+Releases are tagged on [GitHub](https://github.com/pablobernabeu/depictr/releases)
+and archived on Zenodo. The concept DOI
+[10.5281/zenodo.21266308](https://doi.org/10.5281/zenodo.21266308) always
+resolves to the latest archived version, so a citation using it stays current
+as the package evolves. What changed in each release is recorded in the
+[changelog](../news/index.html).
+
+## Contributing and support
+
+Bugs and feature requests are best reported on the
+[GitHub issues page](https://github.com/pablobernabeu/depictr/issues), ideally
+with a small reproducible example. The [contributing guide](../CONTRIBUTING.html)
+explains how to set up for development and what to check before opening a pull
+request.

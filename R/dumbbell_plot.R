@@ -24,9 +24,9 @@
 #' @param palette Length-2 colours for the two groups; defaults to
 #'   [depictr_palette()].
 #' @param legend_inside When `TRUE`, draw the two-group legend inside the panel
-#'   -- in the top-right corner, which the default gap sort (shortest dumbbell on
-#'   top) usually leaves clear -- over a translucent background, instead of in a
-#'   right-hand margin. Defaults to `FALSE`.
+#'   (in the top-right corner, which the default gap sort with the shortest
+#'   dumbbell on top usually leaves clear) over a translucent background,
+#'   instead of in a right-hand margin. Defaults to `FALSE`.
 #' @param title,x_lab,y_lab Plot title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.

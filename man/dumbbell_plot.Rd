@@ -39,9 +39,9 @@ group's value), or \code{"none"} (the data's own order).}
 \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{legend_inside}{When \code{TRUE}, draw the two-group legend inside the panel
--- in the top-right corner, which the default gap sort (shortest dumbbell on
-top) usually leaves clear -- over a translucent background, instead of in a
-right-hand margin. Defaults to \code{FALSE}.}
+(in the top-right corner, which the default gap sort with the shortest
+dumbbell on top usually leaves clear) over a translucent background,
+instead of in a right-hand margin. Defaults to \code{FALSE}.}
 
 \item{title, x_lab, y_lab}{Plot title and axis labels.}
 }

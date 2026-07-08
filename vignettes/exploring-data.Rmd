@@ -114,11 +114,11 @@ To compare the *shape* of a distribution across several groups at once,
 ridgeline_plot(wellbeing_survey, life_satisfaction, region)
 ```
 
-## Estimation plots: effect size, not just a p-value
+## Estimation plots: effect size rather than a p-value
 
 An *estimation plot* puts the effect size and its uncertainty at the centre of
 the comparison. `estimation_plot()` draws the classic Gardner-Altman two-group
-plot: the raw data with group means on top, and the **mean difference** with a
+plot: the raw data with group means on top, and the mean difference with a
 bootstrap confidence interval beneath, aligned so a difference of zero sits under
 the reference group's mean. With two groups it also annotates a standardised
 effect size (Hedges' *g* by default).
@@ -159,8 +159,8 @@ dumbbell_plot(wb, region, life_satisfaction, age_group, legend_inside = TRUE)
 outlier_plot(crop_yield, yield)
 ```
 
-`wellbeing_survey` has *informative* missingness -- income is missing more often
-at higher stress -- so the missingness map is worth a look before modelling.
+`wellbeing_survey` has *informative* missingness (income is missing more often
+at higher stress), so the missingness map is worth a look before modelling.
 
 ```{r, fig.height = 5}
 missingness_map(wellbeing_survey, legend_inside = TRUE)
@@ -171,7 +171,7 @@ missingness_map(wellbeing_survey, legend_inside = TRUE)
 `summary_table()` builds a "Table 1": mean (SD) for numeric variables, counts
 and percentages for categorical ones, optionally by group. The first row always
 reports the sample size (`N`), and any variable with missing values gets a
-`Missing, n (%)` row -- both visible here for the wellbeing survey. It returns a
+`Missing, n (%)` row, both visible here for the wellbeing survey. It returns a
 plain data frame, ready for `knitr::kable()`.
 
 ```{r}
@@ -201,7 +201,7 @@ scatter_trend(crop_yield, fertiliser, yield, group = treatment) +
 ### Tidying the legend
 
 depictr centres a legend title over its keys by default. When the levels speak
-for themselves, though, the title is just clutter -- drop it by mapping it to
+for themselves, though, the title is just clutter, so drop it by mapping it to
 `NULL`. Reversing a discrete colour legend at the same time makes it read
 top-to-bottom in the order the curves are stacked:
 
@@ -216,8 +216,8 @@ ecdf_plot(lexical_decision, RT, group = condition) +
 Several plots take `legend_inside = TRUE` to tuck the legend into a corner they
 usually leave empty (see e.g. `?ecdf_plot`). For any plot that does not, the same
 move is one `theme()` call. A dodged bar chart, for instance, leaves the
-top-right clear when the right-most category is short, so the legend fits there
--- and because the regions are self-evident we drop the title too (with
+top-right clear when the right-most category is short, so the legend fits there.
+Because the regions are self-evident, we drop the title too (with
 `element_blank()`, since this plot sets the legend name on its fill scale):
 
 ```{r}
@@ -234,5 +234,5 @@ explore_categorical(wellbeing_survey, education, group = region,
 Many functions also expose layout controls directly. `explore_distribution(facet
 = TRUE)` and `ridgeline_plot()` separate groups, `correlation_heatmap(reorder =
 TRUE)` clusters variables, and the model-estimate plots take `facet` and
-`standardise` to keep coefficients on very different scales legible -- see
-`vignette("model-estimates")`.
+`standardise` to keep coefficients on very different scales legible (see
+`vignette("model-estimates")`).

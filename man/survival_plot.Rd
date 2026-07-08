@@ -52,14 +52,14 @@ number at risk. Defaults to the curve's x-axis breaks.}
 \item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{legend_inside}{When \code{TRUE} (and there are several groups), draw the
-group legend inside the panel -- in the bottom-left corner a
-monotone-decreasing survival curve always leaves empty -- over a translucent
+group legend inside the panel (in the bottom-left corner a
+monotone-decreasing survival curve always leaves empty) over a translucent
 background, instead of in a right-hand margin. Defaults to \code{FALSE}.}
 
 \item{title, x_lab, y_lab}{Title and axis labels.}
 }
 \value{
-A \link[ggplot2:ggplot]{ggplot2::ggplot} object, or - when \code{risk_table = TRUE} - a
+A \link[ggplot2:ggplot]{ggplot2::ggplot} object or, when \code{risk_table = TRUE}, a
 'patchwork' object stacking the curves above the risk table.
 }
 \description{

@@ -17,8 +17,8 @@
 #' @param colour Curve colour for the single-model case. Defaults to the depictr
 #'   brand blue. Ignored when several models are overlaid.
 #' @param legend_inside When `TRUE` (and several models are overlaid), draw the
-#'   legend inside the panel -- in the bottom-right triangle the concave curve
-#'   leaves empty -- over a translucent background, instead of in a right-hand
+#'   legend inside the panel (in the bottom-right triangle the concave curve
+#'   leaves empty) over a translucent background, instead of in a right-hand
 #'   margin. Defaults to `FALSE`.
 #' @param title Plot title.
 #'

@@ -2,8 +2,8 @@
 
 #' Empirical cumulative distribution function (ECDF) plot
 #'
-#' Draws the empirical CDF of a numeric variable -- the proportion of
-#' observations at or below each value -- optionally split by a grouping
+#' Draws the empirical CDF of a numeric variable (the proportion of
+#' observations at or below each value), optionally split by a grouping
 #' variable. Unlike a histogram it needs no bin-width choice and makes
 #' quantiles, medians and group shifts easy to read directly off the curve.
 #'
@@ -16,8 +16,8 @@
 #'   `NULL` (the default) draws none.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param legend_inside When `TRUE` (and a `group` is given), draw the legend
-#'   inside the panel -- in the bottom-right corner the ECDF leaves empty once it
-#'   saturates -- over a translucent background, instead of in a right-hand
+#'   inside the panel (in the bottom-right corner the ECDF leaves empty once it
+#'   saturates) over a translucent background, instead of in a right-hand
 #'   margin. Defaults to `FALSE`.
 #' @param title,x_lab,y_lab Plot title and axis labels.
 #'

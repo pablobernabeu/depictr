@@ -44,12 +44,12 @@
 #'   number at risk. Defaults to the curve's x-axis breaks.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param legend_inside When `TRUE` (and there are several groups), draw the
-#'   group legend inside the panel -- in the bottom-left corner a
-#'   monotone-decreasing survival curve always leaves empty -- over a translucent
+#'   group legend inside the panel (in the bottom-left corner a
+#'   monotone-decreasing survival curve always leaves empty) over a translucent
 #'   background, instead of in a right-hand margin. Defaults to `FALSE`.
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
-#' @return A [ggplot2::ggplot] object, or - when `risk_table = TRUE` - a
+#' @return A [ggplot2::ggplot] object or, when `risk_table = TRUE`, a
 #'   'patchwork' object stacking the curves above the risk table.
 #' @references
 #' \insertRef{kaplan1958}{depictr}

@@ -55,6 +55,7 @@ fit2 <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
 vif_plot(fit2)
 }
 \references{
-Fox, J. and Monette, G. (1992) Generalized collinearity diagnostics.
-\emph{Journal of the American Statistical Association}, 87, 178-183.
+Fox, J., & Monette, G. (1992). Generalized collinearity diagnostics.
+\emph{Journal of the American Statistical Association}, 87(417), 178-183.
+\doi{10.1080/01621459.1992.10475190}
 }

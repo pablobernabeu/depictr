@@ -31,8 +31,8 @@ colour, giving one ECDF per group.}
 \item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{legend_inside}{When \code{TRUE} (and a \code{group} is given), draw the legend
-inside the panel -- in the bottom-right corner the ECDF leaves empty once it
-saturates -- over a translucent background, instead of in a right-hand
+inside the panel (in the bottom-right corner the ECDF leaves empty once it
+saturates) over a translucent background, instead of in a right-hand
 margin. Defaults to \code{FALSE}.}
 
 \item{title, x_lab, y_lab}{Plot title and axis labels.}
@@ -41,8 +41,8 @@ margin. Defaults to \code{FALSE}.}
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Draws the empirical CDF of a numeric variable -- the proportion of
-observations at or below each value -- optionally split by a grouping
+Draws the empirical CDF of a numeric variable (the proportion of
+observations at or below each value), optionally split by a grouping
 variable. Unlike a histogram it needs no bin-width choice and makes
 quantiles, medians and group shifts easy to read directly off the curve.
 }

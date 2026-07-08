@@ -11,6 +11,7 @@
 #' @section Exploring data:
 #' \itemize{
 #'   \item [explore_distribution()]: histograms / densities of one variable.
+#'   \item [ecdf_plot()]: empirical cumulative distribution, optionally by group.
 #'   \item [explore_categorical()]: bar charts of a categorical variable.
 #'   \item [explore_bivariate()]: a suitable plot for any pair of variables.
 #'   \item [explore_pairs()]: a scatter-plot matrix.
@@ -18,7 +19,10 @@
 #'   \item [missingness_map()]: a map of missing values.
 #'   \item [outlier_plot()]: box / violin plots flagging outliers.
 #'   \item [raincloud_plot()]: half-violin, box and raw points together.
+#'   \item [ridgeline_plot()]: overlapping per-group densities.
 #'   \item [group_comparison_plot()]: group means with confidence intervals.
+#'   \item [estimation_plot()]: group differences with bootstrap intervals.
+#'   \item [dumbbell_plot()]: a two-group comparison across categories.
 #'   \item [scatter_trend()]: scatter plot with a fitted trend.
 #'   \item [summary_table()]: a "Table 1" style descriptive summary.
 #' }
@@ -28,6 +32,8 @@
 #'   \item [pca_plot()]: principal-component biplot.
 #'   \item [scree_plot()]: variance explained by each component.
 #'   \item [cluster_plot()]: k-means clusters on principal-component axes.
+#'   \item [silhouette_plot()]: silhouette widths of a clustering.
+#'   \item [k_diagnostic()]: suggest a number of clusters.
 #'   \item [dendrogram_plot()]: hierarchical-clustering dendrogram.
 #'   \item [survival_plot()]: Kaplan-Meier survival curves.
 #' }
@@ -37,6 +43,8 @@
 #'   \item [timeseries_plot()]: one or more series over time.
 #'   \item [acf_plot()]: autocorrelation / partial autocorrelation.
 #'   \item [decompose_plot()]: trend / seasonal / remainder decomposition.
+#'   \item [seasonal_plot()]: seasonal subseries across cycles.
+#'   \item [ts_forecast()]: a simple forecast with prediction intervals.
 #' }
 #'
 #' @section Model estimates and inference:
@@ -55,6 +63,7 @@
 #' @section Diagnostics and classification:
 #' \itemize{
 #'   \item [residual_diagnostics_plot()]: residual-diagnostic panel.
+#'   \item [binned_residual_plot()]: binned residuals for logistic and other GLMs.
 #'   \item [influence_plot()]: influence and leverage.
 #'   \item [qq_plot()]: normal quantile-quantile plot.
 #'   \item [vif_plot()]: multicollinearity (variance inflation factors).
@@ -63,6 +72,7 @@
 #'   \item [gain_plot()]: cumulative gains chart.
 #'   \item [lift_plot()]: cumulative lift chart.
 #'   \item [calibration_plot()]: calibration of predicted probabilities.
+#'   \item [threshold_plot()]: classification metrics across decision thresholds.
 #'   \item [confusion_matrix_plot()]: confusion matrix as a heatmap.
 #' }
 #'
@@ -81,11 +91,13 @@
 #'   \item [model_report()]: a one-figure overview of a fitted model.
 #'   \item [arrange_plots()]: compose plots with a shared legend and title.
 #'   \item [save_plot()]: save a plot with publication-ready defaults.
+#'   \item [depictr_options()]: set package-wide defaults once.
 #' }
 #'
 #' @section Bundled data:
-#' [lexical_decision], [wellbeing_survey] and [crop_yield] are reproducibly
-#' simulated datasets used throughout the examples and vignettes.
+#' [lexical_decision], [wellbeing_survey], [crop_yield], [clinical_trial] and
+#' [monthly_sales] are reproducibly simulated datasets used throughout the
+#' examples and vignettes.
 #'
 #' @references
 #' \insertRef{wickham2016}{depictr}

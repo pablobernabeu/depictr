@@ -38,8 +38,8 @@ sets the number of resamples. Ignored when several models are overlaid.}
 threshold maximising sensitivity + specificity - 1) on each curve.}
 
 \item{legend_inside}{When \code{TRUE} (and several models are overlaid), draw the
-legend inside the panel -- in the bottom-right corner the curve leaves empty
--- over a translucent background, instead of in a right-hand margin.
+legend inside the panel (in the bottom-right corner the curve leaves empty)
+over a translucent background, instead of in a right-hand margin.
 Defaults to \code{FALSE}.}
 
 \item{title}{Plot title.}
@@ -52,7 +52,7 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object. The AUC(s) are stored in
 Plots the receiver operating characteristic (ROC) curve for a binary
 classifier and reports the area under the curve (AUC). The input can be a
 fitted binomial \code{glm}, a pair of vectors (observed binary outcome and a
-continuous score), or - to \strong{compare several models} - a \emph{named list} of
+continuous score), or, to compare several models, a \emph{named list} of
 models or of (actual, score) pairs, which are overlaid as colour-coded curves
 with a legend and a per-curve AUC. An optional bootstrap confidence band can
 be drawn for the (single-model) curve and its AUC, and the Youden's J

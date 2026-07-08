@@ -11,7 +11,7 @@
 the whole analysis workflow, from a first look at the data, through model
 estimates and predictions, to diagnostics, uncertainty and reporting. Most
 packages address one part of this work; depictr aims to cover it from end to end
-with *one* theme, *one* palette and *one* set of label conventions. Every
+with one theme, one palette and one set of label conventions. Every
 plotting function returns a [ggplot2](https://ggplot2.tidyverse.org) object (or a
 [patchwork](https://patchwork.data-imaginist.com) for composite panels), so a
 plot can be refined further with the usual `+` syntax.

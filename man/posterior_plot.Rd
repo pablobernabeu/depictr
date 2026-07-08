@@ -55,7 +55,7 @@ differences and slopes) but should be set or cleared deliberately.}
 practical equivalence to shade behind the distributions.}
 
 \item{pd}{If \code{TRUE}, annotate each parameter with its probability of
-direction relative to \code{reference_line} -- the posterior probability that
+direction relative to \code{reference_line}, the posterior probability that
 the parameter lies on its majority side of the reference (a value in
 [0.5, 1]). Requires a finite \code{reference_line}.}
 
@@ -88,7 +88,7 @@ Displays posterior (or, more generally, bootstrap or simulation) draws as a
 a point-and-interval beneath it), an interval-only forest plot, a gradient
 interval or a dotplot. The full shape of the posterior is shown, so skew,
 multimodality and the relative mass on either side of a reference value are
-all visible -- not just a point and two limits.
+all visible, rather than a point and two limits alone.
 }
 \details{
 Draws may be supplied in many shapes: a fitted Bayesian model (\code{brms} or

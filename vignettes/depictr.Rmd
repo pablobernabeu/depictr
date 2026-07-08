@@ -32,23 +32,23 @@ The package ships with five reproducibly simulated datasets, each chosen to
 exercise a different family of plots. They are documented under their names
 (e.g. `?lexical_decision`) and load with `data()`:
 
-* `lexical_decision` -- a counterbalanced, crossed reaction-time/accuracy
+* `lexical_decision`: a counterbalanced, crossed reaction-time/accuracy
   experiment (participant, item, condition, modality, word frequency). For
   mixed models and the classification plots.
-* `wellbeing_survey` -- a cross-sectional survey (life satisfaction, stress,
+* `wellbeing_survey`: a cross-sectional survey (life satisfaction, stress,
   sleep, income, age, ordered education, region) with *informative*
   missingness. For descriptives, correlations, regression and missing data.
-* `crop_yield` -- a field trial with a genuine fertiliser-by-treatment
+* `crop_yield`: a field trial with a genuine fertiliser-by-treatment
   interaction. For regression, scatter-trend and interaction plots.
-* `clinical_trial` -- a two-arm trial with separating survival curves and a
+* `clinical_trial`: a two-arm trial with separating survival curves and a
   rare adverse-event outcome. For survival and imbalanced classification.
-* `monthly_sales` -- two seasonal monthly series (indoor/outdoor). For the
+* `monthly_sales`: two seasonal monthly series (indoor/outdoor). For the
   time-series plots.
 
 ## A tour by task
 
 Begin with the data. `explore_bivariate()` chooses a suitable plot for any pair
-of variables -- a scatter with a trend here, because both are numeric.
+of variables, here a scatter with a trend because both are numeric.
 
 ```{r}
 explore_bivariate(crop_yield, fertiliser, yield)

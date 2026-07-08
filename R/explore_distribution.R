@@ -23,8 +23,8 @@
 #'   than two or three groups (overlaid histograms in particular become hard to
 #'   read). Defaults to `FALSE`. Ignored when there is no `group`.
 #' @param legend_inside When `TRUE` (and a `group` is given without `facet`),
-#'   draw the colour legend inside the panel -- in the top-right corner a
-#'   unimodal histogram/density leaves empty -- over a translucent background,
+#'   draw the colour legend inside the panel (in the top-right corner a
+#'   unimodal histogram/density leaves empty) over a translucent background,
 #'   instead of in a right-hand margin. Defaults to `FALSE`.
 #' @param title,x_lab Plot title and x-axis label (defaults to the variable
 #'   name).

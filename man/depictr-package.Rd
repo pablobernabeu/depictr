@@ -18,6 +18,7 @@ conventions.
 
 \itemize{
 \item \code{\link[=explore_distribution]{explore_distribution()}}: histograms / densities of one variable.
+\item \code{\link[=ecdf_plot]{ecdf_plot()}}: empirical cumulative distribution, optionally by group.
 \item \code{\link[=explore_categorical]{explore_categorical()}}: bar charts of a categorical variable.
 \item \code{\link[=explore_bivariate]{explore_bivariate()}}: a suitable plot for any pair of variables.
 \item \code{\link[=explore_pairs]{explore_pairs()}}: a scatter-plot matrix.
@@ -25,7 +26,10 @@ conventions.
 \item \code{\link[=missingness_map]{missingness_map()}}: a map of missing values.
 \item \code{\link[=outlier_plot]{outlier_plot()}}: box / violin plots flagging outliers.
 \item \code{\link[=raincloud_plot]{raincloud_plot()}}: half-violin, box and raw points together.
+\item \code{\link[=ridgeline_plot]{ridgeline_plot()}}: overlapping per-group densities.
 \item \code{\link[=group_comparison_plot]{group_comparison_plot()}}: group means with confidence intervals.
+\item \code{\link[=estimation_plot]{estimation_plot()}}: group differences with bootstrap intervals.
+\item \code{\link[=dumbbell_plot]{dumbbell_plot()}}: a two-group comparison across categories.
 \item \code{\link[=scatter_trend]{scatter_trend()}}: scatter plot with a fitted trend.
 \item \code{\link[=summary_table]{summary_table()}}: a "Table 1" style descriptive summary.
 }
@@ -37,6 +41,8 @@ conventions.
 \item \code{\link[=pca_plot]{pca_plot()}}: principal-component biplot.
 \item \code{\link[=scree_plot]{scree_plot()}}: variance explained by each component.
 \item \code{\link[=cluster_plot]{cluster_plot()}}: k-means clusters on principal-component axes.
+\item \code{\link[=silhouette_plot]{silhouette_plot()}}: silhouette widths of a clustering.
+\item \code{\link[=k_diagnostic]{k_diagnostic()}}: suggest a number of clusters.
 \item \code{\link[=dendrogram_plot]{dendrogram_plot()}}: hierarchical-clustering dendrogram.
 \item \code{\link[=survival_plot]{survival_plot()}}: Kaplan-Meier survival curves.
 }
@@ -48,6 +54,8 @@ conventions.
 \item \code{\link[=timeseries_plot]{timeseries_plot()}}: one or more series over time.
 \item \code{\link[=acf_plot]{acf_plot()}}: autocorrelation / partial autocorrelation.
 \item \code{\link[=decompose_plot]{decompose_plot()}}: trend / seasonal / remainder decomposition.
+\item \code{\link[=seasonal_plot]{seasonal_plot()}}: seasonal subseries across cycles.
+\item \code{\link[=ts_forecast]{ts_forecast()}}: a simple forecast with prediction intervals.
 }
 }
 
@@ -70,6 +78,7 @@ conventions.
 
 \itemize{
 \item \code{\link[=residual_diagnostics_plot]{residual_diagnostics_plot()}}: residual-diagnostic panel.
+\item \code{\link[=binned_residual_plot]{binned_residual_plot()}}: binned residuals for logistic and other GLMs.
 \item \code{\link[=influence_plot]{influence_plot()}}: influence and leverage.
 \item \code{\link[=qq_plot]{qq_plot()}}: normal quantile-quantile plot.
 \item \code{\link[=vif_plot]{vif_plot()}}: multicollinearity (variance inflation factors).
@@ -78,6 +87,7 @@ conventions.
 \item \code{\link[=gain_plot]{gain_plot()}}: cumulative gains chart.
 \item \code{\link[=lift_plot]{lift_plot()}}: cumulative lift chart.
 \item \code{\link[=calibration_plot]{calibration_plot()}}: calibration of predicted probabilities.
+\item \code{\link[=threshold_plot]{threshold_plot()}}: classification metrics across decision thresholds.
 \item \code{\link[=confusion_matrix_plot]{confusion_matrix_plot()}}: confusion matrix as a heatmap.
 }
 }
@@ -100,13 +110,15 @@ conventions.
 \item \code{\link[=model_report]{model_report()}}: a one-figure overview of a fitted model.
 \item \code{\link[=arrange_plots]{arrange_plots()}}: compose plots with a shared legend and title.
 \item \code{\link[=save_plot]{save_plot()}}: save a plot with publication-ready defaults.
+\item \code{\link[=depictr_options]{depictr_options()}}: set package-wide defaults once.
 }
 }
 
 \section{Bundled data}{
 
-\link{lexical_decision}, \link{wellbeing_survey} and \link{crop_yield} are reproducibly
-simulated datasets used throughout the examples and vignettes.
+\link{lexical_decision}, \link{wellbeing_survey}, \link{crop_yield}, \link{clinical_trial} and
+\link{monthly_sales} are reproducibly simulated datasets used throughout the
+examples and vignettes.
 }
 
 \references{
@@ -122,11 +134,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Pablo Bernabeu \email{pcbernabeu@gmail.com}
+\strong{Maintainer}: Pablo Bernabeu \email{pcbernabeu@gmail.com} (\href{https://orcid.org/0000-0003-1083-2460}{ORCID})
 
 Authors:
 \itemize{
-  \item Pablo Bernabeu \email{pcbernabeu@gmail.com}
+  \item Pablo Bernabeu \email{pcbernabeu@gmail.com} (\href{https://orcid.org/0000-0003-1083-2460}{ORCID})
 }
 
 }

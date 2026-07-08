@@ -39,7 +39,7 @@ is computed, so unsorted input is handled correctly.}
 Either an integer horizon (number of future steps) to forecast with the
 built-in STL + seasonal-naive-with-drift method (see \code{\link[=ts_forecast]{ts_forecast()}}), or a
 pre-computed forecast supplied as a data frame with columns \code{time}, \code{fit}
-and (optionally) \code{lwr}/\code{upr} -- for instance from a fitted
+and (optionally) \code{lwr}/\code{upr}, for instance from a fitted
 \code{forecast::forecast()} object. The point forecast continues the line and a
 shaded prediction-interval ribbon, which widens with the horizon, is drawn
 behind it.}

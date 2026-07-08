@@ -19,7 +19,7 @@
 #'   Either an integer horizon (number of future steps) to forecast with the
 #'   built-in STL + seasonal-naive-with-drift method (see [ts_forecast()]), or a
 #'   pre-computed forecast supplied as a data frame with columns `time`, `fit`
-#'   and (optionally) `lwr`/`upr` -- for instance from a fitted
+#'   and (optionally) `lwr`/`upr`, for instance from a fitted
 #'   `forecast::forecast()` object. The point forecast continues the line and a
 #'   shaded prediction-interval ribbon, which widens with the horizon, is drawn
 #'   behind it.

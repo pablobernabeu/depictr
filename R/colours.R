@@ -50,8 +50,8 @@ depictr_reference <- function() depictr_opt("reference")
 # Machado, Oliveira & Fernandes (2009) physiologically-based model, severity
 # 1.0. The transforms operate in *linear* RGB, so colours are linearised from
 # sRGB, multiplied by the per-deficiency matrix, then re-encoded to sRGB.
-# Reference: Machado GM, Oliveira MM, Fernandes LAF (2009), "A Physiologically-
-# based Model for Simulation of Color Vision Deficiency", IEEE TVCG 15(6),
+# Reference: Machado GM, Oliveira MM, Fernandes LAF (2009), "A physiologically-
+# based model for simulation of color vision deficiency", IEEE TVCG 15(6),
 # 1291-1298. Matrices as published for the three dichromacies.
 
 .cvd_matrices <- list(

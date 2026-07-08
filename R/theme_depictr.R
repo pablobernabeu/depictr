@@ -191,10 +191,10 @@ theme_depictr <- function(base_size = depictr_opt("base_size"),
 #'
 #' Returns the theme that the plots exposing a `legend_inside` argument add when
 #' it is set to `TRUE`: it tucks the legend into a corner the plot's geometry
-#' usually leaves empty -- a ROC curve (hugs the top-left), a cumulative gains
-#' chart (concave, above the diagonal), a lift chart (decays to the baseline on
-#' the right), an ECDF (saturates before the right edge), a survival curve
-#' (monotone-decreasing) or a unimodal density -- over a semi-transparent
+#' usually leaves empty, be it a ROC curve (hugs the top-left), a cumulative
+#' gains chart (concave, above the diagonal), a lift chart (decays to the
+#' baseline on the right), an ECDF (saturates before the right edge), a survival
+#' curve (monotone-decreasing) or a unimodal density, over a semi-transparent
 #' background, so the figure needs no right-hand margin. `position` and
 #' `justification` are the ggplot2 `legend.position.inside` and
 #' `legend.justification` coordinates of the anchored corner (npc, 0-1).
