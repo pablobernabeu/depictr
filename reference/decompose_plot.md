@@ -81,8 +81,11 @@ interval.
 ``` r
 decompose_plot(AirPassengers)
 
+# \donttest{
 decompose_plot(AirPassengers, method = "classical")
 
 # Robust STL with a confidence ribbon on the trend
 decompose_plot(AirPassengers, robust = TRUE, confidence = TRUE)
+
+# }
 ```
