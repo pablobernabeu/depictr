@@ -4,22 +4,59 @@ title: "About"
 
 ## Citing depictr
 
-To cite depictr in publications, use `citation("depictr")`, which gives:
+If you use depictr in published work, please cite it.
 
-```{r, echo=FALSE, results='asis'}
-cit <- citation("depictr")
-tv <- sub("(https://\\S+)$", "<\\1>", trimws(cit$textVersion))
-cat("> ", tv, "\n\n", sep = "")
+> Bernabeu, P. (2026). depictr: A Unified Toolkit for Visualising Statistical
+> Models and Data. R package version `r packageVersion("depictr")`.
+> https://github.com/pablobernabeu/depictr
 
-bib <- toBibtex(cit)
-bib[1] <- sub("^@Manual\\{,", "@Manual{depictr,", bib[1])
-cat("```bibtex\n")
-cat(bib, sep = "\n")
-cat("\n```\n")
+```{r bibtex, echo = FALSE, results = "asis"}
+# Build the BibTeX entry from the installed version so it never drifts, then
+# render it with a copy button and a download link. The button uses the
+# browser clipboard API; the link is a self-contained data URI, so neither
+# depends on a static file being shipped alongside the site.
+ver <- as.character(utils::packageVersion("depictr"))
+bib <- paste(
+  "@Manual{depictr,",
+  "  title  = {{depictr}: A Unified Toolkit for Visualising Statistical Models and Data},",
+  "  author = {Pablo Bernabeu},",
+  "  year   = {2026},",
+  sprintf("  note   = {R package version %s},", ver),
+  "  url    = {https://github.com/pablobernabeu/depictr},",
+  "}",
+  sep = "\n"
+)
+esc <- function(x) {
+  x <- gsub("&", "&amp;", x, fixed = TRUE)
+  x <- gsub("<", "&lt;", x, fixed = TRUE)
+  gsub(">", "&gt;", x, fixed = TRUE)
+}
+uri <- paste0(
+  "data:application/x-bibtex;charset=utf-8,",
+  utils::URLencode(bib, reserved = TRUE)
+)
+cat(sprintf(
+'<div class="citation-bibtex">
+<pre id="depictr-bibtex"><code>%s</code></pre>
+<p class="citation-bibtex-actions">
+<button type="button" class="btn btn-primary btn-sm" onclick="depictrCopyBibtex(this)">Copy BibTeX</button>
+<a class="btn btn-outline-primary btn-sm" download="depictr.bib" href="%s">Download .bib</a>
+</p>
+</div>
+<script>
+function depictrCopyBibtex(btn) {
+  var code = document.getElementById("depictr-bibtex");
+  navigator.clipboard.writeText(code.innerText).then(function () {
+    var label = btn.textContent;
+    btn.textContent = "Copied";
+    setTimeout(function () { btn.textContent = label; }, 1500);
+  });
+}
+</script>
+', esc(bib), uri))
 ```
 
-(Printed from the installed package's own `citation()`, so the version always
-matches the one you have.)
+R users can also retrieve this citation directly with `citation("depictr")`.
 
 ## The developer
 

@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use depictr, please cite it as below."
+title: "depictr: A Unified Toolkit for Visualising Statistical Models and Data"
+abstract: "A unified, colourblind-safe toolkit of publication-ready plots spanning the whole analysis workflow, from exploratory data analysis through model estimates and diagnostics to classification and survival."
+type: software
+authors:
+  - family-names: Bernabeu
+    given-names: Pablo
+    orcid: "https://orcid.org/0000-0003-1083-2460"
+    email: pcbernabeu@gmail.com
+version: "0.1.0"
+license: MIT
+repository-code: "https://github.com/pablobernabeu/depictr"
+url: "https://pablobernabeu.github.io/depictr/"
+keywords:
+  - data visualisation
+  - ggplot2
+  - reproducible research
+  - accessibility
+  - colourblind-safe

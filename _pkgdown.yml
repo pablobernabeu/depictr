@@ -26,11 +26,28 @@ footer:
     developed_by: >
       Developed by [Pablo Bernabeu](https://pablobernabeu.github.io). Open,
       reproducible research software in R and Python.
-    legal: "MIT licensed."
+    legal: "MIT licence."
 
 home:
   sidebar:
+    # Slim the right sidebar: the citation points at the About page (not
+    # pkgdown's authors.html#citation), the licence is one British-spelled link
+    # (the default "MIT + file LICENSE" line also links a stub page the deploy
+    # prunes), and Community shows only the contributing guide.
     structure: [links, license, community, citation, authors, dev]
+    components:
+      license:
+        title: Licence
+        text: >
+          [MIT licence](LICENSE.html)
+      community:
+        title: Community
+        text: >
+          [Contributing guide](CONTRIBUTING.html)
+      citation:
+        title: Citation
+        text: >
+          [How to cite depictr](articles/about.html)
 
 navbar:
   structure:
@@ -177,6 +194,6 @@ articles:
   - diagnostics-and-uncertainty
   - multivariate-and-survival
   - time-series
-- title: About
+- title: internal
   contents:
   - articles/about

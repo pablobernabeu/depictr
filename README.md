@@ -1,4 +1,4 @@
-# depictr <img src="man/figures/logo.png" align="right" height="120" alt="" />
+# depictr <small>(R)</small> <img src="man/figures/logo.png" align="right" height="120" alt="" />
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/pablobernabeu/depictr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/pablobernabeu/depictr/actions/workflows/R-CMD-check.yaml)
@@ -166,6 +166,6 @@ Each scheduled workflow can also be run on demand from the repository's
 implements are cited in the relevant help pages and vignettes, drawing on a
 single bibliography at `inst/REFERENCES.bib`.
 
-## License
+## Licence
 
-MIT (c) Pablo Bernabeu. See [LICENSE.md](LICENSE.md).
+MIT (c) Pablo Bernabeu. See the [licence](LICENSE).
