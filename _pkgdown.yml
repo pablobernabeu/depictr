@@ -26,7 +26,7 @@ footer:
     developed_by: >
       Developed by [Pablo Bernabeu](https://pablobernabeu.github.io). Open,
       reproducible research software in R and Python.
-    legal: "MIT licence."
+    legal: "Released under the [MIT licence](LICENSE.html)."
 
 home:
   sidebar:
@@ -46,8 +46,10 @@ home:
           [Contributing guide](CONTRIBUTING.html)
       citation:
         title: Citation
-        text: >
+        text: |
           [How to cite depictr](articles/about.html)
+
+          [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21266308.svg)](https://doi.org/10.5281/zenodo.21266308)
 
 navbar:
   structure:

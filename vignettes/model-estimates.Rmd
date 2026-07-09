@@ -50,7 +50,7 @@ fit <- lmerTest::lmer(
 ## Coefficient (forest) plots
 
 `coefficient_plot()` reads the fitted mixed model directly (through
-`tidy_estimates()`) and draws a horizontal point-and-interval ("forest") plot.
+`tidy_estimates()`) and draws a horizontal point-and-interval ('forest') plot.
 Unrelated primes and auditory presentation both slow responses, while more
 frequent words speed them up.
 
@@ -189,7 +189,7 @@ effectively 100%: the posterior sits almost entirely on one side of zero.
 ## Random effects
 
 `random_effects_plot()` draws a caterpillar plot of the conditional modes
-("BLUPs"). Reading the fitted model directly, it shows the by-item and
+('BLUPs'). Reading the fitted model directly, it shows the by-item and
 by-participant departures from the average, sorted, with their uncertainty, the
 usual way to spot unusual groups.
 

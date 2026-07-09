@@ -326,6 +326,17 @@ a { text-underline-offset: .15em; }
 // modes, on top of the amber hover colour set through --bs-link-hover-color.
 main a:hover, .contents a:hover, #pkgdown-sidebar a:hover { text-decoration: underline; }
 
+// Outline buttons (About page's Copy and Download .bib controls) take their
+// colour from --bs-primary, too dark on the navy dark-mode page; use the light
+// teal so the control stays legible.
+[data-bs-theme="dark"] .btn-outline-primary {
+  --bs-btn-color: var(--brand-teal-light);
+  --bs-btn-border-color: var(--brand-teal-light);
+  --bs-btn-hover-color: var(--brand-ink);
+  --bs-btn-hover-bg: var(--brand-teal-light);
+  --bs-btn-hover-border-color: var(--brand-teal-light);
+}
+
 // ---------------------------------------------------------------------------
 // Footer — the deep-navy signature band
 // ---------------------------------------------------------------------------
