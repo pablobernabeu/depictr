@@ -235,7 +235,8 @@ Each scheduled workflow can also be run on demand from the repository’s
 
 `citation("depictr")` gives the preferred reference. The methods the
 package implements are cited in the relevant help pages and vignettes,
-drawing on a single bibliography at `inst/REFERENCES.bib`.
+drawing on a single bibliography at
+[`inst/REFERENCES.bib`](https://github.com/pablobernabeu/depictr/blob/main/inst/REFERENCES.bib).
 
 ## Licence
 
