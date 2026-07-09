@@ -40,8 +40,13 @@
 #' \doi{10.1080/01621459.1992.10475190}
 #' @export
 #' @examples
-#' fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
-#' vif_plot(fit)
+#' # Two deliberately collinear predictors: soil moisture is largely driven by
+#' # rainfall, so both carry an inflated VIF (around 6, above the line at 5)
+#' # while fertiliser stays near 1.
+#' set.seed(1)
+#' d <- crop_yield
+#' d$soil_moisture <- 0.05 * d$rainfall + rnorm(nrow(d), sd = 2)
+#' vif_plot(lm(yield ~ rainfall + soil_moisture + fertiliser, data = d))
 #'
 #' # Multi-level factors get a single generalised VIF per term
 #' fit2 <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
