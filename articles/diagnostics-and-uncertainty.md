@@ -71,7 +71,7 @@ binned_residual_plot(gfit, title = "Binned residuals: adverse-event model")
 
 [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
 recognises a `glm` and switches to GLM-appropriate panels (binned
-residuals and a Q-Q plot of randomized quantile residuals, which are
+residuals and a Q-Q plot of randomised quantile residuals, which are
 standard-normal under a correct model regardless of the response
 distribution):
 

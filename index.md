@@ -1,8 +1,8 @@
 # depictr (R)
 
-**depictr** is a single, consistent toolkit of publication-ready plots
-that span the whole analysis workflow, from a first look at the data,
-through model estimates and predictions, to diagnostics, uncertainty and
+depictr is a single, consistent toolkit of publication-ready plots that
+span the whole analysis workflow, from a first look at the data, through
+model estimates and predictions, to diagnostics, uncertainty and
 reporting. Most packages address one part of this work; depictr aims to
 cover it from end to end with one theme, one palette and one set of
 label conventions. Every plotting function returns a
@@ -16,9 +16,9 @@ same design.
 
 ## Gallery
 
-A grouped density (the default palette is the colourblind-safe Okabe-Ito
-set) and Kaplan-Meier survival curves with confidence bands and a
-number-at-risk table, each from a single function call:
+A grouped density (the default palette is a colourblind-safe set based
+on Okabe-Ito) and Kaplan-Meier survival curves with confidence bands and
+a number-at-risk table, each from a single function call:
 
 ![Grouped density of response times by priming condition, in the
 Okabe-Ito palette](reference/figures/README-distribution.png)
@@ -194,8 +194,8 @@ clustering), [`survminer`](https://rpkgs.datanovia.com/survminer/)
 series), [`ggdist`](https://mjskay.github.io/ggdist/) / `dabestr`
 (distributions and estimation) and
 [`bayesplot`](https://mc-stan.org/bayesplot/) / `tidybayes` (Bayesian).
-depictr offers a consistent and attractive default for all of these
-tasks within a single package.
+depictr offers one consistent default for all of these tasks within a
+single package.
 
 ## Automated maintenance
 
@@ -211,8 +211,8 @@ scheduled GitHub Actions keep it healthy between releases:
   asks Claude Code to find the smallest change that restores
   compatibility and to open a pull request, falling back to a comment on
   the tracking issue when no safe automated fix exists. It is inert
-  until a `CLAUDE_CODE_OAUTH_TOKEN` secret is added to the repository —
-  generate it with `claude setup-token` (it uses your Claude
+  until a `CLAUDE_CODE_OAUTH_TOKEN` secret is added to the repository.
+  Generate it with `claude setup-token` (it uses your Claude
   subscription, not billable API credits) and enable *Settings → Actions
   → General → Allow GitHub Actions to create and approve pull requests*.
 - **`link-check`** runs weekly, validating every URL in the DESCRIPTION,

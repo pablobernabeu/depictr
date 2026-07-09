@@ -80,7 +80,10 @@ red-blue ramps.</p>
 <dd><p>Number of colours to return. If <code>NULL</code> (the default) the full
 qualitative palette is returned. For the qualitative palette an <code>n</code> larger
 than the available base colours is interpolated; the sequential and
-diverging palettes are ramps and accept any <code>n</code>.</p></dd>
+diverging palettes are ramps and accept any <code>n</code>. Interpolated colours
+beyond the base set are not guaranteed to remain distinguishable under
+colour-vision deficiency, so prefer faceting or a custom palette when many
+groups are needed.</p></dd>
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>

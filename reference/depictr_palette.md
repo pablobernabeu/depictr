@@ -20,7 +20,10 @@ depictr_palette(n = NULL, type = c("qualitative", "sequential", "diverging"))
   Number of colours to return. If `NULL` (the default) the full
   qualitative palette is returned. For the qualitative palette an `n`
   larger than the available base colours is interpolated; the sequential
-  and diverging palettes are ramps and accept any `n`.
+  and diverging palettes are ramps and accept any `n`. Interpolated
+  colours beyond the base set are not guaranteed to remain
+  distinguishable under colour-vision deficiency, so prefer faceting or
+  a custom palette when many groups are needed.
 
 - type:
 

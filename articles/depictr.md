@@ -201,7 +201,7 @@ The remaining articles go into each area in turn.
 [`vignette("exploring-data")`](https://pablobernabeu.github.io/depictr/articles/exploring-data.md)
 covers distributions, categories, bivariate plots, scatter-plot
 matrices, correlations, missingness, outliers, summary tables and the
-new estimation plots.
+estimation plots.
 [`vignette("model-estimates")`](https://pablobernabeu.github.io/depictr/articles/model-estimates.md)
 is the flagship: forest plots, model comparison, predicted values,
 interactions, random effects, optimiser checks and the

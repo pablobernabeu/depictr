@@ -5,7 +5,7 @@ the shared look of every plot once, at the top of a script or in your
 `.Rprofile`, instead of passing the same arguments to each function. The
 options are honoured by
 [`theme_depictr()`](https://pablobernabeu.github.io/depictr/reference/theme_depictr.md)
-(base size, base family and the accent used for titles), by
+(base size, base family and the brand colour used for titles), by
 [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
 and the
 [`scale_colour_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md)
@@ -41,8 +41,10 @@ depictr_options(
 
 - brand:
 
-  The depictr brand colour (used for plot titles and as the lead
-  qualitative colour). Returned by `depictr_brand()`.
+  The depictr brand colour, used for plot titles and single-series
+  geoms. It coincides with the default palette's first colour but does
+  not alter a palette; use `palette` for that. Returned by
+  `depictr_brand()`.
 
 - accent:
 

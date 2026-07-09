@@ -2,8 +2,12 @@
 
 ## depictr 0.1.1
 
-- Documentation and packaging polish, with no change to the plotting
-  API.
+- Documentation and packaging polish; the plotting function signatures
+  are unchanged.
+- [`roc_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/roc_curve_plot.md)
+  rejects a `ci` that resolves to fewer than one bootstrap resample with
+  a clear error, instead of silently drawing an all-`NA` band and an
+  `[NA, NA]` AUC annotation.
 - The documentation site adopts the shared house style used across the
   package family, with a citation page carrying a copyable and
   downloadable BibTeX entry.
@@ -281,10 +285,11 @@ out of, and generalises, three earlier plotting functions
 ### Notes
 
 - Heavier modelling back-ends (`lme4`, `broom`, `simr`, `survival`,
-  `brms`, `posterior`, `ggdist`, `cluster`, `boot`) are in `Suggests`
-  and used only when available, so the package installs and checks
-  without them. Vignettes draw on small precomputed model fits shipped
-  in `inst/extdata/`, so they knit without a Bayesian or mixed-model
+  `posterior`, `ggdist`, `cluster`, `boot`) are in `Suggests` and used
+  only when available, so the package installs and checks without them
+  (`brmsfit` objects are handled through the `posterior` package).
+  Vignettes draw on small precomputed model fits shipped in
+  `inst/extdata/`, so they knit without a Bayesian or mixed-model
   toolchain.
 - Functions with an optional `seed`
   ([`cluster_plot()`](https://pablobernabeu.github.io/depictr/reference/cluster_plot.md),

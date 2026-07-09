@@ -70,7 +70,7 @@ For a `glm`, the default panels are made GLM-aware
 *binned*-residual plot (Gelman & Hill, 2007; see
 [`binned_residual_plot()`](https://pablobernabeu.github.io/depictr/reference/binned_residual_plot.md)),
 which is readable even for binary or count models, and the Q-Q panel
-uses *randomized quantile* residuals (Dunn & Smyth, 1996), which are
+uses *randomised quantile* residuals (Dunn & Smyth, 1996), which are
 standard normal under a correctly specified model regardless of the
 response family. The scale-location and leverage panels are unchanged.
 For an `lm` the behaviour is identical to before. Set

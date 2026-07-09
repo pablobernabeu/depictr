@@ -2,8 +2,9 @@
 
 This is the flagship article. It works through depictr’s model-result
 plots (coefficients, model comparison, predicted values, interactions,
-random effects and goodness-of-fit) and then reaches the capability the
-package is named for: showing a frequentist estimate and a full Bayesian
+random effects and goodness-of-fit) and then reaches the capability that
+[`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+is named for: showing a frequentist estimate and a full Bayesian
 posterior for the same model on one figure.
 
 The running example is `lexical_decision`, a counterbalanced, crossed
@@ -105,7 +106,7 @@ coefficient of determination.
 
 [`effects_plot()`](https://pablobernabeu.github.io/depictr/reference/effects_plot.md)
 shows what the model predicts as one predictor varies, holding the
-others at typical values. It now works on the mixed model: predictions
+others at typical values. It also works on the mixed model: predictions
 use the fixed effects only (`re.form = NA`) and the band is built from
 the fixed-effect design matrix and
 [`vcov()`](https://rdrr.io/r/stats/vcov.html).
@@ -136,14 +137,15 @@ interaction_plot(crop_fit, "fertiliser", "treatment",
 
 ## Frequentist and Bayesian estimates together
 
-This is the package’s namesake capability. Given the frequentist fit and
-a set of Bayesian posterior draws,
+This is the capability
 [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
-draws the *full posterior distribution* for each term (a ‘ggdist’
-half-eye) and overlays the frequentist point and confidence interval at
-the same position. The entire shape of the posterior appears next to the
-frequentist estimate, rather than a point and two limits alone, with the
-two sources in the two leading colourblind-safe palette colours.
+is named for. Given the frequentist fit and a set of Bayesian posterior
+draws, the function draws the *full posterior distribution* for each
+term (a ‘ggdist’ half-eye) and overlays the frequentist point and
+confidence interval at the same position. The entire shape of the
+posterior appears next to the frequentist estimate, rather than a point
+and two limits alone, with the two sources in the two leading
+colourblind-safe palette colours.
 
 The draws here are the real fixed-effect posterior from a `brms` fit of
 the same model (1000 draws x 4 parameters), shipped with the package so
