@@ -1,11 +1,5 @@
 # depictr (R)
 
-[![R-CMD-check](https://github.com/pablobernabeu/depictr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/pablobernabeu/depictr/actions/workflows/R-CMD-check.yaml)
-[![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![License:
-MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/license/MIT)
-
 **depictr** is a single, consistent toolkit of publication-ready plots
 that span the whole analysis workflow, from a first look at the data,
 through model estimates and predictions, to diagnostics, uncertainty and
