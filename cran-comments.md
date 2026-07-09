@@ -11,14 +11,13 @@ function returns a 'ggplot2' object.
 0 errors | 0 warnings | 1 note
 
 * The note is the standard "new submission" note for a first release.
-* The local `--as-cran` run reports one additional note, "Skipping checking
-  math rendering: package 'V8' unavailable", which is specific to the local
-  machine (the optional 'V8' package is not installed) and does not occur on
-  CRAN or win-builder.
+* Example variants that render several multi-panel figures are wrapped in
+  `\donttest{}` so each example file stays within the five-second budget; the
+  first call of every example remains runnable.
 
 ## Test environments
 
-* local: Windows 11, R 4.5.1 (R CMD check --as-cran, remote + manual)
+* local: Windows 11, R 4.6.1 (R CMD check --as-cran, 2026-07-08)
 * GitHub Actions: ubuntu-latest (release, devel, oldrel-1),
   windows-latest (release), macOS-latest (release)
 * win-builder (devel and release)
