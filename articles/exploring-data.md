@@ -226,7 +226,7 @@ missingness_map(wellbeing_survey, legend_inside = TRUE)
 ## A descriptive summary table
 
 [`summary_table()`](https://pablobernabeu.github.io/depictr/reference/summary_table.md)
-builds a “Table 1”: mean (SD) for numeric variables, counts and
+builds a ‘Table 1’: mean (SD) for numeric variables, counts and
 percentages for categorical ones, optionally by group. The first row
 always reports the sample size (`N`), and any variable with missing
 values gets a `Missing, n (%)` row, both visible here for the wellbeing

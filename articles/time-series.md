@@ -38,11 +38,14 @@ indoor_ts <- ts(indoor$sales, start = c(2018, 1), frequency = 12)
 [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md)
 separates a seasonal series into trend, seasonal and remainder
 components. Use `method = "stl"` (the default, loess-based) or
-`method = "classical"`.
+`method = "classical"`. Setting `confidence = TRUE` shades a band around
+the smoothed trend, from the spread of the remainder, so the scale of
+the unexplained variation is visible rather than implied by the line
+alone.
 
 ``` r
 
-decompose_plot(indoor_ts, title = "Indoor sales, decomposed")
+decompose_plot(indoor_ts, confidence = TRUE, title = "Indoor sales, decomposed")
 ```
 
 ![](time-series_files/figure-html/unnamed-chunk-3-1.png)

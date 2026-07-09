@@ -30,7 +30,7 @@ fit <- lmerTest::lmer(
 [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)
 reads the fitted mixed model directly (through
 [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md))
-and draws a horizontal point-and-interval (“forest”) plot. Unrelated
+and draws a horizontal point-and-interval (‘forest’) plot. Unrelated
 primes and auditory presentation both slow responses, while more
 frequent words speed them up.
 
@@ -209,7 +209,7 @@ entirely on one side of zero.
 ## Random effects
 
 [`random_effects_plot()`](https://pablobernabeu.github.io/depictr/reference/random_effects_plot.md)
-draws a caterpillar plot of the conditional modes (“BLUPs”). Reading the
+draws a caterpillar plot of the conditional modes (‘BLUPs’). Reading the
 fitted model directly, it shows the by-item and by-participant
 departures from the average, sorted, with their uncertainty, the usual
 way to spot unusual groups.

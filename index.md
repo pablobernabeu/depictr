@@ -5,7 +5,6 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![License:
 MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/license/MIT)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21266308.svg)](https://doi.org/10.5281/zenodo.21266308)
 
 **depictr** is a single, consistent toolkit of publication-ready plots
 that span the whole analysis workflow, from a first look at the data,
