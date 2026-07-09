@@ -24,9 +24,9 @@ probabilities (or a list of them for the multi-model case).}
 brand blue. Ignored when several models are overlaid.}
 
 \item{legend_inside}{When \code{TRUE} (and several models are overlaid), draw the
-legend inside the panel (in the bottom-right triangle the concave curve
-leaves empty) over a translucent background, instead of in a right-hand
-margin. Defaults to \code{FALSE}.}
+legend inside the panel (in the top-right corner, which the decaying lift
+curve leaves empty) over a translucent background, instead of in a
+right-hand margin. Defaults to \code{FALSE}.}
 
 \item{title}{Plot title.}
 }

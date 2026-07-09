@@ -19,8 +19,9 @@ depictr_options(
 
 \item{base_family}{Base font family for \code{\link[=theme_depictr]{theme_depictr()}}.}
 
-\item{brand}{The depictr brand colour (used for plot titles and as the lead
-qualitative colour). Returned by \code{depictr_brand()}.}
+\item{brand}{The depictr brand colour, used for plot titles and single-series
+geoms. It coincides with the default palette's first colour but does not
+alter a palette; use \code{palette} for that. Returned by \code{depictr_brand()}.}
 
 \item{accent}{A secondary highlight colour. Returned by \code{depictr_accent()}.}
 
@@ -44,7 +45,7 @@ depictr reads a small set of global options so that you can configure the
 shared look of every plot once, at the top of a script or in your
 \code{.Rprofile}, instead of passing the same arguments to each function. The
 options are honoured by \code{\link[=theme_depictr]{theme_depictr()}} (base size, base family and the
-accent used for titles), by \code{\link[=depictr_palette]{depictr_palette()}} and the
+brand colour used for titles), by \code{\link[=depictr_palette]{depictr_palette()}} and the
 \code{\link[=scale_colour_depictr]{scale_colour_depictr()}} family (an optional custom qualitative palette), and
 by the colour accessors \code{depictr_brand()}, \code{depictr_accent()} and
 \code{depictr_reference()}.

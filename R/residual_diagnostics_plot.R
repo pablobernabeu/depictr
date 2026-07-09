@@ -10,7 +10,7 @@
 #' For a `glm`, the default panels are made GLM-aware (`glm_panels = TRUE`): the
 #' "residuals vs. fitted" panel is replaced by a *binned*-residual plot
 #' (Gelman & Hill, 2007; see [binned_residual_plot()]), which is readable even
-#' for binary or count models, and the Q-Q panel uses *randomized quantile*
+#' for binary or count models, and the Q-Q panel uses *randomised quantile*
 #' residuals (Dunn & Smyth, 1996), which are standard normal under a correctly
 #' specified model regardless of the response family. The scale-location and
 #' leverage panels are unchanged. For an `lm` the behaviour is identical to

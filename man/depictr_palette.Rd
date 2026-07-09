@@ -10,7 +10,10 @@ depictr_palette(n = NULL, type = c("qualitative", "sequential", "diverging"))
 \item{n}{Number of colours to return. If \code{NULL} (the default) the full
 qualitative palette is returned. For the qualitative palette an \code{n} larger
 than the available base colours is interpolated; the sequential and
-diverging palettes are ramps and accept any \code{n}.}
+diverging palettes are ramps and accept any \code{n}. Interpolated colours
+beyond the base set are not guaranteed to remain distinguishable under
+colour-vision deficiency, so prefer faceting or a custom palette when many
+groups are needed.}
 
 \item{type}{Palette type: \code{"qualitative"} (categorical groups),
 \code{"sequential"} (ordered low-to-high) or \code{"diverging"} (a midpoint with two

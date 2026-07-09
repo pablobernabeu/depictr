@@ -20,7 +20,8 @@ Description: A cohesive, publication-ready toolkit of plots that span the whole
     influence, quantile-quantile, ROC, calibration, threshold tuning and
     confusion matrices); uncertainty and power; and reporting helpers (a shared
     theme, colourblind-aware palettes, plot composition and saving). Every
-    plotting function returns a 'ggplot2' object, heavier modelling back-ends are
+    plotting function returns a 'ggplot2' object (or a 'patchwork' object for
+    composite panels), heavier modelling back-ends are
     optional, and the package ships with reproducibly simulated datasets so that
     every example and vignette runs without further setup.
 License: MIT + file LICENSE

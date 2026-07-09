@@ -61,11 +61,10 @@ vif_plot <- function(model, threshold = 5,
   multi <- any(res$df > 1)
 
   # Single-degree-of-freedom terms are shown as the ordinary VIF on a plain
-  # "Variance inflation factor" axis, with the reference lines at the actual
-  # `threshold` and its half -- so a bar at 1 against a line at 5 reads
-  # honestly. Multi-df terms have no scalar VIF, so the comparable
-  # GVIF^(1/(2*df)) is plotted and the lines sit at the square roots of the VIF
-  # thresholds (Fox & Monette).
+  # "Variance inflation factor" axis, with the reference line at the actual
+  # `threshold` -- so a bar at 1 against a line at 5 reads honestly. Multi-df
+  # terms have no scalar VIF, so the comparable GVIF^(1/(2*df)) is plotted and
+  # the line sits at the square root of the VIF threshold (Fox & Monette).
   if (multi) {
     value <- res$gvif_adj
     line_main <- sqrt(threshold)

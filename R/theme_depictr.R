@@ -12,7 +12,10 @@
 #' @param n Number of colours to return. If `NULL` (the default) the full
 #'   qualitative palette is returned. For the qualitative palette an `n` larger
 #'   than the available base colours is interpolated; the sequential and
-#'   diverging palettes are ramps and accept any `n`.
+#'   diverging palettes are ramps and accept any `n`. Interpolated colours
+#'   beyond the base set are not guaranteed to remain distinguishable under
+#'   colour-vision deficiency, so prefer faceting or a custom palette when many
+#'   groups are needed.
 #' @param type Palette type: `"qualitative"` (categorical groups),
 #'   `"sequential"` (ordered low-to-high) or `"diverging"` (a midpoint with two
 #'   directions).

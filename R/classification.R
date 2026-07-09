@@ -77,6 +77,10 @@ roc_curve_plot <- function(x, score = NULL, colour = depictr_brand(),
   do_ci <- !isFALSE(ci) && !multi
   if (do_ci) {
     n_boot <- if (isTRUE(ci)) 2000L else as.integer(ci)
+    if (!is.finite(n_boot) || n_boot < 1) {
+      stop("`ci` must be TRUE or a positive number of bootstrap resamples.",
+           call. = FALSE)
+    }
     band <- roc_boot_ci(models[[1]]$actual, models[[1]]$score,
                         n_boot = n_boot, conf_level = conf_level)
     band_df <- data.frame(fpr = band$fpr, lower = band$lower, upper = band$upper)

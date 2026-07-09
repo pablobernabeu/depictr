@@ -131,9 +131,9 @@ binned_residual_data <- function(model, bins = NULL,
   out
 }
 
-#' Randomized quantile residuals for a GLM
+#' Randomised quantile residuals for a GLM
 #'
-#' Computes randomized quantile residuals (Dunn & Smyth, 1996): the residual for
+#' Computes randomised quantile residuals (Dunn & Smyth, 1996): the residual for
 #' observation \eqn{i} is \eqn{\Phi^{-1}(u_i)} where, for a continuous response,
 #' \eqn{u_i = F(y_i;\hat\theta_i)} is the fitted CDF at the observation, and for
 #' a discrete response \eqn{u_i} is drawn uniformly on

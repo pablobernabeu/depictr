@@ -4,7 +4,8 @@ This is the first submission of depictr, a unified toolkit of publication-ready
 plots that span the analysis workflow: exploratory data analysis, model
 estimates and predictions, diagnostics and classification, multivariate and
 survival methods, time series, uncertainty and reporting. Every plotting
-function returns a 'ggplot2' object.
+function returns a 'ggplot2' object (or a 'patchwork' object for composite
+panels).
 
 ## R CMD check results
 

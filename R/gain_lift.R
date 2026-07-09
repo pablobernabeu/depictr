@@ -98,6 +98,10 @@ gain_plot <- function(x, score = NULL, colour = depictr_brand(),
 #' curves with a legend.
 #'
 #' @inheritParams gain_plot
+#' @param legend_inside When `TRUE` (and several models are overlaid), draw the
+#'   legend inside the panel (in the top-right corner, which the decaying lift
+#'   curve leaves empty) over a translucent background, instead of in a
+#'   right-hand margin. Defaults to `FALSE`.
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export

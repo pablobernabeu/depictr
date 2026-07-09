@@ -21,9 +21,9 @@ has_ggdist <- requireNamespace("ggdist", quietly = TRUE)
 
 This is the flagship article. It works through depictr's model-result plots
 (coefficients, model comparison, predicted values, interactions, random effects
-and goodness-of-fit) and then reaches the capability the package is named for:
-showing a frequentist estimate and a full Bayesian posterior for the same model
-on one figure.
+and goodness-of-fit) and then reaches the capability that
+`frequentist_bayesian_plot()` is named for: showing a frequentist estimate and
+a full Bayesian posterior for the same model on one figure.
 
 The running example is `lexical_decision`, a counterbalanced, crossed
 lexical-decision experiment (24 participants, 40 items, 960 trials). We model
@@ -106,7 +106,7 @@ For `glm` models the `R2` column reports McFadden's pseudo-R-squared
 ## Predicted values and interactions
 
 `effects_plot()` shows what the model predicts as one predictor varies, holding
-the others at typical values. It now works on the mixed model: predictions use
+the others at typical values. It also works on the mixed model: predictions use
 the fixed effects only (`re.form = NA`) and the band is built from the
 fixed-effect design matrix and `vcov()`.
 
@@ -129,8 +129,8 @@ interaction_plot(crop_fit, "fertiliser", "treatment",
 
 ## Frequentist and Bayesian estimates together
 
-This is the package's namesake capability. Given the frequentist fit and a
-set of Bayesian posterior draws, `frequentist_bayesian_plot()` draws the
+This is the capability `frequentist_bayesian_plot()` is named for. Given the
+frequentist fit and a set of Bayesian posterior draws, the function draws the
 *full posterior distribution* for each term (a 'ggdist' half-eye) and overlays
 the frequentist point and confidence interval at the same position. The entire
 shape of the posterior appears next to the frequentist estimate, rather than a
