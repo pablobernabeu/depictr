@@ -84,14 +84,14 @@ summary_table(wellbeing_survey,
               group = "region")
 #>            variable      statistic   Overall      East     North     South
 #> 1                 N                      300        69        82        67
-#> 2 life_satisfaction      Mean (SD) 4.4 (1.0) 4.6 (1.0) 4.5 (1.1) 4.0 (1.0)
+#> 2 life_satisfaction      Mean (SD) 4.3 (1.1) 4.7 (0.9) 4.8 (1.0) 3.6 (1.0)
 #> 3                   Missing, n (%)    7 (2%)    1 (1%)    3 (4%)    1 (1%)
 #> 4         education      secondary 140 (47%)  31 (45%)  37 (45%)  33 (49%)
 #> 5                    undergraduate 113 (38%)  28 (41%)  29 (35%)  22 (33%)
 #> 6                     postgraduate  47 (16%)  10 (14%)  16 (20%)  12 (18%)
 #>        West
 #> 1        82
-#> 2 4.3 (1.0)
+#> 2 4.1 (1.0)
 #> 3    2 (2%)
 #> 4  39 (48%)
 #> 5  34 (41%)
