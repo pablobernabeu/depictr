@@ -244,9 +244,10 @@ pre {
   border-radius: 10px;
   border: 1px solid rgba(31, 111, 168, .25);
   padding: .85rem 1rem;
-  // Smaller than the prose so long output lines fit the column, and scroll
-  // inside the block rather than stretching it when they cannot.
-  font-size: .78rem;
+  // Code and output read at the size of the surrounding prose (1rem against
+  // the 1.02rem body compensates for the wider monospace); long lines scroll
+  // inside the block where they cannot fit.
+  font-size: 1rem;
   line-height: 1.5;
   overflow-x: auto;
   max-width: 100%;
@@ -342,17 +343,25 @@ main a:hover, .contents a:hover, #pkgdown-sidebar a:hover { text-decoration: und
 // ---------------------------------------------------------------------------
 footer {
   margin-top: 3rem;
-  // Inset the content so it is not flush against the viewport edges, and lay
-  // the two columns out with room between them.
-  padding: 2rem clamp(1.25rem, 4vw, 4rem) 2.4rem;
+  // Full-bleed: the navy band and its content span the whole viewport,
+  // escaping pkgdown's centred container, and the two footer sentences
+  // read as left-aligned rows.
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  padding: 2rem clamp(1rem, 2.5vw, 2rem) 2.4rem;
   background: var(--brand-ink);
   border-top: 3px solid var(--brand-teal);
   color: rgba(255, 255, 255, .78);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: .5rem 2.5rem;
 }
+
+// The 100vw band overshoots the content area by the scrollbar width; clip
+// that overshoot rather than growing a horizontal scrollbar (page content
+// never needs one: wide code blocks scroll inside their own box).
+body { overflow-x: hidden; }
+
+footer .pkgdown-footer-left,
+footer .pkgdown-footer-right { text-align: left; }
+footer .pkgdown-footer-right { margin-top: .3rem; }
 footer a { color: var(--brand-amber-light); }
 footer a:hover { color: #fff; }
 footer .pkgdown-footer-left,
