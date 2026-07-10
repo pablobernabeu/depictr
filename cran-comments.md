@@ -1,11 +1,11 @@
 ## Submission
 
-This is the first submission of depictr, a unified toolkit of publication-ready
-plots that span the analysis workflow: exploratory data analysis, model
-estimates and predictions, diagnostics and classification, multivariate and
-survival methods, time series, uncertainty and reporting. Every plotting
-function returns a 'ggplot2' object (or a 'patchwork' object for composite
-panels).
+This is the first submission of depictr (version 0.2.0), a unified toolkit of
+publication-ready plots that span the analysis workflow: exploratory data
+analysis, model estimates and predictions, diagnostics and classification,
+multivariate and survival methods, time series, uncertainty and reporting.
+Every plotting function returns a 'ggplot2' object (or a 'patchwork' object
+for composite panels).
 
 ## R CMD check results
 
@@ -18,11 +18,9 @@ panels).
 
 ## Test environments
 
-* local: Windows 11, R 4.6.1 (R CMD check --as-cran, 2026-07-08)
+* local: Windows 11, R 4.6.1 (R CMD check --as-cran, 2026-07-10)
 * GitHub Actions: ubuntu-latest (release, devel, oldrel-1),
   windows-latest (release), macOS-latest (release)
-* win-builder (devel and release)
-* R-hub (Windows, macOS, Linux)
 
 ## Notes
 
