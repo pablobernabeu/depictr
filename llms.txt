@@ -43,120 +43,44 @@ remotes::install_github("pablobernabeu/depictr")
 
 ## What’s in the box
 
-**Explore data**:
-[`explore_distribution()`](https://pablobernabeu.github.io/depictr/reference/explore_distribution.md),
-[`ecdf_plot()`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot.md),
-[`explore_categorical()`](https://pablobernabeu.github.io/depictr/reference/explore_categorical.md),
-[`explore_bivariate()`](https://pablobernabeu.github.io/depictr/reference/explore_bivariate.md),
-[`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md),
-[`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md),
-[`missingness_map()`](https://pablobernabeu.github.io/depictr/reference/missingness_map.md),
-[`outlier_plot()`](https://pablobernabeu.github.io/depictr/reference/outlier_plot.md),
-[`raincloud_plot()`](https://pablobernabeu.github.io/depictr/reference/raincloud_plot.md),
-[`ridgeline_plot()`](https://pablobernabeu.github.io/depictr/reference/ridgeline_plot.md),
-[`group_comparison_plot()`](https://pablobernabeu.github.io/depictr/reference/group_comparison_plot.md),
-[`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md),
-[`dumbbell_plot()`](https://pablobernabeu.github.io/depictr/reference/dumbbell_plot.md),
-[`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md),
-[`summary_table()`](https://pablobernabeu.github.io/depictr/reference/summary_table.md).
-
-**Multivariate, clustering & survival**:
-[`pca_plot()`](https://pablobernabeu.github.io/depictr/reference/pca_plot.md),
-[`scree_plot()`](https://pablobernabeu.github.io/depictr/reference/scree_plot.md),
-[`cluster_plot()`](https://pablobernabeu.github.io/depictr/reference/cluster_plot.md),
-[`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md),
-[`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md),
-[`dendrogram_plot()`](https://pablobernabeu.github.io/depictr/reference/dendrogram_plot.md),
-[`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md).
-
-**Time series**:
-[`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md),
-[`acf_plot()`](https://pablobernabeu.github.io/depictr/reference/acf_plot.md),
-[`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md),
-[`seasonal_plot()`](https://pablobernabeu.github.io/depictr/reference/seasonal_plot.md),
-[`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md).
-
-**Model estimates & inference**:
-[`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md),
-[`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
-[`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md),
-[`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md),
-[`effects_plot()`](https://pablobernabeu.github.io/depictr/reference/effects_plot.md),
-[`interaction_plot()`](https://pablobernabeu.github.io/depictr/reference/interaction_plot.md),
-[`random_effects_plot()`](https://pablobernabeu.github.io/depictr/reference/random_effects_plot.md),
-[`optimizer_fixef_plot()`](https://pablobernabeu.github.io/depictr/reference/optimizer_fixef_plot.md),
-[`model_fit_table()`](https://pablobernabeu.github.io/depictr/reference/model_fit_table.md).
-
-**Diagnostics & classification**:
-[`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md),
-[`binned_residual_plot()`](https://pablobernabeu.github.io/depictr/reference/binned_residual_plot.md),
-[`influence_plot()`](https://pablobernabeu.github.io/depictr/reference/influence_plot.md),
-[`qq_plot()`](https://pablobernabeu.github.io/depictr/reference/qq_plot.md),
-[`vif_plot()`](https://pablobernabeu.github.io/depictr/reference/vif_plot.md),
-[`roc_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/roc_curve_plot.md),
-[`pr_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/pr_curve_plot.md),
-[`gain_plot()`](https://pablobernabeu.github.io/depictr/reference/gain_plot.md),
-[`lift_plot()`](https://pablobernabeu.github.io/depictr/reference/lift_plot.md),
-[`calibration_plot()`](https://pablobernabeu.github.io/depictr/reference/calibration_plot.md),
-[`threshold_plot()`](https://pablobernabeu.github.io/depictr/reference/threshold_plot.md),
-[`confusion_matrix_plot()`](https://pablobernabeu.github.io/depictr/reference/confusion_matrix_plot.md).
-
-**Uncertainty & power**:
-[`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md),
-[`power_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/power_curve_plot.md).
-
-**Theming & reporting**:
-[`theme_depictr()`](https://pablobernabeu.github.io/depictr/reference/theme_depictr.md),
-[`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
-/
-[`scale_colour_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md),
-[`palette_preview()`](https://pablobernabeu.github.io/depictr/reference/palette_preview.md),
-[`format_terms()`](https://pablobernabeu.github.io/depictr/reference/format_terms.md),
-[`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md),
-[`arrange_plots()`](https://pablobernabeu.github.io/depictr/reference/arrange_plots.md),
-[`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md),
-[`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md).
+The functions fall into seven families that follow the analysis
+workflow. Exploratory plots and a descriptive summary table open it. The
+model-estimate views come next (forest plots, model comparison,
+predictions, interactions and random effects), then residual diagnostics
+with the standard classification curves, and then posterior summaries
+and power curves. Further families cover principal components,
+clustering and survival, time series, and the shared theme with
+composition, saving and reporting helpers. The
+[reference](https://pablobernabeu.github.io/depictr/reference/index.html)
+lists every function by family.
 
 Heavier modelling back-ends (`lme4`, `broom`, `simr`) are optional (in
 `Suggests`) and used only when present; the core functions, examples,
 tests and vignettes run on base `lm`/`glm` and the bundled data alone.
 
-## A short tour
+## A first plot
 
 ``` r
 
 library(depictr)
 
-# Explore
-explore_bivariate(crop_yield, fertiliser, yield)
-correlation_heatmap(wellbeing_survey)
-
-# Model
 fit <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment, data = crop_yield)
 coefficient_plot(fit, order = "descending")
-effects_plot(fit, "fertiliser")
-interaction_plot(lm(yield ~ fertiliser * treatment, data = crop_yield),
-                 "fertiliser", "treatment")
-
-# Diagnose & classify
-residual_diagnostics_plot(fit)
-gfit <- glm(accuracy ~ word_frequency + RT, data = lexical_decision,
-            family = binomial)
-roc_curve_plot(gfit)
-
-# Report
-arrange_plots(qq_plot(fit), influence_plot(fit), ncol = 2, tag_levels = "A")
 ```
+
+The [Get
+started](https://pablobernabeu.github.io/depictr/articles/depictr.html)
+article walks through the whole workflow, from exploration to
+diagnostics and reporting.
 
 ## Bundled data
 
-Five reproducibly simulated datasets ship with the package and power
-every example and vignette: `lexical_decision` (a counterbalanced
-psycholinguistic experiment), `wellbeing_survey` (a survey with
-realistic missingness), `crop_yield` (an agronomy field trial with a
-fertiliser-by-treatment interaction), `clinical_trial` (right-censored
-survival times with a rare adverse event) and `monthly_sales` (two
-seasonal retail series). They are generated by
+Five reproducibly simulated datasets (`lexical_decision`,
+`wellbeing_survey`, `crop_yield`, `clinical_trial` and `monthly_sales`)
+ship with the package and power every example and vignette. Each is
+documented under its own name and described in the [Get
+started](https://pablobernabeu.github.io/depictr/articles/depictr.html)
+article, and all are generated by
 [`data-raw/generate_datasets.R`](https://github.com/pablobernabeu/depictr/blob/main/data-raw/generate_datasets.R)
 with fixed seeds.
 
