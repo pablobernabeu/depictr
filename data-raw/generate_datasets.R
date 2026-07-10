@@ -138,8 +138,17 @@ education <- factor(
   levels = c("secondary", "undergraduate", "postgraduate"),
   ordered = TRUE
 )
-income      <- round(stats::rlnorm(n, log(28000), 0.45))
-stress      <- round(pmin(pmax(stats::rnorm(n, 4, 1.4), 1), 7), 1)
+
+# Regions differ genuinely: the South and West carry more stress and lower
+# incomes than the North and East. This flows through to life satisfaction
+# (which depends on stress and income), so the region-grouped plots (faceted
+# densities, ridgelines, the region dendrogram) compare real contrasts rather
+# than four panels of the same sampling noise.
+stress_shift <- c(North = -0.5, South = 0.7, East = -0.2, West = 0.4)[as.character(region)]
+income_shift <- c(North = 0.14, South = -0.14, East = 0.05, West = -0.06)[as.character(region)]
+
+income      <- round(stats::rlnorm(n, log(28000) + income_shift, 0.45))
+stress      <- round(pmin(pmax(stats::rnorm(n, 4, 1.4) + stress_shift, 1), 7), 1)
 sleep_hours <- round(pmin(pmax(stats::rnorm(n, 7 - 0.25 * (stress - 4), 1), 3), 11), 1)
 exercise_days <- stats::rpois(n, lambda = pmax(0.5, 3 - 0.3 * (stress - 4)))
 exercise_days[exercise_days > 7] <- 7L
