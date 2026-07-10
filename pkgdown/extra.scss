@@ -223,6 +223,26 @@ aside h2 {
   color: var(--brand-primary);
 }
 [data-bs-theme="dark"] .template-reference-index .section > h2 { color: var(--brand-teal-light); }
+// pkgdown can emit a group as a heading section (with an empty dl) followed
+// by a headless section holding the functions; joined here so heading and
+// functions read as one card.
+.template-reference-index .section.level2:has(> h2):has(+ .section.level2 > dl:first-child) {
+  margin-bottom: 0;
+  border-bottom: none;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  // Nonzero padding, or the description's bottom margin collapses out of the
+  // card and reopens the gap this rule closes.
+  padding-bottom: .1rem;
+}
+.template-reference-index .section.level2:not(:has(> h2)) {
+  margin-top: 0;
+  border-top: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.template-reference-index .section > dl:empty { display: none; }
+
 .template-reference-index .section > h2::before {
   content: "";
   display: inline-block;
@@ -299,9 +319,16 @@ blockquote p:last-child { margin-bottom: 0; }
 .contents table, table.table {
   border: 1px solid var(--bs-border-color);
   border-radius: 10px;
-  overflow: hidden;
+  // A wide table scrolls inside its own box on a narrow viewport instead of
+  // stretching the page; fit-content keeps a narrow table at its natural
+  // width despite the block display.
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
   border-collapse: separate;
   border-spacing: 0;
+  margin-bottom: 1.6rem;
 }
 .contents table thead th, table.table thead th {
   background: var(--brand-ink);
@@ -311,6 +338,10 @@ blockquote p:last-child { margin-bottom: 0; }
   border-bottom: none;
 }
 .contents table td code, .contents table th code { white-space: nowrap; }
+
+// Breathing room beneath figures (a plot renders as a lone image in its
+// paragraph).
+.contents p > img:only-child { margin-bottom: .7rem; }
 
 // ---------------------------------------------------------------------------
 // Buttons / links inside content
@@ -346,6 +377,7 @@ footer {
   // Full-bleed: the navy band and its content span the whole viewport,
   // escaping pkgdown's centred container, and the two footer sentences
   // read as left-aligned rows.
+  display: block;
   width: 100vw;
   margin-left: calc(50% - 50vw);
   padding: 2rem clamp(1rem, 2.5vw, 2rem) 2.4rem;
@@ -359,8 +391,15 @@ footer {
 // never needs one: wide code blocks scroll inside their own box).
 body { overflow-x: hidden; }
 
+// pkgdown's own stylesheet floats the two blocks side by side; both read
+// as full-width, left-aligned rows instead.
 footer .pkgdown-footer-left,
-footer .pkgdown-footer-right { text-align: left; }
+footer .pkgdown-footer-right {
+  float: none;
+  display: block;
+  width: 100%;
+  text-align: left;
+}
 footer .pkgdown-footer-right { margin-top: .3rem; }
 footer a { color: var(--brand-amber-light); }
 footer a:hover { color: #fff; }
