@@ -8,8 +8,6 @@
 #' the plot to be redrawn without repeating a power simulation that is often
 #' slow to run.
 #'
-#' The function refactors the original `powercurvePlot()` gist.
-#'
 #' @param x A `powerCurve` object from 'simr', or a data frame with a sample
 #'   size column (`nlevels`, `n` or `x`), a power column (`mean` or `power`),
 #'   and optional `lower`/`upper` confidence limits.

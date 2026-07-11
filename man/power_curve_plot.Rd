@@ -48,9 +48,6 @@ power (80\% by default). The input is usually a power curve produced by
 the plot to be redrawn without repeating a power simulation that is often
 slow to run.
 }
-\details{
-The function refactors the original \code{powercurvePlot()} gist.
-}
 \examples{
 pc <- data.frame(
   nlevels = c(10, 20, 30, 40, 50, 60),

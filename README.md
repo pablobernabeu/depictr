@@ -106,28 +106,11 @@ a single package.
 
 ## Automated maintenance
 
-depictr draws on a number of plotting and modelling packages, so several
-scheduled GitHub Actions keep it healthy between releases:
-
-* **`dependency-check`** runs **daily**, checking the package and its full test
-  suite against both the current and the development versions of its
-  dependencies, so a breaking change in any dependency is caught within a day.
-  On failure it opens, and keeps updated, a single tracking issue.
-* **`dependency-autofix`** runs whenever `dependency-check` fails: it asks Claude
-  Code to find the smallest change that restores compatibility and to open a pull
-  request, falling back to a comment on the tracking issue when no safe automated
-  fix exists. It is inert until a `CLAUDE_CODE_OAUTH_TOKEN` secret is added to
-  the repository. Generate it with `claude setup-token` (it uses your Claude
-  subscription, not billable API credits) and enable *Settings → Actions →
-  General → Allow GitHub Actions to create and approve pull requests*.
-* **`link-check`** runs weekly, validating every URL in the DESCRIPTION, README,
-  help pages and vignettes with `urlchecker`, and opening a tracking issue if a
-  link breaks or starts redirecting (both of which CRAN flags).
-* **`R-CMD-check`** runs on every push and pull request across Linux, macOS and
-  Windows (R release, development and previous release).
-
-Each scheduled workflow can also be run on demand from the repository's
-**Actions** tab.
+depictr draws on a number of plotting and modelling packages, so scheduled
+GitHub Actions keep it healthy between releases: a daily check of the package
+and its full test suite against both the current and the development versions
+of its dependencies, a weekly check of every URL in the documentation and
+`R CMD check` on every push across Linux, macOS and Windows.
 
 ## Citing depictr
 

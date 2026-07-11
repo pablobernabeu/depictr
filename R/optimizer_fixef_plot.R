@@ -7,10 +7,8 @@
 #' has settled on a stable solution: tight clusters of points indicate
 #' agreement between optimisers, whereas scatter signals a fragile fit.
 #'
-#' The function refactors the original `plot.fixef.allFit()` gist, using
-#' faceting (one panel per fixed effect, each with its own y-axis) in place of
-#' the earlier hand-built layout. It also accepts a plain data frame, so it can
-#' be used without 'lme4'.
+#' Each fixed effect occupies its own panel, with its own y-axis. The function
+#' also accepts a plain data frame, so it can be used without 'lme4'.
 #'
 #' @param x Either the object returned by [lme4::allFit()], or a data frame with
 #'   one row per optimiser-by-term combination (columns such as `optimizer`,
