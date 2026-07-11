@@ -68,10 +68,6 @@ power_curve_plot(
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
 object.
 
-## Details
-
-The function refactors the original `powercurvePlot()` gist.
-
 ## Examples
 
 ``` r
