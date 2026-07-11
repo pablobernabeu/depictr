@@ -273,6 +273,10 @@ pre {
   max-width: 100%;
 }
 pre code { color: inherit; background: none; }
+// The pre's overflow-x makes it a block formatting context, which shrinks
+// beside the floated hex logo; without the same treatment the copy button's
+// wrapper stays full width and the button strands outside the block.
+div.sourceCode { display: flow-root; }
 :not(pre) > code {
   background: rgba(31, 111, 168, .10);
   color: var(--brand-primary-ink);
