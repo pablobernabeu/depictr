@@ -213,10 +213,18 @@ power_curve_plot(pc_df, x_lab = "Number of participants",
 Combine any of these with `arrange_plots()` and save with `save_plot()`:
 
 ```{r, fig.height = 3.2}
-arrange_plots(
+panel <- arrange_plots(
   qq_plot(fit), influence_plot(fit),
   ncol = 2, title = "Diagnostics", tag_levels = "A"
 )
+panel
+```
+
+`save_plot()` writes it out at a print-ready 300 dpi by default, creating any
+missing directories along the way.
+
+```{r, eval = FALSE}
+save_plot("figures/diagnostics.png", panel, width = 7, height = 3.2, dpi = 300)
 ```
 
 ## References

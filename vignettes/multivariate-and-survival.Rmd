@@ -87,6 +87,13 @@ attr(kd, "suggested")
 knitr::kable(attr(kd, "k_table"), digits = 3)
 ```
 
+The gap statistic compares the within-cluster dispersion against a null
+reference, so unlike the other two criteria it can also support `k = 1`:
+
+```{r, fig.height = 3.5}
+k_diagnostic(crop_yield, k_range = 2:6, cols = num, method = "gap")
+```
+
 `silhouette_plot()` then shows the quality of an actual clustering, one bar per
 observation grouped by cluster, with the average silhouette width per cluster and
 overall (the dashed line). Wide positive bars are well-placed observations;

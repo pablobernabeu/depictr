@@ -52,6 +52,14 @@ unexplained variation is visible rather than implied by the line alone.
 decompose_plot(indoor_ts, confidence = TRUE, title = "Indoor sales, decomposed")
 ```
 
+Classical decomposition instead holds the seasonal component fixed across the
+whole series, where STL lets it evolve from year to year.
+
+```{r, fig.height = 6}
+decompose_plot(indoor_ts, method = "classical",
+               title = "Indoor sales, classical decomposition")
+```
+
 ## Autocorrelation
 
 `acf_plot()` draws the autocorrelation (or, with `type = "partial"`, the partial

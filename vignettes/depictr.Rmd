@@ -115,6 +115,13 @@ ggplot(crop_yield, aes(fertiliser, yield, colour = treatment)) +
   theme_depictr()
 ```
 
+`depictr_palette()` returns the underlying hex colours directly, ready to feed
+`scale_fill_manual()` or a base-graphics `col =` argument:
+
+```{r}
+depictr_palette(4)
+```
+
 The qualitative palette is based on the Okabe-Ito set [@okabe2008], which stays
 distinguishable under the common forms of colour-vision deficiency; sequential
 and diverging variants are available too. Preview them with:
@@ -137,6 +144,15 @@ settings:
 
 ```{r}
 depictr_options()
+```
+
+Supplying arguments sets them for every later plot and returns the previous
+values, so you can put the look back afterwards:
+
+```{r, fig.height = 4}
+old <- depictr_options(base_size = 13, accent = "#b3589a")
+coefficient_plot(fit, title = "Set once, applied everywhere")
+do.call(depictr_options, old)   # restore the previous settings
 ```
 
 ## Where to next
