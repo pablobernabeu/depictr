@@ -273,6 +273,11 @@ pre {
   max-width: 100%;
 }
 pre code { color: inherit; background: none; }
+// Source chunks read a touch smaller than the output and the prose, so a typical
+// line fits the narrower home and article columns without horizontal scrolling.
+// Only .sourceCode blocks (the highlighted input) are affected; output stays at
+// prose size. Both the pre and its code carry the size so the two do not compound.
+pre.sourceCode, pre.sourceCode code { font-size: .85rem; }
 // The pre's overflow-x makes it a block formatting context, which shrinks
 // beside the floated hex logo; without the same treatment the copy button's
 // wrapper stays full width and the button strands outside the block.
