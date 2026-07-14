@@ -50,6 +50,17 @@ decompose_plot(indoor_ts, confidence = TRUE, title = "Indoor sales, decomposed")
 
 ![](time-series_files/figure-html/unnamed-chunk-3-1.png)
 
+Classical decomposition instead holds the seasonal component fixed
+across the whole series, where STL lets it evolve from year to year.
+
+``` r
+
+decompose_plot(indoor_ts, method = "classical",
+               title = "Indoor sales, classical decomposition")
+```
+
+![](time-series_files/figure-html/unnamed-chunk-4-1.png)
+
 ## Autocorrelation
 
 [`acf_plot()`](https://pablobernabeu.github.io/depictr/reference/acf_plot.md)
@@ -62,14 +73,14 @@ spikes at multiples of twelve are the annual seasonality.
 acf_plot(indoor_ts)
 ```
 
-![](time-series_files/figure-html/unnamed-chunk-4-1.png)
+![](time-series_files/figure-html/unnamed-chunk-5-1.png)
 
 ``` r
 
 acf_plot(indoor_ts, type = "partial")
 ```
 
-![](time-series_files/figure-html/unnamed-chunk-5-1.png)
+![](time-series_files/figure-html/unnamed-chunk-6-1.png)
 
 ## The seasonal pattern up close
 
@@ -86,7 +97,7 @@ do.
 seasonal_plot(indoor_ts, title = "Indoor sales: monthly subseries")
 ```
 
-![](time-series_files/figure-html/unnamed-chunk-6-1.png)
+![](time-series_files/figure-html/unnamed-chunk-7-1.png)
 
 With `style = "season"` every year becomes its own line over the months
 on a shared axis, which is handy for spotting an unusual year.
@@ -97,7 +108,7 @@ seasonal_plot(indoor_ts, style = "season",
               title = "Indoor sales: one line per year")
 ```
 
-![](time-series_files/figure-html/unnamed-chunk-7-1.png)
+![](time-series_files/figure-html/unnamed-chunk-8-1.png)
 
 ## Forecasting
 
@@ -132,7 +143,7 @@ timeseries_plot(indoor_ts, forecast = 18, level = 0.9,
                 y_lab = "Units")
 ```
 
-![](time-series_files/figure-html/unnamed-chunk-9-1.png)
+![](time-series_files/figure-html/unnamed-chunk-10-1.png)
 
 For a fully specified statistical model, fit it yourself (for example
 with

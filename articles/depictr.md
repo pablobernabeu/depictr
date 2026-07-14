@@ -141,6 +141,17 @@ ggplot(crop_yield, aes(fertiliser, yield, colour = treatment)) +
 
 ![](depictr_files/figure-html/unnamed-chunk-8-1.png)
 
+[`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
+returns the underlying hex colours directly, ready to feed
+[`scale_fill_manual()`](https://ggplot2.tidyverse.org/reference/scale_manual.html)
+or a base-graphics `col =` argument:
+
+``` r
+
+depictr_palette(4)
+#> [1] "#005b96" "#e69f00" "#009e73" "#d55e00"
+```
+
 The qualitative palette is based on the Okabe-Ito set ([Okabe & Ito,
 2008](#ref-okabe2008)), which stays distinguishable under the common
 forms of colour-vision deficiency; sequential and diverging variants are
@@ -151,7 +162,7 @@ available too. Preview them with:
 palette_preview(type = "all")
 ```
 
-![](depictr_files/figure-html/unnamed-chunk-9-1.png)
+![](depictr_files/figure-html/unnamed-chunk-10-1.png)
 
 [`palette_preview()`](https://pablobernabeu.github.io/depictr/reference/palette_preview.md)
 can also *simulate* a colour-vision deficiency, so you can check a
@@ -162,7 +173,7 @@ palette as a deuteranope (red-green) would see it:
 palette_preview(cvd = "deutan")
 ```
 
-![](depictr_files/figure-html/unnamed-chunk-10-1.png)
+![](depictr_files/figure-html/unnamed-chunk-11-1.png)
 
 Set the look once for a whole script with
 [`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md)
@@ -193,6 +204,22 @@ depictr_options()
 #> 
 #> $na_value
 #> [1] "grey80"
+```
+
+Supplying arguments sets them for every later plot and returns the
+previous values, so you can put the look back afterwards:
+
+``` r
+
+old <- depictr_options(base_size = 13, accent = "#b3589a")
+coefficient_plot(fit, title = "Set once, applied everywhere")
+```
+
+![](depictr_files/figure-html/unnamed-chunk-13-1.png)
+
+``` r
+
+do.call(depictr_options, old)   # restore the previous settings
 ```
 
 ## Where to next

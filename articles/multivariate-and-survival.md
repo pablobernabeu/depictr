@@ -107,6 +107,16 @@ knitr::kable(attr(kd, "k_table"), digits = 3)
 |   5 |          0.227 |
 |   6 |          0.213 |
 
+The gap statistic compares the within-cluster dispersion against a null
+reference, so unlike the other two criteria it can also support `k = 1`:
+
+``` r
+
+k_diagnostic(crop_yield, k_range = 2:6, cols = num, method = "gap")
+```
+
+![](multivariate-and-survival_files/figure-html/unnamed-chunk-8-1.png)
+
 [`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md)
 then shows the quality of an actual clustering, one bar per observation
 grouped by cluster, with the average silhouette width per cluster and
@@ -121,7 +131,7 @@ silhouette_plot(crop_yield, cl, cols = num,
                 title = "Silhouette widths by cluster")
 ```
 
-![](multivariate-and-survival_files/figure-html/unnamed-chunk-8-1.png)
+![](multivariate-and-survival_files/figure-html/unnamed-chunk-9-1.png)
 
 The same diagnostics apply to the wellbeing survey’s numeric profile:
 
@@ -137,7 +147,7 @@ silhouette_plot(na.omit(wellbeing_survey[wb_num]), wcl,
                 title = sprintf("Wellbeing survey, k = %d", attr(wkd, "suggested")))
 ```
 
-![](multivariate-and-survival_files/figure-html/unnamed-chunk-9-1.png)
+![](multivariate-and-survival_files/figure-html/unnamed-chunk-10-1.png)
 
 ## Survival curves
 
@@ -168,7 +178,7 @@ survival_plot(
 )
 ```
 
-![](multivariate-and-survival_files/figure-html/unnamed-chunk-10-1.png)
+![](multivariate-and-survival_files/figure-html/unnamed-chunk-11-1.png)
 
 The log-rank p-value is tiny and the median survival is clearly longer
 in the treatment arm. Because its event times are longer, that arm is

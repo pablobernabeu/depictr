@@ -265,13 +265,23 @@ and save with
 
 ``` r
 
-arrange_plots(
+panel <- arrange_plots(
   qq_plot(fit), influence_plot(fit),
   ncol = 2, title = "Diagnostics", tag_levels = "A"
 )
+panel
 ```
 
 ![](diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-22-1.png)
+
+[`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
+writes it out at a print-ready 300 dpi by default, creating any missing
+directories along the way.
+
+``` r
+
+save_plot("figures/diagnostics.png", panel, width = 7, height = 3.2, dpi = 300)
+```
 
 ## References
 

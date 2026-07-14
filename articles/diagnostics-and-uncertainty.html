@@ -263,11 +263,16 @@ across numbers of participants); we read it straight from disk.</p>
 <p>Combine any of these with <code><a href="../reference/arrange_plots.html">arrange_plots()</a></code> and save with
 <code><a href="../reference/save_plot.html">save_plot()</a></code>:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/arrange_plots.html">arrange_plots</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">panel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/arrange_plots.html">arrange_plots</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/qq_plot.html">qq_plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, <span class="fu"><a href="../reference/influence_plot.html">influence_plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="fl">2</span>, title <span class="op">=</span> <span class="st">"Diagnostics"</span>, tag_levels <span class="op">=</span> <span class="st">"A"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span><span class="va">panel</span></span></code></pre></div>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" alt="" width="672"></p>
+<p><code><a href="../reference/save_plot.html">save_plot()</a></code> writes it out at a print-ready 300 dpi by
+default, creating any missing directories along the way.</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/save_plot.html">save_plot</a></span><span class="op">(</span><span class="st">"figures/diagnostics.png"</span>, <span class="va">panel</span>, width <span class="op">=</span> <span class="fl">7</span>, height <span class="op">=</span> <span class="fl">3.2</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

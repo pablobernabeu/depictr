@@ -183,20 +183,26 @@ attributes:</p>
 </tr>
 </tbody>
 </table>
+<p>The gap statistic compares the within-cluster dispersion against a
+null reference, so unlike the other two criteria it can also support
+<code>k = 1</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/k_diagnostic.html">k_diagnostic</a></span><span class="op">(</span><span class="va">crop_yield</span>, k_range <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">6</span>, cols <span class="op">=</span> <span class="va">num</span>, method <span class="op">=</span> <span class="st">"gap"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="multivariate-and-survival_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="672"></p>
 <p><code><a href="../reference/silhouette_plot.html">silhouette_plot()</a></code> then shows the quality of an actual
 clustering, one bar per observation grouped by cluster, with the average
 silhouette width per cluster and overall (the dashed line). Wide
 positive bars are well-placed observations; negative bars may belong to
 a neighbouring cluster.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/kmeans.html" class="external-link">kmeans</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">crop_yield</span><span class="op">[</span><span class="va">num</span><span class="op">]</span><span class="op">)</span>, centers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">kd</span>, <span class="st">"suggested"</span><span class="op">)</span>,</span>
 <span>             nstart <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">$</span><span class="va">cluster</span></span>
 <span><span class="fu"><a href="../reference/silhouette_plot.html">silhouette_plot</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="va">cl</span>, cols <span class="op">=</span> <span class="va">num</span>,</span>
 <span>                title <span class="op">=</span> <span class="st">"Silhouette widths by cluster"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="multivariate-and-survival_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="multivariate-and-survival_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="672"></p>
 <p>The same diagnostics apply to the wellbeing survey’s numeric
 profile:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">wb_num</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"income"</span>, <span class="st">"stress"</span>, <span class="st">"sleep_hours"</span>,</span>
 <span>            <span class="st">"exercise_days"</span>, <span class="st">"life_satisfaction"</span><span class="op">)</span></span>
 <span><span class="va">wkd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/k_diagnostic.html">k_diagnostic</a></span><span class="op">(</span><span class="va">wellbeing_survey</span>, k_range <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">6</span>, cols <span class="op">=</span> <span class="va">wb_num</span>,</span>
@@ -205,7 +211,7 @@ profile:</p>
 <span>              centers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">wkd</span>, <span class="st">"suggested"</span><span class="op">)</span>, nstart <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">$</span><span class="va">cluster</span></span>
 <span><span class="fu"><a href="../reference/silhouette_plot.html">silhouette_plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">wellbeing_survey</span><span class="op">[</span><span class="va">wb_num</span><span class="op">]</span><span class="op">)</span>, <span class="va">wcl</span>,</span>
 <span>                title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Wellbeing survey, k = %d"</span>, <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">wkd</span>, <span class="st">"suggested"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="multivariate-and-survival_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="multivariate-and-survival_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="survival-curves">Survival curves<a class="anchor" aria-label="anchor" href="#survival-curves"></a>
@@ -225,13 +231,13 @@ dashed guides to each arm’s median survival and the log-rank test of the
 difference as a subtitle. A survival curve is monotone-decreasing, so
 its bottom-left corner is always empty;
 <code>legend_inside = TRUE</code> puts the group legend there.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/survival_plot.html">survival_plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">clinical_trial</span><span class="op">$</span><span class="va">time</span>, <span class="va">clinical_trial</span><span class="op">$</span><span class="va">event</span>, group <span class="op">=</span> <span class="va">clinical_trial</span><span class="op">$</span><span class="va">arm</span>,</span>
 <span>  risk_table <span class="op">=</span> <span class="cn">TRUE</span>, median_line <span class="op">=</span> <span class="cn">TRUE</span>, logrank <span class="op">=</span> <span class="cn">TRUE</span>, legend_inside <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  x_lab <span class="op">=</span> <span class="st">"Months"</span>, title <span class="op">=</span> <span class="st">"Overall survival by arm"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="multivariate-and-survival_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="multivariate-and-survival_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="672"></p>
 <p>The log-rank p-value is tiny and the median survival is clearly
 longer in the treatment arm. Because its event times are longer, that
 arm is more often right-censored at the 36-month study end, visible as

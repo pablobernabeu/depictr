@@ -125,6 +125,12 @@ variation is visible rather than implied by the line alone.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/decompose_plot.html">decompose_plot</a></span><span class="op">(</span><span class="va">indoor_ts</span>, confidence <span class="op">=</span> <span class="cn">TRUE</span>, title <span class="op">=</span> <span class="st">"Indoor sales, decomposed"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="time-series_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="672"></p>
+<p>Classical decomposition instead holds the seasonal component fixed
+across the whole series, where STL lets it evolve from year to year.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/decompose_plot.html">decompose_plot</a></span><span class="op">(</span><span class="va">indoor_ts</span>, method <span class="op">=</span> <span class="st">"classical"</span>,</span>
+<span>               title <span class="op">=</span> <span class="st">"Indoor sales, classical decomposition"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="time-series_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="autocorrelation">Autocorrelation<a class="anchor" aria-label="anchor" href="#autocorrelation"></a>
@@ -133,12 +139,12 @@ variation is visible rather than implied by the line alone.</p>
 <code>type = "partial"</code>, the partial autocorrelation) function,
 with approximate significance bounds. The spikes at multiples of twelve
 are the annual seasonality.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/acf_plot.html">acf_plot</a></span><span class="op">(</span><span class="va">indoor_ts</span><span class="op">)</span></span></code></pre></div>
-<p><img src="time-series_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/acf_plot.html">acf_plot</a></span><span class="op">(</span><span class="va">indoor_ts</span>, type <span class="op">=</span> <span class="st">"partial"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/acf_plot.html">acf_plot</a></span><span class="op">(</span><span class="va">indoor_ts</span><span class="op">)</span></span></code></pre></div>
 <p><img src="time-series_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="672"></p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/acf_plot.html">acf_plot</a></span><span class="op">(</span><span class="va">indoor_ts</span>, type <span class="op">=</span> <span class="st">"partial"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="time-series_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="the-seasonal-pattern-up-close">The seasonal pattern up close<a class="anchor" aria-label="anchor" href="#the-seasonal-pattern-up-close"></a>
@@ -149,16 +155,16 @@ and a reference line at each month’s mean. This shows the seasonal shape
 (differences <em>between</em> panels) and the year-on-year trend within
 each month (the slope <em>inside</em> each panel) at the same time,
 something a single overlaid line cannot do.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/seasonal_plot.html">seasonal_plot</a></span><span class="op">(</span><span class="va">indoor_ts</span>, title <span class="op">=</span> <span class="st">"Indoor sales: monthly subseries"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="time-series_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="time-series_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="672"></p>
 <p>With <code>style = "season"</code> every year becomes its own line
 over the months on a shared axis, which is handy for spotting an unusual
 year.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/seasonal_plot.html">seasonal_plot</a></span><span class="op">(</span><span class="va">indoor_ts</span>, style <span class="op">=</span> <span class="st">"season"</span>,</span>
 <span>              title <span class="op">=</span> <span class="st">"Indoor sales: one line per year"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="time-series_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="time-series_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="forecasting">Forecasting<a class="anchor" aria-label="anchor" href="#forecasting"></a>
@@ -167,7 +173,7 @@ year.</p>
 forecaster: it decomposes the series with STL, extrapolates the recent
 trend, carries the seasonal pattern forward, and returns point forecasts
 with prediction intervals that widen with the horizon.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_forecast.html">ts_forecast</a></span><span class="op">(</span><span class="va">indoor_ts</span>, h <span class="op">=</span> <span class="fl">18</span>, level <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">fc</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       time      fit      lwr      upr</span></span>
@@ -181,11 +187,11 @@ with prediction intervals that widen with the horizon.</p>
 overlays that forecast on the history: the point forecast continues the
 line and the shaded ribbon shows the (growing) 90% prediction
 interval.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/timeseries_plot.html">timeseries_plot</a></span><span class="op">(</span><span class="va">indoor_ts</span>, forecast <span class="op">=</span> <span class="fl">18</span>, level <span class="op">=</span> <span class="fl">0.9</span>,</span>
 <span>                title <span class="op">=</span> <span class="st">"Indoor sales with an 18-month forecast"</span>,</span>
 <span>                y_lab <span class="op">=</span> <span class="st">"Units"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="time-series_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="672"></p>
+<p><img src="time-series_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="672"></p>
 <p>For a fully specified statistical model, fit it yourself (for example
 with <code><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast::forecast()</a></code>) and pass the resulting
 <code>time</code>/<code>fit</code>/<code>lwr</code>/<code>upr</code>
