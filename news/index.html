@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">depictr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,21 @@
       <small>Source: <a href="https://github.com/pablobernabeu/depictr/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.1" id="depictr-021">depictr 0.2.1<a class="anchor" aria-label="anchor" href="#depictr-021"></a></h2>
+<div class="section level3">
+<h3 id="documentation-0-2-1">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-2-1"></a></h3>
+<ul><li>The introductory vignette shows <code><a href="../reference/depictr_palette.html">depictr_palette()</a></code> returning the palette’s hex colours directly, ready for <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual()</a></code> or a base-graphics <code>col =</code> argument, and shows <code><a href="../reference/depictr_options.html">depictr_options()</a></code> setting defaults for every later plot and returning the previous values, so the earlier look can be put back afterwards.</li>
+<li>
+<code><a href="../articles/diagnostics-and-uncertainty.html">vignette("diagnostics-and-uncertainty")</a></code> saves an arranged panel with <code><a href="../reference/save_plot.html">save_plot()</a></code>, which writes at a print-ready 300 dpi by default and creates any missing directories.</li>
+<li>
+<code><a href="../articles/multivariate-and-survival.html">vignette("multivariate-and-survival")</a></code> adds <code>k_diagnostic(method = "gap")</code>, which compares within-cluster dispersion against a null reference and so, unlike the other two criteria, can support <code>k = 1</code>.</li>
+<li>
+<code><a href="../articles/time-series.html">vignette("time-series")</a></code> adds classical decomposition, which holds the seasonal component fixed across the series where STL lets it evolve from year to year.</li>
+<li>The <code><a href="../reference/optimizer_fixef_plot.html">optimizer_fixef_plot()</a></code> and <code><a href="../reference/power_curve_plot.html">power_curve_plot()</a></code> reference pages describe what each plot shows rather than the prototype gists they grew from.</li>
+<li>On the documentation site, source chunks are set a little smaller than the output and the prose, so a typical line fits the narrower home and article columns without horizontal scrolling, and the copy button stays attached to its code block.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="depictr-020">depictr 0.2.0<a class="anchor" aria-label="anchor" href="#depictr-020"></a></h2>
 <div class="section level3">

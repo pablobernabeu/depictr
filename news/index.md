@@ -1,5 +1,40 @@
 # Changelog
 
+## depictr 0.2.1
+
+### Documentation
+
+- The introductory vignette shows
+  [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
+  returning the palette’s hex colours directly, ready for
+  [`scale_fill_manual()`](https://ggplot2.tidyverse.org/reference/scale_manual.html)
+  or a base-graphics `col =` argument, and shows
+  [`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md)
+  setting defaults for every later plot and returning the previous
+  values, so the earlier look can be put back afterwards.
+- [`vignette("diagnostics-and-uncertainty")`](https://pablobernabeu.github.io/depictr/articles/diagnostics-and-uncertainty.md)
+  saves an arranged panel with
+  [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md),
+  which writes at a print-ready 300 dpi by default and creates any
+  missing directories.
+- [`vignette("multivariate-and-survival")`](https://pablobernabeu.github.io/depictr/articles/multivariate-and-survival.md)
+  adds `k_diagnostic(method = "gap")`, which compares within-cluster
+  dispersion against a null reference and so, unlike the other two
+  criteria, can support `k = 1`.
+- [`vignette("time-series")`](https://pablobernabeu.github.io/depictr/articles/time-series.md)
+  adds classical decomposition, which holds the seasonal component fixed
+  across the series where STL lets it evolve from year to year.
+- The
+  [`optimizer_fixef_plot()`](https://pablobernabeu.github.io/depictr/reference/optimizer_fixef_plot.md)
+  and
+  [`power_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/power_curve_plot.md)
+  reference pages describe what each plot shows rather than the
+  prototype gists they grew from.
+- On the documentation site, source chunks are set a little smaller than
+  the output and the prose, so a typical line fits the narrower home and
+  article columns without horizontal scrolling, and the copy button
+  stays attached to its code block.
+
 ## depictr 0.2.0
 
 ### Fixes
