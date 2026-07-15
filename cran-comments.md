@@ -18,7 +18,7 @@ for composite panels).
 
 ## Test environments
 
-* local: Windows 11, R 4.6.1 (R CMD check --as-cran, 2026-07-10)
+* local: Windows 11, R 4.6.1 (R CMD check --as-cran, 2026-07-15)
 * GitHub Actions: ubuntu-latest (release, devel, oldrel-1),
   windows-latest (release and devel), macOS-latest (release)
 
