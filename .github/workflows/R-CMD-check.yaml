@@ -19,6 +19,11 @@ jobs:
         config:
           - {os: macos-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
+          # Windows on R-devel is the combination win-builder checks, and the one
+          # the rest of this matrix leaves uncovered (Windows is otherwise only
+          # on release, R-devel only on Linux). Running it here gives the same
+          # signal on every push, rather than by email after an upload.
+          - {os: windows-latest, r: 'devel'}
           - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,  r: 'release'}
           - {os: ubuntu-latest,  r: 'oldrel-1'}
