@@ -1,6 +1,6 @@
 ## Submission
 
-This is the first submission of depictr (version 0.2.0), a unified toolkit of
+This is the first submission of depictr (version 0.2.1), a unified toolkit of
 publication-ready plots that span the analysis workflow: exploratory data
 analysis, model estimates and predictions, diagnostics and classification,
 multivariate and survival methods, time series, uncertainty and reporting.
@@ -20,7 +20,7 @@ for composite panels).
 
 * local: Windows 11, R 4.6.1 (R CMD check --as-cran, 2026-07-10)
 * GitHub Actions: ubuntu-latest (release, devel, oldrel-1),
-  windows-latest (release), macOS-latest (release)
+  windows-latest (release and devel), macOS-latest (release)
 
 ## Notes
 
