@@ -81,6 +81,13 @@ vif_plot <- function(model, threshold = 5,
   df$flag <- factor(ifelse(df$vif >= line_main, "above", "below"),
                     levels = c("below", "above"))
 
+  # Key only the levels the model actually produced. Keying both regardless
+  # gives a well-behaved model a second swatch for a category nothing was
+  # assigned to, which draws as a blank patch beside its label.
+  all_labels <- c(below = paste0("VIF < ", format(threshold)),
+                  above = paste0("VIF >= ", format(threshold)))
+  present <- levels(df$flag)[levels(df$flag) %in% as.character(df$flag)]
+
   # Scale the axis to the data so the bars stay prominent. Draw the single
   # threshold line when it falls within that range; when every value is
   # comfortably below it, note it in the caption rather than stranding a line in
@@ -108,9 +115,8 @@ vif_plot <- function(model, threshold = 5,
     ggplot2::scale_fill_manual(
       name = NULL,
       values = c(below = palette[1], above = palette[2]),
-      breaks = c("below", "above"),
-      labels = c(paste0("VIF < ", format(threshold)),
-                 paste0("VIF >= ", format(threshold))),
+      breaks = present,
+      labels = unname(all_labels[present]),
       drop = FALSE
     ) +
     ggplot2::scale_x_continuous(limits = c(0, upper),

@@ -77,11 +77,17 @@ Terms are aligned by their canonical display label, so the \code{brms}-style \co
 prefix is reconciled automatically against the frequentist term names.
 }
 \examples{
-# Summary path: a tidy "Bayesian" summary as a data frame.
+# Summary path: a tidy "Bayesian" summary as a data frame. The summary here
+# stands in for a regularised posterior, so a weakly informative prior pulls
+# each estimate toward zero and narrows its interval; a real posterior would
+# come from the model fit rather than from arithmetic on the frequentist one.
 freq <- lm(life_satisfaction ~ stress + sleep_hours + exercise_days,
            data = wellbeing_survey)
 bayes <- tidy_estimates(freq)
-bayes$estimate <- bayes$estimate * 0.95
+bayes$estimate <- bayes$estimate * 0.9
+half <- (bayes$conf.high - bayes$conf.low) / 2 * 0.8
+bayes$conf.low <- bayes$estimate - half
+bayes$conf.high <- bayes$estimate + half
 frequentist_bayesian_plot(freq, bayes,
                           title = "Frequentist vs. Bayesian estimates")
 

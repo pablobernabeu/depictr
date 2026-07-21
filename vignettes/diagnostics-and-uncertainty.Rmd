@@ -12,7 +12,24 @@ link-citations: true
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
-                      fig.width = 7, fig.height = 4.5, dpi = 96)
+                      fig.width = 7, fig.height = 4.5, dpi = 96,
+                      dev.args = list(bg = "transparent"))
+
+# Figures on the package website sit on a warm off-white page in light mode and
+# are inverted by pkgdown in dark mode, so an opaque background would read as a
+# pale slab one way and a black plate the other. Two things paint one. The device
+# canvas is made transparent by `dev.args` above, and theme_depictr() then
+# inherits theme_minimal()'s white plot.background, which is drawn over that
+# canvas, so it is cleared as each figure is printed. This is deliberately a
+# vignette-level choice: theme_depictr() keeps its opaque background, which is
+# what a figure saved for a paper wants.
+transparent_bg <- ggplot2::theme(
+  plot.background  = ggplot2::element_rect(fill = NA, colour = NA),
+  panel.background = ggplot2::element_rect(fill = NA, colour = NA)
+)
+knit_print.ggplot <- function(x, ...) knitr::normal_print(x + transparent_bg)
+knit_print.patchwork <- function(x, ...) knitr::normal_print(x & transparent_bg)
+
 library(depictr)
 has_simr <- requireNamespace("simr", quietly = TRUE)
 ```
@@ -38,11 +55,20 @@ influence_plot(fit)
 The bubble area is Cook's distance, the standard measure of an observation's
 influence on the fitted coefficients [@cook1977].
 
-`vif_plot()` checks for multicollinearity among the predictors:
+`vif_plot()` checks for multicollinearity among the predictors. The crop-yield
+predictors are close to orthogonal, so to see the diagnostic do its job we add a
+soil-moisture measure that is largely driven by rainfall.
 
 ```{r, fig.height = 3.2}
-vif_plot(fit)
+set.seed(1)
+collinear <- crop_yield
+collinear$soil_moisture <- 0.05 * collinear$rainfall +
+  rnorm(nrow(collinear), sd = 2)
+vif_plot(lm(yield ~ rainfall + soil_moisture + fertiliser, data = collinear))
 ```
+
+Rainfall and soil moisture each carry a variance inflation factor near 6, above
+the rule-of-thumb line at 5, while fertiliser stays at 1.
 
 ## Diagnostics for a generalised linear model
 
@@ -192,7 +218,7 @@ power_curve_plot(pc, x_lab = "Number of participants",
                  title = "Power for the condition effect")
 ```
 
-```{r, eval = !has_simr, echo = FALSE}
+```{r, eval = !has_simr, echo = !has_simr}
 # Summarising a powerCurve object needs the 'simr' package. Without it we draw
 # the same curve from a tidy data frame, which power_curve_plot() also accepts.
 pc_df <- data.frame(
@@ -203,7 +229,7 @@ pc_df <- data.frame(
 )
 ```
 
-```{r, eval = !has_simr, fig.height = 4.5}
+```{r, eval = !has_simr, echo = !has_simr, fig.height = 4.5}
 power_curve_plot(pc_df, x_lab = "Number of participants",
                  title = "Power for the condition effect")
 ```

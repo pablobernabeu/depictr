@@ -12,7 +12,24 @@ link-citations: true
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
-                      fig.width = 7, fig.height = 4.5, dpi = 96)
+                      fig.width = 7, fig.height = 4.5, dpi = 96,
+                      dev.args = list(bg = "transparent"))
+
+# Figures on the package website sit on a warm off-white page in light mode and
+# are inverted by pkgdown in dark mode, so an opaque background would read as a
+# pale slab one way and a black plate the other. Two things paint one. The device
+# canvas is made transparent by `dev.args` above, and theme_depictr() then
+# inherits theme_minimal()'s white plot.background, which is drawn over that
+# canvas, so it is cleared as each figure is printed. This is deliberately a
+# vignette-level choice: theme_depictr() keeps its opaque background, which is
+# what a figure saved for a paper wants.
+transparent_bg <- ggplot2::theme(
+  plot.background  = ggplot2::element_rect(fill = NA, colour = NA),
+  panel.background = ggplot2::element_rect(fill = NA, colour = NA)
+)
+knit_print.ggplot <- function(x, ...) knitr::normal_print(x + transparent_bg)
+knit_print.patchwork <- function(x, ...) knitr::normal_print(x & transparent_bg)
+
 ```
 
 **depictr** is a single, consistent toolkit of plots that span the whole

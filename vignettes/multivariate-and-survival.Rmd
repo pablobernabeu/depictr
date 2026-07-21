@@ -12,7 +12,24 @@ link-citations: true
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
-                      fig.width = 7, fig.height = 4.5, dpi = 96)
+                      fig.width = 7, fig.height = 4.5, dpi = 96,
+                      dev.args = list(bg = "transparent"))
+
+# Figures on the package website sit on a warm off-white page in light mode and
+# are inverted by pkgdown in dark mode, so an opaque background would read as a
+# pale slab one way and a black plate the other. Two things paint one. The device
+# canvas is made transparent by `dev.args` above, and theme_depictr() then
+# inherits theme_minimal()'s white plot.background, which is drawn over that
+# canvas, so it is cleared as each figure is printed. This is deliberately a
+# vignette-level choice: theme_depictr() keeps its opaque background, which is
+# what a figure saved for a paper wants.
+transparent_bg <- ggplot2::theme(
+  plot.background  = ggplot2::element_rect(fill = NA, colour = NA),
+  panel.background = ggplot2::element_rect(fill = NA, colour = NA)
+)
+knit_print.ggplot <- function(x, ...) knitr::normal_print(x + transparent_bg)
+knit_print.patchwork <- function(x, ...) knitr::normal_print(x & transparent_bg)
+
 library(depictr)
 ```
 
@@ -88,23 +105,38 @@ knitr::kable(attr(kd, "k_table"), digits = 3)
 ```
 
 The gap statistic compares the within-cluster dispersion against a null
-reference, so unlike the other two criteria it can also support `k = 1`:
+reference, so unlike the other two criteria it can also support `k = 1`. Giving
+it a range that starts there shows what it makes of these data. The reference
+samples are drawn at random, so the chunk is seeded for a reproducible build.
 
 ```{r, fig.height = 3.5}
-k_diagnostic(crop_yield, k_range = 2:6, cols = num, method = "gap")
+set.seed(1)
+k_diagnostic(crop_yield, k_range = 1:6, cols = num, method = "gap")
 ```
+
+The verdict is `k = 1`, which is worth taking seriously: the three-cluster
+partition drawn above is a description imposed on the data rather than evidence
+of groups within it.
 
 `silhouette_plot()` then shows the quality of an actual clustering, one bar per
 observation grouped by cluster, with the average silhouette width per cluster and
-overall (the dashed line). Wide positive bars are well-placed observations;
-negative bars may belong to a neighbouring cluster.
+overall (the dashed line). Wide positive bars are well-placed observations, and a
+bar below zero marks an observation that sits closer to a neighbouring cluster
+than to its own.
 
 ```{r, fig.height = 5}
+set.seed(1)
 cl <- kmeans(scale(crop_yield[num]), centers = attr(kd, "suggested"),
              nstart = 10)$cluster
 silhouette_plot(crop_yield, cl, cols = num,
                 title = "Silhouette widths by cluster")
 ```
+
+The overall average here is 0.24, and only six of the two hundred bars fall
+below zero, none of them by much. Rousseeuw's rough guide treats an average at
+or below 0.25 as no substantial structure, so this figure agrees with the gap
+statistic: k-means returns clusters whether or not the data contains any, and
+the silhouette is one way of asking which case you are in.
 
 The same diagnostics apply to the wellbeing survey's numeric profile:
 
