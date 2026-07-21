@@ -108,23 +108,33 @@ knitr::kable(attr(kd, "k_table"), digits = 3)
 |   6 |          0.213 |
 
 The gap statistic compares the within-cluster dispersion against a null
-reference, so unlike the other two criteria it can also support `k = 1`:
+reference, so unlike the other two criteria it can also support `k = 1`.
+Giving it a range that starts there shows what it makes of these data.
+The reference samples are drawn at random, so the chunk is seeded for a
+reproducible build.
 
 ``` r
 
-k_diagnostic(crop_yield, k_range = 2:6, cols = num, method = "gap")
+set.seed(1)
+k_diagnostic(crop_yield, k_range = 1:6, cols = num, method = "gap")
 ```
 
 ![](multivariate-and-survival_files/figure-html/unnamed-chunk-8-1.png)
+
+The verdict is `k = 1`, which is worth taking seriously: the
+three-cluster partition drawn above is a description imposed on the data
+rather than evidence of groups within it.
 
 [`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md)
 then shows the quality of an actual clustering, one bar per observation
 grouped by cluster, with the average silhouette width per cluster and
 overall (the dashed line). Wide positive bars are well-placed
-observations; negative bars may belong to a neighbouring cluster.
+observations, and a bar below zero marks an observation that sits closer
+to a neighbouring cluster than to its own.
 
 ``` r
 
+set.seed(1)
 cl <- kmeans(scale(crop_yield[num]), centers = attr(kd, "suggested"),
              nstart = 10)$cluster
 silhouette_plot(crop_yield, cl, cols = num,
@@ -132,6 +142,13 @@ silhouette_plot(crop_yield, cl, cols = num,
 ```
 
 ![](multivariate-and-survival_files/figure-html/unnamed-chunk-9-1.png)
+
+The overall average here is 0.24, and only six of the two hundred bars
+fall below zero, none of them by much. Rousseeuw’s rough guide treats an
+average at or below 0.25 as no substantial structure, so this figure
+agrees with the gap statistic: k-means returns clusters whether or not
+the data contains any, and the silhouette is one way of asking which
+case you are in.
 
 The same diagnostics apply to the wellbeing survey’s numeric profile:
 

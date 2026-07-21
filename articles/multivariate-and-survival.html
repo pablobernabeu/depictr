@@ -185,21 +185,35 @@ attributes:</p>
 </table>
 <p>The gap statistic compares the within-cluster dispersion against a
 null reference, so unlike the other two criteria it can also support
-<code>k = 1</code>:</p>
+<code>k = 1</code>. Giving it a range that starts there shows what it
+makes of these data. The reference samples are drawn at random, so the
+chunk is seeded for a reproducible build.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/k_diagnostic.html">k_diagnostic</a></span><span class="op">(</span><span class="va">crop_yield</span>, k_range <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">6</span>, cols <span class="op">=</span> <span class="va">num</span>, method <span class="op">=</span> <span class="st">"gap"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/k_diagnostic.html">k_diagnostic</a></span><span class="op">(</span><span class="va">crop_yield</span>, k_range <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, cols <span class="op">=</span> <span class="va">num</span>, method <span class="op">=</span> <span class="st">"gap"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="multivariate-and-survival_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="672"></p>
+<p>The verdict is <code>k = 1</code>, which is worth taking seriously:
+the three-cluster partition drawn above is a description imposed on the
+data rather than evidence of groups within it.</p>
 <p><code><a href="../reference/silhouette_plot.html">silhouette_plot()</a></code> then shows the quality of an actual
 clustering, one bar per observation grouped by cluster, with the average
 silhouette width per cluster and overall (the dashed line). Wide
-positive bars are well-placed observations; negative bars may belong to
-a neighbouring cluster.</p>
+positive bars are well-placed observations, and a bar below zero marks
+an observation that sits closer to a neighbouring cluster than to its
+own.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/kmeans.html" class="external-link">kmeans</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">crop_yield</span><span class="op">[</span><span class="va">num</span><span class="op">]</span><span class="op">)</span>, centers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">kd</span>, <span class="st">"suggested"</span><span class="op">)</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/kmeans.html" class="external-link">kmeans</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">crop_yield</span><span class="op">[</span><span class="va">num</span><span class="op">]</span><span class="op">)</span>, centers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">kd</span>, <span class="st">"suggested"</span><span class="op">)</span>,</span>
 <span>             nstart <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">$</span><span class="va">cluster</span></span>
 <span><span class="fu"><a href="../reference/silhouette_plot.html">silhouette_plot</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="va">cl</span>, cols <span class="op">=</span> <span class="va">num</span>,</span>
 <span>                title <span class="op">=</span> <span class="st">"Silhouette widths by cluster"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="multivariate-and-survival_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="672"></p>
+<p>The overall average here is 0.24, and only six of the two hundred
+bars fall below zero, none of them by much. Rousseeuw’s rough guide
+treats an average at or below 0.25 as no substantial structure, so this
+figure agrees with the gap statistic: k-means returns clusters whether
+or not the data contains any, and the silhouette is one way of asking
+which case you are in.</p>
 <p>The same diagnostics apply to the wellbeing survey’s numeric
 profile:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">

@@ -34,14 +34,23 @@ observation’s influence on the fitted coefficients ([Cook,
 1977](#ref-cook1977)).
 
 [`vif_plot()`](https://pablobernabeu.github.io/depictr/reference/vif_plot.md)
-checks for multicollinearity among the predictors:
+checks for multicollinearity among the predictors. The crop-yield
+predictors are close to orthogonal, so to see the diagnostic do its job
+we add a soil-moisture measure that is largely driven by rainfall.
 
 ``` r
 
-vif_plot(fit)
+set.seed(1)
+collinear <- crop_yield
+collinear$soil_moisture <- 0.05 * collinear$rainfall +
+  rnorm(nrow(collinear), sd = 2)
+vif_plot(lm(yield ~ rainfall + soil_moisture + fertiliser, data = collinear))
 ```
 
 ![](diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-4-1.png)
+
+Rainfall and soil moisture each carry a variance inflation factor near
+6, above the rule-of-thumb line at 5, while fertiliser stays at 1.
 
 ## Diagnostics for a generalised linear model
 
@@ -249,12 +258,6 @@ power_curve_plot(pc, x_lab = "Number of participants",
 ```
 
 ![](diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-19-1.png)
-
-``` r
-
-power_curve_plot(pc_df, x_lab = "Number of participants",
-                 title = "Power for the condition effect")
-```
 
 ## Composing and saving
 

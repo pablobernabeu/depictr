@@ -85,7 +85,7 @@ object.
 ## Examples
 
 ``` r
-# Cluster the US states by the bundled survey's regional averages
+# Cluster the survey regions by their wellbeing averages
 d <- aggregate(cbind(stress, sleep_hours, life_satisfaction) ~ region,
                data = wellbeing_survey, FUN = mean)
 rownames(d) <- d$region

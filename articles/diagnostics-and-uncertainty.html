@@ -104,10 +104,19 @@ particular checks. We fit a linear model to the crop-yield trial.</p>
 <p>The bubble area is Cook’s distance, the standard measure of an
 observation’s influence on the fitted coefficients <span class="citation">(<a href="#ref-cook1977">Cook, 1977</a>)</span>.</p>
 <p><code><a href="../reference/vif_plot.html">vif_plot()</a></code> checks for multicollinearity among the
-predictors:</p>
+predictors. The crop-yield predictors are close to orthogonal, so to see
+the diagnostic do its job we add a soil-moisture measure that is largely
+driven by rainfall.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/vif_plot.html">vif_plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">collinear</span> <span class="op">&lt;-</span> <span class="va">crop_yield</span></span>
+<span><span class="va">collinear</span><span class="op">$</span><span class="va">soil_moisture</span> <span class="op">&lt;-</span> <span class="fl">0.05</span> <span class="op">*</span> <span class="va">collinear</span><span class="op">$</span><span class="va">rainfall</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">collinear</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/vif_plot.html">vif_plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">rainfall</span> <span class="op">+</span> <span class="va">soil_moisture</span> <span class="op">+</span> <span class="va">fertiliser</span>, data <span class="op">=</span> <span class="va">collinear</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="672"></p>
+<p>Rainfall and soil moisture each carry a variance inflation factor
+near 6, above the rule-of-thumb line at 5, while fertiliser stays at
+1.</p>
 </div>
 <div class="section level2">
 <h2 id="diagnostics-for-a-generalised-linear-model">Diagnostics for a generalised linear model<a class="anchor" aria-label="anchor" href="#diagnostics-for-a-generalised-linear-model"></a>
@@ -253,16 +262,13 @@ across numbers of participants); we read it straight from disk.</p>
 <span><span class="fu"><a href="../reference/power_curve_plot.html">power_curve_plot</a></span><span class="op">(</span><span class="va">pc</span>, x_lab <span class="op">=</span> <span class="st">"Number of participants"</span>,</span>
 <span>                 title <span class="op">=</span> <span class="st">"Power for the condition effect"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-19-1.png" class="r-plt" alt="" width="672"></p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/power_curve_plot.html">power_curve_plot</a></span><span class="op">(</span><span class="va">pc_df</span>, x_lab <span class="op">=</span> <span class="st">"Number of participants"</span>,</span>
-<span>                 title <span class="op">=</span> <span class="st">"Power for the condition effect"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="composing-and-saving">Composing and saving<a class="anchor" aria-label="anchor" href="#composing-and-saving"></a>
 </h2>
 <p>Combine any of these with <code><a href="../reference/arrange_plots.html">arrange_plots()</a></code> and save with
 <code><a href="../reference/save_plot.html">save_plot()</a></code>:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">panel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/arrange_plots.html">arrange_plots</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/qq_plot.html">qq_plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, <span class="fu"><a href="../reference/influence_plot.html">influence_plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="fl">2</span>, title <span class="op">=</span> <span class="st">"Diagnostics"</span>, tag_levels <span class="op">=</span> <span class="st">"A"</span></span>
@@ -271,7 +277,7 @@ across numbers of participants); we read it straight from disk.</p>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" alt="" width="672"></p>
 <p><code><a href="../reference/save_plot.html">save_plot()</a></code> writes it out at a print-ready 300 dpi by
 default, creating any missing directories along the way.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/save_plot.html">save_plot</a></span><span class="op">(</span><span class="st">"figures/diagnostics.png"</span>, <span class="va">panel</span>, width <span class="op">=</span> <span class="fl">7</span>, height <span class="op">=</span> <span class="fl">3.2</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2 unnumbered">
