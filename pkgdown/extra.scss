@@ -337,6 +337,18 @@ blockquote p:last-child { margin-bottom: 0; }
   border-collapse: separate;
   border-spacing: 0;
   margin-bottom: 1.6rem;
+  // A step below the prose and level with the code blocks, so a data table
+  // reads as data rather than body text; this also lets more columns sit in
+  // the column before the box has to scroll. Lining figures keep the digit
+  // columns aligned. The mkdocs twin lands at the same size (~13.6px).
+  font-size: .85rem;
+  font-variant-numeric: tabular-nums;
+}
+// Tighter cells than the Bootstrap default fit more of a wide table into the
+// column before it scrolls, without shrinking the type below a readable size.
+.contents table th, .contents table td,
+table.table th, table.table td {
+  padding: .4rem .55rem;
 }
 .contents table thead th, table.table thead th {
   background: var(--brand-ink);

@@ -102,6 +102,9 @@
 #' @references
 #' \insertRef{wickham2016}{depictr}
 #'
+#' @author Pablo Bernabeu, author and maintainer
+#'   (\email{pcbernabeu@gmail.com},
+#'   \href{https://orcid.org/0000-0003-1083-2460}{ORCID}).
 #' @keywords internal
 "_PACKAGE"
 
