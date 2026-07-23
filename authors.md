@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/pablobernabeu/depictr/blob/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/pablobernabeu/depictr/blob/v0.2.2/inst/CITATION)
 
 Bernabeu, P. (2026). depictr: A unified toolkit for visualising
 statistical models and data. R package version 0.2.2.
