@@ -42,12 +42,14 @@ upper envelope a perfect model. Pass a \emph{named list} of models / (actual,
 score) pairs to overlay several colour-coded gains curves with a legend.
 }
 \examples{
-gfit <- glm(accuracy ~ word_frequency + RT + condition,
-            data = lexical_decision, family = binomial)
+# Targeting only pays off when the positive class is scarce, so the example
+# uses the rare clinical-trial adverse event (about 10\% positive).
+gfit <- glm(adverse_event ~ biomarker + age + arm,
+            data = clinical_trial, family = binomial)
 gain_plot(gfit)
 
 # Compare two models.
-reduced <- glm(accuracy ~ word_frequency, data = lexical_decision,
+reduced <- glm(adverse_event ~ biomarker, data = clinical_trial,
                family = binomial)
 gain_plot(list(Full = gfit, Reduced = reduced))
 }

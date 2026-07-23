@@ -191,9 +191,11 @@ roc_curve_plot <- function(x, score = NULL, colour = depictr_brand(),
 #' @return A [ggplot2::ggplot] object.
 #' @export
 #' @examples
-#' gfit <- glm(accuracy ~ word_frequency + RT, data = lexical_decision,
-#'             family = binomial)
-#' calibration_plot(gfit, bins = 8)
+#' # Calibration is judged against the base rate, so the example uses the rare
+#' # clinical-trial adverse event (about 10% positive).
+#' gfit <- glm(adverse_event ~ biomarker + age + arm,
+#'             data = clinical_trial, family = binomial)
+#' calibration_plot(gfit, bins = 6)
 calibration_plot <- function(x, score = NULL, bins = 10,
                              colour = depictr_brand(), conf_level = 0.95,
                              title = NULL) {

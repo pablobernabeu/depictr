@@ -44,7 +44,9 @@ over-interpreted. Pass a \emph{named list} of models / (actual, score) pairs to
 overlay several colour-coded calibration curves with a legend.
 }
 \examples{
-gfit <- glm(accuracy ~ word_frequency + RT, data = lexical_decision,
-            family = binomial)
-calibration_plot(gfit, bins = 8)
+# Calibration is judged against the base rate, so the example uses the rare
+# clinical-trial adverse event (about 10\% positive).
+gfit <- glm(adverse_event ~ biomarker + age + arm,
+            data = clinical_trial, family = binomial)
+calibration_plot(gfit, bins = 6)
 }

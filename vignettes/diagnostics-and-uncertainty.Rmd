@@ -209,30 +209,33 @@ posterior_plot(draws[c("conditionunrelated", "modalityauditory",
 `power_curve_plot()` reads a `simr::powerCurve()` object or a tidy data frame, so
 a slow power simulation does not have to be re-run to redraw it. The package
 ships a real `powerCurve` object from a `simr` analysis of the lexical-decision
-design (power for the condition effect across numbers of participants); we read
-it straight from disk.
+design, which simulated power for the word-frequency slope as the number of
+participants grows. We read it straight from disk.
 
 ```{r, eval = has_simr}
 pc <- readRDS(system.file("extdata", "powercurve_lexdec.rds", package = "depictr"))
 power_curve_plot(pc, x_lab = "Number of participants",
-                 title = "Power for the condition effect")
+                 title = "Power for the word-frequency effect")
 ```
 
 ```{r, eval = !has_simr, echo = !has_simr}
-# Summarising a powerCurve object needs the 'simr' package. Without it we draw
-# the same curve from a tidy data frame, which power_curve_plot() also accepts.
-pc_df <- data.frame(
-  nlevels = seq(10, 70, by = 10),
-  mean  = c(0.16, 0.31, 0.48, 0.63, 0.78, 0.88, 0.94),
-  lower = c(0.09, 0.23, 0.39, 0.54, 0.70, 0.82, 0.89),
-  upper = c(0.25, 0.40, 0.57, 0.71, 0.85, 0.93, 0.97)
-)
+# Summarising a powerCurve object needs the 'simr' package. Without it we read
+# the same five points from the summary stored alongside the object, as a tidy
+# data frame, which power_curve_plot() also accepts.
+pc_df <- readRDS(system.file("extdata", "powercurve_lexdec_summary.rds",
+                             package = "depictr"))
 ```
 
 ```{r, eval = !has_simr, echo = !has_simr, fig.height = 4.5}
 power_curve_plot(pc_df, x_lab = "Number of participants",
-                 title = "Power for the condition effect")
+                 title = "Power for the word-frequency effect")
 ```
+
+The analysis ran 100 simulations at each of 12, 24, 36, 48 and 60 participants.
+Power for the word-frequency slope is 88% with 12 participants and 99% with 24,
+and it stays there for the larger samples. The confidence band is widest at the
+smallest sample size, where its lower limit falls on the 80% target line, so 24
+participants is the first design the simulation clears comfortably.
 
 ## Composing and saving
 

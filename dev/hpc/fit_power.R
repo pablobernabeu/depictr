@@ -18,4 +18,12 @@ pc <- powerCurve(mext, test = fixed("word_frequency", "t"), along = "participant
 saveRDS(pc, file.path(OUT, "powercurve_lexdec.rds"))
 print(summary(pc))
 write.csv(summary(pc), file.path(OUT, "powercurve_summary.csv"), row.names = FALSE)
+
+## The vignette's no-simr fallback needs these numbers without calling
+## summary.powerCurve(), so store the summary alongside the object itself. Both
+## files go to inst/extdata/, which keeps the two rendering paths in agreement.
+s <- as.data.frame(summary(pc))
+s <- s[, c("nlevels", "successes", "trials", "mean", "lower", "upper")]
+rownames(s) <- NULL
+saveRDS(s, file.path(OUT, "powercurve_lexdec_summary.rds"), version = 2)
 cat("JOB B DONE\n")

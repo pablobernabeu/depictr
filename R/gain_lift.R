@@ -25,12 +25,14 @@
 #' @return A [ggplot2::ggplot] object.
 #' @export
 #' @examples
-#' gfit <- glm(accuracy ~ word_frequency + RT + condition,
-#'             data = lexical_decision, family = binomial)
+#' # Targeting only pays off when the positive class is scarce, so the example
+#' # uses the rare clinical-trial adverse event (about 10% positive).
+#' gfit <- glm(adverse_event ~ biomarker + age + arm,
+#'             data = clinical_trial, family = binomial)
 #' gain_plot(gfit)
 #'
 #' # Compare two models.
-#' reduced <- glm(accuracy ~ word_frequency, data = lexical_decision,
+#' reduced <- glm(adverse_event ~ biomarker, data = clinical_trial,
 #'                family = binomial)
 #' gain_plot(list(Full = gfit, Reduced = reduced))
 gain_plot <- function(x, score = NULL, colour = depictr_brand(),
@@ -106,12 +108,14 @@ gain_plot <- function(x, score = NULL, colour = depictr_brand(),
 #' @return A [ggplot2::ggplot] object.
 #' @export
 #' @examples
-#' gfit <- glm(accuracy ~ word_frequency + RT + condition,
-#'             data = lexical_decision, family = binomial)
+#' # Lift is measured against the base rate, so the example uses the rare
+#' # clinical-trial adverse event (about 10% positive).
+#' gfit <- glm(adverse_event ~ biomarker + age + arm,
+#'             data = clinical_trial, family = binomial)
 #' lift_plot(gfit)
 #'
 #' # Compare two models.
-#' reduced <- glm(accuracy ~ word_frequency, data = lexical_decision,
+#' reduced <- glm(adverse_event ~ biomarker, data = clinical_trial,
 #'                family = binomial)
 #' lift_plot(list(Full = gfit, Reduced = reduced))
 lift_plot <- function(x, score = NULL, colour = depictr_brand(),

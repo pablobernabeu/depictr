@@ -26,15 +26,17 @@
 #'   supplied).
 #' @export
 #' @examples
-#' gfit <- glm(accuracy ~ word_frequency + RT + condition,
-#'             data = lexical_decision, family = binomial)
+#' # The clinical-trial adverse event is rare (about 10% positive), which is
+#' # where a precision-recall curve is worth drawing.
+#' gfit <- glm(adverse_event ~ biomarker + age + arm,
+#'             data = clinical_trial, family = binomial)
 #' pr_curve_plot(gfit)
 #'
 #' # Mark the maximum-F1 operating point.
 #' pr_curve_plot(gfit, f1 = TRUE)
 #'
 #' # Compare two models with per-curve average precision in the legend.
-#' reduced <- glm(accuracy ~ word_frequency, data = lexical_decision,
+#' reduced <- glm(adverse_event ~ biomarker, data = clinical_trial,
 #'                family = binomial)
 #' pr_curve_plot(list(Full = gfit, Reduced = reduced))
 pr_curve_plot <- function(x, score = NULL, colour = depictr_brand(),

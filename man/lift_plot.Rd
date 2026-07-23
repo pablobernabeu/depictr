@@ -42,12 +42,14 @@ list} of models / (actual, score) pairs to overlay several colour-coded lift
 curves with a legend.
 }
 \examples{
-gfit <- glm(accuracy ~ word_frequency + RT + condition,
-            data = lexical_decision, family = binomial)
+# Lift is measured against the base rate, so the example uses the rare
+# clinical-trial adverse event (about 10\% positive).
+gfit <- glm(adverse_event ~ biomarker + age + arm,
+            data = clinical_trial, family = binomial)
 lift_plot(gfit)
 
 # Compare two models.
-reduced <- glm(accuracy ~ word_frequency, data = lexical_decision,
+reduced <- glm(adverse_event ~ biomarker, data = clinical_trial,
                family = binomial)
 lift_plot(list(Full = gfit, Reduced = reduced))
 }
