@@ -255,13 +255,20 @@ point-and-interval forests.</p>
 <code><a href="https://rdrr.io/pkg/simr/man/powerCurve.html" class="external-link">simr::powerCurve()</a></code> object or a tidy data frame, so a slow
 power simulation does not have to be re-run to redraw it. The package
 ships a real <code>powerCurve</code> object from a <code>simr</code>
-analysis of the lexical-decision design (power for the condition effect
-across numbers of participants); we read it straight from disk.</p>
+analysis of the lexical-decision design, which simulated power for the
+word-frequency slope as the number of participants grows. We read it
+straight from disk.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"powercurve_lexdec.rds"</span>, package <span class="op">=</span> <span class="st">"depictr"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/power_curve_plot.html">power_curve_plot</a></span><span class="op">(</span><span class="va">pc</span>, x_lab <span class="op">=</span> <span class="st">"Number of participants"</span>,</span>
-<span>                 title <span class="op">=</span> <span class="st">"Power for the condition effect"</span><span class="op">)</span></span></code></pre></div>
+<span>                 title <span class="op">=</span> <span class="st">"Power for the word-frequency effect"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-19-1.png" class="r-plt" alt="" width="672"></p>
+<p>The analysis ran 100 simulations at each of 12, 24, 36, 48 and 60
+participants. Power for the word-frequency slope is 88% with 12
+participants and 99% with 24, and it stays there for the larger samples.
+The confidence band is widest at the smallest sample size, where its
+lower limit falls on the 80% target line, so 24 participants is the
+first design the simulation clears comfortably.</p>
 </div>
 <div class="section level2">
 <h2 id="composing-and-saving">Composing and saving<a class="anchor" aria-label="anchor" href="#composing-and-saving"></a>

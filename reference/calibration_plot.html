@@ -122,9 +122,11 @@ drawn in the single-model case to keep the overlay legible.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">gfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">accuracy</span> <span class="op">~</span> <span class="va">word_frequency</span> <span class="op">+</span> <span class="va">RT</span>, data <span class="op">=</span> <span class="va">lexical_decision</span>,</span></span>
-<span class="r-in"><span>            family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">calibration_plot</span><span class="op">(</span><span class="va">gfit</span>, bins <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Calibration is judged against the base rate, so the example uses the rare</span></span></span>
+<span class="r-in"><span><span class="co"># clinical-trial adverse event (about 10% positive).</span></span></span>
+<span class="r-in"><span><span class="va">gfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">adverse_event</span> <span class="op">~</span> <span class="va">biomarker</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">arm</span>,</span></span>
+<span class="r-in"><span>            data <span class="op">=</span> <span class="va">clinical_trial</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">calibration_plot</span><span class="op">(</span><span class="va">gfit</span>, bins <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="calibration_plot-1.png" alt="" width="672" height="432"></span>
 </code></pre></div>
     </div>

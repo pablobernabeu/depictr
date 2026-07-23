@@ -246,18 +246,25 @@ reads a
 [`simr::powerCurve()`](https://rdrr.io/pkg/simr/man/powerCurve.html)
 object or a tidy data frame, so a slow power simulation does not have to
 be re-run to redraw it. The package ships a real `powerCurve` object
-from a `simr` analysis of the lexical-decision design (power for the
-condition effect across numbers of participants); we read it straight
-from disk.
+from a `simr` analysis of the lexical-decision design, which simulated
+power for the word-frequency slope as the number of participants grows.
+We read it straight from disk.
 
 ``` r
 
 pc <- readRDS(system.file("extdata", "powercurve_lexdec.rds", package = "depictr"))
 power_curve_plot(pc, x_lab = "Number of participants",
-                 title = "Power for the condition effect")
+                 title = "Power for the word-frequency effect")
 ```
 
 ![](diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-19-1.png)
+
+The analysis ran 100 simulations at each of 12, 24, 36, 48 and 60
+participants. Power for the word-frequency slope is 88% with 12
+participants and 99% with 24, and it stays there for the larger samples.
+The confidence band is widest at the smallest sample size, where its
+lower limit falls on the 80% target line, so 24 participants is the
+first design the simulation clears comfortably.
 
 ## Composing and saving
 

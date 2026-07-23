@@ -119,8 +119,10 @@ supplied).</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">gfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">accuracy</span> <span class="op">~</span> <span class="va">word_frequency</span> <span class="op">+</span> <span class="va">RT</span> <span class="op">+</span> <span class="va">condition</span>,</span></span>
-<span class="r-in"><span>            data <span class="op">=</span> <span class="va">lexical_decision</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># The clinical-trial adverse event is rare (about 10% positive), which is</span></span></span>
+<span class="r-in"><span><span class="co"># where a precision-recall curve is worth drawing.</span></span></span>
+<span class="r-in"><span><span class="va">gfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">adverse_event</span> <span class="op">~</span> <span class="va">biomarker</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">arm</span>,</span></span>
+<span class="r-in"><span>            data <span class="op">=</span> <span class="va">clinical_trial</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">pr_curve_plot</span><span class="op">(</span><span class="va">gfit</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="pr_curve_plot-1.png" alt="" width="672" height="432"></span>
 <span class="r-in"><span></span></span>
@@ -129,7 +131,7 @@ supplied).</p>
 <span class="r-plt img"><img src="pr_curve_plot-2.png" alt="" width="672" height="432"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Compare two models with per-curve average precision in the legend.</span></span></span>
-<span class="r-in"><span><span class="va">reduced</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">accuracy</span> <span class="op">~</span> <span class="va">word_frequency</span>, data <span class="op">=</span> <span class="va">lexical_decision</span>,</span></span>
+<span class="r-in"><span><span class="va">reduced</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">adverse_event</span> <span class="op">~</span> <span class="va">biomarker</span>, data <span class="op">=</span> <span class="va">clinical_trial</span>,</span></span>
 <span class="r-in"><span>               family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">pr_curve_plot</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Full <span class="op">=</span> <span class="va">gfit</span>, Reduced <span class="op">=</span> <span class="va">reduced</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="pr_curve_plot-3.png" alt="" width="672" height="432"></span>
