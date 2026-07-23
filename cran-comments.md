@@ -1,6 +1,6 @@
 ## Submission
 
-This is the first submission of depictr (version 0.2.1), a unified toolkit of
+This is the first submission of depictr (version 0.2.2), a unified toolkit of
 publication-ready plots that span the analysis workflow: exploratory data
 analysis, model estimates and predictions, diagnostics and classification,
 multivariate and survival methods, time series, uncertainty and reporting.
@@ -9,16 +9,22 @@ for composite panels).
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
+0 errors | 0 warnings | 2 notes
 
 * The note is the standard "new submission" note for a first release.
+
+The local machine has no pandoc on the check subprocess PATH, so the local run
+also reports that 'README.md' and 'NEWS.md' cannot be checked. That note is an
+artefact of this machine and does not arise where pandoc is present, including
+the GitHub Actions runs above.
+
 * Example variants that render several multi-panel figures are wrapped in
   `\donttest{}` so each example file stays within the five-second budget; the
   first call of every example remains runnable.
 
 ## Test environments
 
-* local: Windows 11, R 4.6.1 (R CMD check --as-cran, 2026-07-15)
+* local: Windows 11, R 4.6.1 (R CMD check --as-cran, 2026-07-23)
 * GitHub Actions: ubuntu-latest (release, devel, oldrel-1),
   windows-latest (release and devel), macOS-latest (release)
 

@@ -1,3 +1,22 @@
+# depictr 0.2.2
+
+## Examples that match the chart
+
+* The precision-recall, gain and lift examples move to an outcome with a scarce
+  positive class, which is the case those charts are documented for. They
+  previously ran on an outcome that was 94 per cent positive, so the gain curve
+  sat on the diagonal and lift hovered at one.
+* The calibration example fits a model and plots its predicted probabilities,
+  a reliability curve being a check on a fitted model rather than on a raw score.
+* The power-curve article names the effect the shipped simulation actually
+  covers, and its no-simr branch reads a summary derived from that simulation,
+  so the two branches agree by construction.
+
+## Fixes
+
+* `vif_plot()` restricts its scale to the severity levels present, which removes
+  an empty key entry from the rendered figure.
+
 # depictr 0.2.1
 
 ## Documentation

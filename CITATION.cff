@@ -8,8 +8,8 @@ authors:
     given-names: Pablo
     orcid: "https://orcid.org/0000-0003-1083-2460"
     email: pcbernabeu@gmail.com
-version: "0.2.1"
-date-released: "2026-07-15"
+version: "0.2.2"
+date-released: "2026-07-23"
 doi: "10.5281/zenodo.21266308"
 license: MIT
 repository-code: "https://github.com/pablobernabeu/depictr"
