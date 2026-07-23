@@ -5,7 +5,7 @@
 If you use depictr in published work, please cite it.
 
 > Bernabeu, P. (2026). depictr: A unified toolkit for visualising
-> statistical models and data. R package version 0.2.1.
+> statistical models and data. R package version 0.2.2.
 > <https://doi.org/10.5281/zenodo.21266308>
 
 ```
@@ -13,14 +13,14 @@ If you use depictr in published work, please cite it.
   title  = {{depictr}: A unified toolkit for visualising statistical models and data},
   author = {Pablo Bernabeu},
   year   = {2026},
-  note   = {R package version 0.2.1},
+  note   = {R package version 0.2.2},
   doi    = {10.5281/zenodo.21266308},
   url    = {https://doi.org/10.5281/zenodo.21266308},
 }
 ```
 
 Copy BibTeX [Download
-.bib](data:application/x-bibtex;charset=utf-8,%40Manual%7Bdepictr%2C%0A%20%20title%20%20%3D%20%7B%7Bdepictr%7D%3A%20A%20unified%20toolkit%20for%20visualising%20statistical%20models%20and%20data%7D%2C%0A%20%20author%20%3D%20%7BPablo%20Bernabeu%7D%2C%0A%20%20year%20%20%20%3D%20%7B2026%7D%2C%0A%20%20note%20%20%20%3D%20%7BR%20package%20version%200.2.1%7D%2C%0A%20%20doi%20%20%20%20%3D%20%7B10.5281%2Fzenodo.21266308%7D%2C%0A%20%20url%20%20%20%20%3D%20%7Bhttps%3A%2F%2Fdoi.org%2F10.5281%2Fzenodo.21266308%7D%2C%0A%7D)
+.bib](data:application/x-bibtex;charset=utf-8,%40Manual%7Bdepictr%2C%0A%20%20title%20%20%3D%20%7B%7Bdepictr%7D%3A%20A%20unified%20toolkit%20for%20visualising%20statistical%20models%20and%20data%7D%2C%0A%20%20author%20%3D%20%7BPablo%20Bernabeu%7D%2C%0A%20%20year%20%20%20%3D%20%7B2026%7D%2C%0A%20%20note%20%20%20%3D%20%7BR%20package%20version%200.2.2%7D%2C%0A%20%20doi%20%20%20%20%3D%20%7B10.5281%2Fzenodo.21266308%7D%2C%0A%20%20url%20%20%20%20%3D%20%7Bhttps%3A%2F%2Fdoi.org%2F10.5281%2Fzenodo.21266308%7D%2C%0A%7D)
 
 R users can also retrieve this citation directly with
 `citation("depictr")`.

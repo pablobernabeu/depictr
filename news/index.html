@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">depictr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,20 @@
       <small>Source: <a href="https://github.com/pablobernabeu/depictr/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.2" id="depictr-022">depictr 0.2.2<a class="anchor" aria-label="anchor" href="#depictr-022"></a></h2>
+<div class="section level3">
+<h3 id="examples-that-match-the-chart-0-2-2">Examples that match the chart<a class="anchor" aria-label="anchor" href="#examples-that-match-the-chart-0-2-2"></a></h3>
+<ul><li>The precision-recall, gain and lift examples move to an outcome with a scarce positive class, which is the case those charts are documented for. They previously ran on an outcome that was 94 per cent positive, so the gain curve sat on the diagonal and lift hovered at one.</li>
+<li>The calibration example fits a model and plots its predicted probabilities, a reliability curve being a check on a fitted model rather than on a raw score.</li>
+<li>The power-curve article names the effect the shipped simulation actually covers, and its no-simr branch reads a summary derived from that simulation, so the two branches agree by construction.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="fixes-0-2-2">Fixes<a class="anchor" aria-label="anchor" href="#fixes-0-2-2"></a></h3>
+<ul><li>
+<code><a href="../reference/vif_plot.html">vif_plot()</a></code> restricts its scale to the severity levels present, which removes an empty key entry from the rendered figure.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.1" id="depictr-021">depictr 0.2.1<a class="anchor" aria-label="anchor" href="#depictr-021"></a></h2>
 <div class="section level3">
