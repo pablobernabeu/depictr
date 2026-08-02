@@ -192,10 +192,8 @@ reference:
   - monthly_sales
 
 articles:
-- title: Articles
-  navbar: ~
+- title: Guides
   contents:
-  - depictr
   - exploring-data
   - model-estimates
   - diagnostics-and-uncertainty

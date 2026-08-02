@@ -119,7 +119,7 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
   `scatter_trend()` and `summary_table()`.
 * `estimation_plot()` for estimation statistics: group effect sizes
   (mean differences, Cohen's *d* / Hedges' *g*) with bootstrap confidence
-  intervals, in the spirit of the "new statistics".
+  intervals, in the spirit of the 'new statistics'.
 * `ecdf_plot()` (empirical cumulative distribution, optionally by group),
   `ridgeline_plot()` (overlapping per-group densities) and `dumbbell_plot()`
   (a connected two-group comparison across categories).
@@ -148,8 +148,8 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
 
 ## Model estimates and inference
 
-* `tidy_estimates()` -- the shared tidy estimate table (methods for `lm`,
-  `glm`, `merMod` and data frames; falls back to `broom::tidy()`).
+* `tidy_estimates()` provides the shared tidy estimate table, with methods for
+  `lm`, `glm`, `merMod` and data frames and a fallback to `broom::tidy()`.
 * `coefficient_plot()`, `compare_models()`, `frequentist_bayesian_plot()`,
   `effects_plot()`, `interaction_plot()`, `random_effects_plot()`,
   `optimizer_fixef_plot()` and `model_fit_table()`.
@@ -182,9 +182,9 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
   `scale_color_depictr()`, `scale_fill_depictr()`), `palette_preview()`,
   `format_terms()`, `model_report()` (a one-figure model overview),
   `arrange_plots()` and `save_plot()`.
-* `depictr_options()` sets package-wide defaults once -- the brand and accent
-  colours, qualitative palette, base font size and family, and the colour used
-  for missing values -- which every plot and scale then honours.
+* `depictr_options()` sets package-wide defaults once, covering the brand and
+  accent colours, qualitative palette, base font size and family, and the colour
+  used for missing values. Every plot and scale then honours them.
 
 ## Layout and legibility
 
@@ -193,49 +193,52 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
   term out in its own free-scaled panel, so terms on very different scales (a
   large intercept alongside small slopes) stay legible instead of being squished
   onto the zero line. `frequentist_bayesian_plot()` uses this layout by default.
-* A pass over every plot for legibility: `silhouette_plot()` cluster labels no
-  longer clip; `raincloud_plot()` uses one colour per group across all layers;
-  `dendrogram_plot()` hides leaf labels for large trees; `confusion_matrix_plot()`
-  picks each label's colour from the tile luminance; `gain_plot()`/`lift_plot()`
-  label their reference lines; `timeseries_plot()` shows a single legend; and
-  `k_diagnostic()` now returns the diagnostic curve as a plot.
+* Every plot has had a pass for legibility. `silhouette_plot()` cluster labels
+  no longer clip. `raincloud_plot()` uses one colour per group across all
+  layers. `dendrogram_plot()` hides leaf labels for large trees.
+  `confusion_matrix_plot()` picks each label's colour from the tile luminance.
+  `gain_plot()` and `lift_plot()` label their reference lines.
+  `timeseries_plot()` shows a single legend, and `k_diagnostic()` now returns
+  the diagnostic curve as a plot.
 * `coefficient_plot()` gains `standardise`, scaling each coefficient by its
   predictor's standard deviation so magnitudes are comparable; `model_report()`
   uses it by default, removing the empty band in its coefficient panel.
 * `vif_plot()` shows the ordinary VIF (not its square root) for single-df terms,
   scales the axis to the data, and draws a single clearly-labelled threshold
-  line (reported in the caption when it is off-axis) -- no more wide empty band
+  line (reported in the caption when it is off-axis), leaving no wide empty band
   or hard-to-read guides.
 * `seasonal_plot(style = "season")` reverses its sequential legend so the
   darkest, most-recent cycle sits at the top, matching the plotted order.
 * Factor coefficient names are prettified by default to the effect (variable)
-  name -- `conditionunrelated` becomes `condition`, `word_frequency` becomes
-  `word frequency` -- in `coefficient_plot()`, `compare_models()`
-  and `frequentist_bayesian_plot()` (read from the model); `optimizer_fixef_plot()`
+  name in `coefficient_plot()`, `compare_models()` and
+  `frequentist_bayesian_plot()`, where they are read from the model, so
+  `conditionunrelated` becomes `condition` and `word_frequency` becomes
+  `word frequency`. `optimizer_fixef_plot()`
   and `posterior_plot()` gain a `labels` argument for the same. Any user-supplied
   `labels` take precedence. `pca_plot()` likewise shows underscores in its
   loading-arrow labels as spaces (`soil_ph` -> `soil ph`).
 * Redundant cluster legends are dropped: `silhouette_plot()` (the bands are
   labelled in place) and `cluster_plot()` when the centroids are labelled.
-* `survival_plot()`: the log-rank annotation renders a proper chi-squared and
-  an italic *p*, formatted APA style (no leading zero, *p* < .001 below that
-  threshold); the median guide is labelled "median <value>"; the y-axis title
-  margin is tighter; and the colour legend and the number-at-risk table list
-  the groups in the same order, following the group factor's levels.
+* `survival_plot()` has been tidied in several ways. The log-rank annotation
+  renders a proper chi-squared and an italic *p*, formatted APA style (no
+  leading zero, *p* < .001 below that threshold). The median guide is labelled
+  'median <value>'. The y-axis title margin is tighter, and the colour legend
+  and the number-at-risk table list the groups in the same order, following the
+  group factor's levels.
 * A `legend_inside` argument (off by default) draws the legend inside the panel,
-  over a semi-transparent background, in a corner the plot usually leaves empty
-  -- reclaiming the right-hand margin. It is offered by `roc_curve_plot()`,
+  over a semi-transparent background, in a corner the plot usually leaves empty,
+  which reclaims the right-hand margin. It is offered by `roc_curve_plot()`,
   `gain_plot()`, `lift_plot()` (bottom-right / top-right of the curve),
   `ecdf_plot()`, `survival_plot()`, `explore_distribution()`, `dumbbell_plot()`
   and `missingness_map()`. For any other plot the same is one `theme()` call;
   `vignette("exploring-data")` shows how, alongside tidying legend titles.
 * `theme_depictr()` now centres legend titles over their keys, which reads more
-  tidily than ggplot2's default left alignment -- especially for an inside or a
+  tidily than ggplot2's default left alignment, especially for an inside or a
   top/bottom legend.
 * `estimation_plot()` reserves more headroom above the lower panel so the
   effect-size annotation (Hedges' *g* / Cohen's *d*) is never clipped.
-* `scree_plot()` colour-matches and names its dual axes -- "Variance explained
-  (bars)" on the left, "Cumulative (line)" on the right.
+* `scree_plot()` colour-matches and names its dual axes, 'Variance explained
+  (bars)' on the left and 'Cumulative (line)' on the right.
 * Statistical letters are italic in annotations: the log-rank *p*,
   `model_report()`'s *n* and *R*, and `estimation_plot()`'s *g* / *d*.
 * British (en-GB) spelling throughout: the `crop_yield` column is now
