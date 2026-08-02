@@ -1,9 +1,7 @@
 # Articles
 
-### Articles
+### Guides
 
-- [Getting started with
-  depictr](https://pablobernabeu.github.io/depictr/articles/depictr.md):
 - [Exploring
   data](https://pablobernabeu.github.io/depictr/articles/exploring-data.md):
 - [Visualising model

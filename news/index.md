@@ -157,7 +157,7 @@ out of, and generalises, three earlier plotting functions
 - [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md)
   for estimation statistics: group effect sizes (mean differences,
   Cohen’s *d* / Hedges’ *g*) with bootstrap confidence intervals, in the
-  spirit of the “new statistics”.
+  spirit of the ‘new statistics’.
 - [`ecdf_plot()`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot.md)
   (empirical cumulative distribution, optionally by group),
   [`ridgeline_plot()`](https://pablobernabeu.github.io/depictr/reference/ridgeline_plot.md)
@@ -205,9 +205,9 @@ out of, and generalises, three earlier plotting functions
 ### Model estimates and inference
 
 - [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md)
-  – the shared tidy estimate table (methods for `lm`, `glm`, `merMod`
-  and data frames; falls back to
-  [`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html)).
+  provides the shared tidy estimate table, with methods for `lm`, `glm`,
+  `merMod` and data frames and a fallback to
+  [`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html).
 - [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
   [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md),
   [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md),
@@ -269,9 +269,10 @@ out of, and generalises, three earlier plotting functions
   and
   [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md).
 - [`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md)
-  sets package-wide defaults once – the brand and accent colours,
-  qualitative palette, base font size and family, and the colour used
-  for missing values – which every plot and scale then honours.
+  sets package-wide defaults once, covering the brand and accent
+  colours, qualitative palette, base font size and family, and the
+  colour used for missing values. Every plot and scale then honours
+  them.
 
 ### Layout and legibility
 
@@ -286,19 +287,21 @@ out of, and generalises, three earlier plotting functions
   squished onto the zero line.
   [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
   uses this layout by default.
-- A pass over every plot for legibility:
+- Every plot has had a pass for legibility.
   [`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md)
-  cluster labels no longer clip;
+  cluster labels no longer clip.
   [`raincloud_plot()`](https://pablobernabeu.github.io/depictr/reference/raincloud_plot.md)
-  uses one colour per group across all layers;
+  uses one colour per group across all layers.
   [`dendrogram_plot()`](https://pablobernabeu.github.io/depictr/reference/dendrogram_plot.md)
-  hides leaf labels for large trees;
+  hides leaf labels for large trees.
   [`confusion_matrix_plot()`](https://pablobernabeu.github.io/depictr/reference/confusion_matrix_plot.md)
-  picks each label’s colour from the tile luminance;
-  [`gain_plot()`](https://pablobernabeu.github.io/depictr/reference/gain_plot.md)/[`lift_plot()`](https://pablobernabeu.github.io/depictr/reference/lift_plot.md)
-  label their reference lines;
+  picks each label’s colour from the tile luminance.
+  [`gain_plot()`](https://pablobernabeu.github.io/depictr/reference/gain_plot.md)
+  and
+  [`lift_plot()`](https://pablobernabeu.github.io/depictr/reference/lift_plot.md)
+  label their reference lines.
   [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
-  shows a single legend; and
+  shows a single legend, and
   [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
   now returns the diagnostic curve as a plot.
 - [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)
@@ -309,19 +312,19 @@ out of, and generalises, three earlier plotting functions
 - [`vif_plot()`](https://pablobernabeu.github.io/depictr/reference/vif_plot.md)
   shows the ordinary VIF (not its square root) for single-df terms,
   scales the axis to the data, and draws a single clearly-labelled
-  threshold line (reported in the caption when it is off-axis) – no more
-  wide empty band or hard-to-read guides.
+  threshold line (reported in the caption when it is off-axis), leaving
+  no wide empty band or hard-to-read guides.
 - `seasonal_plot(style = "season")` reverses its sequential legend so
   the darkest, most-recent cycle sits at the top, matching the plotted
   order.
 - Factor coefficient names are prettified by default to the effect
-  (variable) name – `conditionunrelated` becomes `condition`,
-  `word_frequency` becomes `word frequency` – in
+  (variable) name in
   [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
   [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md)
   and
-  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
-  (read from the model);
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md),
+  where they are read from the model, so `conditionunrelated` becomes
+  `condition` and `word_frequency` becomes `word frequency`.
   [`optimizer_fixef_plot()`](https://pablobernabeu.github.io/depictr/reference/optimizer_fixef_plot.md)
   and
   [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
@@ -335,17 +338,17 @@ out of, and generalises, three earlier plotting functions
   (the bands are labelled in place) and
   [`cluster_plot()`](https://pablobernabeu.github.io/depictr/reference/cluster_plot.md)
   when the centroids are labelled.
-- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md):
-  the log-rank annotation renders a proper chi-squared and an italic
-  *p*, formatted APA style (no leading zero, *p* \< .001 below that
-  threshold); the median guide is labelled “median ”; the y-axis title
-  margin is tighter; and the colour legend and the number-at-risk table
-  list the groups in the same order, following the group factor’s
-  levels.
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  has been tidied in several ways. The log-rank annotation renders a
+  proper chi-squared and an italic *p*, formatted APA style (no leading
+  zero, *p* \< .001 below that threshold). The median guide is labelled
+  ‘median ’. The y-axis title margin is tighter, and the colour legend
+  and the number-at-risk table list the groups in the same order,
+  following the group factor’s levels.
 - A `legend_inside` argument (off by default) draws the legend inside
   the panel, over a semi-transparent background, in a corner the plot
-  usually leaves empty – reclaiming the right-hand margin. It is offered
-  by
+  usually leaves empty, which reclaims the right-hand margin. It is
+  offered by
   [`roc_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/roc_curve_plot.md),
   [`gain_plot()`](https://pablobernabeu.github.io/depictr/reference/gain_plot.md),
   [`lift_plot()`](https://pablobernabeu.github.io/depictr/reference/lift_plot.md)
@@ -362,14 +365,14 @@ out of, and generalises, three earlier plotting functions
   shows how, alongside tidying legend titles.
 - [`theme_depictr()`](https://pablobernabeu.github.io/depictr/reference/theme_depictr.md)
   now centres legend titles over their keys, which reads more tidily
-  than ggplot2’s default left alignment – especially for an inside or a
+  than ggplot2’s default left alignment, especially for an inside or a
   top/bottom legend.
 - [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md)
   reserves more headroom above the lower panel so the effect-size
   annotation (Hedges’ *g* / Cohen’s *d*) is never clipped.
 - [`scree_plot()`](https://pablobernabeu.github.io/depictr/reference/scree_plot.md)
-  colour-matches and names its dual axes – “Variance explained (bars)”
-  on the left, “Cumulative (line)” on the right.
+  colour-matches and names its dual axes, ‘Variance explained (bars)’ on
+  the left and ‘Cumulative (line)’ on the right.
 - Statistical letters are italic in annotations: the log-rank *p*,
   [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)’s
   *n* and *R*, and
