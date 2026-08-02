@@ -41,8 +41,8 @@ customise any of these plots with ordinary ggplot2 code.
 `explore_distribution()` for a numeric variable, `explore_categorical()` for a
 categorical one. A unimodal density leaves its upper corners empty, so
 `legend_inside = TRUE` tucks the colour legend into the top-right rather than
-spending a right-hand margin on it. Several plots take this argument; it is off
-by default because the empty corner depends on the data.
+spending a right-hand margin on it. Several plots take this argument, and it is
+off by default because the empty corner depends on the data.
 
 ```{r}
 explore_distribution(lexical_decision, RT, group = condition, type = "density",
@@ -91,8 +91,8 @@ scatter_trend(crop_yield, fertiliser, yield, group = treatment)
 
 ## Many variables at once
 
-`explore_pairs()` is a scatter-plot matrix; `correlation_heatmap()` condenses
-the same information into a single coloured grid.
+`explore_pairs()` is a scatter-plot matrix, and `correlation_heatmap()`
+condenses the same information into a single coloured grid.
 
 ```{r, fig.height = 6}
 explore_pairs(crop_yield,
@@ -172,6 +172,10 @@ dumbbell_plot(wb, region, life_satisfaction, age_group, legend_inside = TRUE)
 ```
 
 ## Data quality: outliers and missingness
+
+`outlier_plot()` draws the distribution as a box or violin plot and highlights
+the points beyond the 1.5 * IQR fences, so unusual values are easy to see before
+any modelling begins.
 
 ```{r}
 outlier_plot(crop_yield, yield)

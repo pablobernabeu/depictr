@@ -66,7 +66,7 @@
 ## Documentation
 
 * The package overview (`?depictr`) lists every exported function and all five
-  bundled datasets; previously several functions and two datasets were missing.
+  bundled datasets. Previously several functions and two datasets were missing.
 * The `vif_plot()` example fits deliberately collinear predictors, so the plot
   shows inflated VIFs sitting above the threshold line instead of
   near-identical bars around 1 with the line off the axis.
@@ -80,8 +80,8 @@
 * References throughout the documentation follow APA 7 and carry DOIs, and
   spelling is consistently British (en-GB).
 * The documentation site's home page is restructured around a pitch, gallery
-  and signposts; the time-series decomposition example draws its trend
-  confidence band; and `LICENSE.md` carries the full MIT text so the site's
+  and signposts. The time-series decomposition example draws its trend
+  confidence band. `LICENSE.md` carries the full MIT text so the site's
   licence page renders in full, as in the sibling packages.
 
 ## Packaging and checks
@@ -89,12 +89,12 @@
 * Example variants that render several multi-panel figures
   (`posterior_plot()`, `residual_diagnostics_plot()`, `decompose_plot()`) are
   wrapped in `\donttest{}` so each example file stays within CRAN's
-  five-second budget; the first call of every example still runs.
+  five-second budget. The first call of every example still runs.
 * `CITATION.cff` and the test artefact `Rplots.pdf` are excluded from the
   build tarball, and the test that produced `Rplots.pdf` draws to a null
   device instead.
-* New tests pin the `legend_inside` gates: the legend moves inside the panel
-  when a plot's gate is satisfied and the theme is left alone when it is not.
+* New tests pin the `legend_inside` gates. The legend moves inside the panel
+  when a plot's gate is satisfied, and the theme is left alone when it is not.
 
 # depictr 0.1.1
 
@@ -201,7 +201,7 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
   `timeseries_plot()` shows a single legend, and `k_diagnostic()` now returns
   the diagnostic curve as a plot.
 * `coefficient_plot()` gains `standardise`, scaling each coefficient by its
-  predictor's standard deviation so magnitudes are comparable; `model_report()`
+  predictor's standard deviation so magnitudes are comparable. `model_report()`
   uses it by default, removing the empty band in its coefficient panel.
 * `vif_plot()` shows the ordinary VIF (not its square root) for single-df terms,
   scales the axis to the data, and draws a single clearly-labelled threshold
@@ -222,7 +222,7 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
 * `survival_plot()` has been tidied in several ways. The log-rank annotation
   renders a proper chi-squared and an italic *p*, formatted APA style (no
   leading zero, *p* < .001 below that threshold). The median guide is labelled
-  'median <value>'. The y-axis title margin is tighter, and the colour legend
+  `median <value>`. The y-axis title margin is tighter, and the colour legend
   and the number-at-risk table list the groups in the same order, following the
   group factor's levels.
 * A `legend_inside` argument (off by default) draws the legend inside the panel,
@@ -230,8 +230,8 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
   which reclaims the right-hand margin. It is offered by `roc_curve_plot()`,
   `gain_plot()`, `lift_plot()` (bottom-right / top-right of the curve),
   `ecdf_plot()`, `survival_plot()`, `explore_distribution()`, `dumbbell_plot()`
-  and `missingness_map()`. For any other plot the same is one `theme()` call;
-  `vignette("exploring-data")` shows how, alongside tidying legend titles.
+  and `missingness_map()`. For any other plot the same is one `theme()` call,
+  and `vignette("exploring-data")` shows how, alongside tidying legend titles.
 * `theme_depictr()` now centres legend titles over their keys, which reads more
   tidily than ggplot2's default left alignment, especially for an inside or a
   top/bottom legend.

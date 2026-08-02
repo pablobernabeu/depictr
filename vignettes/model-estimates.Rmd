@@ -84,7 +84,7 @@ coefficient_plot(
 
 Coefficient names are tidied to the effect (variable) name automatically
 (`conditionunrelated` becomes `condition`, `word_frequency` becomes `word
-frequency`); pass `labels` to override any of them. The slopes also sit on quite
+frequency`). Pass `labels` to override any of them. The slopes also sit on quite
 different scales, so `standardise = TRUE` rescales each
 coefficient by its predictor's standard deviation, putting them on one
 comparable axis:
@@ -103,8 +103,8 @@ by default).
 
 `compare_models()` overlays the estimates from several models so you can see how
 a coefficient moves as the specification changes. Here a reduced model (dropping
-`modality`) is compared with the full model; `model_fit_table()` summarises their
-fit.
+`modality`) is compared with the full model, and `model_fit_table()` summarises
+their fit.
 
 ```{r compare, eval = has_lmer}
 reduced <- lmerTest::lmer(
@@ -186,7 +186,7 @@ table instead of draws (for instance the `Estimate`/`Q2.5`/`Q97.5` of
 
 `posterior_plot()` summarises any draws (posterior, bootstrap or simulation) as
 a distribution per parameter. With `style = "halfeye"` it shows the density slab
-and a point-and-interval; a region of practical equivalence (ROPE) can be shaded
+and a point-and-interval. A region of practical equivalence (ROPE) can be shaded
 and each parameter annotated with its probability of direction (the posterior
 mass on its majority side of the reference line).
 
@@ -222,9 +222,9 @@ random_effects_plot(fit, title = "By-group departures (random intercepts)")
 ## Optimiser checks
 
 A mixed-model fit should be stable across optimisers. `lme4::allFit()` refits the
-model with every available optimiser; `optimizer_fixef_plot()` then shows the
-fixed effects side by side, one panel per term. Tight clusters mean the fit has
-settled; scatter would signal a fragile solution.
+model with every available optimiser, and `optimizer_fixef_plot()` then shows
+the fixed effects side by side, one panel per term. Tight clusters mean the fit
+has settled, while scatter would signal a fragile solution.
 
 The package ships the `allFit()` summary for this model, so we can plot it
 without re-running the (slow) refits. The plot accepts a tidy data frame of
@@ -255,7 +255,7 @@ within each panel), so this fit is stable.
 `model_report()` composes several views (coefficients, the effect of a focal
 predictor, residuals against fitted values and a Q-Q plot, with a fit-statistics
 subtitle) into a single figure for a rapid review or a report appendix. It works
-on `lm`/`glm` models; here we use the crop-yield model.
+on `lm`/`glm` models, and here we use the crop-yield model.
 
 ```{r report, fig.width = 9, fig.height = 7}
 full <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment,
