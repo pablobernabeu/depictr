@@ -87,14 +87,13 @@
 
     
     
-<p><strong>depictr</strong> is a single, consistent toolkit of plots
-that span the whole analysis workflow, from a first look at the data,
-through model estimates and predictions, to diagnostics, uncertainty and
-reporting. Every plotting function returns a <code>ggplot2</code> object
-<span class="citation">(<a href="#ref-wickham2016">Wickham,
-2016</a>)</span> (or a <code>patchwork</code> for composite panels), so
-you can keep customising with the usual <code>+</code> syntax, and every
-plot shares one theme, one palette and one set of label conventions.</p>
+<p>depictr is a single, consistent toolkit of plots that span the whole
+analysis workflow, from a first look at the data, through model
+estimates and predictions, to diagnostics, uncertainty and reporting.
+Every plotting function returns a <code>ggplot2</code> object <span class="citation">(<a href="#ref-wickham2016">Wickham, 2016</a>)</span>
+(or a <code>patchwork</code> for composite panels), so you can keep
+customising with the usual <code>+</code> syntax, and every plot shares
+one theme, one palette and one set of label conventions.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pablobernabeu.github.io/depictr/">depictr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
@@ -207,7 +206,7 @@ base-graphics <code>col =</code> argument:</p>
 <pre><code>[1] "#005b96" "#e69f00" "#009e73" "#d55e00"</code></pre>
 <p>The qualitative palette is based on the Okabe-Ito set <span class="citation">(<a href="#ref-okabe2008">Okabe &amp; Ito,
 2008</a>)</span>, which stays distinguishable under the common forms of
-colour-vision deficiency; sequential and diverging variants are
+colour-vision deficiency, and sequential and diverging variants are
 available too. Preview them with:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/palette_preview.html">palette_preview</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></code></pre></div>

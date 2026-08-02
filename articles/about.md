@@ -38,7 +38,7 @@ and holds a PhD in Psychology from Lancaster University.
 
 More about his work is at
 [pablobernabeu.github.io](https://pablobernabeu.github.io), on
-[GitHub](https://github.com/pablobernabeu), and via [ORCID
+[GitHub](https://github.com/pablobernabeu) and via [ORCID
 0000-0003-1083-2460](https://orcid.org/0000-0003-1083-2460).
 
 A sibling [Python package](https://pablobernabeu.github.io/depictr-py/),

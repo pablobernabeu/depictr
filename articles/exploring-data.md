@@ -15,7 +15,7 @@ for a numeric variable,
 for a categorical one. A unimodal density leaves its upper corners
 empty, so `legend_inside = TRUE` tucks the colour legend into the
 top-right rather than spending a right-hand margin on it. Several plots
-take this argument; it is off by default because the empty corner
+take this argument, and it is off by default because the empty corner
 depends on the data.
 
 ``` r
@@ -88,7 +88,7 @@ scatter_trend(crop_yield, fertiliser, yield, group = treatment)
 ## Many variables at once
 
 [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md)
-is a scatter-plot matrix;
+is a scatter-plot matrix, and
 [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md)
 condenses the same information into a single coloured grid.
 
@@ -205,6 +205,11 @@ dumbbell_plot(wb, region, life_satisfaction, age_group, legend_inside = TRUE)
 ![](exploring-data_files/figure-html/unnamed-chunk-15-1.png)
 
 ## Data quality: outliers and missingness
+
+[`outlier_plot()`](https://pablobernabeu.github.io/depictr/reference/outlier_plot.md)
+draws the distribution as a box or violin plot and highlights the points
+beyond the 1.5 \* IQR fences, so unusual values are easy to see before
+any modelling begins.
 
 ``` r
 

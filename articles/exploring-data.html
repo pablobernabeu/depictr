@@ -101,7 +101,7 @@ customise any of these plots with ordinary ggplot2 code.</p>
 density leaves its upper corners empty, so
 <code>legend_inside = TRUE</code> tucks the colour legend into the
 top-right rather than spending a right-hand margin on it. Several plots
-take this argument; it is off by default because the empty corner
+take this argument, and it is off by default because the empty corner
 depends on the data.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/explore_distribution.html">explore_distribution</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">RT</span>, group <span class="op">=</span> <span class="va">condition</span>, type <span class="op">=</span> <span class="st">"density"</span>,</span>
@@ -147,7 +147,7 @@ slopes.</p>
 <div class="section level2">
 <h2 id="many-variables-at-once">Many variables at once<a class="anchor" aria-label="anchor" href="#many-variables-at-once"></a>
 </h2>
-<p><code><a href="../reference/explore_pairs.html">explore_pairs()</a></code> is a scatter-plot matrix;
+<p><code><a href="../reference/explore_pairs.html">explore_pairs()</a></code> is a scatter-plot matrix, and
 <code><a href="../reference/correlation_heatmap.html">correlation_heatmap()</a></code> condenses the same information into a
 single coloured grid.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -228,6 +228,9 @@ satisfaction by region.</p>
 <div class="section level2">
 <h2 id="data-quality-outliers-and-missingness">Data quality: outliers and missingness<a class="anchor" aria-label="anchor" href="#data-quality-outliers-and-missingness"></a>
 </h2>
+<p><code><a href="../reference/outlier_plot.html">outlier_plot()</a></code> draws the distribution as a box or violin
+plot and highlights the points beyond the 1.5 * IQR fences, so unusual
+values are easy to see before any modelling begins.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/outlier_plot.html">outlier_plot</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="va">yield</span><span class="op">)</span></span></code></pre></div>
 <p><img src="exploring-data_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="672"></p>

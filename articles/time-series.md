@@ -8,10 +8,10 @@ carrying a trend, a twelve-month seasonal cycle and noise.
 ## Plotting one or several series
 
 [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
-accepts a `ts` object, a numeric vector, or a data frame with time,
-value and (optionally) group columns. Passing the long-form data frame
-with a grouping column draws both series at once, each in its own
-colour; a moving-average overlay is one argument away.
+accepts a `ts` object, a numeric vector or a data frame with time, value
+and (optionally) group columns. Passing the long-form data frame with a
+grouping column draws both series at once, each in its own colour, and a
+moving-average overlay is one argument away.
 
 ``` r
 
@@ -115,8 +115,8 @@ seasonal_plot(indoor_ts, style = "season",
 [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)
 is a lightweight, dependency-free forecaster: it decomposes the series
 with STL, extrapolates the recent trend, carries the seasonal pattern
-forward, and returns point forecasts with prediction intervals that
-widen with the horizon.
+forward and returns point forecasts with prediction intervals that widen
+with the horizon.
 
 ``` r
 

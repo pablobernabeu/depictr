@@ -70,7 +70,7 @@ dendrogram_plot(region_means[-1], k = 2, title = "Regions clustered")
 
 ![](multivariate-and-survival_files/figure-html/unnamed-chunk-5-1.png)
 
-## How many clusters? Quality diagnostics
+## Choosing the number of clusters
 
 Choosing `k` should not be guesswork.
 [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
@@ -178,8 +178,8 @@ silhouette_plot(na.omit(wellbeing_survey[wb_num]), wcl,
 draws Kaplan-Meier curves ([Kaplan & Meier, 1958](#ref-kaplan1958)) with
 stepwise confidence limits from Greenwood’s formula ([Greenwood,
 1926](#ref-greenwood1926)) and censoring marks. The estimate is computed
-in base R, so no modelling package is needed; you can pass follow-up
-times and an event indicator directly, a data frame, or a
+in base R, so no modelling package is needed. You can pass follow-up
+times and an event indicator directly, a data frame or a
 [`survival::survfit`](https://rdrr.io/pkg/survival/man/survfit.html)
 object.
 
@@ -189,8 +189,8 @@ separate. Turning on the three publication annotations gives a
 survminer-style figure: a number-at-risk table beneath the curves,
 dashed guides to each arm’s median survival and the log-rank test of the
 difference as a subtitle. A survival curve is monotone-decreasing, so
-its bottom-left corner is always empty; `legend_inside = TRUE` puts the
-group legend there.
+its bottom-left corner is always empty, and `legend_inside = TRUE` puts
+the group legend there.
 
 ``` r
 

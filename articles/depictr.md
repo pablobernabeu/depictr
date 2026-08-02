@@ -1,6 +1,6 @@
 # Getting started with depictr
 
-**depictr** is a single, consistent toolkit of plots that span the whole
+depictr is a single, consistent toolkit of plots that span the whole
 analysis workflow, from a first look at the data, through model
 estimates and predictions, to diagnostics, uncertainty and reporting.
 Every plotting function returns a `ggplot2` object ([Wickham,
@@ -158,8 +158,8 @@ depictr_palette(4)
 
 The qualitative palette is based on the Okabe-Ito set ([Okabe & Ito,
 2008](#ref-okabe2008)), which stays distinguishable under the common
-forms of colour-vision deficiency; sequential and diverging variants are
-available too. Preview them with:
+forms of colour-vision deficiency, and sequential and diverging variants
+are available too. Preview them with:
 
 ``` r
 

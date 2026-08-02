@@ -131,7 +131,7 @@ up.</p>
 <p>Coefficient names are tidied to the effect (variable) name
 automatically (<code>conditionunrelated</code> becomes
 <code>condition</code>, <code>word_frequency</code> becomes
-<code>word frequency</code>); pass <code>labels</code> to override any
+<code>word frequency</code>). Pass <code>labels</code> to override any
 of them. The slopes also sit on quite different scales, so
 <code>standardise = TRUE</code> rescales each coefficient by its
 predictor’s standard deviation, putting them on one comparable axis:</p>
@@ -150,8 +150,8 @@ comparison below uses by default).</p>
 <p><code><a href="../reference/compare_models.html">compare_models()</a></code> overlays the estimates from several
 models so you can see how a coefficient moves as the specification
 changes. Here a reduced model (dropping <code>modality</code>) is
-compared with the full model; <code><a href="../reference/model_fit_table.html">model_fit_table()</a></code> summarises
-their fit.</p>
+compared with the full model, and <code><a href="../reference/model_fit_table.html">model_fit_table()</a></code>
+summarises their fit.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">reduced</span> <span class="op">&lt;-</span> <span class="fu">lmerTest</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span></span>
 <span>  <span class="va">RT</span> <span class="op">~</span> <span class="va">condition</span> <span class="op">+</span> <span class="va">word_frequency</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">participant</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">item</span><span class="op">)</span>,</span>
@@ -268,7 +268,7 @@ plot.</p>
 <p><code><a href="../reference/posterior_plot.html">posterior_plot()</a></code> summarises any draws (posterior,
 bootstrap or simulation) as a distribution per parameter. With
 <code>style = "halfeye"</code> it shows the density slab and a
-point-and-interval; a region of practical equivalence (ROPE) can be
+point-and-interval. A region of practical equivalence (ROPE) can be
 shaded and each parameter annotated with its probability of direction
 (the posterior mass on its majority side of the reference line).</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
@@ -305,9 +305,9 @@ their uncertainty, the usual way to spot unusual groups.</p>
 </h2>
 <p>A mixed-model fit should be stable across optimisers.
 <code><a href="https://rdrr.io/pkg/lme4/man/allFit.html" class="external-link">lme4::allFit()</a></code> refits the model with every available
-optimiser; <code><a href="../reference/optimizer_fixef_plot.html">optimizer_fixef_plot()</a></code> then shows the fixed
+optimiser, and <code><a href="../reference/optimizer_fixef_plot.html">optimizer_fixef_plot()</a></code> then shows the fixed
 effects side by side, one panel per term. Tight clusters mean the fit
-has settled; scatter would signal a fragile solution.</p>
+has settled, while scatter would signal a fragile solution.</p>
 <p>The package ships the <code>allFit()</code> summary for this model,
 so we can plot it without re-running the (slow) refits. The plot accepts
 a tidy data frame of optimiser-by-term values, which we read straight
@@ -338,7 +338,7 @@ coincide within each panel), so this fit is stable.</p>
 effect of a focal predictor, residuals against fitted values and a Q-Q
 plot, with a fit-statistics subtitle) into a single figure for a rapid
 review or a report appendix. It works on
-<code>lm</code>/<code>glm</code> models; here we use the crop-yield
+<code>lm</code>/<code>glm</code> models, and here we use the crop-yield
 model.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">full</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">rainfall</span> <span class="op">+</span> <span class="va">fertiliser</span> <span class="op">+</span> <span class="va">soil_ph</span> <span class="op">+</span> <span class="va">treatment</span>,</span>

@@ -3,7 +3,7 @@
 ## Regression diagnostics
 
 [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
-assembles the classic panel;
+assembles the classic panel.
 [`influence_plot()`](https://pablobernabeu.github.io/depictr/reference/influence_plot.md)
 and
 [`qq_plot()`](https://pablobernabeu.github.io/depictr/reference/qq_plot.md)
@@ -59,7 +59,7 @@ residual-versus-fitted plot is hard to read.
 [`binned_residual_plot()`](https://pablobernabeu.github.io/depictr/reference/binned_residual_plot.md)
 instead splits the data into equal-count bins of fitted values and plots
 the mean residual per bin against a +/- 2 standard-error band ([Gelman &
-Hill, 2007](#ref-gelman2007)): most points should sit inside the band,
+Hill, 2007](#ref-gelman2007)). Most points should sit inside the band,
 scattered around zero.
 
 We model the *rare* adverse-event outcome from the clinical trial (about
@@ -111,8 +111,8 @@ roc_curve_plot(gfit, youden = TRUE)
 
 When the positive class is rare the precision-recall curve is more
 informative than the ROC curve, because it ignores the many true
-negatives. The baseline is the positive prevalence; `f1 = TRUE` marks
-the maximum-F1 operating point:
+negatives. The baseline is the positive prevalence, and `f1 = TRUE`
+marks the maximum-F1 operating point:
 
 ``` r
 

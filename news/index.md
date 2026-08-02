@@ -83,8 +83,8 @@
 
 - The package overview
   ([`?depictr`](https://pablobernabeu.github.io/depictr/reference/depictr-package.md))
-  lists every exported function and all five bundled datasets;
-  previously several functions and two datasets were missing.
+  lists every exported function and all five bundled datasets.
+  Previously several functions and two datasets were missing.
 - The
   [`vif_plot()`](https://pablobernabeu.github.io/depictr/reference/vif_plot.md)
   example fits deliberately collinear predictors, so the plot shows
@@ -104,9 +104,9 @@
 - References throughout the documentation follow APA 7 and carry DOIs,
   and spelling is consistently British (en-GB).
 - The documentation site’s home page is restructured around a pitch,
-  gallery and signposts; the time-series decomposition example draws its
-  trend confidence band; and `LICENSE.md` carries the full MIT text so
-  the site’s licence page renders in full, as in the sibling packages.
+  gallery and signposts. The time-series decomposition example draws its
+  trend confidence band. `LICENSE.md` carries the full MIT text so the
+  site’s licence page renders in full, as in the sibling packages.
 
 ### Packaging and checks
 
@@ -115,13 +115,13 @@
   [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md),
   [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md))
   are wrapped in `\donttest{}` so each example file stays within CRAN’s
-  five-second budget; the first call of every example still runs.
+  five-second budget. The first call of every example still runs.
 - `CITATION.cff` and the test artefact `Rplots.pdf` are excluded from
   the build tarball, and the test that produced `Rplots.pdf` draws to a
   null device instead.
-- New tests pin the `legend_inside` gates: the legend moves inside the
-  panel when a plot’s gate is satisfied and the theme is left alone when
-  it is not.
+- New tests pin the `legend_inside` gates. The legend moves inside the
+  panel when a plot’s gate is satisfied, and the theme is left alone
+  when it is not.
 
 ## depictr 0.1.1
 
@@ -306,7 +306,7 @@ out of, and generalises, three earlier plotting functions
   now returns the diagnostic curve as a plot.
 - [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)
   gains `standardise`, scaling each coefficient by its predictor’s
-  standard deviation so magnitudes are comparable;
+  standard deviation so magnitudes are comparable.
   [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
   uses it by default, removing the empty band in its coefficient panel.
 - [`vif_plot()`](https://pablobernabeu.github.io/depictr/reference/vif_plot.md)
@@ -342,8 +342,8 @@ out of, and generalises, three earlier plotting functions
   has been tidied in several ways. The log-rank annotation renders a
   proper chi-squared and an italic *p*, formatted APA style (no leading
   zero, *p* \< .001 below that threshold). The median guide is labelled
-  ‘median ’. The y-axis title margin is tighter, and the colour legend
-  and the number-at-risk table list the groups in the same order,
+  `median <value>`. The y-axis title margin is tighter, and the colour
+  legend and the number-at-risk table list the groups in the same order,
   following the group factor’s levels.
 - A `legend_inside` argument (off by default) draws the legend inside
   the panel, over a semi-transparent background, in a corner the plot
@@ -360,7 +360,8 @@ out of, and generalises, three earlier plotting functions
   and
   [`missingness_map()`](https://pablobernabeu.github.io/depictr/reference/missingness_map.md).
   For any other plot the same is one
-  [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) call;
+  [`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) call,
+  and
   [`vignette("exploring-data")`](https://pablobernabeu.github.io/depictr/articles/exploring-data.md)
   shows how, alongside tidying legend titles.
 - [`theme_depictr()`](https://pablobernabeu.github.io/depictr/reference/theme_depictr.md)

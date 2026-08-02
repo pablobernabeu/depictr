@@ -50,7 +50,7 @@ coefficient_plot(
 
 Coefficient names are tidied to the effect (variable) name automatically
 (`conditionunrelated` becomes `condition`, `word_frequency` becomes
-`word frequency`); pass `labels` to override any of them. The slopes
+`word frequency`). Pass `labels` to override any of them. The slopes
 also sit on quite different scales, so `standardise = TRUE` rescales
 each coefficient by its predictor’s standard deviation, putting them on
 one comparable axis:
@@ -73,7 +73,7 @@ below uses by default).
 [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md)
 overlays the estimates from several models so you can see how a
 coefficient moves as the specification changes. Here a reduced model
-(dropping `modality`) is compared with the full model;
+(dropping `modality`) is compared with the full model, and
 [`model_fit_table()`](https://pablobernabeu.github.io/depictr/reference/model_fit_table.md)
 summarises their fit.
 
@@ -185,7 +185,7 @@ two-source forest plot.
 [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
 summarises any draws (posterior, bootstrap or simulation) as a
 distribution per parameter. With `style = "halfeye"` it shows the
-density slab and a point-and-interval; a region of practical equivalence
+density slab and a point-and-interval. A region of practical equivalence
 (ROPE) can be shaded and each parameter annotated with its probability
 of direction (the posterior mass on its majority side of the reference
 line).
@@ -231,10 +231,10 @@ random_effects_plot(fit, title = "By-group departures (random intercepts)")
 
 A mixed-model fit should be stable across optimisers.
 [`lme4::allFit()`](https://rdrr.io/pkg/lme4/man/allFit.html) refits the
-model with every available optimiser;
+model with every available optimiser, and
 [`optimizer_fixef_plot()`](https://pablobernabeu.github.io/depictr/reference/optimizer_fixef_plot.md)
 then shows the fixed effects side by side, one panel per term. Tight
-clusters mean the fit has settled; scatter would signal a fragile
+clusters mean the fit has settled, while scatter would signal a fragile
 solution.
 
 The package ships the `allFit()` summary for this model, so we can plot
@@ -271,7 +271,7 @@ coincide within each panel), so this fit is stable.
 composes several views (coefficients, the effect of a focal predictor,
 residuals against fitted values and a Q-Q plot, with a fit-statistics
 subtitle) into a single figure for a rapid review or a report appendix.
-It works on `lm`/`glm` models; here we use the crop-yield model.
+It works on `lm`/`glm` models, and here we use the crop-yield model.
 
 ``` r
 
