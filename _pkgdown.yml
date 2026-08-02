@@ -23,7 +23,15 @@ footer:
     developed_by: >
       Developed by [Pablo Bernabeu](https://pablobernabeu.github.io). Open,
       reproducible research software in R and Python.
-    legal: "Released under the [MIT licence](LICENSE.html)."
+    # The licence path is root-relative, unlike the home sidebar's below. pkgdown
+    # renders the footer into every page without adjusting a relative href for the
+    # page's depth, so a bare LICENSE.html resolves against the current directory
+    # and 404s everywhere below the root (articles/LICENSE.html and the like). An
+    # absolute URL does not help: pkgdown strips the configured site url back off
+    # and leaves the same bare filename. A leading slash is the one form that
+    # survives, and it is unambiguous from any depth. The sidebar keeps its
+    # relative href because it renders only on the home page, at the site root.
+    legal: "Released under the [MIT licence](/depictr/LICENSE.html)."
 
 home:
   sidebar:

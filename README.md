@@ -9,14 +9,15 @@
 depictr is a single, consistent toolkit of publication-ready plots that span
 the whole analysis workflow, from a first look at the data, through model
 estimates and predictions, to diagnostics, uncertainty and reporting. Most
-packages address one part of this work; depictr aims to cover it from end to end
-with one theme, one palette and one set of label conventions. Every
+packages address one part of this work, whereas depictr aims to cover it from end
+to end with one theme, one palette and one set of label conventions. Every
 plotting function returns a [ggplot2](https://ggplot2.tidyverse.org) object (or a
 [patchwork](https://patchwork.data-imaginist.com) for composite panels), so a
 plot can be refined further with the usual `+` syntax.
 
-A Python sibling, [depictr-py](https://pablobernabeu.github.io/depictr-py/),
-mirrors the same design.
+This is the feature-parity twin of [the Python
+package](https://pablobernabeu.github.io/depictr-py/) of the same name, which
+offers the same workflow on top of [plotnine](https://plotnine.org).
 
 ## Gallery
 
@@ -50,7 +51,7 @@ saving and reporting helpers. The
 every function by family.
 
 Heavier modelling back-ends (`lme4`, `broom`, `simr`) are optional (in
-`Suggests`) and used only when present; the core functions, examples, tests and
+`Suggests`) and used only when present. The core functions, examples, tests and
 vignettes run on base `lm`/`glm` and the bundled data alone.
 
 ## A first plot
@@ -78,9 +79,12 @@ with fixed seeds.
 
 ## Learn more
 
+Each vignette takes one stretch of the workflow and works through it on the
+bundled data.
+
 * `vignette("depictr")`: getting started
 * `vignette("exploring-data")`: exploratory plots, estimation statistics and tables
-* `vignette("model-estimates")`: estimates, comparison, predictions, random effects, and Bayesian posteriors
+* `vignette("model-estimates")`: estimates, comparison, predictions, random effects and Bayesian posteriors
 * `vignette("diagnostics-and-uncertainty")`: diagnostics, classification, posteriors, power
 * `vignette("multivariate-and-survival")`: PCA, clustering with diagnostics, survival curves
 * `vignette("time-series")`: trends, autocorrelation, decomposition, seasonality and forecasts
@@ -107,17 +111,31 @@ a single package.
 ## Automated maintenance
 
 depictr draws on a number of plotting and modelling packages, so scheduled
-GitHub Actions keep it healthy between releases: a daily check of the package
-and its full test suite against both the current and the development versions
-of its dependencies, a weekly check of every URL in the documentation and
-`R CMD check` on every push across Linux, macOS and Windows.
+GitHub Actions keep it healthy between releases. A daily job checks the package
+and its full test suite against both the current and the development versions of
+its dependencies, and a weekly job checks every URL in the documentation. On top
+of those, `R CMD check` runs on every push across Linux, macOS and Windows.
 
-## Citing depictr
+## Citation
 
-`citation("depictr")` gives the preferred reference. The methods the package
+`citation("depictr")` gives the preferred reference. The [About
+page](https://pablobernabeu.github.io/depictr/articles/about.html) carries the
+same citation with a BibTeX entry and a short note on the developer, and the
+repository ships
+[`CITATION.cff`](https://github.com/pablobernabeu/depictr/blob/main/CITATION.cff)
+for the *Cite this repository* button on GitHub. The methods the package
 implements are cited in the relevant help pages and vignettes, drawing on a
 single bibliography at [`inst/REFERENCES.bib`](https://github.com/pablobernabeu/depictr/blob/main/inst/REFERENCES.bib).
 
 ## Licence
 
-MIT (c) Pablo Bernabeu. See the [licence](LICENSE).
+MIT (c) Pablo Bernabeu. See the
+[licence](https://github.com/pablobernabeu/depictr/blob/main/LICENSE).
+
+## Contributing
+
+Issues and pull requests are welcome. The [contributing
+guide](https://github.com/pablobernabeu/depictr/blob/main/.github/CONTRIBUTING.md)
+describes the development setup and the conventions the package follows, and
+everyone taking part is asked to honour the [Code of
+Conduct](https://github.com/pablobernabeu/depictr/blob/main/.github/CODE_OF_CONDUCT.md).

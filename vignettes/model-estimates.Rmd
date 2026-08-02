@@ -11,13 +11,14 @@ link-citations: true
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+knitr::opts_chunk$set(collapse = FALSE, comment = "",
                       fig.width = 7, fig.height = 4.5, dpi = 96,
                       dev.args = list(bg = "transparent"))
 
 # Figures on the package website sit on a warm off-white page in light mode and
 # are inverted by pkgdown in dark mode, so an opaque background would read as a
-# pale slab one way and a black plate the other. Two things paint one. The device
+# pale slab one way and a black plate the other. Two things paint one. The
+# device
 # canvas is made transparent by `dev.args` above, and theme_depictr() then
 # inherits theme_minimal()'s white plot.background, which is drawn over that
 # canvas, so it is cleared as each figure is printed. This is deliberately a
@@ -31,7 +32,8 @@ knit_print.ggplot <- function(x, ...) knitr::normal_print(x + transparent_bg)
 knit_print.patchwork <- function(x, ...) knitr::normal_print(x & transparent_bg)
 
 library(depictr)
-has_lme4   <- requireNamespace("lme4", quietly = TRUE)
+# Every chunk that touches the fitted model is guarded on lmerTest, which imports
+# lme4, so one condition covers both packages.
 has_lmer   <- requireNamespace("lmerTest", quietly = TRUE)
 has_ggdist <- requireNamespace("ggdist", quietly = TRUE)
 ```
@@ -59,10 +61,9 @@ fit <- lmerTest::lmer(
 )
 ```
 
-```{r fit-fallback, eval = !has_lmer, echo = FALSE}
-# Without lmerTest/lme4 the live fit is skipped; the remaining chunks that need
-# `fit` are guarded by the same condition so the article still knits.
-```
+<!-- Without lmerTest the live fit is skipped. Every chunk that needs `fit` is
+     guarded on the same condition, so the article still knits. -->
+
 
 ## Coefficient (forest) plots
 
@@ -160,7 +161,9 @@ MCMC need not be re-run. Terms are matched by canonical label, so the `brms`
 parameter names line up with the frequentist ones automatically.
 
 ```{r fbp, eval = has_lmer && has_ggdist, fig.height = 4}
-draws <- readRDS(system.file("extdata", "lexdec_draws.rds", package = "depictr"))
+draws <- readRDS(
+  system.file("extdata", "lexdec_draws.rds", package = "depictr")
+)
 
 frequentist_bayesian_plot(
   fit, draws,
@@ -188,7 +191,9 @@ and each parameter annotated with its probability of direction (the posterior
 mass on its majority side of the reference line).
 
 ```{r posterior, eval = has_ggdist, fig.height = 4}
-draws <- readRDS(system.file("extdata", "lexdec_draws.rds", package = "depictr"))
+draws <- readRDS(
+  system.file("extdata", "lexdec_draws.rds", package = "depictr")
+)
 slopes <- draws[c("conditionunrelated", "modalityauditory", "word_frequency")]
 
 posterior_plot(
@@ -210,7 +215,7 @@ effectively 100%: the posterior sits almost entirely on one side of zero.
 by-participant departures from the average, sorted, with their uncertainty, the
 usual way to spot unusual groups.
 
-```{r ranef, eval = has_lme4, fig.height = 6}
+```{r ranef, eval = has_lmer, fig.height = 6}
 random_effects_plot(fit, title = "By-group departures (random intercepts)")
 ```
 

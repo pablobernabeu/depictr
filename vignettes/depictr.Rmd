@@ -11,13 +11,14 @@ link-citations: true
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+knitr::opts_chunk$set(collapse = FALSE, comment = "",
                       fig.width = 7, fig.height = 4.5, dpi = 96,
                       dev.args = list(bg = "transparent"))
 
 # Figures on the package website sit on a warm off-white page in light mode and
 # are inverted by pkgdown in dark mode, so an opaque background would read as a
-# pale slab one way and a black plate the other. Two things paint one. The device
+# pale slab one way and a black plate the other. Two things paint one. The
+# device
 # canvas is made transparent by `dev.args` above, and theme_depictr() then
 # inherits theme_minimal()'s white plot.background, which is drawn over that
 # canvas, so it is cleared as each figure is printed. This is deliberately a
@@ -75,7 +76,8 @@ Turn next to the model. After fitting it, `coefficient_plot()` draws a forest
 plot of the estimates.
 
 ```{r}
-fit <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment, data = crop_yield)
+fit <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment,
+          data = crop_yield)
 coefficient_plot(fit, order = "descending", title = "Drivers of crop yield")
 ```
 
@@ -98,7 +100,8 @@ a distribution per parameter. These are the real fixed-effect posterior draws
 from a Bayesian fit of the lexical-decision model, shipped with the package.
 
 ```{r}
-draws <- readRDS(system.file("extdata", "lexdec_draws.rds", package = "depictr"))
+draws <- readRDS(system.file("extdata", "lexdec_draws.rds",
+                             package = "depictr"))
 posterior_plot(draws[c("conditionunrelated", "modalityauditory",
                        "word_frequency")],
                labels = c(conditionunrelated = "condition",

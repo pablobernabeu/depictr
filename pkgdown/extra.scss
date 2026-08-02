@@ -173,14 +173,14 @@ h3 { font-size: 1.25rem; margin-top: 1.8rem; }
 
 // The lead paragraph (first paragraph after the title) set larger and calmer
 .template-home main > .row > .col-md-9 > p:first-of-type,
-.template-home .contents > p:first-of-type {
+.template-home :is(.contents, main) > p:first-of-type {
   font-size: 1.18rem;
   line-height: 1.6;
   color: var(--brand-muted);
 }
 
 // Badges row
-.template-home .contents .badge,
+.template-home :is(.contents, main) .badge,
 .template-home img[src*="badge"] { margin: 0 .15rem .35rem 0; }
 
 // Logo in the hero
@@ -273,6 +273,11 @@ pre {
   overflow-x: auto;
   max-width: 100%;
 }
+// Bootstrap's dark theme ships its own `[data-bs-theme="dark"] pre` rule, which
+// outranks a bare `pre` selector. Without restating the ground at that weight
+// the block loses the navy in dark mode and falls back to Bootstrap's
+// translucent grey, so source and output stop matching the rest of the family.
+[data-bs-theme="dark"] pre { background: var(--brand-ink); color: #E7EDF0; }
 pre code { color: inherit; background: none; }
 // The inline-code rule above (.875em) must not compound inside blocks: any
 // code nested in a pre carries the same absolute size as the pre itself.
@@ -324,7 +329,7 @@ blockquote p:last-child { margin-bottom: 0; }
 // ---------------------------------------------------------------------------
 // Tables
 // ---------------------------------------------------------------------------
-.contents table, table.table {
+:is(.contents, main) table, table.table {
   border: 1px solid var(--bs-border-color);
   border-radius: 10px;
   // A wide table scrolls inside its own box on a narrow viewport instead of
@@ -346,22 +351,22 @@ blockquote p:last-child { margin-bottom: 0; }
 }
 // Tighter cells than the Bootstrap default fit more of a wide table into the
 // column before it scrolls, without shrinking the type below a readable size.
-.contents table th, .contents table td,
+:is(.contents, main) table th, :is(.contents, main) table td,
 table.table th, table.table td {
   padding: .4rem .55rem;
 }
-.contents table thead th, table.table thead th {
+:is(.contents, main) table thead th, table.table thead th {
   background: var(--brand-ink);
   color: #fff;
   font-family: var(--bs-body-font-family);
   font-weight: 600;
   border-bottom: none;
 }
-.contents table td code, .contents table th code { white-space: nowrap; }
+:is(.contents, main) table td code, :is(.contents, main) table th code { white-space: nowrap; }
 
 // Breathing room beneath figures (a plot renders as a lone image in its
 // paragraph).
-.contents p > img:only-child { margin-bottom: .7rem; }
+:is(.contents, main) p > img:only-child { margin-bottom: .7rem; }
 
 // ---------------------------------------------------------------------------
 // Buttons / links inside content
@@ -376,7 +381,7 @@ table.table th, table.table td {
 a { text-underline-offset: .15em; }
 // Content links: underline on hover so the highlight is unmistakable in both
 // modes, on top of the amber hover colour set through --bs-link-hover-color.
-main a:hover, .contents a:hover, #pkgdown-sidebar a:hover { text-decoration: underline; }
+:is(.contents, main) a:hover, #pkgdown-sidebar a:hover { text-decoration: underline; }
 
 // Outline buttons (About page's Copy and Download .bib controls) take their
 // colour from --bs-primary, too dark on the navy dark-mode page; use the light
@@ -437,4 +442,75 @@ footer :not(pre) > code { background: rgba(255, 255, 255, .10); color: #E7EDF0; 
   flex-wrap: wrap;
   gap: .5rem;
   margin-top: .75rem;
+}
+
+// ---------------------------------------------------------------------------
+// Scrollbars
+// ---------------------------------------------------------------------------
+// A wide code block, data table or output pane scrolls inside its own box (set
+// above). Give that scroll a branded, always-visible grip. Left to the browser
+// default the thumb is a mid-grey that all but vanishes against the deep-navy
+// code ground, so the bar reads as an empty gutter with no movable part, and
+// the increment arrows the OS paints on a styled bar do not scroll and read as
+// dead. Both the standard properties (Firefox) and the WebKit pseudo-elements
+// (Chrome, Edge, Safari) are set, so a clearly visible, well-proportioned
+// thumb — draggable, no dead arrow buttons — appears in every engine. The
+// colour is the package's bright accent: --brand-teal on most sites (retuned
+// to blue on depictr), falling back to --brand-violet on lexsync.
+pre,
+:is(.contents, main) table,
+table.table {
+  scrollbar-width: thin;
+  scrollbar-color: var(--brand-teal, var(--brand-violet, #5BC7C7)) transparent;
+}
+pre::-webkit-scrollbar,
+:is(.contents, main) table::-webkit-scrollbar,
+table.table::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+pre::-webkit-scrollbar-track,
+:is(.contents, main) table::-webkit-scrollbar-track,
+table.table::-webkit-scrollbar-track { background: transparent; }
+pre::-webkit-scrollbar-thumb,
+:is(.contents, main) table::-webkit-scrollbar-thumb,
+table.table::-webkit-scrollbar-thumb {
+  background-color: var(--brand-teal, var(--brand-violet, #5BC7C7));
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 7px;
+}
+pre::-webkit-scrollbar-thumb:hover,
+:is(.contents, main) table::-webkit-scrollbar-thumb:hover,
+table.table::-webkit-scrollbar-thumb:hover { background-color: var(--brand-teal-light, var(--brand-violet-light, #8AD3D3)); }
+pre::-webkit-scrollbar-corner,
+:is(.contents, main) table::-webkit-scrollbar-corner,
+table.table::-webkit-scrollbar-corner { background: transparent; }
+
+// ---------------------------------------------------------------------------
+// Output blocks
+// ---------------------------------------------------------------------------
+// The vignettes set `comment = ""`, so an output line carries no `#>` marker
+// and the block itself has to show that it is output. knitr splits output off
+// into a bare <pre>, highlighted source always being wrapped in div.sourceCode,
+// which gives the hook: a raised navy surface a step above the source ground,
+// with an accent rule down the left edge, set close under the block it belongs
+// to so that the two read as a pair. The accent falls back through the family's
+// palettes, lexsync naming its bright accent violet rather than teal.
+//
+// Reference pages are left alone on purpose. pkgdown interleaves their input
+// and output line by line inside one block, and there the `#>` marker is what
+// tells the two apart.
+:is(.contents, main) div.sourceCode + pre { margin-top: -0.5rem; }
+:is(.contents, main) pre:not(.sourceCode) {
+  background: var(--brand-ink-raised);
+  border-color: rgba(33, 166, 166, .18);
+  border-left: 3px solid var(--brand-teal, var(--brand-violet, #21A6A6));
+  // A chunk that prints its own text, a generated Graphviz DOT source say,
+  // cannot be divided line by line at the source, so let output wrap rather
+  // than force a horizontal scroll. Source keeps its exact layout: its long
+  // lines were shortened at the source, and anything still too wide to fit
+  // scrolls under the branded scrollbar.
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
