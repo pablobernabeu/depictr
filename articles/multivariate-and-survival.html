@@ -81,7 +81,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Multivariate analysis and survival</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/pablobernabeu/depictr/blob/v0.2.2/vignettes/multivariate-and-survival.Rmd" class="external-link"><code>vignettes/multivariate-and-survival.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/pablobernabeu/depictr/blob/main/vignettes/multivariate-and-survival.Rmd" class="external-link"><code>vignettes/multivariate-and-survival.Rmd</code></a></small>
       <div class="d-none name"><code>multivariate-and-survival.Rmd</code></div>
     </div>
 
@@ -152,9 +152,10 @@ references.</p>
 <p>The suggested <code>k</code> and the underlying table are attached as
 attributes:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">kd</span>, <span class="st">"suggested"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 2</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">kd</span>, <span class="st">"k_table"</span><span class="op">)</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">kd</span>, <span class="st">"suggested"</span><span class="op">)</span></span></code></pre></div>
+<pre><code>[1] 2</code></pre>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">kd</span>, <span class="st">"k_table"</span><span class="op">)</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="right">k</th>
@@ -188,7 +189,7 @@ null reference, so unlike the other two criteria it can also support
 <code>k = 1</code>. Giving it a range that starts there shows what it
 makes of these data. The reference samples are drawn at random, so the
 chunk is seeded for a reproducible build.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/k_diagnostic.html">k_diagnostic</a></span><span class="op">(</span><span class="va">crop_yield</span>, k_range <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, cols <span class="op">=</span> <span class="va">num</span>, method <span class="op">=</span> <span class="st">"gap"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="multivariate-and-survival_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="672"></p>
@@ -201,7 +202,7 @@ silhouette width per cluster and overall (the dashed line). Wide
 positive bars are well-placed observations, and a bar below zero marks
 an observation that sits closer to a neighbouring cluster than to its
 own.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/kmeans.html" class="external-link">kmeans</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">crop_yield</span><span class="op">[</span><span class="va">num</span><span class="op">]</span><span class="op">)</span>, centers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">kd</span>, <span class="st">"suggested"</span><span class="op">)</span>,</span>
 <span>             nstart <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">$</span><span class="va">cluster</span></span>
@@ -216,7 +217,7 @@ or not the data contains any, and the silhouette is one way of asking
 which case you are in.</p>
 <p>The same diagnostics apply to the wellbeing survey’s numeric
 profile:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">wb_num</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"income"</span>, <span class="st">"stress"</span>, <span class="st">"sleep_hours"</span>,</span>
 <span>            <span class="st">"exercise_days"</span>, <span class="st">"life_satisfaction"</span><span class="op">)</span></span>
 <span><span class="va">wkd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/k_diagnostic.html">k_diagnostic</a></span><span class="op">(</span><span class="va">wellbeing_survey</span>, k_range <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">6</span>, cols <span class="op">=</span> <span class="va">wb_num</span>,</span>
@@ -224,7 +225,8 @@ profile:</p>
 <span><span class="va">wcl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/kmeans.html" class="external-link">kmeans</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">wellbeing_survey</span><span class="op">[</span><span class="va">wb_num</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>              centers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">wkd</span>, <span class="st">"suggested"</span><span class="op">)</span>, nstart <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">$</span><span class="va">cluster</span></span>
 <span><span class="fu"><a href="../reference/silhouette_plot.html">silhouette_plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">wellbeing_survey</span><span class="op">[</span><span class="va">wb_num</span><span class="op">]</span><span class="op">)</span>, <span class="va">wcl</span>,</span>
-<span>                title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Wellbeing survey, k = %d"</span>, <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">wkd</span>, <span class="st">"suggested"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>                title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Wellbeing survey, k = %d"</span>,</span>
+<span>                                <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">wkd</span>, <span class="st">"suggested"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="multivariate-and-survival_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
@@ -245,7 +247,7 @@ dashed guides to each arm’s median survival and the log-rank test of the
 difference as a subtitle. A survival curve is monotone-decreasing, so
 its bottom-left corner is always empty;
 <code>legend_inside = TRUE</code> puts the group legend there.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/survival_plot.html">survival_plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">clinical_trial</span><span class="op">$</span><span class="va">time</span>, <span class="va">clinical_trial</span><span class="op">$</span><span class="va">event</span>, group <span class="op">=</span> <span class="va">clinical_trial</span><span class="op">$</span><span class="va">arm</span>,</span>
 <span>  risk_table <span class="op">=</span> <span class="cn">TRUE</span>, median_line <span class="op">=</span> <span class="cn">TRUE</span>, logrank <span class="op">=</span> <span class="cn">TRUE</span>, legend_inside <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -283,7 +285,7 @@ Association</em>, <em>53</em>(282), 457–481. <a href="https://doi.org/10.1080/
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Released under the <a href="LICENSE.html">MIT licence</a>. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
+  <p>Released under the <a href="/depictr/LICENSE.html">MIT licence</a>. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

@@ -81,7 +81,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Diagnostics, classification and uncertainty</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/pablobernabeu/depictr/blob/v0.2.2/vignettes/diagnostics-and-uncertainty.Rmd" class="external-link"><code>vignettes/diagnostics-and-uncertainty.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/pablobernabeu/depictr/blob/main/vignettes/diagnostics-and-uncertainty.Rmd" class="external-link"><code>vignettes/diagnostics-and-uncertainty.Rmd</code></a></small>
       <div class="d-none name"><code>diagnostics-and-uncertainty.Rmd</code></div>
     </div>
 
@@ -208,9 +208,9 @@ the natural companion to the ROC and PR curves for actually
 <span><span class="va">tp</span></span></code></pre></div>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">tp</span>, <span class="st">"thresholds"</span><span class="op">)</span>   <span class="co"># the Youden and max-F1 thresholds</span></span>
-<span><span class="co">#&gt;    youden        f1 </span></span>
-<span><span class="co">#&gt; 0.1315540 0.2128417</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">tp</span>, <span class="st">"thresholds"</span><span class="op">)</span>   <span class="co"># the Youden and max-F1 thresholds</span></span></code></pre></div>
+<pre><code>   youden        f1 
+0.1315540 0.2128417 </code></pre>
 </div>
 <div class="section level3">
 <h3 id="calibration">Calibration<a class="anchor" aria-label="anchor" href="#calibration"></a>
@@ -220,13 +220,13 @@ probabilities match observed frequencies. Each bin’s observed rate
 carries a Wilson binomial confidence interval, so bins backed by few
 observations (common in the sparse upper tail when the outcome is rare)
 are not over-interpreted.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/calibration_plot.html">calibration_plot</a></span><span class="op">(</span><span class="va">gfit</span>, bins <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></code></pre></div>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="480"></p>
 <p>A confusion-matrix heatmap completes the picture. Passing
 <code>threshold = "youden"</code> reuses the same operating point the
 ROC curve marks, so the two agree:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/confusion_matrix_plot.html">confusion_matrix_plot</a></span><span class="op">(</span><span class="va">gfit</span>, threshold <span class="op">=</span> <span class="st">"youden"</span>, normalise <span class="op">=</span> <span class="st">"row"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" alt="" width="480"></p>
 </div>
@@ -238,8 +238,10 @@ ROC curve marks, so the two agree:</p>
 simulation) as a distribution per parameter. Here are the real posterior
 draws from a Bayesian fit of the lexical-decision model, shown as
 point-and-interval forests.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"lexdec_draws.rds"</span>, package <span class="op">=</span> <span class="st">"depictr"</span><span class="op">)</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"lexdec_draws.rds"</span>, package <span class="op">=</span> <span class="st">"depictr"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/posterior_plot.html">posterior_plot</a></span><span class="op">(</span><span class="va">draws</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"conditionunrelated"</span>, <span class="st">"modalityauditory"</span>,</span>
 <span>                       <span class="st">"word_frequency"</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>               labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>conditionunrelated <span class="op">=</span> <span class="st">"condition"</span>,</span>
@@ -258,8 +260,10 @@ ships a real <code>powerCurve</code> object from a <code>simr</code>
 analysis of the lexical-decision design, which simulated power for the
 word-frequency slope as the number of participants grows. We read it
 straight from disk.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"powercurve_lexdec.rds"</span>, package <span class="op">=</span> <span class="st">"depictr"</span><span class="op">)</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"powercurve_lexdec.rds"</span>, package <span class="op">=</span> <span class="st">"depictr"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/power_curve_plot.html">power_curve_plot</a></span><span class="op">(</span><span class="va">pc</span>, x_lab <span class="op">=</span> <span class="st">"Number of participants"</span>,</span>
 <span>                 title <span class="op">=</span> <span class="st">"Power for the word-frequency effect"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-19-1.png" class="r-plt" alt="" width="672"></p>
@@ -275,7 +279,7 @@ first design the simulation clears comfortably.</p>
 </h2>
 <p>Combine any of these with <code><a href="../reference/arrange_plots.html">arrange_plots()</a></code> and save with
 <code><a href="../reference/save_plot.html">save_plot()</a></code>:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">panel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/arrange_plots.html">arrange_plots</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/qq_plot.html">qq_plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, <span class="fu"><a href="../reference/influence_plot.html">influence_plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="fl">2</span>, title <span class="op">=</span> <span class="st">"Diagnostics"</span>, tag_levels <span class="op">=</span> <span class="st">"A"</span></span>
@@ -284,7 +288,7 @@ first design the simulation clears comfortably.</p>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" alt="" width="672"></p>
 <p><code><a href="../reference/save_plot.html">save_plot()</a></code> writes it out at a print-ready 300 dpi by
 default, creating any missing directories along the way.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/save_plot.html">save_plot</a></span><span class="op">(</span><span class="st">"figures/diagnostics.png"</span>, <span class="va">panel</span>, width <span class="op">=</span> <span class="fl">7</span>, height <span class="op">=</span> <span class="fl">3.2</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2 unnumbered">
@@ -312,7 +316,7 @@ and multilevel/hierarchical models</em>. Cambridge University Press. <a href="ht
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Released under the <a href="LICENSE.html">MIT licence</a>. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
+  <p>Released under the <a href="/depictr/LICENSE.html">MIT licence</a>. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

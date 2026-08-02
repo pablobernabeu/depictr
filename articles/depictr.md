@@ -56,7 +56,8 @@ draws a forest plot of the estimates.
 
 ``` r
 
-fit <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment, data = crop_yield)
+fit <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment,
+          data = crop_yield)
 coefficient_plot(fit, order = "descending", title = "Drivers of crop yield")
 ```
 
@@ -91,7 +92,8 @@ Bayesian fit of the lexical-decision model, shipped with the package.
 
 ``` r
 
-draws <- readRDS(system.file("extdata", "lexdec_draws.rds", package = "depictr"))
+draws <- readRDS(system.file("extdata", "lexdec_draws.rds",
+                             package = "depictr"))
 posterior_plot(draws[c("conditionunrelated", "modalityauditory",
                        "word_frequency")],
                labels = c(conditionunrelated = "condition",
@@ -114,13 +116,14 @@ figures taken from a paper) can be supplied directly.
 ``` r
 
 tidy_estimates(fit)
-#>                term     estimate    std.error     conf.low    conf.high
-#> 1       (Intercept) -7.156372471 0.7307020339 -8.597465983 -5.715278960
-#> 2          rainfall  0.003869765 0.0006025038  0.002681505  0.005058026
-#> 3        fertiliser  0.011266582 0.0010906005  0.009115695  0.013417469
-#> 4           soil_ph  1.030217728 0.1056219670  0.821909657  1.238525800
-#> 5 treatmentenhanced  1.317044684 0.0978270830  1.124109715  1.509979654
 ```
+
+                   term     estimate    std.error     conf.low    conf.high
+    1       (Intercept) -7.156372471 0.7307020339 -8.597465983 -5.715278960
+    2          rainfall  0.003869765 0.0006025038  0.002681505  0.005058026
+    3        fertiliser  0.011266582 0.0010906005  0.009115695  0.013417469
+    4           soil_ph  1.030217728 0.1056219670  0.821909657  1.238525800
+    5 treatmentenhanced  1.317044684 0.0978270830  1.124109715  1.509979654
 
 ## A consistent, accessible look
 
@@ -149,8 +152,9 @@ or a base-graphics `col =` argument:
 ``` r
 
 depictr_palette(4)
-#> [1] "#005b96" "#e69f00" "#009e73" "#d55e00"
 ```
+
+    [1] "#005b96" "#e69f00" "#009e73" "#d55e00"
 
 The qualitative palette is based on the Okabe-Ito set ([Okabe & Ito,
 2008](#ref-okabe2008)), which stays distinguishable under the common
@@ -184,27 +188,28 @@ arguments it reports the current settings:
 ``` r
 
 depictr_options()
-#> $base_size
-#> [1] 11
-#> 
-#> $base_family
-#> [1] ""
-#> 
-#> $brand
-#> [1] "#005b96"
-#> 
-#> $accent
-#> [1] "#d55e00"
-#> 
-#> $reference
-#> [1] "grey60"
-#> 
-#> $palette
-#> NULL
-#> 
-#> $na_value
-#> [1] "grey80"
 ```
+
+    $base_size
+    [1] 11
+
+    $base_family
+    [1] ""
+
+    $brand
+    [1] "#005b96"
+
+    $accent
+    [1] "#d55e00"
+
+    $reference
+    [1] "grey60"
+
+    $palette
+    NULL
+
+    $na_value
+    [1] "grey80"
 
 Supplying arguments sets them for every later plot and returns the
 previous values, so you can put the look back afterwards:

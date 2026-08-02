@@ -189,9 +189,10 @@ tp
 ``` r
 
 attr(tp, "thresholds")   # the Youden and max-F1 thresholds
-#>    youden        f1 
-#> 0.1315540 0.2128417
 ```
+
+       youden        f1 
+    0.1315540 0.2128417 
 
 ### Calibration
 
@@ -228,7 +229,9 @@ the lexical-decision model, shown as point-and-interval forests.
 
 ``` r
 
-draws <- readRDS(system.file("extdata", "lexdec_draws.rds", package = "depictr"))
+draws <- readRDS(
+  system.file("extdata", "lexdec_draws.rds", package = "depictr")
+)
 posterior_plot(draws[c("conditionunrelated", "modalityauditory",
                        "word_frequency")],
                labels = c(conditionunrelated = "condition",
@@ -252,7 +255,9 @@ We read it straight from disk.
 
 ``` r
 
-pc <- readRDS(system.file("extdata", "powercurve_lexdec.rds", package = "depictr"))
+pc <- readRDS(
+  system.file("extdata", "powercurve_lexdec.rds", package = "depictr")
+)
 power_curve_plot(pc, x_lab = "Number of participants",
                  title = "Power for the word-frequency effect")
 ```

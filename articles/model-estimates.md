@@ -155,7 +155,9 @@ automatically.
 
 ``` r
 
-draws <- readRDS(system.file("extdata", "lexdec_draws.rds", package = "depictr"))
+draws <- readRDS(
+  system.file("extdata", "lexdec_draws.rds", package = "depictr")
+)
 
 frequentist_bayesian_plot(
   fit, draws,
@@ -190,7 +192,9 @@ line).
 
 ``` r
 
-draws <- readRDS(system.file("extdata", "lexdec_draws.rds", package = "depictr"))
+draws <- readRDS(
+  system.file("extdata", "lexdec_draws.rds", package = "depictr")
+)
 slopes <- draws[c("conditionunrelated", "modalityauditory", "word_frequency")]
 
 posterior_plot(

@@ -83,8 +83,8 @@
 </div>
 <!-- badges: start -->
 
-<p>depictr is a single, consistent toolkit of publication-ready plots that span the whole analysis workflow, from a first look at the data, through model estimates and predictions, to diagnostics, uncertainty and reporting. Most packages address one part of this work; depictr aims to cover it from end to end with one theme, one palette and one set of label conventions. Every plotting function returns a <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a> object (or a <a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a> for composite panels), so a plot can be refined further with the usual <code>+</code> syntax.</p>
-<p>A Python sibling, <a href="https://pablobernabeu.github.io/depictr-py/">depictr-py</a>, mirrors the same design.</p>
+<p>depictr is a single, consistent toolkit of publication-ready plots that span the whole analysis workflow, from a first look at the data, through model estimates and predictions, to diagnostics, uncertainty and reporting. Most packages address one part of this work, whereas depictr aims to cover it from end to end with one theme, one palette and one set of label conventions. Every plotting function returns a <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a> object (or a <a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a> for composite panels), so a plot can be refined further with the usual <code>+</code> syntax.</p>
+<p>This is the feature-parity twin of <a href="https://pablobernabeu.github.io/depictr-py/">the Python package</a> of the same name, which offers the same workflow on top of <a href="https://plotnine.org" class="external-link">plotnine</a>.</p>
 <div class="section level2">
 <h2 id="gallery">Gallery<a class="anchor" aria-label="anchor" href="#gallery"></a>
 </h2>
@@ -107,7 +107,7 @@
 <h2 id="whats-in-the-box">What’s in the box<a class="anchor" aria-label="anchor" href="#whats-in-the-box"></a>
 </h2>
 <p>The functions fall into seven families that follow the analysis workflow. Exploratory plots and a descriptive summary table open it. The model-estimate views come next (forest plots, model comparison, predictions, interactions and random effects), then residual diagnostics with the standard classification curves, and then posterior summaries and power curves. Further families cover principal components, clustering and survival, time series, and the shared theme with composition, saving and reporting helpers. The <a href="https://pablobernabeu.github.io/depictr/reference/index.html">reference</a> lists every function by family.</p>
-<p>Heavier modelling back-ends (<code>lme4</code>, <code>broom</code>, <code>simr</code>) are optional (in <code>Suggests</code>) and used only when present; the core functions, examples, tests and vignettes run on base <code>lm</code>/<code>glm</code> and the bundled data alone.</p>
+<p>Heavier modelling back-ends (<code>lme4</code>, <code>broom</code>, <code>simr</code>) are optional (in <code>Suggests</code>) and used only when present. The core functions, examples, tests and vignettes run on base <code>lm</code>/<code>glm</code> and the bundled data alone.</p>
 </div>
 <div class="section level2">
 <h2 id="a-first-plot">A first plot<a class="anchor" aria-label="anchor" href="#a-first-plot"></a>
@@ -127,13 +127,14 @@
 <div class="section level2">
 <h2 id="learn-more">Learn more<a class="anchor" aria-label="anchor" href="#learn-more"></a>
 </h2>
+<p>Each vignette takes one stretch of the workflow and works through it on the bundled data.</p>
 <ul>
 <li>
 <code><a href="articles/depictr.html">vignette("depictr")</a></code>: getting started</li>
 <li>
 <code><a href="articles/exploring-data.html">vignette("exploring-data")</a></code>: exploratory plots, estimation statistics and tables</li>
 <li>
-<code><a href="articles/model-estimates.html">vignette("model-estimates")</a></code>: estimates, comparison, predictions, random effects, and Bayesian posteriors</li>
+<code><a href="articles/model-estimates.html">vignette("model-estimates")</a></code>: estimates, comparison, predictions, random effects and Bayesian posteriors</li>
 <li>
 <code><a href="articles/diagnostics-and-uncertainty.html">vignette("diagnostics-and-uncertainty")</a></code>: diagnostics, classification, posteriors, power</li>
 <li>
@@ -150,17 +151,22 @@
 <div class="section level2">
 <h2 id="automated-maintenance">Automated maintenance<a class="anchor" aria-label="anchor" href="#automated-maintenance"></a>
 </h2>
-<p>depictr draws on a number of plotting and modelling packages, so scheduled GitHub Actions keep it healthy between releases: a daily check of the package and its full test suite against both the current and the development versions of its dependencies, a weekly check of every URL in the documentation and <code>R CMD check</code> on every push across Linux, macOS and Windows.</p>
+<p>depictr draws on a number of plotting and modelling packages, so scheduled GitHub Actions keep it healthy between releases. A daily job checks the package and its full test suite against both the current and the development versions of its dependencies, and a weekly job checks every URL in the documentation. On top of those, <code>R CMD check</code> runs on every push across Linux, macOS and Windows.</p>
 </div>
 <div class="section level2">
-<h2 id="citing-depictr">Citing depictr<a class="anchor" aria-label="anchor" href="#citing-depictr"></a>
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
-<p><code>citation("depictr")</code> gives the preferred reference. The methods the package implements are cited in the relevant help pages and vignettes, drawing on a single bibliography at <a href="https://github.com/pablobernabeu/depictr/blob/main/inst/REFERENCES.bib" class="external-link"><code>inst/REFERENCES.bib</code></a>.</p>
+<p><code>citation("depictr")</code> gives the preferred reference. The <a href="https://pablobernabeu.github.io/depictr/articles/about.html">About page</a> carries the same citation with a BibTeX entry and a short note on the developer, and the repository ships <a href="https://github.com/pablobernabeu/depictr/blob/main/CITATION.cff" class="external-link"><code>CITATION.cff</code></a> for the <em>Cite this repository</em> button on GitHub. The methods the package implements are cited in the relevant help pages and vignettes, drawing on a single bibliography at <a href="https://github.com/pablobernabeu/depictr/blob/main/inst/REFERENCES.bib" class="external-link"><code>inst/REFERENCES.bib</code></a>.</p>
 </div>
 <div class="section level2">
 <h2 id="licence">Licence<a class="anchor" aria-label="anchor" href="#licence"></a>
 </h2>
-<p>MIT (c) Pablo Bernabeu. See the <a href="LICENSE">licence</a>.</p>
+<p>MIT (c) Pablo Bernabeu. See the <a href="https://github.com/pablobernabeu/depictr/blob/main/LICENSE" class="external-link">licence</a>.</p>
+</div>
+<div class="section level2">
+<h2 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
+</h2>
+<p>Issues and pull requests are welcome. The <a href="https://github.com/pablobernabeu/depictr/blob/main/.github/CONTRIBUTING.md" class="external-link">contributing guide</a> describes the development setup and the conventions the package follows, and everyone taking part is asked to honour the <a href="https://github.com/pablobernabeu/depictr/blob/main/.github/CODE_OF_CONDUCT.md" class="external-link">Code of Conduct</a>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -221,7 +227,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Released under the <a href="LICENSE.html">MIT licence</a>. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
+  <p>Released under the <a href="/depictr/LICENSE.html">MIT licence</a>. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

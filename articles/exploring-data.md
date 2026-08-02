@@ -94,7 +94,8 @@ condenses the same information into a single coloured grid.
 
 ``` r
 
-explore_pairs(crop_yield, cols = c("rainfall", "fertiliser", "soil_ph", "yield"))
+explore_pairs(crop_yield,
+              cols = c("rainfall", "fertiliser", "soil_ph", "yield"))
 ```
 
 ![](exploring-data_files/figure-html/unnamed-chunk-7-1.png)

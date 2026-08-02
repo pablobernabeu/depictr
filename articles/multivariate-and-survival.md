@@ -95,7 +95,12 @@ The suggested `k` and the underlying table are attached as attributes:
 ``` r
 
 attr(kd, "suggested")
-#> [1] 2
+```
+
+    [1] 2
+
+``` r
+
 knitr::kable(attr(kd, "k_table"), digits = 3)
 ```
 
@@ -161,7 +166,8 @@ wkd <- k_diagnostic(wellbeing_survey, k_range = 2:6, cols = wb_num,
 wcl <- kmeans(scale(na.omit(wellbeing_survey[wb_num])),
               centers = attr(wkd, "suggested"), nstart = 10)$cluster
 silhouette_plot(na.omit(wellbeing_survey[wb_num]), wcl,
-                title = sprintf("Wellbeing survey, k = %d", attr(wkd, "suggested")))
+                title = sprintf("Wellbeing survey, k = %d",
+                                attr(wkd, "suggested")))
 ```
 
 ![](multivariate-and-survival_files/figure-html/unnamed-chunk-10-1.png)

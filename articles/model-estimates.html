@@ -81,7 +81,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Visualising model estimates</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/pablobernabeu/depictr/blob/v0.2.2/vignettes/model-estimates.Rmd" class="external-link"><code>vignettes/model-estimates.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/pablobernabeu/depictr/blob/main/vignettes/model-estimates.Rmd" class="external-link"><code>vignettes/model-estimates.Rmd</code></a></small>
       <div class="d-none name"><code>model-estimates.Rmd</code></div>
     </div>
 
@@ -109,6 +109,8 @@ model.</p>
 <span>    <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">participant</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">item</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">correct</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<!-- Without lmerTest the live fit is skipped. Every chunk that needs `fit` is
+     guarded on the same condition, so the article still knits. -->
 <div class="section level2">
 <h2 id="coefficient-forest-plots">Coefficient (forest) plots<a class="anchor" aria-label="anchor" href="#coefficient-forest-plots"></a>
 </h2>
@@ -238,7 +240,9 @@ shipped with the package so the slow MCMC need not be re-run. Terms are
 matched by canonical label, so the <code>brms</code> parameter names
 line up with the frequentist ones automatically.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"lexdec_draws.rds"</span>, package <span class="op">=</span> <span class="st">"depictr"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"lexdec_draws.rds"</span>, package <span class="op">=</span> <span class="st">"depictr"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/frequentist_bayesian_plot.html">frequentist_bayesian_plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit</span>, <span class="va">draws</span>,</span>
@@ -268,7 +272,9 @@ point-and-interval; a region of practical equivalence (ROPE) can be
 shaded and each parameter annotated with its probability of direction
 (the posterior mass on its majority side of the reference line).</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"lexdec_draws.rds"</span>, package <span class="op">=</span> <span class="st">"depictr"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"lexdec_draws.rds"</span>, package <span class="op">=</span> <span class="st">"depictr"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">slopes</span> <span class="op">&lt;-</span> <span class="va">draws</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"conditionunrelated"</span>, <span class="st">"modalityauditory"</span>, <span class="st">"word_frequency"</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/posterior_plot.html">posterior_plot</a></span><span class="op">(</span></span>
@@ -362,7 +368,7 @@ behavior. In P. Zarembka (Ed.), <em>Frontiers in econometrics</em> (pp.
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Released under the <a href="LICENSE.html">MIT licence</a>. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
+  <p>Released under the <a href="/depictr/LICENSE.html">MIT licence</a>. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

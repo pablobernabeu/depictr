@@ -81,7 +81,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Time series</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/pablobernabeu/depictr/blob/v0.2.2/vignettes/time-series.Rmd" class="external-link"><code>vignettes/time-series.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/pablobernabeu/depictr/blob/main/vignettes/time-series.Rmd" class="external-link"><code>vignettes/time-series.Rmd</code></a></small>
       <div class="d-none name"><code>time-series.Rmd</code></div>
     </div>
 
@@ -175,19 +175,19 @@ trend, carries the seasonal pattern forward, and returns point forecasts
 with prediction intervals that widen with the horizon.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ts_forecast.html">ts_forecast</a></span><span class="op">(</span><span class="va">indoor_ts</span>, h <span class="op">=</span> <span class="fl">18</span>, level <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">fc</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       time      fit      lwr      upr</span></span>
-<span><span class="co">#&gt; 1 2024.000 325.4647 308.9359 341.9935</span></span>
-<span><span class="co">#&gt; 2 2024.083 344.0097 320.6345 367.3850</span></span>
-<span><span class="co">#&gt; 3 2024.167 355.7215 327.0927 384.3502</span></span>
-<span><span class="co">#&gt; 4 2024.250 368.7429 335.6853 401.8005</span></span>
-<span><span class="co">#&gt; 5 2024.333 361.4311 324.4716 398.3906</span></span>
-<span><span class="co">#&gt; 6 2024.417 355.8928 315.4057 396.3799</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">fc</span><span class="op">)</span></span></code></pre></div>
+<pre><code>      time      fit      lwr      upr
+1 2024.000 325.4647 308.9359 341.9935
+2 2024.083 344.0097 320.6345 367.3850
+3 2024.167 355.7215 327.0927 384.3502
+4 2024.250 368.7429 335.6853 401.8005
+5 2024.333 361.4311 324.4716 398.3906
+6 2024.417 355.8928 315.4057 396.3799</code></pre>
 <p>Passing an integer horizon straight to <code><a href="../reference/timeseries_plot.html">timeseries_plot()</a></code>
 overlays that forecast on the history: the point forecast continues the
 line and the shaded ribbon shows the (growing) 90% prediction
 interval.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/timeseries_plot.html">timeseries_plot</a></span><span class="op">(</span><span class="va">indoor_ts</span>, forecast <span class="op">=</span> <span class="fl">18</span>, level <span class="op">=</span> <span class="fl">0.9</span>,</span>
 <span>                title <span class="op">=</span> <span class="st">"Indoor sales with an 18-month forecast"</span>,</span>
 <span>                y_lab <span class="op">=</span> <span class="st">"Units"</span><span class="op">)</span></span></code></pre></div>
@@ -209,7 +209,7 @@ frame.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Released under the <a href="LICENSE.html">MIT licence</a>. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
+  <p>Released under the <a href="/depictr/LICENSE.html">MIT licence</a>. Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>
