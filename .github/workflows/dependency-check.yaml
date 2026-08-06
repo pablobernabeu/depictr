@@ -1,8 +1,8 @@
 # Scheduled check of depictr against current and development dependency versions.
 # It runs daily (and on demand) so that a breaking change in any
-# dependency is caught quickly. On failure it opens, or updates, a single issue
-# to flag the maintainer; the companion dependency-autofix workflow can attempt
-# a fix first when an Anthropic API key is configured.
+# dependency is caught quickly. On failure it opens, or comments on, a single
+# issue to flag the maintainer; the companion dependency-autofix workflow can
+# attempt a fix first when a Claude Code OAuth token is configured.
 name: dependency-check
 
 on:
@@ -60,13 +60,35 @@ jobs:
           upload-snapshots: false
           error-on: '"warning"'
 
+      # The issue is raised with the gh CLI rather than a third-party action:
+      # gh already ships on the runner and does the same job without adding an
+      # unpinned dependency to the supply chain. The title and label are read
+      # from the template's front matter, so the template file stays the single
+      # source of truth for the issue content. Deduplication is by title, which
+      # also means that when both matrix legs fail, the second leg comments on
+      # the issue the first one opened.
       - name: Open or update an issue on failure
         if: failure()
-        uses: JasonEtco/create-an-issue@v2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CONFIG: ${{ matrix.config.label }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        with:
-          filename: .github/issue-templates/dependency-issue.md
-          update_existing: true
+        run: |
+          template=.github/issue-templates/dependency-issue.md
+          title=$(sed -n 's/^title: *"\(.*\)"$/\1/p' "$template")
+          label=$(sed -n 's/^labels: *//p' "$template")
+          # The body is the template minus its front matter, with the
+          # {{ env.* }} placeholders filled in.
+          sed '1,/^---$/d' "$template" \
+            | sed -e "s|{{ env.CONFIG }}|$CONFIG|g" \
+                  -e "s|{{ env.RUN_URL }}|$RUN_URL|g" > issue-body.md
+          gh label create "$label" --color ededed \
+            --description "Dependency maintenance" 2>/dev/null || true
+          existing=$(gh issue list --state open --search "$title in:title" \
+            --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body-file issue-body.md
+          else
+            gh issue create --title "$title" --body-file issue-body.md \
+              --label "$label"
+          fi

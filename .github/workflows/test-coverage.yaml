@@ -1,0 +1,45 @@
+# Reports test coverage on each push and pull request, writing the percentage to
+# the run summary. It uses no external service (no Codecov), so it needs no token
+# and adds no badge that could rot.
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+name: test-coverage.yaml
+
+permissions:
+  contents: read
+
+jobs:
+  test-coverage:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::covr
+          needs: check
+
+      - name: Measure and report coverage
+        shell: Rscript {0}
+        run: |
+          cov <- covr::package_coverage(quiet = FALSE)
+          pct <- round(covr::percent_coverage(cov), 1)
+          cat(sprintf("Test coverage: %s%%\n", pct))
+          summary <- Sys.getenv("GITHUB_STEP_SUMMARY")
+          if (nzchar(summary)) {
+            cat(sprintf("## Test coverage: **%s%%**\n", pct),
+                file = summary, append = TRUE)
+          }
+          if (pct < 80) {
+            cat("::warning::Test coverage is below 80%\n")
+          }

@@ -7,6 +7,11 @@ on:
 
 name: R-CMD-check
 
+# The workflow only checks out the repository and runs R CMD check, so
+# read-only permissions on everything are sufficient (uploading snapshot
+# artifacts needs no write scope).
+permissions: read-all
+
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}

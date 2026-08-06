@@ -13,5 +13,5 @@ its final destination (for a redirect) or to a working equivalent.
 
 A transient network timeout can occasionally cause a false positive, so re-run
 the **link-check** workflow to confirm before changing anything. This issue
-updates itself on each subsequent failure and can be closed once the link check
-passes again.
+receives a comment on each subsequent failure and can be closed once the link
+check passes again.

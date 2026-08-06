@@ -1,10 +1,13 @@
 # depictr <small>(R)</small> <img src="man/figures/logo.png" align="right" height="120" alt="" />
 
 <!-- badges: start -->
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21266308.svg)](https://doi.org/10.5281/zenodo.21266308)
 [![R-CMD-check](https://github.com/pablobernabeu/depictr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/pablobernabeu/depictr/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/license/MIT)
 <!-- badges: end -->
+
+Documentation: <https://pablobernabeu.github.io/depictr/>
 
 depictr is a single, consistent toolkit of publication-ready plots that span
 the whole analysis workflow, from a first look at the data, through model
