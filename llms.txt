@@ -1,5 +1,7 @@
 # depictr (R)
 
+Documentation: <https://pablobernabeu.github.io/depictr/>
+
 depictr is a single, consistent toolkit of publication-ready plots that
 span the whole analysis workflow, from a first look at the data, through
 model estimates and predictions, to diagnostics, uncertainty and
