@@ -58,10 +58,7 @@ correlation_heatmap <- function(data, cols = NULL, method = "pearson",
   # Drop (near-)constant columns: cor() cannot define a correlation for them
   # and would otherwise emit a raw "standard deviation is zero" warning and
   # leave a band of unannotated NA cells.
-  is_const <- vapply(cols, function(cn) {
-    v <- data[[cn]][!is.na(data[[cn]])]
-    length(v) < 2 || stats::sd(v) < .Machine$double.eps^0.5
-  }, logical(1))
+  is_const <- constant_columns(data, cols)
   if (any(is_const)) {
     message("correlation_heatmap(): dropping zero-variance column(s): ",
             paste(cols[is_const], collapse = ", "), ".")

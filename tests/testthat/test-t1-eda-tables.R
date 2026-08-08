@@ -67,6 +67,33 @@ test_that("summary_table() reports per-variable missingness when present", {
   expect_false("Missing, n (%)" %in% tab3$statistic)
 })
 
+test_that("summary_table() gives the missing-group rows a column of their own", {
+  # Regression: split() dropped the NA-group rows, so they fell out of every
+  # group column while Overall still counted them and the group Ns no longer
+  # summed to N.
+  df <- data.frame(x = c(1, 2, 3, 4), g = c("a", "a", "b", NA))
+  tab <- summary_table(df, vars = "x", group = "g")
+
+  expect_true("Missing" %in% names(tab))
+  # Missing sits after the real levels, as in the Python twin.
+  expect_identical(names(tab),
+                   c("variable", "statistic", "Overall", "a", "b", "Missing"))
+  n_row <- tab[tab$variable == "N", ]
+  expect_equal(as.integer(n_row$Overall), nrow(df))
+  expect_equal(sum(as.integer(unlist(n_row[c("a", "b", "Missing")]))), nrow(df))
+
+  # A real level called "Missing" keeps its column; the NA rows go to "Missing_".
+  df2 <- data.frame(x = c(1, 2, 3, 4), g = c("a", "Missing", "Missing", NA))
+  tab2 <- summary_table(df2, vars = "x", group = "g")
+  expect_true(all(c("Missing", "Missing_") %in% names(tab2)))
+  expect_equal(as.integer(tab2[tab2$variable == "N", "Missing"]), 2L)
+  expect_equal(as.integer(tab2[tab2$variable == "N", "Missing_"]), 1L)
+
+  # No such column when the grouping variable is complete.
+  tab3 <- summary_table(crop_yield, vars = "yield", group = "treatment")
+  expect_false("Missing" %in% names(tab3))
+})
+
 # --- correlation_heatmap(): zero-variance columns ---------------------------
 
 test_that("correlation_heatmap() drops zero-variance columns without warning", {

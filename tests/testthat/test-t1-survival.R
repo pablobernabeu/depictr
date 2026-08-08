@@ -42,6 +42,26 @@ test_that("status accepts the survival::Surv 1/2 coding", {
   expect_s3_class(survival_plot(c(5, 6, 7, 8), c(2, 1, 2, 2)), "ggplot")
 })
 
+test_that("a non-finite follow-up time is refused, not silently dropped", {
+  # Regression: NA and Inf times were dropped inside km_estimate(), which moves
+  # the number at risk (and every step of the curve) with nothing said.
+  for (bad in c(NA_real_, Inf, -Inf)) {
+    tt <- c(5, 6, 7, 8)
+    tt[3] <- bad
+    expect_error(
+      survival_plot(tt, c(1, 1, 1, 0)),
+      "^`time` must be finite; drop or impute missing follow-up times before plotting\\.$"
+    )
+  }
+  # The data-frame path funnels through the same estimator.
+  expect_error(
+    survival_plot(data.frame(time = c(5, NA, 7), status = c(1, 1, 0))),
+    "must be finite"
+  )
+  # Complete times still plot, and a missing status is still dropped.
+  expect_s3_class(survival_plot(c(5, 6, 7, 8), c(1, 1, NA, 0)), "ggplot")
+})
+
 test_that("logical status is accepted and invalid coding errors", {
   km_lgl <- depictr:::km_estimate(c(5, 6, 7, 8), c(TRUE, TRUE, TRUE, TRUE), 0.95)
   expect_equal(km_lgl$curve$surv, c(1, 0.75, 0.5, 0.25, 0))

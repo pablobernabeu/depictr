@@ -86,6 +86,49 @@ test_that("the default qualitative palette stays distinguishable under CVD", {
   }
 })
 
+test_that("interpolating past the base set warns, and the base set does not", {
+  old <- options(depictr.palette = NULL)
+  on.exit(options(old), add = TRUE)
+
+  # The warning is about interpolation, so asking for the base set (or a slice
+  # of it, or either ramp) must stay quiet.
+  expect_no_warning(depictr_palette())
+  expect_no_warning(depictr_palette(8))
+  expect_no_warning(depictr_palette(20, type = "sequential"))
+
+  expect_warning(
+    pal <- depictr_palette(10),
+    paste0("^10 colours interpolated through the 8-colour Okabe-Ito set: the ",
+           "colour-vision-deficiency guarantee holds only up to 8 categories\\. ",
+           "Use a sequential palette, or facet the groups, if the distinction ",
+           "must survive colour-vision deficiency\\.$")
+  )
+  expect_length(pal, 10)
+  # The claim the warning makes is true: the interpolated set fails the
+  # package's own check, while the eight it is made for clears it.
+  expect_false(all(palette_cvd_safety(pal) > 5))
+  expect_true(all(palette_cvd_safety(depictr_palette(8)) > 5))
+})
+
+test_that("a user-supplied palette is interpolated without the Okabe-Ito warning", {
+  # The message names Okabe-Ito, and a custom palette never carried that
+  # guarantee, so there is nothing to withdraw.
+  old <- depictr_options(palette = c("#1b9e77", "#d95f02", "#7570b3"))
+  on.exit(do.call(depictr_options, old), add = TRUE)
+  expect_no_warning(pal <- depictr_palette(9))
+  expect_length(pal, 9)
+})
+
+test_that("scale_colour_depictr() warns at draw time past eight groups", {
+  old <- options(depictr.palette = NULL)
+  on.exit(options(old), add = TRUE)
+  df <- data.frame(g = factor(letters[1:10]), v = 1:10)
+  p <- ggplot2::ggplot(df, ggplot2::aes(g, v, colour = g)) +
+    ggplot2::geom_point() + scale_colour_depictr()
+  expect_warning(ggplot2::ggplot_build(p),
+                 "colour-vision-deficiency guarantee holds only up to 8")
+})
+
 # --- palette_preview() CVD rendering ----------------------------------------
 
 test_that("palette_preview() builds without warnings for every cvd setting", {

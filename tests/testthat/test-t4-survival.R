@@ -232,3 +232,42 @@ test_that("custom risk_breaks are honoured", {
   tab <- depictr:::n_at_risk(counts, brks)
   expect_setequal(unique(tab$time), brks)
 })
+
+test_that("a missing group is dropped rather than drawn as a phantom arm", {
+  # Regression: NA survived unique(), so the loop ran with g = NA, gv == NA
+  # matched nothing and km_estimate() returned a one-row all-censored curve
+  # labelled NA -- a spurious grey series in the legend. With logrank = TRUE
+  # the zero-row group frame was fatal.
+  set.seed(1)
+  tt <- rexp(60, 0.1)
+  ev <- rbinom(60, 1, 0.7)
+  gg <- rep(c("a", "b"), each = 30)
+  gg[c(5, 20, 40)] <- NA
+
+  expect_message(survival_plot(tt, ev, group = gg),
+                 "3 observation(s) with a missing group were dropped",
+                 fixed = TRUE)
+  p <- suppressMessages(survival_plot(tt, ev, group = gg))
+  expect_setequal(unique(as.character(p$data$group)), c("a", "b"))
+  expect_false(anyNA(p$data$group))
+
+  expect_s3_class(
+    suppressMessages(survival_plot(tt, ev, group = gg, logrank = TRUE)),
+    "ggplot"
+  )
+
+  # A factor group keeps its level order and loses only the NA rows.
+  gf <- factor(gg, levels = c("b", "a"))
+  pf <- suppressMessages(survival_plot(tt, ev, group = gf))
+  expect_equal(levels(factor(pf$data$group, levels = c("b", "a"))),
+               c("b", "a"))
+
+  # Nothing left to plot is an error, not an empty frame.
+  expect_error(
+    suppressMessages(survival_plot(tt, ev, group = rep(NA_character_, 60))),
+    "missing for every observation"
+  )
+
+  # Complete groups are untouched: no message, same curve as before.
+  expect_silent(survival_plot(tt, ev, group = rep(c("a", "b"), each = 30)))
+})

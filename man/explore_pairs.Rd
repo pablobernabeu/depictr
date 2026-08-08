@@ -29,7 +29,9 @@ quickly).}
 \item{point_alpha}{Point transparency in the scatter panels.}
 
 \item{method}{Correlation method for the upper-triangle coefficients, passed
-to \code{\link[stats:cor]{stats::cor()}}: \code{"pearson"}, \code{"spearman"} or \code{"kendall"}.}
+to \code{\link[stats:cor]{stats::cor()}}: \code{"pearson"}, \code{"spearman"} or \code{"kendall"}. A pair whose
+correlation is undefined (a constant column, or too few complete cases) is
+labelled \code{n/a}, as in \code{\link[=correlation_heatmap]{correlation_heatmap()}}.}
 
 \item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 

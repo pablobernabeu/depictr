@@ -18,14 +18,20 @@ k_diagnostic(
 \arguments{
 \item{data}{A data frame or numeric matrix.}
 
-\item{k_range}{Integer vector of candidate cluster counts to evaluate.}
+\item{k_range}{Integer vector of candidate cluster counts to evaluate.
+Candidates the chosen criterion cannot evaluate are skipped with a message
+naming them: \code{k = 1} under \code{"silhouette"} (a lone cluster has no
+neighbouring cluster to compare against, so the width is undefined), and
+any \code{k} at or above the number of observations under every criterion.}
 
 \item{method}{Diagnostic: \code{"silhouette"}, \code{"wss"} (within sum of squares
 elbow) or \code{"gap"}.}
 
 \item{cols}{When \code{data} is a data frame, the numeric columns to use.}
 
-\item{scale}{Whether to scale variables to unit variance first.}
+\item{scale}{Whether to scale variables to unit variance first. Columns with
+(near-)zero variance cannot be scaled and are dropped with a message, as in
+\code{\link[=correlation_heatmap]{correlation_heatmap()}}.}
 
 \item{nstart}{Number of random starts for \code{\link[stats:kmeans]{stats::kmeans()}}.}
 

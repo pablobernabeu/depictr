@@ -10,10 +10,10 @@ depictr_palette(n = NULL, type = c("qualitative", "sequential", "diverging"))
 \item{n}{Number of colours to return. If \code{NULL} (the default) the full
 qualitative palette is returned. For the qualitative palette an \code{n} larger
 than the available base colours is interpolated; the sequential and
-diverging palettes are ramps and accept any \code{n}. Interpolated colours
-beyond the base set are not guaranteed to remain distinguishable under
-colour-vision deficiency, so prefer faceting or a custom palette when many
-groups are needed.}
+diverging palettes are ramps and accept any \code{n}. Interpolating the built-in
+qualitative palette beyond its eight base colours loses the
+colour-vision-deficiency guarantee and warns, so facet the groups or use
+the sequential ramp when many groups are needed.}
 
 \item{type}{Palette type: \code{"qualitative"} (categorical groups),
 \code{"sequential"} (ordered low-to-high) or \code{"diverging"} (a midpoint with two
@@ -31,6 +31,12 @@ sequential and diverging palettes are perceptually ordered single-hue and
 red-blue ramps.
 }
 \details{
+The guarantee belongs to the eight Okabe-Ito colours themselves, not to any
+number of colours: past eight the qualitative palette has to interpolate
+between them, and the interpolated colours sit close enough together to fail
+the package's own colour-distance check. That case warns rather than handing
+back colours under a guarantee it cannot keep.
+
 The qualitative palette can be overridden globally with
 \code{options(depictr.palette = )} (see \code{\link[=depictr_options]{depictr_options()}}); when set, that
 custom palette replaces the built-in Okabe-Ito set and is interpolated when

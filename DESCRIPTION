@@ -33,7 +33,7 @@ Imports:
     ggplot2 (>= 3.5.0),
     stringr,
     scales,
-    patchwork (>= 1.2.0),
+    patchwork (>= 1.3.0),
     rlang,
     stats,
     grDevices,

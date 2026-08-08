@@ -158,9 +158,12 @@ ts_seasonal_frame <- function(x, frequency = NULL, season_labels = NULL) {
 #' Default season labels for a given frequency
 #' @noRd
 default_season_labels <- function(freq) {
+  # Only frequencies whose calendar position the `ts` start carries can be
+  # named: stats::cycle() knows which month or quarter season 1 is. A plain
+  # ts(x, frequency = 7) has no weekday information, so naming its seasons
+  # Mon..Sun would be a guess; the season index is left for `season_labels`.
   if (freq == 12) return(month.abb)
   if (freq == 4) return(paste0("Q", 1:4))
-  if (freq == 7) return(c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"))
   as.character(seq_len(freq))
 }
 

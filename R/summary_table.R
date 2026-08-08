@@ -23,7 +23,9 @@
 #' @param vars Columns to summarise. If `NULL`, all columns except `group` are
 #'   used, with high-cardinality identifier-like columns skipped (see Details).
 #' @param group Optional grouping variable; one summary column is produced per
-#'   level, alongside an overall column.
+#'   level, alongside an overall column. Records whose group value is missing
+#'   get a trailing `Missing` column of their own, so the group sizes still sum
+#'   to the overall `N`.
 #' @param digits Number of decimal places for numeric summaries.
 #' @param missing Whether to add a `Missing, n (%)` row for variables that
 #'   contain missing values. Defaults to `TRUE`.
@@ -31,8 +33,9 @@
 #'   distinct-level count is at least `max_levels` *and* exceeds half the number
 #'   of rows are treated as identifiers and skipped. Defaults to `20`.
 #'
-#' @return A data frame with columns `variable`, `statistic`, `Overall` and one
-#'   column per group level. The first row reports `N`.
+#' @return A data frame with columns `variable`, `statistic`, `Overall`, one
+#'   column per group level and, when the grouping variable has missing values,
+#'   a trailing `Missing` column. The first row reports `N`.
 #' @export
 #' @examples
 #' summary_table(crop_yield, vars = c("yield", "rainfall", "treatment"))
@@ -68,8 +71,18 @@ summary_table <- function(data, vars = NULL, group = NULL, digits = 1,
   }
   check_columns(data, vars)
 
-  groups <- if (is.null(group)) list(Overall = data) else
-    c(list(Overall = data), split(data, data[[group]]))
+  groups <- if (is.null(group)) list(Overall = data) else {
+    parts <- c(list(Overall = data), split(data, data[[group]]))
+    # split() drops the rows whose group is missing. Without a column of their
+    # own they fall out of every group while Overall still counts them, so the
+    # group sizes stop summing to N with nothing on the table to say why.
+    if (anyNA(data[[group]])) {
+      na_name <- "Missing"
+      while (na_name %in% names(parts)) na_name <- paste0(na_name, "_")
+      parts[[na_name]] <- data[is.na(data[[group]]), , drop = FALSE]
+    }
+    parts
+  }
 
   num_fmt <- function(v) {
     v <- v[!is.na(v)]

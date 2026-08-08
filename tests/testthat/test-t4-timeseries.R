@@ -167,3 +167,23 @@ test_that("decompose_plot() robust STL and backward compatibility", {
   expect_error(decompose_plot(y, confidence = TRUE, level = 2),
                "between 0 and 1")
 })
+
+test_that("a frequency-7 series is labelled by season index, not weekday", {
+  # Regression: a plain ts(x, frequency = 7) carries no weekday information --
+  # season 1 is simply the first observation -- yet the panels were labelled
+  # Mon..Sun, contradicting @param season_labels.
+  set.seed(3)
+  y <- stats::ts(rnorm(70), frequency = 7)
+  expect_equal(depictr:::default_season_labels(7), as.character(1:7))
+  p <- seasonal_plot(y)
+  expect_setequal(unique(as.character(p$data$season)), as.character(1:7))
+  expect_false(any(c("Mon", "Sun") %in% as.character(p$data$season)))
+
+  # Frequencies the ts start really does pin down keep their names.
+  expect_equal(depictr:::default_season_labels(12), month.abb)
+  expect_equal(depictr:::default_season_labels(4), paste0("Q", 1:4))
+  # A caller who does know the alignment can still supply the weekdays.
+  wd <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+  pw <- seasonal_plot(y, season_labels = wd)
+  expect_setequal(unique(as.character(pw$data$season)), wd)
+})

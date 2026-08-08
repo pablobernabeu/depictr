@@ -78,3 +78,29 @@ test_that("coefficient_plot() handles data-frame and model input identically", {
   expect_s3_class(p_df, "ggplot")
   expect_setequal(as.character(p_df$data$label), c("a", "b"))
 })
+
+test_that("the faceted reference line honours depictr_options(reference =)", {
+  # Regression: the faceted branch hard-coded "grey60", so the option moved the
+  # line in the shared-axis layout and in coefficient_plot() but not here.
+  set.seed(7)
+  dd <- data.frame(y = rnorm(80), a = rnorm(80), b = rnorm(80), cc = rnorm(80))
+  m1 <- lm(y ~ a + b, dd)
+  m2 <- lm(y ~ a + cc, dd)
+
+  vline_colours <- function(p) {
+    vl <- Filter(function(l) inherits(l$geom, "GeomVline"), p$layers)
+    unname(unlist(lapply(vl, function(l) l$aes_params$colour)))
+  }
+
+  old <- depictr_options(reference = "#FF0000")
+  on.exit(do.call(depictr_options, old), add = TRUE)
+  expect_equal(vline_colours(compare_models(A = m1, B = m2, facet = TRUE)),
+               "#FF0000")
+  # The shared-axis layout already honoured it; the two must now agree.
+  expect_equal(vline_colours(compare_models(A = m1, B = m2)), "#FF0000")
+
+  do.call(depictr_options, old)
+  # Default unchanged, so no committed figure moves.
+  expect_equal(vline_colours(compare_models(A = m1, B = m2, facet = TRUE)),
+               "grey60")
+})

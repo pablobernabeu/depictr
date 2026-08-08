@@ -86,6 +86,21 @@ test_that("quantile residuals are reproducible with a seed", {
   set.seed(1); s1 <- runif(1)
   set.seed(1); invisible(depictr:::quantile_residuals(gfit, seed = 7)); s2 <- runif(1)
   expect_identical(s1, s2)
+
+  # Including in a session that has not drawn a random number yet: there is no
+  # state to save, so the restoration is to leave .Random.seed absent rather
+  # than let the internal set.seed() leak into the caller's stream.
+  saved <- get(".Random.seed", envir = .GlobalEnv)
+  on.exit(assign(".Random.seed", saved, envir = .GlobalEnv), add = TRUE)
+
+  rm(".Random.seed", envir = .GlobalEnv)
+  invisible(depictr:::quantile_residuals(gfit, seed = 7))
+  expect_false(exists(".Random.seed", envir = .GlobalEnv))
+
+  vals <- stats::rnorm(50)
+  rm(".Random.seed", envir = .GlobalEnv)
+  invisible(depictr:::qq_band(vals, type = "simulate", seed = 3, n_sim = 20))
+  expect_false(exists(".Random.seed", envir = .GlobalEnv))
 })
 
 test_that("residual_diagnostics_plot() is glm-aware but lm is unchanged", {

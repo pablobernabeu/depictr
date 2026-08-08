@@ -1,5 +1,5 @@
 # simr power analysis on lexical_decision -> a real powerCurve object for the
-# power_curve_plot demo/tests (and to fix the simr-path nlevels/nrow + title bugs).
+# power_curve_plot demo/tests.
 args <- commandArgs(trailingOnly = TRUE)
 OUT <- if (length(args) >= 1) args[1] else "."
 dir.create(OUT, showWarnings = FALSE, recursive = TRUE)

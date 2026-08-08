@@ -98,6 +98,10 @@ compare_models <- function(...,
   # the term, instead of producing two near-identical rows/panels.
   est$term[est$term %in% c("Intercept", "b_Intercept")] <- "(Intercept)"
 
+  # Judged before the intercept is dropped, so labelling a term that is merely
+  # not plotted is not reported as a typo.
+  warn_unused_labels(est$term, labels)
+
   if (!intercept) {
     est <- est[!est$term %in% c("(Intercept)", "Intercept", "b_Intercept"), ,
                 drop = FALSE]
@@ -182,7 +186,7 @@ compare_models <- function(...,
     # One free-scaled panel per term keeps the source overlay and its single
     # legend, but lets each term occupy its own x-range.
     p <- add_term_facets(p, reference_line = reference_line,
-                         reference_colour = "grey60")
+                         reference_colour = depictr_reference())
   }
 
   p

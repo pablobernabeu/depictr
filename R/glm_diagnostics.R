@@ -155,9 +155,15 @@ binned_residual_data <- function(model, bins = NULL,
 #' @noRd
 quantile_residuals <- function(model, seed = NULL) {
   if (!is.null(seed)) {
+    # Leave the caller's random stream as we found it, including the case of a
+    # session that has not drawn a random number yet (no state to save, so the
+    # restoration is to remove the seed our set.seed() leaves behind).
     if (exists(".Random.seed", envir = .GlobalEnv)) {
       old <- get(".Random.seed", envir = .GlobalEnv)
       on.exit(assign(".Random.seed", old, envir = .GlobalEnv), add = TRUE)
+    } else {
+      on.exit(suppressWarnings(rm(".Random.seed", envir = .GlobalEnv)),
+              add = TRUE)
     }
     set.seed(seed)
   }

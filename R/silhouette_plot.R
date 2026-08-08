@@ -133,10 +133,16 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
 #'
 #' @param data A data frame or numeric matrix.
 #' @param k_range Integer vector of candidate cluster counts to evaluate.
+#'   Candidates the chosen criterion cannot evaluate are skipped with a message
+#'   naming them: `k = 1` under `"silhouette"` (a lone cluster has no
+#'   neighbouring cluster to compare against, so the width is undefined), and
+#'   any `k` at or above the number of observations under every criterion.
 #' @param method Diagnostic: `"silhouette"`, `"wss"` (within sum of squares
 #'   elbow) or `"gap"`.
 #' @param cols When `data` is a data frame, the numeric columns to use.
-#' @param scale Whether to scale variables to unit variance first.
+#' @param scale Whether to scale variables to unit variance first. Columns with
+#'   (near-)zero variance cannot be scaled and are dropped with a message, as in
+#'   [correlation_heatmap()].
 #' @param nstart Number of random starts for [stats::kmeans()].
 #' @param B Number of reference bootstrap samples for the gap statistic.
 #' @param title Plot title.
@@ -225,15 +231,24 @@ k_diagnostic_data <- function(data, k_range = 2:8,
                               cols = NULL, scale = TRUE, nstart = 10, B = 50) {
   method <- match.arg(method)
   X <- numeric_matrix(data, cols, scale)
-  k_range <- sort(unique(as.integer(k_range)))
-  k_range <- k_range[k_range >= 1 & k_range < nrow(X)]
+  requested <- sort(unique(as.integer(k_range)))
+  # The silhouette width compares each point with its nearest *other* cluster,
+  # so it is undefined at k = 1; wss and gap both define a k = 1 baseline. A k
+  # at or above the number of observations leaves no clustering to evaluate.
+  # Say which candidates went, rather than quietly narrowing the search.
+  k_min <- if (method == "silhouette") 2L else 1L
+  k_range <- requested[requested >= k_min & requested < nrow(X)]
+  dropped <- setdiff(requested, k_range)
+  if (length(dropped)) {
+    message("k_diagnostic(): skipping k = ", paste(dropped, collapse = ", "),
+            " (not evaluable for the ", method, " criterion).")
+  }
   if (length(k_range) < 2) {
     stop("`k_range` must contain at least two feasible values of k.",
          call. = FALSE)
   }
 
   if (method == "wss") {
-    k_range <- k_range[k_range >= 1]
     wss <- vapply(k_range, function(k) {
       if (k == 1) sum(scale(X, scale = FALSE)^2)
       else sum(stats::kmeans(X, centers = k, nstart = nstart)$withinss)
@@ -244,7 +259,7 @@ k_diagnostic_data <- function(data, k_range = 2:8,
   }
 
   if (method == "silhouette") {
-    kk <- k_range[k_range >= 2]
+    kk <- k_range
     d <- stats::dist(X)
     avg <- vapply(kk, function(k) {
       cl <- stats::kmeans(X, centers = k, nstart = nstart)$cluster
@@ -256,8 +271,7 @@ k_diagnostic_data <- function(data, k_range = 2:8,
   }
 
   # Gap statistic (Tibshirani, Walther & Hastie, 2001)
-  kk <- k_range[k_range >= 1]
-  gap_out <- gap_statistic(X, kk, nstart = nstart, B = B)
+  gap_out <- gap_statistic(X, k_range, nstart = nstart, B = B)
   list(table = gap_out$table, suggested = gap_out$suggested, method = method)
 }
 
@@ -283,7 +297,14 @@ numeric_matrix <- function(data, cols, scale) {
   } else {
     stop("`data` must be a data frame or a numeric matrix.", call. = FALSE)
   }
-  if (scale) mat <- scale(mat)
+  if (scale) {
+    mat <- drop_constant_matrix_columns(mat, "k_diagnostic")
+    if (!ncol(mat)) {
+      stop("Need at least one numeric column with non-zero variance.",
+           call. = FALSE)
+    }
+    mat <- scale(mat)
+  }
   mat
 }
 

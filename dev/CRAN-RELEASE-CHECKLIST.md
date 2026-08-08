@@ -16,8 +16,7 @@ machine with a full R toolchain.
 - [ ] **Confirm the name is free**: run `available.packages()` / check
   <https://cran.r-project.org/package=depictr>. (No conflict found at the time
   of writing; `statVisual` is archived.)
-- [ ] Run `urlchecker::url_check()` to validate URLs (the GitHub URLs resolve
-  only once the repository is named `depictr`).
+- [ ] Run `urlchecker::url_check()` to validate URLs.
 - [ ] Run `devtools::check(remote = TRUE, manual = TRUE)` — exercises the
   CRAN incoming checks and the PDF manual that were skipped in the offline
   build here. Expect 0 errors / 0 warnings; the only local note (`simr` not

@@ -48,3 +48,23 @@ test_that("summary_table() returns a tidy descriptive table", {
                            group = "region")
   expect_true(all(levels(wellbeing_survey$region) %in% names(grouped)))
 })
+
+test_that("explore_pairs() labels an undefined correlation n/a, without warning", {
+  # Regression: a constant column surfaced the raw "the standard deviation is
+  # zero" warning from stats::cor() and printed "r = NA", which is exactly what
+  # correlation_heatmap() documents the package as preventing.
+  d <- crop_yield
+  d$const <- 1
+  cols <- c("rainfall", "yield", "const")
+
+  expect_silent(print(explore_pairs(d, cols = cols)))
+  expect_silent(print(explore_pairs(d, cols = cols, group = treatment)))
+
+  expect_equal(depictr:::pair_correlation(d$rainfall, d$const, "pearson"),
+               "n/a")
+  expect_equal(depictr:::pair_correlation(c(1, NA), c(NA, 2), "pearson"),
+               "n/a")
+  # A well-defined pair is still formatted to two decimal places as before.
+  expect_equal(depictr:::pair_correlation(d$rainfall, d$yield, "pearson"),
+               formatC(cor(d$rainfall, d$yield), format = "f", digits = 2))
+})

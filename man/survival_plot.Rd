@@ -23,7 +23,9 @@ survival_plot(
 }
 \arguments{
 \item{time}{A numeric vector of follow-up times, a data frame with \code{time},
-\code{status} and optional \code{group} columns, or a \code{survfit} object.}
+\code{status} and optional \code{group} columns, or a \code{survfit} object. Every time
+must be finite: a missing or infinite one is an error rather than a silent
+exclusion, since dropping it would move the number at risk unannounced.}
 
 \item{status}{Event indicator when \code{time} is a vector. Either the 0/1
 convention (\code{0} = censored, \code{1} = event) or the \code{\link[survival:Surv]{survival::Surv()}} 1/2
@@ -31,7 +33,8 @@ convention (\code{1} = censored, \code{2} = event) is accepted; logical values a
 also allowed. Other codings raise an error.}
 
 \item{group}{Optional grouping variable (a vector, or a column name when
-\code{time} is a data frame).}
+\code{time} is a data frame). Observations whose group is missing are dropped
+with a message, since they belong to no arm.}
 
 \item{conf_level}{Confidence level for the limits (\code{NA} to omit them).}
 

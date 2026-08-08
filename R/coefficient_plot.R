@@ -40,7 +40,10 @@
 #'   Requires a fitted model (ignored, with a warning, for a tidy data frame).
 #'   Defaults to `FALSE`.
 #' @param title,subtitle,x_lab Plot title, subtitle and x-axis label. `x_lab`
-#'   defaults to "Estimate", or "Standardised estimate" when `standardise`.
+#'   defaults to "Estimate", or "Estimate per SD of predictor" when
+#'   `standardise`. The label names the convention on the figure itself,
+#'   because only the predictors are rescaled here: a fully standardised beta
+#'   would rescale the outcome too.
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export
@@ -89,10 +92,15 @@ coefficient_plot <- function(x,
   if (standardise) {
     est <- standardise_estimates(est, x)
   }
-  x_lab <- x_lab %||% if (standardise) "Standardised estimate" else "Estimate"
+  # Name the convention on the axis: only the predictors are rescaled, so
+  # "standardised estimate" would promise the fully standardised beta that the
+  # reader of a travelling figure would reasonably assume it meant.
+  x_lab <- x_lab %||%
+    if (standardise) "Estimate per SD of predictor" else "Estimate"
 
   # Prettify coefficient names to the effect (variable) name by default
   # (e.g. "conditionunrelated" -> "condition"); user `labels` take precedence.
+  warn_unused_labels(est$term, labels)
   labels <- merge_pretty_labels(labels, pretty_coef_map(x))
 
   if (!intercept) {
@@ -246,10 +254,12 @@ standardise_estimates <- function(est, x) {
 #' @param p A ggplot whose data has a `label` column (term label) mapped to `y`
 #'   and `conf.low`/`conf.high` (or `outer_lo`/`outer_hi`) interval columns.
 #' @param reference_line Position of the per-panel reference line (`NA` to omit).
-#' @param reference_colour Colour of the reference line.
+#' @param reference_colour Colour of the reference line. Defaults to the
+#'   package-wide `reference` option so a faceted panel matches the shared-axis
+#'   layout.
 #' @noRd
 add_term_facets <- function(p, reference_line = NA,
-                            reference_colour = "grey60") {
+                            reference_colour = depictr_reference()) {
   out <- p +
     ggplot2::facet_wrap(
       ggplot2::vars(.data$label),
@@ -306,6 +316,29 @@ order_terms <- function(est, order) {
     est <- est[order(est$estimate, decreasing = TRUE), , drop = FALSE]
   }
   est
+}
+
+#' Warn when a named `labels` entry matches no term
+#'
+#' [make_labels()] drops an entry whose name is not a term, so a mistyped key
+#' leaves the raw parameter name on the plot with nothing to say the relabelling
+#' never happened. The check lives here rather than in [make_labels()] because
+#' it must see the user's `labels` before [merge_pretty_labels()] folds in the
+#' automatic factor-level keys (which include `b_`-prefixed variants that a
+#' frequentist fit never has), and the complete term list, which several callers
+#' reach only after labelling row by row.
+#' @noRd
+warn_unused_labels <- function(terms, labels) {
+  if (is.null(labels) || is.null(names(labels))) return(invisible(NULL))
+  terms <- unique(terms)
+  unused <- setdiff(names(labels), terms)
+  if (length(unused)) {
+    warning("`labels` keys not found among the parameters: ",
+            paste(sort(unused), collapse = ", "),
+            ". The parameters are ", paste(terms, collapse = ", "), ".",
+            call. = FALSE)
+  }
+  invisible(NULL)
 }
 
 #' Build display labels for a set of terms

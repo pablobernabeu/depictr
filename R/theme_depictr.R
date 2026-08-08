@@ -9,13 +9,19 @@
 #' sequential and diverging palettes are perceptually ordered single-hue and
 #' red-blue ramps.
 #'
+#' The guarantee belongs to the eight Okabe-Ito colours themselves, not to any
+#' number of colours: past eight the qualitative palette has to interpolate
+#' between them, and the interpolated colours sit close enough together to fail
+#' the package's own colour-distance check. That case warns rather than handing
+#' back colours under a guarantee it cannot keep.
+#'
 #' @param n Number of colours to return. If `NULL` (the default) the full
 #'   qualitative palette is returned. For the qualitative palette an `n` larger
 #'   than the available base colours is interpolated; the sequential and
-#'   diverging palettes are ramps and accept any `n`. Interpolated colours
-#'   beyond the base set are not guaranteed to remain distinguishable under
-#'   colour-vision deficiency, so prefer faceting or a custom palette when many
-#'   groups are needed.
+#'   diverging palettes are ramps and accept any `n`. Interpolating the built-in
+#'   qualitative palette beyond its eight base colours loses the
+#'   colour-vision-deficiency guarantee and warns, so facet the groups or use
+#'   the sequential ramp when many groups are needed.
 #' @param type Palette type: `"qualitative"` (categorical groups),
 #'   `"sequential"` (ordered low-to-high) or `"diverging"` (a midpoint with two
 #'   directions).
@@ -57,7 +63,8 @@ depictr_palette <- function(n = NULL, type = c("qualitative", "sequential",
   # Okabe-Ito set (led by the depictr brand blue); the option falls back to the
   # package default.
   base <- depictr_opt("palette")
-  if (is.null(base)) {
+  builtin <- is.null(base)
+  if (builtin) {
     base <- c(
       blue           = "#005b96",
       orange         = "#e69f00",
@@ -72,6 +79,17 @@ depictr_palette <- function(n = NULL, type = c("qualitative", "sequential",
   base <- unname(base)
   if (is.null(n)) return(base)
   if (n <= length(base)) return(base[seq_len(n)])
+  # Interpolating past the base set puts the colours close enough together to
+  # fail palette_cvd_safety(), so say so instead of quietly breaking the
+  # package's headline accessibility claim. Only the built-in set carries that
+  # claim: a user-supplied palette was never Okabe-Ito to begin with.
+  if (builtin) {
+    warning(n, " colours interpolated through the ", length(base),
+            "-colour Okabe-Ito set: the colour-vision-deficiency guarantee ",
+            "holds only up to ", length(base), " categories. Use a sequential ",
+            "palette, or facet the groups, if the distinction must survive ",
+            "colour-vision deficiency.", call. = FALSE)
+  }
   grDevices::colorRampPalette(base)(n)
 }
 
@@ -84,7 +102,10 @@ depictr_palette <- function(n = NULL, type = c("qualitative", "sequential",
 #'
 #' @param n Optional number of colours to draw from [depictr_palette()]. By
 #'   default ggplot2 requests exactly as many colours as there are groups; pass
-#'   `n` only to force a fixed slice of the palette.
+#'   `n` only to force a fixed slice of the palette. More than eight groups
+#'   means the built-in qualitative palette is interpolated, which loses the
+#'   colour-vision-deficiency guarantee and warns at draw time; facet the groups
+#'   or use a sequential scale when there are that many.
 #' @param palette Optional palette override: a function of one argument (the
 #'   number of colours) returning a character vector of colours. Defaults to
 #'   [depictr_palette()].

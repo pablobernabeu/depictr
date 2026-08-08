@@ -13,7 +13,9 @@ test_that("format_terms() can wrap long labels", {
 
 test_that("depictr_palette() returns the requested number of colours", {
   expect_length(depictr_palette(3), 3)
-  expect_length(depictr_palette(20), 20)          # interpolates
+  # Interpolates, and says so: past the base set the guarantee lapses.
+  expect_warning(pal20 <- depictr_palette(20), "guarantee holds only up to 8")
+  expect_length(pal20, 20)
   expect_match(depictr_palette(1), "^#")
   expect_error(depictr_palette(0), "positive")
   # First qualitative colour is the brand blue

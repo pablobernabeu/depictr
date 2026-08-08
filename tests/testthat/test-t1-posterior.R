@@ -65,3 +65,29 @@ test_that("wide draws of only index columns error informatively", {
   draws <- data.frame(.chain = 1:10, .draw = 1:10)
   expect_error(draws_to_long(draws), "Could not find draws")
 })
+
+test_that("posterior_plot() warns about a `labels` key that matches nothing", {
+  # Regression: a mistyped parameter name left the raw name on the plot with
+  # nothing to say the relabelling never happened.
+  set.seed(5)
+  draws <- data.frame(stress = rnorm(500, -0.4, 0.1),
+                      sleep_hours = rnorm(500, 0.3, 0.1))
+  expect_warning(
+    posterior_plot(draws, labels = c(strss = "Stress")),
+    paste0("^`labels` keys not found among the parameters: strss\\. ",
+           "The parameters are stress, sleep_hours\\.$")
+  )
+  # Once per call, not once per labelling pass: the factor levels, the summaries
+  # and the draws are all labelled from the same parameter list.
+  n_warn <- 0L
+  withCallingHandlers(
+    posterior_plot(draws, labels = c(strss = "Stress")),
+    warning = function(cond) {
+      n_warn <<- n_warn + 1L
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_equal(n_warn, 1L)
+
+  expect_no_warning(posterior_plot(draws, labels = c(stress = "Stress")))
+})

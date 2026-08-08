@@ -30,7 +30,10 @@ scale_fill_depictr(
 \arguments{
 \item{n}{Optional number of colours to draw from \code{\link[=depictr_palette]{depictr_palette()}}. By
 default ggplot2 requests exactly as many colours as there are groups; pass
-\code{n} only to force a fixed slice of the palette.}
+\code{n} only to force a fixed slice of the palette. More than eight groups
+means the built-in qualitative palette is interpolated, which loses the
+colour-vision-deficiency guarantee and warns at draw time; facet the groups
+or use a sequential scale when there are that many.}
 
 \item{palette}{Optional palette override: a function of one argument (the
 number of colours) returning a character vector of colours. Defaults to

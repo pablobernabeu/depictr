@@ -155,3 +155,96 @@ test_that("cluster_plot(suggest_k=) chooses k, stays backward-compatible", {
   expect_s3_class(p4, "ggplot")
   expect_silent(ggplot2::ggplot_build(p4))
 })
+
+test_that("a zero-variance column is dropped rather than crashing k-means", {
+  # Regression: scale() turns a constant column into NaN, and kmeans() then
+  # died with the raw "NA/NaN/Inf in foreign function call" error. The package
+  # standard, set by correlation_heatmap(), is to drop and say so.
+  d <- crop_yield
+  d$const <- 1
+
+  expect_message(
+    cluster_plot(d, cols = c(cols, "const"), k = 2, seed = 1),
+    "cluster_plot(): dropping zero-variance column(s): const.",
+    fixed = TRUE
+  )
+  p <- suppressMessages(cluster_plot(d, cols = c(cols, "const"), k = 2,
+                                     seed = 1))
+  expect_s3_class(p, "ggplot")
+  expect_silent(ggplot2::ggplot_build(p))
+  # The dropped column must not reach the suggest_k diagnostic either, so the
+  # message is emitted once rather than twice.
+  expect_message(
+    cluster_plot(d, cols = c(cols, "const"), suggest_k = TRUE, k_range = 2:4,
+                 seed = 1),
+    "cluster_plot(): dropping zero-variance column(s): const.",
+    fixed = TRUE
+  )
+
+  expect_message(
+    k_diagnostic(d, k_range = 2:4, cols = c(cols, "const")),
+    "k_diagnostic(): dropping zero-variance column(s): const.",
+    fixed = TRUE
+  )
+
+  # The two-column minimum is enforced after the drop, not before.
+  expect_error(
+    suppressMessages(cluster_plot(d, cols = c("rainfall", "const"), k = 2,
+                                  seed = 1)),
+    "non-zero variance"
+  )
+
+  # Unscaled clustering never divides by the SD, so nothing is dropped.
+  expect_silent(cluster_plot(d, cols = c(cols, "const"), k = 2, scale = FALSE,
+                             seed = 1))
+  # And an all-varying input is untouched.
+  expect_silent(cluster_plot(crop_yield, cols = cols, k = 2, seed = 1))
+})
+
+test_that("k_diagnostic() names the candidate k values it cannot evaluate", {
+  # Regression: infeasible and criterion-incompatible k were filtered out in
+  # silence, so the plotted search space differed from the requested one with
+  # nothing in the figure or the table to say so.
+  expect_message(
+    k_diagnostic(crop_yield, k_range = 1:5, method = "silhouette", cols = cols),
+    "k_diagnostic(): skipping k = 1 (not evaluable for the silhouette criterion).",
+    fixed = TRUE
+  )
+  kd <- suppressMessages(
+    k_diagnostic(crop_yield, k_range = 1:5, method = "silhouette", cols = cols)
+  )
+  expect_equal(attr(kd, "k_table")$k, 2:5)
+
+  expect_message(
+    k_diagnostic(crop_yield, k_range = c(2, 3, 999), method = "silhouette",
+                 cols = cols),
+    "skipping k = 999",
+    fixed = TRUE
+  )
+
+  # The gap criterion does define a k = 1 baseline, so nothing is skipped.
+  expect_silent(k_diagnostic(crop_yield, k_range = 1:4, method = "gap",
+                             cols = cols, B = 5))
+  # Nor is anything skipped when every candidate is evaluable.
+  expect_silent(k_diagnostic(crop_yield, k_range = 2:5, method = "silhouette",
+                             cols = cols))
+})
+
+test_that("a seeded cluster_plot() leaves a fresh session unseeded", {
+  # Regression: with no .Random.seed to save, no on.exit was registered, so the
+  # internal set.seed() leaked and the caller's next draw became deterministic
+  # -- the opposite of what the seed argument documents.
+  if (exists(".Random.seed", envir = .GlobalEnv)) {
+    saved <- get(".Random.seed", envir = .GlobalEnv)
+    on.exit(assign(".Random.seed", saved, envir = .GlobalEnv), add = TRUE)
+  }
+  suppressWarnings(rm(".Random.seed", envir = .GlobalEnv))
+  cluster_plot(crop_yield, cols = cols, k = 2, seed = 42)
+  expect_false(exists(".Random.seed", envir = .GlobalEnv))
+
+  # And an already-seeded session is restored exactly, as before.
+  set.seed(99)
+  before <- get(".Random.seed", envir = .GlobalEnv)
+  cluster_plot(crop_yield, cols = cols, k = 2, seed = 42)
+  expect_identical(get(".Random.seed", envir = .GlobalEnv), before)
+})

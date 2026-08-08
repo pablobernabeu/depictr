@@ -116,6 +116,7 @@ posterior_plot <- function(draws,
   long <- normalise_posterior_draws(draws)
 
   params <- unique(long$term)
+  warn_unused_labels(params, labels)
   point_fun <- if (point == "median") stats::median else mean
 
   # Per-parameter summaries (used for the interval style, the slab point, the

@@ -85,7 +85,9 @@
 #' @section Theming and reporting:
 #' \itemize{
 #'   \item [theme_depictr()]: the shared theme.
-#'   \item [depictr_palette()], [scale_colour_depictr()]: the shared palette.
+#'   \item [depictr_palette()], [scale_colour_depictr()] (aliased as
+#'     `scale_color_depictr()`) and [scale_fill_depictr()]: the shared palette
+#'     and its ggplot2 scales.
 #'   \item [palette_preview()]: preview the palettes.
 #'   \item [format_terms()]: tidy raw coefficient names for display.
 #'   \item [model_report()]: a one-figure overview of a fitted model.

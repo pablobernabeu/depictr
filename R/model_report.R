@@ -45,7 +45,7 @@ model_report <- function(model, predictor = NULL, standardise = TRUE,
 
   p_coef <- coefficient_plot(
     model, standardise = standardise,
-    title = if (standardise) "Coefficients (standardised)" else "Coefficients"
+    title = if (standardise) "Coefficients (per predictor SD)" else "Coefficients"
   )
   p_eff <- effects_plot(model, predictor,
                         title = paste("Effect of", predictor))
@@ -75,6 +75,8 @@ model_report <- function(model, predictor = NULL, standardise = TRUE,
   # Free each panel's left axis title from cross-panel alignment so it sits next
   # to its own axis, rather than being pushed out to match a neighbour with
   # wider axis text (which leaves a gap between the title and the plot area).
+  # `type` and `side` arrived in patchwork 1.3.0, which is why DESCRIPTION
+  # floors patchwork there.
   freel <- function(p) patchwork::free(p, type = "label", side = "l")
   arrange_plots(
     freel(p_coef), freel(p_eff), freel(p_rf), freel(p_qq),

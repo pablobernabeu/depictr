@@ -25,13 +25,16 @@
 #'   risk/event tables.
 #'
 #' @param time A numeric vector of follow-up times, a data frame with `time`,
-#'   `status` and optional `group` columns, or a `survfit` object.
+#'   `status` and optional `group` columns, or a `survfit` object. Every time
+#'   must be finite: a missing or infinite one is an error rather than a silent
+#'   exclusion, since dropping it would move the number at risk unannounced.
 #' @param status Event indicator when `time` is a vector. Either the 0/1
 #'   convention (`0` = censored, `1` = event) or the [survival::Surv()] 1/2
 #'   convention (`1` = censored, `2` = event) is accepted; logical values are
 #'   also allowed. Other codings raise an error.
 #' @param group Optional grouping variable (a vector, or a column name when
-#'   `time` is a data frame).
+#'   `time` is a data frame). Observations whose group is missing are dropped
+#'   with a message, since they belong to no arm.
 #' @param conf_level Confidence level for the limits (`NA` to omit them).
 #' @param censor_marks Whether to mark censoring times with a `+`.
 #' @param risk_table Whether to add a number-at-risk table beneath the curves
@@ -200,6 +203,20 @@ km_input <- function(time, status, group, conf_level) {
   # is shared by the colour legend and the risk-table rows.
   glevels <- if (!is.null(gv) && is.factor(gv)) levels(droplevels(gv)) else NULL
   gv <- if (is.null(gv)) rep("all", length(tv)) else as.character(gv)
+  # A missing group belongs to no arm, so drop those rows here rather than let
+  # NA become a level of its own: `unique()` keeps it, `gv == NA` then matches
+  # nothing and the arm is drawn as a phantom all-censored curve. Same pairwise
+  # convention as drop_incomplete() in the classification helpers.
+  if (anyNA(gv)) {
+    keep <- !is.na(gv)
+    message(sum(!keep), " observation(s) with a missing group were dropped.")
+    tv <- tv[keep]
+    sv <- sv[keep]
+    gv <- gv[keep]
+    if (!length(gv)) {
+      stop("`group` is missing for every observation.", call. = FALSE)
+    }
+  }
   groups <- if (!is.null(glevels)) glevels else unique(gv)
   curves <- list()
   censors <- list()
@@ -222,7 +239,14 @@ km_input <- function(time, status, group, conf_level) {
 #' Base-R Kaplan-Meier estimate with Greenwood standard errors
 #' @noRd
 km_estimate <- function(time, status, conf_level) {
-  keep <- !is.na(time) & !is.na(status)
+  # Dropping a follow-up time silently would move the number at risk (and so
+  # every step of the curve) without the figure or the risk table saying so, and
+  # whether to drop or impute is the analyst's call rather than ours.
+  if (!all(is.finite(time))) {
+    stop("`time` must be finite; drop or impute missing follow-up times ",
+         "before plotting.", call. = FALSE)
+  }
+  keep <- !is.na(status)
   time <- time[keep]
   status <- normalise_status(status[keep])
   has_ci <- !is.na(conf_level)

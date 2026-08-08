@@ -18,7 +18,9 @@
 #'   [stats::cutree()] output matching [dendrogram_plot()]) are accepted. Must
 #'   have exactly one entry per row of `data` (rows with missing values in
 #'   `cols` are dropped from both before plotting).
-#' @param scale Whether to scale variables to unit variance before clustering and the PCA.
+#' @param scale Whether to scale variables to unit variance before clustering
+#'   and the PCA. Columns with (near-)zero variance cannot be scaled and are
+#'   dropped with a message, as in [correlation_heatmap()].
 #' @param suggest_k Optionally choose `k` automatically with a cluster-quality
 #'   diagnostic instead of using the supplied `k`. Either `TRUE` (uses the
 #'   average-silhouette criterion), a string naming the criterion
@@ -62,15 +64,32 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
       stop("`seed` must be a single number or NULL.", call. = FALSE)
     }
     # Restore the caller's RNG state on exit, however the function returns, so
-    # a reproducible `seed` here has no side effect on their random stream.
+    # a reproducible `seed` here has no side effect on their random stream. In a
+    # session that has not drawn a random number yet there is no state to save,
+    # and "unset" is restored by removing the seed our set.seed() would leave.
     if (exists(".Random.seed", envir = .GlobalEnv)) {
       old_seed <- get(".Random.seed", envir = .GlobalEnv)
       on.exit(assign(".Random.seed", old_seed, envir = .GlobalEnv), add = TRUE)
+    } else {
+      on.exit(suppressWarnings(rm(".Random.seed", envir = .GlobalEnv)),
+              add = TRUE)
     }
   }
 
   cc <- stats::complete.cases(data[cols])
   mat <- as.matrix(data[cc, cols, drop = FALSE])
+  if (scale) {
+    # Re-check the two-column minimum *after* the drop: a column that survives
+    # the check above can still be constant in the complete-case rows.
+    mat <- drop_constant_matrix_columns(mat, "cluster_plot")
+    if (ncol(mat) < 2) {
+      stop("Need at least two numeric columns with non-zero variance.",
+           call. = FALSE)
+    }
+    # Keep `cols` in step so a suggest_k diagnostic searches the same columns
+    # and does not repeat the message.
+    cols <- colnames(mat)
+  }
   X <- if (scale) scale(mat) else mat
 
   kd <- NULL

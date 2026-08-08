@@ -20,7 +20,9 @@ summary_table(
 used, with high-cardinality identifier-like columns skipped (see Details).}
 
 \item{group}{Optional grouping variable; one summary column is produced per
-level, alongside an overall column.}
+level, alongside an overall column. Records whose group value is missing
+get a trailing \code{Missing} column of their own, so the group sizes still sum
+to the overall \code{N}.}
 
 \item{digits}{Number of decimal places for numeric summaries.}
 
@@ -32,8 +34,9 @@ distinct-level count is at least \code{max_levels} \emph{and} exceeds half the n
 of rows are treated as identifiers and skipped. Defaults to \code{20}.}
 }
 \value{
-A data frame with columns \code{variable}, \code{statistic}, \code{Overall} and one
-column per group level. The first row reports \code{N}.
+A data frame with columns \code{variable}, \code{statistic}, \code{Overall}, one
+column per group level and, when the grouping variable has missing values,
+a trailing \code{Missing} column. The first row reports \code{N}.
 }
 \description{
 Builds the kind of descriptive table that opens many empirical papers:

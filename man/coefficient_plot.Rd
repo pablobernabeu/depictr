@@ -71,7 +71,10 @@ Requires a fitted model (ignored, with a warning, for a tidy data frame).
 Defaults to \code{FALSE}.}
 
 \item{title, subtitle, x_lab}{Plot title, subtitle and x-axis label. \code{x_lab}
-defaults to "Estimate", or "Standardised estimate" when \code{standardise}.}
+defaults to "Estimate", or "Estimate per SD of predictor" when
+\code{standardise}. The label names the convention on the figure itself,
+because only the predictors are rescaled here: a fully standardised beta
+would rescale the outcome too.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.

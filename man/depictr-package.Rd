@@ -104,7 +104,9 @@ conventions.
 
 \itemize{
 \item \code{\link[=theme_depictr]{theme_depictr()}}: the shared theme.
-\item \code{\link[=depictr_palette]{depictr_palette()}}, \code{\link[=scale_colour_depictr]{scale_colour_depictr()}}: the shared palette.
+\item \code{\link[=depictr_palette]{depictr_palette()}}, \code{\link[=scale_colour_depictr]{scale_colour_depictr()}} (aliased as
+\code{scale_color_depictr()}) and \code{\link[=scale_fill_depictr]{scale_fill_depictr()}}: the shared palette
+and its ggplot2 scales.
 \item \code{\link[=palette_preview]{palette_preview()}}: preview the palettes.
 \item \code{\link[=format_terms]{format_terms()}}: tidy raw coefficient names for display.
 \item \code{\link[=model_report]{model_report()}}: a one-figure overview of a fitted model.

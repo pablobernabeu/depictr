@@ -11,9 +11,16 @@
 # revision (brms/rstan/rstanarm, ggdist/posterior/tidybayes/bayesplot,
 # lme4/lmerTest/simr/survival) and dev tooling.
 set -euo pipefail
+
+# Site-specific project space. Override at submission time with
+#   PROJECT_ROOT=/your/project/depictr sbatch dev/hpc/install_pkgs.slurm
+# The #SBATCH --output path above has to be edited by hand: Slurm reads the
+# directives before the shell runs, so it does not expand variables in them.
+PROJECT_ROOT="${PROJECT_ROOT:-/data/educ-lift/educ1242/depictr}"
+
 module purge
 module load R/4.5.1-gfbf-2025a
-export R_LIBS_USER=/data/educ-lift/educ1242/depictr/r-library
+export R_LIBS_USER="$PROJECT_ROOT/r-library"
 export MAKEFLAGS="-j${SLURM_CPUS_PER_TASK:-8}"
 mkdir -p "$R_LIBS_USER"
 echo "host=$(hostname) R=$(command -v R) lib=$R_LIBS_USER start=$(date)"

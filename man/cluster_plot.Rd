@@ -37,7 +37,9 @@ computed yourself. Hierarchical or PAM assignments (such as
 have exactly one entry per row of \code{data} (rows with missing values in
 \code{cols} are dropped from both before plotting).}
 
-\item{scale}{Whether to scale variables to unit variance before clustering and the PCA.}
+\item{scale}{Whether to scale variables to unit variance before clustering
+and the PCA. Columns with (near-)zero variance cannot be scaled and are
+dropped with a message, as in \code{\link[=correlation_heatmap]{correlation_heatmap()}}.}
 
 \item{suggest_k}{Optionally choose \code{k} automatically with a cluster-quality
 diagnostic instead of using the supplied \code{k}. Either \code{TRUE} (uses the

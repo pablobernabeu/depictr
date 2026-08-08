@@ -15,7 +15,9 @@
 #'   quickly).
 #' @param point_alpha Point transparency in the scatter panels.
 #' @param method Correlation method for the upper-triangle coefficients, passed
-#'   to [stats::cor()]: `"pearson"`, `"spearman"` or `"kendall"`.
+#'   to [stats::cor()]: `"pearson"`, `"spearman"` or `"kendall"`. A pair whose
+#'   correlation is undefined (a constant column, or too few complete cases) is
+#'   labelled `n/a`, as in [correlation_heatmap()].
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param title Overall title for the matrix.
 #'
@@ -81,6 +83,21 @@ explore_pairs <- function(data, cols = NULL, group = NULL, max_cols = 8,
 
 # ---- internal helpers ------------------------------------------------------
 
+#' Formatted correlation for one upper-triangle panel
+#'
+#' A (near-)constant column has no correlation: [stats::cor()] emits the raw
+#' `"the standard deviation is zero"` warning and returns `NA`. Label the panel
+#' `n/a` instead, matching how [correlation_heatmap()] renders an undefined
+#' cell, so the two EDA entry points agree on what the package shows.
+#' @noRd
+pair_correlation <- function(x, y, method) {
+  r <- suppressWarnings(
+    stats::cor(x, y, use = "pairwise.complete.obs", method = method)
+  )
+  if (length(r) != 1L || is.na(r)) "n/a" else
+    formatC(r, format = "f", digits = 2)
+}
+
 #' Build one panel of the scatter-plot matrix
 #' @noRd
 pairs_panel <- function(d, xvar, yvar, i, j, k, group, pal, point_alpha,
@@ -143,24 +160,22 @@ pairs_panel <- function(d, xvar, yvar, i, j, k, group, pal, point_alpha,
 
   # Upper triangle: correlation coefficient(s), no clipping
   if (is.null(group)) {
-    r <- stats::cor(d[[xvar]], d[[yvar]], use = "pairwise.complete.obs",
-                    method = method)
     lab <- data.frame(x = 0.5, y = 0.5,
-                      label = paste0("r = ", formatC(r, format = "f", digits = 2)))
+                      label = paste0("r = ", pair_correlation(d[[xvar]],
+                                                              d[[yvar]],
+                                                              method)))
     p <- ggplot2::ggplot(lab, ggplot2::aes(x = .data$x, y = .data$y)) +
       ggplot2::geom_text(ggplot2::aes(label = .data$label),
                          size = 3.6, colour = depictr_brand())
   } else {
     grp <- d[[group]]
     parts <- tapply(seq_len(nrow(d)), grp, function(idx) {
-      stats::cor(d[[xvar]][idx], d[[yvar]][idx], use = "pairwise.complete.obs",
-                 method = method)
+      pair_correlation(d[[xvar]][idx], d[[yvar]][idx], method)
     })
     lab <- data.frame(
       x = 0.5,
       y = seq(0.8, 0.2, length.out = length(parts)),
-      label = paste0(names(parts), ": ",
-                     formatC(unlist(parts), format = "f", digits = 2)),
+      label = paste0(names(parts), ": ", unlist(parts)),
       grp = factor(names(parts), levels = levels(grp))
     )
     p <- ggplot2::ggplot(lab, ggplot2::aes(x = .data$x, y = .data$y)) +
