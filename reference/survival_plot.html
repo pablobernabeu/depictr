@@ -87,7 +87,9 @@ required; a <code>survfit</code> object from the 'survival' package is also acce
 
 <dl><dt id="arg-time">time<a class="anchor" aria-label="anchor" href="#arg-time"></a></dt>
 <dd><p>A numeric vector of follow-up times, a data frame with <code>time</code>,
-<code>status</code> and optional <code>group</code> columns, or a <code>survfit</code> object.</p></dd>
+<code>status</code> and optional <code>group</code> columns, or a <code>survfit</code> object. Every time
+must be finite: a missing or infinite one is an error rather than a silent
+exclusion, since dropping it would move the number at risk unannounced.</p></dd>
 
 
 <dt id="arg-status">status<a class="anchor" aria-label="anchor" href="#arg-status"></a></dt>
@@ -99,7 +101,8 @@ also allowed. Other codings raise an error.</p></dd>
 
 <dt id="arg-group">group<a class="anchor" aria-label="anchor" href="#arg-group"></a></dt>
 <dd><p>Optional grouping variable (a vector, or a column name when
-<code>time</code> is a data frame).</p></dd>
+<code>time</code> is a data frame). Observations whose group is missing are dropped
+with a message, since they belong to no arm.</p></dd>
 
 
 <dt id="arg-conf-level">conf_level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>

@@ -12,10 +12,11 @@ of label conventions. Every plotting function returns a
 [patchwork](https://patchwork.data-imaginist.com) for composite panels),
 so a plot can be refined further with the usual `+` syntax.
 
-This is the feature-parity twin of [the Python
-package](https://pablobernabeu.github.io/depictr-py/) of the same name,
-which offers the same workflow on top of
-[plotnine](https://plotnine.org).
+This is the R half of a sibling pair. [The Python
+package](https://pablobernabeu.github.io/depictr-py/) of the same name
+covers most of the same workflow on top of
+[plotnine](https://plotnine.org); see its README for the handful of
+functions that are not ported and the few places where the two differ.
 
 ## Gallery
 

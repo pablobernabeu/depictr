@@ -92,7 +92,10 @@ colour and fill scales used throughout the package. They honour the global
 <dl><dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
 <dd><p>Optional number of colours to draw from <code><a href="depictr_palette.html">depictr_palette()</a></code>. By
 default ggplot2 requests exactly as many colours as there are groups; pass
-<code>n</code> only to force a fixed slice of the palette.</p></dd>
+<code>n</code> only to force a fixed slice of the palette. More than eight groups
+means the built-in qualitative palette is interpolated, which loses the
+colour-vision-deficiency guarantee and warns at draw time; facet the groups
+or use a sequential scale when there are that many.</p></dd>
 
 
 <dt id="arg-palette">palette<a class="anchor" aria-label="anchor" href="#arg-palette"></a></dt>

@@ -32,7 +32,10 @@ survival_plot(
 - time:
 
   A numeric vector of follow-up times, a data frame with `time`,
-  `status` and optional `group` columns, or a `survfit` object.
+  `status` and optional `group` columns, or a `survfit` object. Every
+  time must be finite: a missing or infinite one is an error rather than
+  a silent exclusion, since dropping it would move the number at risk
+  unannounced.
 
 - status:
 
@@ -45,7 +48,8 @@ survival_plot(
 - group:
 
   Optional grouping variable (a vector, or a column name when `time` is
-  a data frame).
+  a data frame). Observations whose group is missing are dropped with a
+  message, since they belong to no arm.
 
 - conf_level:
 

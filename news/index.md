@@ -1,5 +1,80 @@
 # Changelog
 
+## depictr (development version)
+
+### Figures that misreported the data
+
+- **[`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  drew a phantom arm for a group that does not exist.** An `NA` in
+  `group` became a level of its own, matching no observation, so the
+  plot gained an all-censored curve for a group nobody was in, and under
+  `logrank = TRUE` it failed outright. Missing groups are now dropped
+  with a message saying how many.
+- **[`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  silently discarded non-finite follow-up times.** Dropping a case from
+  a Kaplan-Meier fit changes the denominator, and so every step of the
+  curve and every cell of the number-at-risk table, while the figure
+  carries no trace of it. It now refuses them, with the same message as
+  the Python twin: whether to drop or impute is the analyst’s decision,
+  not the plotting layer’s. This replaces a silent drop, so it is a
+  behaviour change for anyone who relied on the old handling.
+- **[`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
+  interpolated past its accessibility guarantee without saying so.**
+  Beyond the eight Okabe-Ito base colours the palette is a ramp, and the
+  colour-vision-deficiency guarantee that is this package’s reason for
+  existing stops holding; the interpolated palette fails the package’s
+  own safety check. It now warns at the point of interpolation, and only
+  for the built-in palette, since a user-supplied one carries no such
+  claim. The documentation is qualified to match.
+- **[`summary_table()`](https://pablobernabeu.github.io/depictr/reference/summary_table.md)
+  counted missing-group records in `Overall` and in no group column**,
+  so the per-group sizes silently fell short of the headline N. They now
+  get a `Missing` column of their own.
+- **A seeded plot leaked its seed into the caller’s random stream** in a
+  session that had not yet drawn a random number, so the documented
+  reproducibility guarantee quietly failed in exactly the fresh session
+  that would rely on it.
+- `compare_models(facet = TRUE)` now honours
+  `depictr_options(reference = )` for its per-panel reference line;
+  [`seasonal_plot()`](https://pablobernabeu.github.io/depictr/reference/seasonal_plot.md)
+  no longer labels a frequency-7 series Mon..Sun, an alignment a plain
+  `ts` cannot know; and a mistyped `labels` key now warns instead of
+  leaving the raw parameter name on the plot.
+
+### Degenerate input
+
+- [`cluster_plot()`](https://pablobernabeu.github.io/depictr/reference/cluster_plot.md)
+  and
+  [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
+  drop zero-variance columns with a message when `scale = TRUE`, as
+  [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md)
+  already did, instead of failing with a raw k-means error.
+  [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
+  names the values of `k_range` it cannot evaluate rather than narrowing
+  the search in silence, and
+  [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md)
+  labels an undefined correlation `n/a` instead of printing `r = NA`
+  beside a raw [`stats::cor()`](https://rdrr.io/r/stats/cor.html)
+  warning.
+
+### Metadata and documentation
+
+- The declared minimum dependency versions are now installed and tested
+  by a CI job. The patchwork floor is raised from 1.2.0 to 1.3.0 —
+  verified by execution, not inference: 1.2.0 cannot run
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
+  at all, because `patchwork::free(type =, side =)` arrived in 1.3.0.
+- [`?depictr`](https://pablobernabeu.github.io/depictr/reference/depictr-package.md)
+  again lists every exported function
+  ([`scale_fill_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md)
+  and the
+  [`scale_color_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md)
+  alias were missing), the README no longer describes the Python package
+  as a feature-parity twin (its own README says otherwise), CONTRIBUTING
+  no longer claims the maintenance workflows close their own issues, and
+  the `standardise = TRUE` axis label now names the x-only convention
+  the figure uses.
+
 ## depictr 0.2.2
 
 ### Examples that match the chart

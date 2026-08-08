@@ -112,7 +112,9 @@ have exactly one entry per row of <code>data</code> (rows with missing values in
 
 
 <dt id="arg-scale">scale<a class="anchor" aria-label="anchor" href="#arg-scale"></a></dt>
-<dd><p>Whether to scale variables to unit variance before clustering and the PCA.</p></dd>
+<dd><p>Whether to scale variables to unit variance before clustering
+and the PCA. Columns with (near-)zero variance cannot be scaled and are
+dropped with a message, as in <code><a href="correlation_heatmap.html">correlation_heatmap()</a></code>.</p></dd>
 
 
 <dt id="arg-suggest-k">suggest_k<a class="anchor" aria-label="anchor" href="#arg-suggest-k"></a></dt>

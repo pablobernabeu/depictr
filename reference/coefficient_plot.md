@@ -106,7 +106,10 @@ coefficient_plot(
 - title, subtitle, x_lab:
 
   Plot title, subtitle and x-axis label. `x_lab` defaults to "Estimate",
-  or "Standardised estimate" when `standardise`.
+  or "Estimate per SD of predictor" when `standardise`. The label names
+  the convention on the figure itself, because only the predictors are
+  rescaled here: a fully standardised beta would rescale the outcome
+  too.
 
 ## Value
 

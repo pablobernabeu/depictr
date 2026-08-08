@@ -177,8 +177,12 @@ one colourblind-aware palette and one set of label conventions.
   the shared theme.
 
 - [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md),
-  [`scale_colour_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md):
-  the shared palette.
+  [`scale_colour_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md)
+  (aliased as
+  [`scale_color_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md))
+  and
+  [`scale_fill_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md):
+  the shared palette and its ggplot2 scales.
 
 - [`palette_preview()`](https://pablobernabeu.github.io/depictr/reference/palette_preview.md):
   preview the palettes.

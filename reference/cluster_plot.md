@@ -59,7 +59,9 @@ cluster_plot(
 - scale:
 
   Whether to scale variables to unit variance before clustering and the
-  PCA.
+  PCA. Columns with (near-)zero variance cannot be scaled and are
+  dropped with a message, as in
+  [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md).
 
 - suggest_k:
 

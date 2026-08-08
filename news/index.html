@@ -48,6 +48,35 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="depictr-development-version">depictr (development version)<a class="anchor" aria-label="anchor" href="#depictr-development-version"></a></h2>
+<div class="section level3">
+<h3 id="figures-that-misreported-the-data-development-version">Figures that misreported the data<a class="anchor" aria-label="anchor" href="#figures-that-misreported-the-data-development-version"></a></h3>
+<ul><li>
+<strong><code><a href="../reference/survival_plot.html">survival_plot()</a></code> drew a phantom arm for a group that does not exist.</strong> An <code>NA</code> in <code>group</code> became a level of its own, matching no observation, so the plot gained an all-censored curve for a group nobody was in, and under <code>logrank = TRUE</code> it failed outright. Missing groups are now dropped with a message saying how many.</li>
+<li>
+<strong><code><a href="../reference/survival_plot.html">survival_plot()</a></code> silently discarded non-finite follow-up times.</strong> Dropping a case from a Kaplan-Meier fit changes the denominator, and so every step of the curve and every cell of the number-at-risk table, while the figure carries no trace of it. It now refuses them, with the same message as the Python twin: whether to drop or impute is the analyst’s decision, not the plotting layer’s. This replaces a silent drop, so it is a behaviour change for anyone who relied on the old handling.</li>
+<li>
+<strong><code><a href="../reference/depictr_palette.html">depictr_palette()</a></code> interpolated past its accessibility guarantee without saying so.</strong> Beyond the eight Okabe-Ito base colours the palette is a ramp, and the colour-vision-deficiency guarantee that is this package’s reason for existing stops holding; the interpolated palette fails the package’s own safety check. It now warns at the point of interpolation, and only for the built-in palette, since a user-supplied one carries no such claim. The documentation is qualified to match.</li>
+<li>
+<strong><code><a href="../reference/summary_table.html">summary_table()</a></code> counted missing-group records in <code>Overall</code> and in no group column</strong>, so the per-group sizes silently fell short of the headline N. They now get a <code>Missing</code> column of their own.</li>
+<li>
+<strong>A seeded plot leaked its seed into the caller’s random stream</strong> in a session that had not yet drawn a random number, so the documented reproducibility guarantee quietly failed in exactly the fresh session that would rely on it.</li>
+<li>
+<code>compare_models(facet = TRUE)</code> now honours <code>depictr_options(reference = )</code> for its per-panel reference line; <code><a href="../reference/seasonal_plot.html">seasonal_plot()</a></code> no longer labels a frequency-7 series Mon..Sun, an alignment a plain <code>ts</code> cannot know; and a mistyped <code>labels</code> key now warns instead of leaving the raw parameter name on the plot.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="degenerate-input-development-version">Degenerate input<a class="anchor" aria-label="anchor" href="#degenerate-input-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/cluster_plot.html">cluster_plot()</a></code> and <code><a href="../reference/k_diagnostic.html">k_diagnostic()</a></code> drop zero-variance columns with a message when <code>scale = TRUE</code>, as <code><a href="../reference/correlation_heatmap.html">correlation_heatmap()</a></code> already did, instead of failing with a raw k-means error. <code><a href="../reference/k_diagnostic.html">k_diagnostic()</a></code> names the values of <code>k_range</code> it cannot evaluate rather than narrowing the search in silence, and <code><a href="../reference/explore_pairs.html">explore_pairs()</a></code> labels an undefined correlation <code>n/a</code> instead of printing <code>r = NA</code> beside a raw <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">stats::cor()</a></code> warning.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="metadata-and-documentation-development-version">Metadata and documentation<a class="anchor" aria-label="anchor" href="#metadata-and-documentation-development-version"></a></h3>
+<ul><li>The declared minimum dependency versions are now installed and tested by a CI job. The patchwork floor is raised from 1.2.0 to 1.3.0 — verified by execution, not inference: 1.2.0 cannot run <code><a href="../reference/model_report.html">model_report()</a></code> at all, because <code>patchwork::free(type =, side =)</code> arrived in 1.3.0.</li>
+<li>
+<code><a href="../reference/depictr-package.html">?depictr</a></code> again lists every exported function (<code><a href="../reference/scale_colour_depictr.html">scale_fill_depictr()</a></code> and the <code><a href="../reference/scale_colour_depictr.html">scale_color_depictr()</a></code> alias were missing), the README no longer describes the Python package as a feature-parity twin (its own README says otherwise), CONTRIBUTING no longer claims the maintenance workflows close their own issues, and the <code>standardise = TRUE</code> axis label now names the x-only convention the figure uses.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.2" id="depictr-022">depictr 0.2.2<a class="anchor" aria-label="anchor" href="#depictr-022"></a></h2>
 <div class="section level3">
 <h3 id="examples-that-match-the-chart-0-2-2">Examples that match the chart<a class="anchor" aria-label="anchor" href="#examples-that-match-the-chart-0-2-2"></a></h3>

@@ -80,10 +80,10 @@ red-blue ramps.</p>
 <dd><p>Number of colours to return. If <code>NULL</code> (the default) the full
 qualitative palette is returned. For the qualitative palette an <code>n</code> larger
 than the available base colours is interpolated; the sequential and
-diverging palettes are ramps and accept any <code>n</code>. Interpolated colours
-beyond the base set are not guaranteed to remain distinguishable under
-colour-vision deficiency, so prefer faceting or a custom palette when many
-groups are needed.</p></dd>
+diverging palettes are ramps and accept any <code>n</code>. Interpolating the built-in
+qualitative palette beyond its eight base colours loses the
+colour-vision-deficiency guarantee and warns, so facet the groups or use
+the sequential ramp when many groups are needed.</p></dd>
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
@@ -98,7 +98,12 @@ directions).</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The qualitative palette can be overridden globally with
+    <p>The guarantee belongs to the eight Okabe-Ito colours themselves, not to any
+number of colours: past eight the qualitative palette has to interpolate
+between them, and the interpolated colours sit close enough together to fail
+the package's own colour-distance check. That case warns rather than handing
+back colours under a guarantee it cannot keep.</p>
+<p>The qualitative palette can be overridden globally with
 <code>options(depictr.palette = )</code> (see <code><a href="depictr_options.html">depictr_options()</a></code>); when set, that
 custom palette replaces the built-in Okabe-Ito set and is interpolated when
 more colours are requested than it provides. The sequential and diverging

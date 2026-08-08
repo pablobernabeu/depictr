@@ -91,7 +91,9 @@ used, with high-cardinality identifier-like columns skipped (see Details).</p></
 
 <dt id="arg-group">group<a class="anchor" aria-label="anchor" href="#arg-group"></a></dt>
 <dd><p>Optional grouping variable; one summary column is produced per
-level, alongside an overall column.</p></dd>
+level, alongside an overall column. Records whose group value is missing
+get a trailing <code>Missing</code> column of their own, so the group sizes still sum
+to the overall <code>N</code>.</p></dd>
 
 
 <dt id="arg-digits">digits<a class="anchor" aria-label="anchor" href="#arg-digits"></a></dt>
@@ -111,8 +113,9 @@ of rows are treated as identifiers and skipped. Defaults to <code>20</code>.</p>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data frame with columns <code>variable</code>, <code>statistic</code>, <code>Overall</code> and one
-column per group level. The first row reports <code>N</code>.</p>
+    <p>A data frame with columns <code>variable</code>, <code>statistic</code>, <code>Overall</code>, one
+column per group level and, when the grouping variable has missing values,
+a trailing <code>Missing</code> column. The first row reports <code>N</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>

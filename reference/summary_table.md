@@ -34,7 +34,9 @@ summary_table(
 - group:
 
   Optional grouping variable; one summary column is produced per level,
-  alongside an overall column.
+  alongside an overall column. Records whose group value is missing get
+  a trailing `Missing` column of their own, so the group sizes still sum
+  to the overall `N`.
 
 - digits:
 
@@ -53,8 +55,9 @@ summary_table(
 
 ## Value
 
-A data frame with columns `variable`, `statistic`, `Overall` and one
-column per group level. The first row reports `N`.
+A data frame with columns `variable`, `statistic`, `Overall`, one column
+per group level and, when the grouping variable has missing values, a
+trailing `Missing` column. The first row reports `N`.
 
 ## Details
 

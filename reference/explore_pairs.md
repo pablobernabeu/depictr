@@ -48,7 +48,9 @@ explore_pairs(
 
   Correlation method for the upper-triangle coefficients, passed to
   [`stats::cor()`](https://rdrr.io/r/stats/cor.html): `"pearson"`,
-  `"spearman"` or `"kendall"`.
+  `"spearman"` or `"kendall"`. A pair whose correlation is undefined (a
+  constant column, or too few complete cases) is labelled `n/a`, as in
+  [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md).
 
 - palette:
 

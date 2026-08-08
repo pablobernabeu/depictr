@@ -103,7 +103,9 @@ quickly).</p></dd>
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
 <dd><p>Correlation method for the upper-triangle coefficients, passed
-to <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">stats::cor()</a></code>: <code>"pearson"</code>, <code>"spearman"</code> or <code>"kendall"</code>.</p></dd>
+to <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">stats::cor()</a></code>: <code>"pearson"</code>, <code>"spearman"</code> or <code>"kendall"</code>. A pair whose
+correlation is undefined (a constant column, or too few complete cases) is
+labelled <code>n/a</code>, as in <code><a href="correlation_heatmap.html">correlation_heatmap()</a></code>.</p></dd>
 
 
 <dt id="arg-palette">palette<a class="anchor" aria-label="anchor" href="#arg-palette"></a></dt>

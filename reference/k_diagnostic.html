@@ -90,7 +90,11 @@ the Tibshirani et al. heuristic).</p>
 
 
 <dt id="arg-k-range">k_range<a class="anchor" aria-label="anchor" href="#arg-k-range"></a></dt>
-<dd><p>Integer vector of candidate cluster counts to evaluate.</p></dd>
+<dd><p>Integer vector of candidate cluster counts to evaluate.
+Candidates the chosen criterion cannot evaluate are skipped with a message
+naming them: <code>k = 1</code> under <code>"silhouette"</code> (a lone cluster has no
+neighbouring cluster to compare against, so the width is undefined), and
+any <code>k</code> at or above the number of observations under every criterion.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
@@ -103,7 +107,9 @@ elbow) or <code>"gap"</code>.</p></dd>
 
 
 <dt id="arg-scale">scale<a class="anchor" aria-label="anchor" href="#arg-scale"></a></dt>
-<dd><p>Whether to scale variables to unit variance first.</p></dd>
+<dd><p>Whether to scale variables to unit variance first. Columns with
+(near-)zero variance cannot be scaled and are dropped with a message, as in
+<code><a href="correlation_heatmap.html">correlation_heatmap()</a></code>.</p></dd>
 
 
 <dt id="arg-nstart">nstart<a class="anchor" aria-label="anchor" href="#arg-nstart"></a></dt>

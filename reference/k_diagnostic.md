@@ -30,7 +30,11 @@ k_diagnostic(
 
 - k_range:
 
-  Integer vector of candidate cluster counts to evaluate.
+  Integer vector of candidate cluster counts to evaluate. Candidates the
+  chosen criterion cannot evaluate are skipped with a message naming
+  them: `k = 1` under `"silhouette"` (a lone cluster has no neighbouring
+  cluster to compare against, so the width is undefined), and any `k` at
+  or above the number of observations under every criterion.
 
 - method:
 
@@ -43,7 +47,10 @@ k_diagnostic(
 
 - scale:
 
-  Whether to scale variables to unit variance first.
+  Whether to scale variables to unit variance first. Columns with
+  (near-)zero variance cannot be scaled and are dropped with a message,
+  as in
+  [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md).
 
 - nstart:
 
