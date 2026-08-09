@@ -85,9 +85,19 @@ jobs:
           r-version: 'oldrel-3'
           use-public-rspm: true
 
+      # Deriv is pinned to work around an upstream metadata bug, not because this
+      # package cares which version it gets: it arrives only as a dependency of
+      # simr, itself a Suggests. Deriv 4.3.0 (2026-07-23) calls R_ClosureFormals
+      # and Rf_allocLang, both added to the C API in R 4.5, but its DESCRIPTION
+      # declares Depends: Rcpp and names no R version at all. pak therefore
+      # offers it to the R pinned below, where it fails to compile and takes the
+      # whole job down before a line of depictr runs. 4.2.0 is the last release
+      # before Deriv gained compiled code at all -- NeedsCompilation: no, pure R
+      # over methods -- so it cannot fail this way on any R. Drop the pin once
+      # Deriv declares its R requirement, or once oldrel-3 has moved past R 4.3.
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::testthat
+          extra-packages: any::testthat, Deriv@4.2.0
           needs: check
 
       # Downgrade over the resolved versions, then print what we ended up with
