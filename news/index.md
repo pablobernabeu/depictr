@@ -129,6 +129,14 @@
   no longer claims the maintenance workflows close their own issues, and
   the `standardise = TRUE` axis label now names the x-only convention
   the figure uses.
+- The README no longer opens with a link to the documentation site,
+  which on the site’s own home page pointed the reader at the page in
+  front of them.
+- Every vignette now turns console colour off and fixes the console
+  width while it renders. pkgdown passes the calling terminal’s colour
+  support into its build subprocess, so a coloured message or error
+  would otherwise reach the reader as escape sequences in the middle of
+  the text.
 
 ## depictr 0.2.2
 

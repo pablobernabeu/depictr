@@ -89,6 +89,8 @@
 <code><a href="../reference/model_fit_table.html">model_fit_table()</a></code> documents that a single model is enough, which is what the code always accepted, and <code><a href="../reference/raincloud_plot.html">raincloud_plot()</a></code> no longer claims to be built from base graphics primitives: like <code><a href="../reference/ridgeline_plot.html">ridgeline_plot()</a></code>, it is base R and ggplot2 alone.</li>
 <li>
 <code><a href="../reference/depictr-package.html">?depictr</a></code> again lists every exported function (<code><a href="../reference/scale_colour_depictr.html">scale_fill_depictr()</a></code> and the <code><a href="../reference/scale_colour_depictr.html">scale_color_depictr()</a></code> alias were missing), the README no longer describes the Python package as a feature-parity twin (its own README says otherwise), CONTRIBUTING no longer claims the maintenance workflows close their own issues, and the <code>standardise = TRUE</code> axis label now names the x-only convention the figure uses.</li>
+<li>The README no longer opens with a link to the documentation site, which on the site’s own home page pointed the reader at the page in front of them.</li>
+<li>Every vignette now turns console colour off and fixes the console width while it renders. pkgdown passes the calling terminal’s colour support into its build subprocess, so a coloured message or error would otherwise reach the reader as escape sequences in the middle of the text.</li>
 </ul></div>
 </div>
     <div class="section level2">
