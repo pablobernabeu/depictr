@@ -13,7 +13,7 @@ required; a survfit object from the 'survival' package is also accepted."><meta 
 
     <a class="navbar-brand me-2" href="../index.html">depictr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,7 +96,9 @@ exclusion, since dropping it would move the number at risk unannounced.</p></dd>
 <dd><p>Event indicator when <code>time</code> is a vector. Either the 0/1
 convention (<code>0</code> = censored, <code>1</code> = event) or the <code><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">survival::Surv()</a></code> 1/2
 convention (<code>1</code> = censored, <code>2</code> = event) is accepted; logical values are
-also allowed. Other codings raise an error.</p></dd>
+also allowed. Other codings raise an error. Observations whose status is
+missing are dropped with a message, since they record neither an event nor
+a censoring.</p></dd>
 
 
 <dt id="arg-group">group<a class="anchor" aria-label="anchor" href="#arg-group"></a></dt>

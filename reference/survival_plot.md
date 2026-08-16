@@ -43,7 +43,9 @@ survival_plot(
   (`0` = censored, `1` = event) or the
   [`survival::Surv()`](https://rdrr.io/pkg/survival/man/Surv.html) 1/2
   convention (`1` = censored, `2` = event) is accepted; logical values
-  are also allowed. Other codings raise an error.
+  are also allowed. Other codings raise an error. Observations whose
+  status is missing are dropped with a message, since they record
+  neither an event nor a censoring.
 
 - group:
 

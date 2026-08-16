@@ -16,7 +16,7 @@ model_fit_table(..., digits = 3)
 
 - ...:
 
-  Two or more fitted models. Name the arguments to label the rows.
+  One or more fitted models. Name the arguments to label the rows.
 
 - digits:
 
