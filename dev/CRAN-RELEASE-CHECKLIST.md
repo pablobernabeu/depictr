@@ -36,10 +36,3 @@ machine with a full R toolchain.
 - [ ] Tag the release on GitHub.
 - [ ] The `pkgdown` workflow publishes the site to GitHub Pages on push to the
   default branch; enable Pages (gh-pages branch) in the repository settings.
-
-## Repository note
-
-This package currently lives in the `frequentist_bayesian_plot` repository for
-historical reasons. Rename it to `depictr` on GitHub (Settings -> rename) so the
-package URLs (`https://github.com/pablobernabeu/depictr`) resolve; renaming
-preserves history and stars.

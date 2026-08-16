@@ -45,10 +45,15 @@ power_curve_plot <- function(x,
   interaction <- match.arg(interaction)
   pc <- powercurve_to_df(x)
 
-  if (is.null(title)) title <- attr(pc, "title")
-  if (!is.null(title) && interaction != "colon") {
-    title <- format_terms(title, interaction = interaction,
-                          strip_prefix = FALSE, tidy_intercept = FALSE)
+  if (is.null(title)) {
+    # Only a title recovered from the object is a raw term name in need of
+    # tidying; a user-supplied title is finished prose and passes through
+    # verbatim.
+    title <- attr(pc, "title")
+    if (!is.null(title) && interaction != "colon") {
+      title <- format_terms(title, interaction = interaction,
+                            strip_prefix = FALSE, tidy_intercept = FALSE)
+    }
   }
 
   has_band <- all(c("lower", "upper") %in% names(pc))

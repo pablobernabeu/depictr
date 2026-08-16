@@ -103,6 +103,25 @@ test_that("quantile residuals are reproducible with a seed", {
   expect_false(exists(".Random.seed", envir = .GlobalEnv))
 })
 
+test_that("quantile residuals handle a cbind(successes, failures) response", {
+  # Regression: as.numeric() flattened the n x 2 response matrix and the raw
+  # success counts were multiplied by the trial totals again, so the residuals
+  # centred far from zero instead of on it.
+  set.seed(21)
+  n <- 400
+  xx <- rnorm(n)
+  trials <- sample(5:20, n, replace = TRUE)
+  succ <- rbinom(n, trials, plogis(-0.4 + 0.8 * xx))
+  fit <- glm(cbind(succ, trials - succ) ~ xx, family = binomial)
+
+  qr <- depictr:::quantile_residuals(fit, seed = 1)
+  expect_true(isTRUE(attr(qr, "quantile")))
+  expect_length(qr, n)
+  # Approximately standard normal under correct specification.
+  expect_lt(abs(mean(qr)), 0.15)
+  expect_gt(stats::ks.test(as.numeric(qr), "pnorm")$p.value, 0.05)
+})
+
 test_that("residual_diagnostics_plot() is glm-aware but lm is unchanged", {
   gfit <- glm(adverse_event ~ biomarker + age + arm,
               data = clinical_trial, family = binomial)

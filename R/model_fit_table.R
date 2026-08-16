@@ -7,7 +7,7 @@
 #' freedom, AIC, BIC, the log-likelihood, an R-squared (ordinary for `lm` and
 #' McFadden's pseudo-R-squared for `glm`) and the root-mean-square error.
 #'
-#' @param ... Two or more fitted models. Name the arguments to label the rows.
+#' @param ... One or more fitted models. Name the arguments to label the rows.
 #' @param digits Number of decimal places to round to.
 #'
 #' @return A data frame with one row per model and columns `model`, `n`, `df`,

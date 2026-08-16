@@ -2,6 +2,26 @@
 
 ## Figures that misreported the data
 
+* **`quantile_residuals()` produced nonsense for a `cbind(successes, failures)`
+  binomial model.** The two-column response matrix was flattened to a vector and
+  the raw success counts were then multiplied by the trial totals a second time,
+  so the residuals of a well-specified model centred far from zero and the Q-Q
+  diagnostic looked catastrophically misspecified. The matrix response now
+  supplies its counts and trial totals directly, and the residuals are standard
+  normal again where they should be.
+* **`ridgeline_plot()` stacked its overlaps upside down.** The row sort meant to
+  draw the top ridge first is a no-op, because ggplot2 draws ribbon groups in
+  factor-level order, so each upper ridge painted over the one below it, the
+  opposite of the conventional ridgeline overlap. The draw order is now carried
+  by the group aesthetic, with the colour assignment unchanged.
+* **`random_effects_plot(sort = TRUE)` froze every facet in the first facet's
+  order.** With more than one term the level factor was shared across panels, so
+  only the first panel came out sorted and the rest zig-zagged. Each facet now
+  orders its own levels, with the plain level names kept on the axis.
+* A user-supplied `title` in `power_curve_plot()` is no longer run through
+  `format_terms()`, which turned a colon into a multiplication sign and blanked
+  underscores; only a title recovered from the power-curve object, which is a
+  raw term name, is tidied.
 * **`survival_plot()` drew a phantom arm for a group that does not exist.** An `NA` in
   `group` became a level of its own, matching no observation, so the plot gained an
   all-censored curve for a group nobody was in, and under `logrank = TRUE` it failed
@@ -31,6 +51,20 @@
 
 ## Degenerate input
 
+* `survival_plot()` now says when it drops observations with a missing status,
+  with the same wording as the missing-group message, instead of dropping them
+  silently; a status that is missing for every observation is an error. This
+  brings the third kind of incomplete survival input into line with the other
+  two (a missing group is announced, a non-finite time refused).
+* `silhouette_plot()` checks that `clusters` has one entry per row of `data`
+  before dropping incomplete rows. A vector sized to the complete rows used to
+  slip past the late check, because subsetting it with the logical index padded
+  it with `NA`, and then died in the distance computation; it is now refused
+  with the same message `cluster_plot()` uses.
+* `tidy_estimates()` no longer fails on a rank-deficient `lm` with a raw
+  "differing number of rows" error. `confint()` keeps aliased terms as `NA` rows
+  while `coef(summary())` drops them; the intervals are now cut to the estimated
+  terms, with a message naming the aliased terms that were left out.
 * `cluster_plot()` and `k_diagnostic()` drop zero-variance columns with a message when
   `scale = TRUE`, as `correlation_heatmap()` already did, instead of failing with a raw
   k-means error. `k_diagnostic()` names the values of `k_range` it cannot evaluate rather
@@ -43,6 +77,10 @@
   patchwork floor is raised from 1.2.0 to 1.3.0 — verified by execution, not inference:
   1.2.0 cannot run `model_report()` at all, because `patchwork::free(type =, side =)`
   arrived in 1.3.0.
+* `model_fit_table()` documents that a single model is enough, which is what the
+  code always accepted, and `raincloud_plot()` no longer claims to be built from
+  base graphics primitives: like `ridgeline_plot()`, it is base R and ggplot2
+  alone.
 * `?depictr` again lists every exported function (`scale_fill_depictr()` and the
   `scale_color_depictr()` alias were missing), the README no longer describes the Python
   package as a feature-parity twin (its own README says otherwise), CONTRIBUTING no

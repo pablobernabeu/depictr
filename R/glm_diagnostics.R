@@ -185,10 +185,18 @@ quantile_residuals <- function(model, seed = NULL) {
     sigma <- sqrt(sum(stats::residuals(model)^2) / stats::df.residual(model))
     u <- stats::pnorm(as.numeric(y), mean = mu, sd = sigma)
   } else if (fam == "binomial") {
-    # y may be 0/1, logical, factor, or a proportion with trial weights.
-    yy <- as.numeric(y)
-    if (is.factor(y)) yy <- as.numeric(y) - 1
-    counts <- round(yy * w)
+    # y may be 0/1, logical, factor, a proportion with trial weights, or a
+    # cbind(successes, failures) matrix. The matrix response carries the counts
+    # and trial totals directly; flattening it with as.numeric() would pair
+    # each success count with the wrong trial size.
+    if (is.matrix(y)) {
+      counts <- y[, 1]
+      w <- rowSums(y)
+    } else {
+      yy <- as.numeric(y)
+      if (is.factor(y)) yy <- as.numeric(y) - 1
+      counts <- round(yy * w)
+    }
     a <- stats::pbinom(counts - 1, size = w, prob = mu)
     b <- stats::pbinom(counts, size = w, prob = mu)
     u <- stats::runif(length(mu), pmin(a, b), pmax(a, b))

@@ -44,3 +44,25 @@ test_that("ridgeline_plot rejects non-positive overlap", {
     "positive"
   )
 })
+
+test_that("ridgeline_plot draws the top ridge first, colours unchanged", {
+  # Regression: the data-row sort meant to draw from the top down was a no-op,
+  # because ggplot2 draws ribbon groups in factor-level order; upper ridges
+  # overpainted the lower ones, the opposite of the conventional overlap.
+  p <- ridgeline_plot(wellbeing_survey, life_satisfaction, region)
+  d <- ggplot2::ggplot_build(p)$data[[1]]
+
+  # Group ids are the draw order; the baseline (ymin) must descend with them,
+  # so the top ridge is painted first and each lower ridge lands in front.
+  base_by_group <- tapply(d$ymin, d$group, unique)
+  bases <- as.numeric(base_by_group[order(as.integer(names(base_by_group)))])
+  expect_true(all(diff(bases) < 0))
+
+  # The fill still follows the original level order: bottom ridge (base 1)
+  # takes the first palette colour, and so on up.
+  pal <- depictr_palette(length(bases))
+  fill_by_base <- vapply(seq_along(pal), function(b) {
+    unique(d$fill[d$ymin == b])
+  }, character(1))
+  expect_identical(fill_by_base, pal)
+})

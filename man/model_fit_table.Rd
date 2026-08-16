@@ -7,7 +7,7 @@
 model_fit_table(..., digits = 3)
 }
 \arguments{
-\item{...}{Two or more fitted models. Name the arguments to label the rows.}
+\item{...}{One or more fitted models. Name the arguments to label the rows.}
 
 \item{digits}{Number of decimal places to round to.}
 }

@@ -29,6 +29,28 @@ test_that("random_effects_plot() works from a data frame", {
   expect_error(random_effects_plot(data.frame(a = 1)), "estimate")
 })
 
+test_that("random_effects_plot(sort = TRUE) orders each facet on its own", {
+  # Regression: the level factor was shared across facets, so every panel froze
+  # in the first panel's order and later caterpillars zig-zagged.
+  re <- data.frame(
+    level = rep(c("G1", "G2", "G3", "G4"), 2),
+    term = rep(c("(Intercept)", "slope"), each = 4),
+    estimate = c(1, 2, 3, 4, 4, 3, 2, 1),
+    std.error = 0.2
+  )
+  p <- random_effects_plot(re, sort = TRUE)
+  b <- ggplot2::ggplot_build(p)
+  pts <- b$data[[3]]  # layers: vline, errorbar, points
+  for (panel in unique(pts$PANEL)) {
+    dp <- pts[pts$PANEL == panel, , drop = FALSE]
+    expect_true(all(diff(dp$x[order(dp$y)]) > 0))
+  }
+  # The per-facet keys never reach the axis: labels are the plain level names.
+  labs <- unlist(lapply(b$layout$panel_params,
+                        function(pp) pp$y$get_labels()))
+  expect_true(all(labs %in% re$level))
+})
+
 test_that("model_fit_table() summarises several models", {
   m1 <- lm(yield ~ rainfall, data = crop_yield)
   m2 <- lm(yield ~ rainfall + fertiliser, data = crop_yield)

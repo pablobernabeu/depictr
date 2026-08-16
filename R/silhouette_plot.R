@@ -325,19 +325,25 @@ sil_prepare <- function(data, clusters, cols, scale, distance) {
     } else {
       check_columns(data, cols)
     }
+    # `clusters` is defined per row of `data`; validate against the full row
+    # count *before* dropping incomplete rows, since subsetting a too-short
+    # vector with a logical index pads it with NA instead of failing.
+    if (length(clusters) != nrow(data)) {
+      stop("`clusters` must have one entry per row of `data`.", call. = FALSE)
+    }
     cc <- stats::complete.cases(data[cols])
     mat <- as.matrix(data[cc, cols, drop = FALSE])
     cl <- clusters[cc]
   } else if (is.matrix(data) && is.numeric(data)) {
+    if (length(clusters) != nrow(data)) {
+      stop("`clusters` must have one entry per row of `data`.", call. = FALSE)
+    }
     cc <- stats::complete.cases(data)
     mat <- data[cc, , drop = FALSE]
     cl <- clusters[cc]
   } else {
     stop("`data` must be a data frame, numeric matrix or `dist` object.",
          call. = FALSE)
-  }
-  if (length(cl) != nrow(mat)) {
-    stop("`clusters` must have one entry per row of `data`.", call. = FALSE)
   }
   if (scale) mat <- scale(mat)
   list(clusters = as.integer(as.factor(cl)),

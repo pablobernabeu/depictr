@@ -82,15 +82,17 @@ ridgeline_plot <- function(data, x, group, overlap = 1.4, alpha = 0.85,
   }
   dens$base <- pos[dens$group]
   dens$y <- dens$base + dens$h * overlap
+  # ggplot2 draws ribbon groups in factor-level order, not data-row order, so
+  # the draw-order aesthetic gets reversed levels: the top ridge is painted
+  # first and each lower ridge in front of the tail of the one above (the
+  # conventional ridgeline overlap). The fill keeps the original level order so
+  # the colour assignment is unchanged.
+  dens$draw_group <- factor(dens$group, levels = rev(groups))
   dens$group <- factor(dens$group, levels = groups)
-
-  # Draw from the top ridge down so each lower ridge sits in front of the tail
-  # of the one above (the conventional ridgeline overlap).
-  dens <- dens[order(-dens$base, dens$x), , drop = FALSE]
 
   pal_fun <- if (is.null(palette)) NULL else function(k) palette
 
-  ggplot2::ggplot(dens, ggplot2::aes(x = .data$x, group = .data$group,
+  ggplot2::ggplot(dens, ggplot2::aes(x = .data$x, group = .data$draw_group,
                                      fill = .data$group)) +
     ggplot2::geom_ribbon(
       ggplot2::aes(ymin = .data$base, ymax = .data$y),

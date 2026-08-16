@@ -6,7 +6,7 @@
 #' (the cloud), a narrow boxplot, and the raw jittered points (the rain). It
 #' conveys the shape, the summary and the individual observations together,
 #' giving a fuller and more transparent picture than a boxplot alone. The plot
-#' is built from base graphics primitives and so needs no extra packages.
+#' is built with base R and ggplot2 alone, with no extra package dependency.
 #'
 #' Groups with fewer than two observations cannot have a density estimated, so
 #' their half-violin is omitted (the points and box are still drawn) and a

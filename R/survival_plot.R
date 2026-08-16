@@ -31,7 +31,9 @@
 #' @param status Event indicator when `time` is a vector. Either the 0/1
 #'   convention (`0` = censored, `1` = event) or the [survival::Surv()] 1/2
 #'   convention (`1` = censored, `2` = event) is accepted; logical values are
-#'   also allowed. Other codings raise an error.
+#'   also allowed. Other codings raise an error. Observations whose status is
+#'   missing are dropped with a message, since they record neither an event nor
+#'   a censoring.
 #' @param group Optional grouping variable (a vector, or a column name when
 #'   `time` is a data frame). Observations whose group is missing are dropped
 #'   with a message, since they belong to no arm.
@@ -217,6 +219,19 @@ km_input <- function(time, status, group, conf_level) {
       stop("`group` is missing for every observation.", call. = FALSE)
     }
   }
+  # A missing status is neither an event nor a censoring, so the observation
+  # cannot enter the estimate; drop it with a message, mirroring the
+  # missing-group path, rather than in silence.
+  if (anyNA(sv)) {
+    keep <- !is.na(sv)
+    message(sum(!keep), " observation(s) with a missing status were dropped.")
+    tv <- tv[keep]
+    sv <- sv[keep]
+    gv <- gv[keep]
+    if (!length(sv)) {
+      stop("`status` is missing for every observation.", call. = FALSE)
+    }
+  }
   groups <- if (!is.null(glevels)) glevels else unique(gv)
   curves <- list()
   censors <- list()
@@ -246,9 +261,7 @@ km_estimate <- function(time, status, conf_level) {
     stop("`time` must be finite; drop or impute missing follow-up times ",
          "before plotting.", call. = FALSE)
   }
-  keep <- !is.na(status)
-  time <- time[keep]
-  status <- normalise_status(status[keep])
+  status <- normalise_status(status)
   has_ci <- !is.na(conf_level)
   n_obs <- length(time)
   tmax <- if (n_obs) max(time) else 0

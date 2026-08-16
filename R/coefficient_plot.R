@@ -320,10 +320,10 @@ order_terms <- function(est, order) {
 
 #' Warn when a named `labels` entry matches no term
 #'
-#' [make_labels()] drops an entry whose name is not a term, so a mistyped key
+#' `make_labels()` drops an entry whose name is not a term, so a mistyped key
 #' leaves the raw parameter name on the plot with nothing to say the relabelling
-#' never happened. The check lives here rather than in [make_labels()] because
-#' it must see the user's `labels` before [merge_pretty_labels()] folds in the
+#' never happened. The check lives here rather than in `make_labels()` because
+#' it must see the user's `labels` before `merge_pretty_labels()` folds in the
 #' automatic factor-level keys (which include `b_`-prefixed variants that a
 #' frequentist fit never has), and the complete term list, which several callers
 #' reach only after labelling row by row.

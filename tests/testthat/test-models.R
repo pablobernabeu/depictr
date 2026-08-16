@@ -6,6 +6,20 @@ test_that("power_curve_plot() accepts a data frame and reads the title", {
   expect_error(power_curve_plot(data.frame(a = 1)), "sample-size")
 })
 
+test_that("power_curve_plot() leaves a user title alone but tidies a derived one", {
+  # Regression: a user-supplied title was run through format_terms(), so
+  # "Power analysis: RT_model" rendered with a multiplication sign in place
+  # of the colon and the underscore blanked.
+  pc <- data.frame(nlevels = c(10, 20, 30), mean = c(0.3, 0.6, 0.85))
+  p <- power_curve_plot(pc, title = "Power analysis: RT_model")
+  expect_identical(p$labels$title, "Power analysis: RT_model")
+
+  # A title recovered from the object is a raw term name and is still tidied.
+  attr(pc, "title") <- "word_frequency:condition"
+  p2 <- power_curve_plot(pc)
+  expect_identical(p2$labels$title, "word frequency × condition")
+})
+
 test_that("optimizer_fixef_plot() works from a data frame", {
   df <- expand.grid(optimizer = c("bobyqa", "Nelder_Mead"),
                     term = c("(Intercept)", "x1"))

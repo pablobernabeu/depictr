@@ -58,7 +58,7 @@ constant_columns <- function(data, cols) {
 
 #' Drop (near-)constant columns of a numeric matrix before scaling it
 #'
-#' Matrix counterpart of [constant_columns()], for the clustering path where the
+#' Matrix counterpart of `constant_columns()`, for the clustering path where the
 #' data has already been coerced to a matrix of complete cases. [scale()] turns
 #' a constant column into `NaN`, which [stats::kmeans()] rejects with the raw
 #' "NA/NaN/Inf in foreign function call" error; dropping the column with a

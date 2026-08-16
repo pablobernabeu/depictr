@@ -21,6 +21,26 @@ test_that("silhouette_plot() returns a ggplot that builds cleanly", {
   expect_error(silhouette_plot(crop_yield, cols = cols), "clusters")
 })
 
+test_that("a clusters vector sized to the complete rows is refused up front", {
+  # Regression: the length check ran after complete-case subsetting, so a
+  # vector sized to the complete rows was NA-padded by the logical index and
+  # died later with a raw distance/silhouette error.
+  d <- crop_yield[1:10, cols]
+  d$rainfall[c(2, 7)] <- NA
+  cl8 <- rep(1:2, 4)  # one entry per complete row, not per row of `data`
+
+  expect_error(silhouette_plot(d, cl8),
+               "`clusters` must have one entry per row of `data`.",
+               fixed = TRUE)
+  expect_error(silhouette_plot(as.matrix(d), cl8),
+               "`clusters` must have one entry per row of `data`.",
+               fixed = TRUE)
+
+  # A vector sized to the full row count still works after the row drop.
+  cl10 <- rep(1:2, 5)
+  expect_s3_class(silhouette_plot(d, cl10), "ggplot")
+})
+
 test_that("base_silhouette() matches cluster::silhouette to numerical tolerance", {
   skip_if_not_installed("cluster")
   set.seed(42)

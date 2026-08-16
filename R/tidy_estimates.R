@@ -83,6 +83,15 @@ tidy_estimates.data.frame <- function(x, conf_level = 0.95, ...) {
 tidy_estimates.lm <- function(x, conf_level = 0.95, ...) {
   co <- stats::coef(summary(x))
   ci <- suppressWarnings(stats::confint(x, level = conf_level))
+  # In a rank-deficient fit coef(summary()) omits aliased terms while confint()
+  # keeps them as NA rows, so the interval matrix must be cut down to the
+  # estimated terms before the columns are bound together.
+  aliased <- setdiff(rownames(ci), rownames(co))
+  if (length(aliased)) {
+    message(length(aliased), " aliased term(s) in a rank-deficient fit were ",
+            "dropped: ", paste(aliased, collapse = ", "), ".")
+    ci <- ci[rownames(co), , drop = FALSE]
+  }
   build_estimates(rownames(co), co[, 1], co[, 2], ci)
 }
 

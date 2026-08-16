@@ -271,3 +271,26 @@ test_that("a missing group is dropped rather than drawn as a phantom arm", {
   # Complete groups are untouched: no message, same curve as before.
   expect_silent(survival_plot(tt, ev, group = rep(c("a", "b"), each = 30)))
 })
+
+test_that("a missing status is dropped with a message, not in silence", {
+  # Regression: km_estimate() dropped NA-status rows without a word, while a
+  # missing group was announced and a non-finite time refused outright.
+  tt <- c(1, 2, 3, 4, 5, 6)
+  ev <- c(1, 0, NA, 1, NA, 0)
+
+  expect_message(survival_plot(tt, ev),
+                 "2 observation(s) with a missing status were dropped",
+                 fixed = TRUE)
+
+  # The estimate is built from the four complete observations only.
+  counts <- suppressMessages(depictr:::km_input(tt, ev, NULL, 0.95))$counts
+  expect_equal(counts[["all"]]$n, 4)
+  expect_equal(sort(counts[["all"]]$all_time), c(1, 2, 4, 6))
+
+  # A status missing everywhere is an error, mirroring the group path.
+  expect_error(suppressMessages(survival_plot(c(1, 2), c(NA, NA))),
+               "missing for every observation")
+
+  # Complete statuses stay silent.
+  expect_silent(survival_plot(tt, c(1, 0, 1, 1, 0, 0)))
+})

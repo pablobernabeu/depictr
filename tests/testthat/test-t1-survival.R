@@ -58,8 +58,13 @@ test_that("a non-finite follow-up time is refused, not silently dropped", {
     survival_plot(data.frame(time = c(5, NA, 7), status = c(1, 1, 0))),
     "must be finite"
   )
-  # Complete times still plot, and a missing status is still dropped.
-  expect_s3_class(survival_plot(c(5, 6, 7, 8), c(1, 1, NA, 0)), "ggplot")
+  # Complete times still plot, and a missing status is dropped with a message.
+  expect_message(
+    p_na <- survival_plot(c(5, 6, 7, 8), c(1, 1, NA, 0)),
+    "1 observation(s) with a missing status were dropped",
+    fixed = TRUE
+  )
+  expect_s3_class(p_na, "ggplot")
 })
 
 test_that("logical status is accepted and invalid coding errors", {

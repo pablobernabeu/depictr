@@ -44,7 +44,18 @@ random_effects_plot <- function(x, conf_level = 0.95, sort = TRUE,
     ord <- order(re$facet, re$estimate)
     re <- re[ord, , drop = FALSE]
   }
-  re$level <- factor(re$level, levels = unique(re$level))
+  n_labels <- length(unique(re$level))
+  if (facets) {
+    # A level factor shared across facets would freeze every panel in the first
+    # panel's order, so each facet gets its own y keys: level pasted to facet
+    # (the reorder_within pattern), with the plain labels restored on the axis.
+    # A carriage return separates the parts because, unlike an underscore or
+    # colon, it does not plausibly occur in a level or term name.
+    key <- paste(re$level, re$facet, sep = "\r")
+    re$level <- factor(key, levels = unique(key))
+  } else {
+    re$level <- factor(re$level, levels = unique(re$level))
+  }
 
   p <- ggplot2::ggplot(re, ggplot2::aes(x = .data$estimate, y = .data$level)) +
     ggplot2::geom_vline(xintercept = 0, linetype = 2,
@@ -59,9 +70,11 @@ random_effects_plot <- function(x, conf_level = 0.95, sort = TRUE,
     theme_depictr(grid = "x")
 
   if (facets) {
-    p <- p + ggplot2::facet_wrap(~ facet, scales = "free_y")
+    p <- p +
+      ggplot2::facet_wrap(~ facet, scales = "free_y") +
+      ggplot2::scale_y_discrete(labels = function(x) sub("\r.*$", "", x))
   }
-  if (nlevels(re$level) > 30) {
+  if (n_labels > 30) {
     p <- p + ggplot2::theme(axis.text.y = ggplot2::element_blank(),
                             axis.ticks.y = ggplot2::element_blank())
   }

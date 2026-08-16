@@ -34,3 +34,22 @@ test_that("tidy_estimates() standardises a data frame and back-fills CIs", {
 test_that("tidy_estimates() errors helpfully without an estimate column", {
   expect_error(tidy_estimates(data.frame(x = 1)), "estimate column")
 })
+
+test_that("a rank-deficient lm drops aliased terms with a message", {
+  # Regression: coef(summary()) omits aliased rows while confint() keeps them
+  # as NA rows, so binding the columns failed with a raw "differing number of
+  # rows" error.
+  set.seed(3)
+  d <- data.frame(y = rnorm(20), x1 = rnorm(20))
+  d$x2 <- 2 * d$x1  # perfectly collinear
+  fit <- lm(y ~ x1 + x2, data = d)
+
+  expect_message(te <- tidy_estimates(fit), "aliased term(s)", fixed = TRUE)
+  expect_message(tidy_estimates(fit), "x2", fixed = TRUE)
+  expect_equal(te$term, c("(Intercept)", "x1"))
+  expect_false(anyNA(te$conf.low))
+  expect_false(anyNA(te$conf.high))
+
+  # A full-rank fit stays silent.
+  expect_silent(tidy_estimates(lm(y ~ x1, data = d)))
+})
