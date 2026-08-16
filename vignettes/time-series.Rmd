@@ -11,6 +11,12 @@ vignette: >
 knitr::opts_chunk$set(collapse = FALSE, comment = "",
                       fig.width = 7, fig.height = 4, dpi = 96,
                       dev.args = list(bg = "transparent"))
+# Console colour carries no meaning on a rendered page. pkgdown turns it on for
+# its own build, and the escape sequences then reach the reader as literal text,
+# so colour is switched off here for a plain vignette render and a site build
+# alike. The fixed width keeps printed output inside the documentation column.
+options(cli.num_colors = 1, cli.hyperlink = FALSE, crayon.enabled = FALSE,
+        width = 80)
 
 # Figures on the package website sit on a warm off-white page in light mode and
 # are inverted by pkgdown in dark mode, so an opaque background would read as a

@@ -116,6 +116,41 @@ h3 { font-size: 1.25rem; margin-top: 1.8rem; }
 }
 
 // ---------------------------------------------------------------------------
+// Page layout — keep the content row centred inside its container
+// ---------------------------------------------------------------------------
+// pkgdown caps the prose column at 50rem so a line never becomes unreadably
+// long, and from 1400px up it adds a 5rem gutter in front of the table of
+// contents. Neither the cap nor the gutter narrows the surrounding .row, so the
+// two columns sit flush against its left edge and every pixel they do not use
+// piles up on the right. Measured on an article page at a 1920px viewport, the
+// content began 292.5px from the left edge and ended 402.5px from the right.
+// pkgdown compensates only between 1200px and 1399px, where its own stylesheet
+// sets justify-content: space-evenly; above and below that band the page is
+// visibly off-centre. Pages with no table of contents are further out still,
+// because the empty three-column slot is never reclaimed: the article index
+// measured 300px against 820px at the same viewport.
+//
+// Fill the container instead, which is already centred. Where a table of
+// contents is present the spare width goes into the middle gutter, so the two
+// columns keep their existing alignment with the navbar brand and the navbar's
+// right-hand items. Where there is none, the prose column takes the full row
+// and centres itself once it reaches the 50rem cap. Below the md breakpoint the
+// row collapses to a single column and neither rule has anything to do.
+@media (min-width: 768px) {
+  body > .container > .row {
+    justify-content: space-between;
+  }
+
+  body > .container > .row:not(:has(> aside)) {
+    justify-content: center;
+
+    > main {
+      width: 100%;  // reclaim the empty sidebar slot, still capped at 50rem
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Navbar — always the deep-navy ink band with a teal underline, in both modes
 // ---------------------------------------------------------------------------
 .navbar {
