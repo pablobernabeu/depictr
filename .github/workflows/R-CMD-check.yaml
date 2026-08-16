@@ -40,20 +40,20 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: r-lib/actions/setup-pandoc@v2
+      - uses: r-lib/actions/setup-pandoc@d3c5be51b12e724e68f33216ca3c148b66d5f0b6  # v2.12.1
 
-      - uses: r-lib/actions/setup-r@v2
+      - uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6  # v2.12.1
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
+      - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6  # v2.12.1
         with:
           extra-packages: any::rcmdcheck
           needs: check
 
-      - uses: r-lib/actions/check-r-package@v2
+      - uses: r-lib/actions/check-r-package@d3c5be51b12e724e68f33216ca3c148b66d5f0b6  # v2.12.1
         with:
           upload-snapshots: true
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
@@ -80,7 +80,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: r-lib/actions/setup-r@v2
+      - uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6  # v2.12.1
         with:
           r-version: 'oldrel-3'
           use-public-rspm: true
@@ -95,7 +95,7 @@ jobs:
       # before Deriv gained compiled code at all -- NeedsCompilation: no, pure R
       # over methods -- so it cannot fail this way on any R. Drop the pin once
       # Deriv declares its R requirement, or once oldrel-3 has moved past R 4.3.
-      - uses: r-lib/actions/setup-r-dependencies@v2
+      - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6  # v2.12.1
         with:
           extra-packages: any::testthat, Deriv@4.2.0
           needs: check
@@ -117,3 +117,89 @@ jobs:
       - name: Run the test suite against the floors
         shell: Rscript {0}
         run: testthat::test_local(stop_on_failure = TRUE)
+
+  # An @export that never reaches NAMESPACE is invisible to the test suite:
+  # testthat runs inside the package namespace, where unexported internals are
+  # reachable too, so a dropped export passes every test and surfaces only once
+  # a user calls the function. This job regenerates NAMESPACE from the roxygen
+  # comments and fails when the committed copy differs.
+  #
+  # NAMESPACE alone is gated. man/*.Rd is the obvious companion and is left out
+  # deliberately: Rd formatting churns between roxygen2 releases, so gating it
+  # would redden the job on upgrades that changed nothing about the package.
+  namespace-check:
+    runs-on: ubuntu-latest
+
+    name: NAMESPACE matches the roxygen tags
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6  # v2.12.1
+        with:
+          r-version: 'release'
+          use-public-rspm: true
+
+      # roxygen2 is pinned rather than resolved. Left floating, a release that
+      # changed its output would fail this job on a commit that touched nothing.
+      # The package dependencies come along because roxygen loads the package to
+      # read its roxygen blocks.
+      - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6  # v2.12.1
+        with:
+          extra-packages: roxygen2@8.0.0
+          needs: check
+
+      - name: Check the pinned roxygen2 against DESCRIPTION
+        shell: Rscript {0}
+        run: |
+          installed <- as.character(packageVersion("roxygen2"))
+          cat("roxygen2 installed:", installed, "\n")
+          desc <- read.dcf("DESCRIPTION")
+          field <- intersect(c("Config/roxygen2/version", "RoxygenNote"), colnames(desc))
+          if (length(field) == 0) {
+            cat("DESCRIPTION records no roxygen2 version, so there is nothing to compare.\n")
+          } else {
+            recorded <- trimws(as.character(desc[1, field[1]]))
+            cat("DESCRIPTION", paste0(field[1], ":"), recorded, "\n")
+            if (!identical(installed, recorded)) {
+              stop(
+                "roxygen2 ", installed, " is installed but DESCRIPTION records ", recorded,
+                ". A diff from this job would then reflect the roxygen2 version difference ",
+                "rather than a stale NAMESPACE. Update whichever of the two is behind: the ",
+                "pin in this workflow, or DESCRIPTION by running devtools::document().",
+                call. = FALSE
+              )
+            }
+          }
+
+      # roxygenise() rewrites NAMESPACE only when the file carries its header,
+      # and says nothing when it does not. Without this check a header lost in
+      # an edit would leave the job green over a file nothing regenerates, which
+      # is the failure it exists to catch.
+      - name: Regenerate NAMESPACE from the roxygen comments
+        shell: Rscript {0}
+        run: |
+          header <- readLines("NAMESPACE", n = 1L, warn = FALSE)
+          if (!any(grepl("Generated by roxygen2", header, fixed = TRUE))) {
+            stop(
+              "NAMESPACE has lost its \"# Generated by roxygen2: do not edit by hand\" ",
+              "first line, so roxygenise() will skip it and this job can no longer fail. ",
+              "Restore the header.",
+              call. = FALSE
+            )
+          }
+          roxygen2::roxygenise(".", roclets = "namespace")
+
+      - name: Fail if NAMESPACE drifted
+        run: |
+          if ! git diff --exit-code -- NAMESPACE; then
+            echo
+            echo "NAMESPACE is out of date with the roxygen tags in R/."
+            echo "The diff above is what regenerating the file produced: the lines"
+            echo "marked + are what the committed NAMESPACE is missing."
+            echo "Fix it by running devtools::document() locally and committing NAMESPACE."
+            exit 1
+          fi
