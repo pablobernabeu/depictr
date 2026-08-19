@@ -356,3 +356,35 @@ test_that("check_figure() leaves the plot it was given untouched", {
   check_figure(p)
   expect_equal(ggplot2::ggplot_build(p)$data, before)
 })
+
+# --- the declared ggplot2 floor ----------------------------------------------
+
+test_that("the pre-4.0.0 theme completion resolves what complete_theme() does", {
+  # check_figure() calls ggplot2::complete_theme() where ggplot2 has it and
+  # assembles the equivalent from the exported API below 4.0.0. Only the
+  # declared-minimum-dependencies job installs a ggplot2 that takes the second
+  # branch, so left to itself the compatibility path is exercised in one job
+  # rather than across the matrix. Comparing the two wherever both exist is what
+  # stops them drifting apart in between.
+  complete_theme <- .ggplot2_export("complete_theme")
+  skip_if(is.null(complete_theme),
+          "This ggplot2 has no complete_theme() to compare against.")
+  # A complete theme, an empty one, a lone element added to the default, and a
+  # complete theme that paints nothing: the four shapes the completion has to
+  # tell apart.
+  plots <- list(
+    good_figure(),
+    ggplot(crop_yield, aes(rainfall, yield)) + geom_point(),
+    ggplot(crop_yield, aes(rainfall, yield)) + geom_point() +
+      theme(plot.background = ggplot2::element_rect(fill = "#eeeeee")),
+    ggplot(crop_yield, aes(rainfall, yield)) + geom_point() + theme_void()
+  )
+  for (p in plots) {
+    theme <- ggplot2::ggplot_build(p)$plot$theme
+    for (element in c("plot.background", "panel.background", "text")) {
+      expect_equal(
+        ggplot2::calc_element(element, .completed_theme_compat(theme)),
+        ggplot2::calc_element(element, complete_theme(theme)))
+    }
+  }
+})

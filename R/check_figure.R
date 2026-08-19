@@ -133,7 +133,7 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
   .positive_scalar(min_text_pt, "min_text_pt")
 
   built <- ggplot2::ggplot_build(plot)
-  resolved <- ggplot2::complete_theme(built$plot$theme)
+  resolved <- .completed_theme(built$plot$theme)
   plot_bg <- .element_background(
     ggplot2::calc_element("plot.background", resolved)) %||% "#ffffff"
   panel_bg <- .element_background(
@@ -162,6 +162,73 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
     stop("`", arg, "` must be a single positive number.", call. = FALSE)
   }
   invisible(TRUE)
+}
+
+# --- theme resolution -------------------------------------------------------
+
+#' Fetch an exported ggplot2 object, or NULL where this ggplot2 has none
+#'
+#' Written this way rather than as a literal `ggplot2::complete_theme` because
+#' the literal is a missing export against the declared ggplot2 floor, which
+#' `R CMD check` reports as such under "checking dependencies in R code". This
+#' reaches exports only, so it is not the `:::` that would also reach internals.
+#' @noRd
+.ggplot2_export <- function(name) {
+  tryCatch(getExportedValue("ggplot2", name), error = function(e) NULL)
+}
+
+#' Resolve a plot's theme against the default and fill in what it omits
+#'
+#' [ggplot2::calc_element()] walks an element up its inheritance chain, so it
+#' needs a theme that names every element rather than only the ones the plot
+#' happens to set. ggplot2 4.0.0 exports `complete_theme()` for exactly that.
+#' The declared floor is ggplot2 3.5.0, so below 4.0.0 the same completion is
+#' assembled from the exported API by `.completed_theme_compat()`.
+#' @noRd
+.completed_theme <- function(theme) {
+  complete_theme <- .ggplot2_export("complete_theme")
+  if (is.null(complete_theme)) {
+    .completed_theme_compat(theme)
+  } else {
+    complete_theme(theme)
+  }
+}
+
+#' Theme completion for a ggplot2 that predates `complete_theme()`
+#'
+#' ggplot2's own documented completion, the `plot_theme()` that
+#' `complete_theme()` is a wrapper around. A complete theme replaces the active
+#' default outright and only has its gaps filled from it, an incomplete one is
+#' added to that default, and either way whatever is still unnamed comes from
+#' `theme_grey()`, the fallback ggplot2 registers at load and restores in
+#' `reset_theme_settings()`.
+#'
+#' An extension that has called `register_theme_elements()` adds its own
+#' elements to that fallback, which this cannot see. Those elements are the
+#' extension's own, and the audit asks only for `plot.background`,
+#' `panel.background` and `text`.
+#' @noRd
+.completed_theme_compat <- function(theme) {
+  default <- ggplot2::theme_get()
+  theme <- theme %||% ggplot2::theme()
+  if (isTRUE(attr(theme, "complete", exact = TRUE))) {
+    # Merging element by element would let the default's settings show through a
+    # theme that deliberately dropped them, so a complete theme is only topped
+    # up with the elements it does not name at all.
+    absent <- setdiff(names(default), names(theme))
+    theme[absent] <- default[absent]
+  } else {
+    theme <- default + theme
+  }
+  fallback <- ggplot2::theme_grey()
+  absent <- setdiff(names(fallback), names(theme))
+  theme[absent] <- fallback[absent]
+  attr(theme, "complete") <- TRUE
+  # The result is assembled from themes already validated on their way in, and
+  # ggplot2 exports no element validator, so revalidation is neither possible
+  # nor wanted here. `complete_theme()` clears the flag for the same reason.
+  attr(theme, "validate") <- FALSE
+  theme
 }
 
 # --- colour bookkeeping -----------------------------------------------------
