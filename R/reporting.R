@@ -48,7 +48,7 @@ palette_preview <- function(n = 8, type = c("qualitative", "sequential",
   df$type <- factor(df$type, levels = types)
   # The tile is filled with the (possibly CVD-simulated) appearance; the label
   # keeps the true hex so the original colour is always identifiable.
-  df$shown <- if (cvd == "none") df$col else cvd_simulate(df$col, cvd)
+  df$shown <- if (cvd == "none") df$col else simulate_cvd(df$col, cvd)
   # Pick a legible label colour per swatch: near-black on light tiles, white on
   # dark ones. Decide by WCAG relative luminance (sRGB-linearised) of the tile
   # as displayed, which tracks perceived lightness far better than a raw RGB

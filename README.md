@@ -48,14 +48,39 @@ model-estimate views come next (forest plots, model
 comparison, predictions, interactions and random effects), then residual
 diagnostics with the standard classification curves, and then posterior
 summaries and power curves. Further families cover principal components,
-clustering and survival, time series, and the shared theme with composition,
-saving and reporting helpers. The
+clustering and survival, time series, and the shared theme with the
+accessibility checks, composition, saving and reporting helpers. The
 [reference](https://pablobernabeu.github.io/depictr/reference/index.html) lists
 every function by family.
 
 Heavier modelling back-ends (`lme4`, `broom`, `simr`) are optional (in
 `Suggests`) and used only when present. The core functions, examples, tests and
 vignettes run on base `lm`/`glm` and the bundled data alone.
+
+## Accessibility, measured rather than asserted
+
+The default palette is the Okabe-Ito set, and that choice is checked. The package
+ships a simulator of colour-vision deficiency based on the model of Machado,
+Oliveira and Fernandes (2009), and `palette_safety()` measures how far apart the
+palette's colours stay under each deficiency.
+
+A safe palette is not a safe figure, though, so `check_figure()` audits the plot
+you are about to submit: colour separability under each dichromacy and in
+greyscale, text size against a stated output width, WCAG contrast for text and
+geometry, and whether any distinction rests on colour alone. Each row reports the
+value it measured next to the threshold, so a verdict can be argued with.
+
+```r
+check_figure(explore_distribution(lexical_decision, RT, group = condition),
+             width_cm = 8.9)
+```
+
+Two limits are worth knowing. The colourblind-safety guarantee covers the eight
+base colours; past those the palette interpolates and `depictr_palette()` warns.
+And the guarantee is about hue confusion rather than greyscale: the palette's
+orange and sky blue differ by only 0.79 in CIE lightness, so they print as the
+same grey. A figure that may be printed in black and white wants fewer groups, a
+sequential palette, or a redundant shape or line type.
 
 ## A first plot
 

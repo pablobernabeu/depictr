@@ -2,30 +2,33 @@
 
 # --- (a) colour-vision-deficiency transform ---------------------------------
 
-test_that("cvd_simulate() leaves colours unchanged for type 'none'", {
+test_that("simulate_cvd() at severity zero returns the colours unchanged", {
   cols <- c("#005b96", "#e69f00", "#009e73")
-  # 'none' normalises to upper-case hex but does not alter the colour.
-  expect_identical(cvd_simulate(cols, "none"), toupper(cols))
+  # Severity zero is the identity matrix, so the round trip through linear RGB
+  # must come back to the same eight-bit colour, in canonical lower-case hex.
+  for (tp in c("protan", "deutan", "tritan")) {
+    expect_identical(simulate_cvd(cols, tp, severity = 0), cols)
+  }
 })
 
-test_that("cvd_simulate() preserves achromatic colours (grey/black/white)", {
+test_that("simulate_cvd() preserves achromatic colours (grey/black/white)", {
   # The Machado severity-1.0 matrices have rows that sum to 1, so neutral greys
   # map to themselves under every deficiency. This is the defining sanity check.
-  for (tp in c("deutan", "protan", "tritan")) {
-    expect_identical(cvd_simulate("#808080", tp), "#808080")
-    expect_identical(cvd_simulate("#000000", tp), "#000000")
-    expect_identical(cvd_simulate("#ffffff", tp), "#FFFFFF")
+  for (tp in c("protan", "deutan", "tritan")) {
+    expect_identical(simulate_cvd("#808080", tp), "#808080")
+    expect_identical(simulate_cvd("#000000", tp), "#000000")
+    expect_identical(simulate_cvd("#ffffff", tp), "#ffffff")
   }
   # Equivalently, the matrix rows must each sum to ~1.
-  for (tp in c("deutan", "protan", "tritan")) {
+  for (tp in c("protan", "deutan", "tritan")) {
     expect_equal(unname(rowSums(.cvd_matrices[[tp]])), c(1, 1, 1),
                  tolerance = 1e-4)
   }
 })
 
-test_that("cvd_simulate() matches an independent Machado re-implementation", {
+test_that("simulate_cvd() matches an independent Machado re-implementation", {
   # Re-implement the deutan transform from scratch (no shared code) and confirm
-  # cvd_simulate() reproduces it bit-for-bit, guarding against a transposed
+  # simulate_cvd() reproduces it bit-for-bit, guarding against a transposed
   # matrix or swapped channels.
   indep_deutan <- function(hex) {
     M <- matrix(c(
@@ -36,19 +39,47 @@ test_that("cvd_simulate() matches an independent Machado re-implementation", {
     lin <- ifelse(srgb <= 0.04045, srgb / 12.92, ((srgb + 0.055) / 1.055)^2.4)
     out <- pmax(pmin(as.numeric(M %*% lin), 1), 0)
     enc <- ifelse(out <= 0.0031308, out * 12.92, 1.055 * out^(1 / 2.4) - 0.055)
-    grDevices::rgb(enc[1], enc[2], enc[3])
+    tolower(grDevices::rgb(enc[1], enc[2], enc[3]))
   }
   test <- c("#005b96", "#e69f00", "#d55e00", "#ff0000", "#3366cc")
   expect_identical(
     vapply(test, indep_deutan, character(1), USE.NAMES = FALSE),
-    cvd_simulate(test, "deutan")
+    simulate_cvd(test, "deutan")
   )
 })
 
-test_that("cvd_simulate() reddens out: red loses red, gains green under protan", {
-  rp <- grDevices::col2rgb(cvd_simulate("#ff0000", "protan"))[, 1]
+test_that("simulate_cvd() matches colorspace, an independent implementation", {
+  # colorspace implements the same Machado model from the published matrices.
+  # Agreement to the eight-bit colour is the strongest external check available
+  # without leaving CRAN.
+  skip_if_not_installed("colorspace")
+  pal <- depictr_palette()
+  for (tp in c("protan", "deutan", "tritan")) {
+    theirs <- tolower(switch(
+      tp,
+      protan = colorspace::protan(pal, severity = 1),
+      deutan = colorspace::deutan(pal, severity = 1),
+      tritan = colorspace::tritan(pal, severity = 1)
+    ))
+    expect_identical(simulate_cvd(pal, tp), theirs, info = tp)
+  }
+})
+
+test_that("simulate_cvd() reddens out: red loses red, gains green under protan", {
+  rp <- grDevices::col2rgb(simulate_cvd("#ff0000", "protan"))[, 1]
   expect_lt(rp["red"], 255)
   expect_gt(rp["green"], 0)
+})
+
+test_that("simulate_cvd() refuses an unknown deficiency and an out-of-range severity", {
+  expect_error(simulate_cvd("#005b96", "none"),
+               "^`deficiency` must be one of 'protan', 'deutan' or 'tritan'\\.$")
+  expect_error(simulate_cvd("#005b96", c("protan", "deutan")),
+               "^`deficiency` must be one of 'protan', 'deutan' or 'tritan'\\.$")
+  expect_error(simulate_cvd("#005b96", "deutan", severity = 2),
+               "^`severity` must lie in \\[0, 1\\]\\.$")
+  expect_error(simulate_cvd("#005b96", "deutan", severity = NA),
+               "^`severity` must lie in \\[0, 1\\]\\.$")
 })
 
 # --- automated colourblind-safety assertion ---------------------------------
@@ -58,8 +89,13 @@ test_that("the default qualitative palette stays distinguishable under CVD", {
   # distance >= 5 is comfortably above the ~2.3 just-noticeable-difference, so
   # every pair remains clearly separable. The observed worst case (deutan) is
   # ~7.4, leaving a healthy margin.
-  saf <- palette_cvd_safety()
-  expect_named(saf, c("none", "deutan", "protan", "tritan"))
+  report <- palette_safety()
+  saf <- report$by_condition
+  expect_named(saf, c("normal", "protan", "deutan", "tritan"))
+  expect_true(report$safe)
+  expect_identical(report$worst_condition, "deutan")
+  expect_identical(report$worst_pair, c("#cc79a7", "#999999"))
+  expect_equal(report$min_delta_e, 7.4)
   expect_true(all(saf > 5),
               info = paste("min CVD distances:",
                            paste(round(saf, 2), collapse = ", ")))
@@ -80,10 +116,27 @@ test_that("the default qualitative palette stays distinguishable under CVD", {
     d <- as.matrix(stats::dist(lab)); diag(d) <- Inf; min(d)
   }
   pal <- depictr_palette()
-  for (tp in c("none", "deutan", "protan", "tritan")) {
-    expect_equal(saf[[tp]], independent_min(cvd_simulate(pal, tp)),
-                 tolerance = 1e-3)
+  for (tp in c("normal", "protan", "deutan", "tritan")) {
+    seen <- if (tp == "normal") pal else simulate_cvd(pal, tp)
+    expect_equal(saf[[tp]], round(independent_min(seen), 2), tolerance = 1e-3)
   }
+})
+
+test_that("palette_safety() needs a pair, and reports the closest one", {
+  # One colour has no pairwise distance. The no-pair sentinel used to survive to
+  # the result as an infinite distance with safe = TRUE, and a worst pair naming
+  # the same colour twice.
+  expect_error(palette_safety("#005b96"),
+               "^`colours` needs at least two colours to have a pairwise distance\\.$")
+  expect_error(palette_safety(character(0)),
+               "^`colours` needs at least two colours to have a pairwise distance\\.$")
+  # Passing nothing at all still means the default palette.
+  expect_identical(palette_safety()$worst_pair,
+                   palette_safety(depictr_palette())$worst_pair)
+  # Two colours a hair apart stay close under every condition.
+  near <- palette_safety(c("#005b96", "#015c97"))
+  expect_false(near$safe)
+  expect_identical(near$worst_pair, c("#005b96", "#015c97"))
 })
 
 test_that("interpolating past the base set warns, and the base set does not", {
@@ -106,8 +159,8 @@ test_that("interpolating past the base set warns, and the base set does not", {
   expect_length(pal, 10)
   # The claim the warning makes is true: the interpolated set fails the
   # package's own check, while the eight it is made for clears it.
-  expect_false(all(palette_cvd_safety(pal) > 5))
-  expect_true(all(palette_cvd_safety(depictr_palette(8)) > 5))
+  expect_false(palette_safety(pal)$safe)
+  expect_true(palette_safety(depictr_palette(8))$safe)
 })
 
 test_that("a user-supplied palette is interpolated without the Okabe-Ito warning", {
@@ -146,7 +199,7 @@ test_that("palette_preview(cvd=) recolours tiles but keeps original hex labels",
   expect_false(identical(none_fill, deut_fill))
   # ... and equal the simulated colours of the true palette.
   expect_identical(toupper(deut_fill),
-                   toupper(cvd_simulate(depictr_palette(8), "deutan")))
+                   toupper(simulate_cvd(depictr_palette(8), "deutan")))
 
   # The text labels keep the *original* hex codes, not the simulated ones.
   built <- ggplot2::ggplot_build(palette_preview(8, cvd = "deutan"))

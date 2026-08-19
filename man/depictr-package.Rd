@@ -100,7 +100,7 @@ conventions.
 }
 }
 
-\section{Theming and reporting}{
+\section{Theming, accessibility and reporting}{
 
 \itemize{
 \item \code{\link[=theme_depictr]{theme_depictr()}}: the shared theme.
@@ -108,6 +108,9 @@ conventions.
 \code{scale_color_depictr()}) and \code{\link[=scale_fill_depictr]{scale_fill_depictr()}}: the shared palette
 and its ggplot2 scales.
 \item \code{\link[=palette_preview]{palette_preview()}}: preview the palettes.
+\item \code{\link[=check_figure]{check_figure()}}: audit a finished figure for accessibility.
+\item \code{\link[=palette_safety]{palette_safety()}}: check a palette's colour-vision safety.
+\item \code{\link[=simulate_cvd]{simulate_cvd()}}: simulate a colour-vision deficiency.
 \item \code{\link[=format_terms]{format_terms()}}: tidy raw coefficient names for display.
 \item \code{\link[=model_report]{model_report()}}: a one-figure overview of a fitted model.
 \item \code{\link[=arrange_plots]{arrange_plots()}}: compose plots with a shared legend and title.

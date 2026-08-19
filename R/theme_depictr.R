@@ -80,9 +80,9 @@ depictr_palette <- function(n = NULL, type = c("qualitative", "sequential",
   if (is.null(n)) return(base)
   if (n <= length(base)) return(base[seq_len(n)])
   # Interpolating past the base set puts the colours close enough together to
-  # fail palette_cvd_safety(), so say so instead of quietly breaking the
-  # package's headline accessibility claim. Only the built-in set carries that
-  # claim: a user-supplied palette was never Okabe-Ito to begin with.
+  # fail palette_safety(), so say so instead of quietly breaking the package's
+  # headline accessibility claim. Only the built-in set carries that claim: a
+  # user-supplied palette was never Okabe-Ito to begin with.
   if (builtin) {
     warning(n, " colours interpolated through the ", length(base),
             "-colour Okabe-Ito set: the colour-vision-deficiency guarantee ",

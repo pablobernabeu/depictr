@@ -82,13 +82,16 @@
 #'   \item [power_curve_plot()]: power against sample size.
 #' }
 #'
-#' @section Theming and reporting:
+#' @section Theming, accessibility and reporting:
 #' \itemize{
 #'   \item [theme_depictr()]: the shared theme.
 #'   \item [depictr_palette()], [scale_colour_depictr()] (aliased as
 #'     `scale_color_depictr()`) and [scale_fill_depictr()]: the shared palette
 #'     and its ggplot2 scales.
 #'   \item [palette_preview()]: preview the palettes.
+#'   \item [check_figure()]: audit a finished figure for accessibility.
+#'   \item [palette_safety()]: check a palette's colour-vision safety.
+#'   \item [simulate_cvd()]: simulate a colour-vision deficiency.
 #'   \item [format_terms()]: tidy raw coefficient names for display.
 #'   \item [model_report()]: a one-figure overview of a fitted model.
 #'   \item [arrange_plots()]: compose plots with a shared legend and title.

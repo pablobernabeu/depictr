@@ -51,6 +51,7 @@ Suggests:
     posterior,
     boot,
     cluster,
+    colorspace,
     testthat (>= 3.0.0),
     withr
 VignetteBuilder: knitr

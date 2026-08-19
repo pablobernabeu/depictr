@@ -167,15 +167,19 @@ reference:
   - posterior_plot
   - power_curve_plot
 
-- title: Theming and reporting
+- title: Theming, accessibility and reporting
   desc: >
-    A shared theme and colourblind-aware palette, label helpers, plot
+    A shared theme and colourblind-aware palette, the colour-vision tools that
+    check the palette and audit a finished figure, label helpers, plot
     composition and saving, and a one-figure model report.
   contents:
   - theme_depictr
   - depictr_palette
   - scale_colour_depictr
   - palette_preview
+  - check_figure
+  - palette_safety
+  - simulate_cvd
   - format_terms
   - model_report
   - arrange_plots

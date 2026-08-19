@@ -163,6 +163,77 @@ check a palette as a deuteranope (red-green) would see it:
 palette_preview(cvd = "deutan")
 ```
 
+The simulation is available on its own as `simulate_cvd()`, and `palette_safety()`
+turns it into a verdict: for normal vision and each deficiency at full severity it
+reports the smallest perceptual distance between any two colours in a palette, so
+the accessibility claim is measured rather than asserted.
+
+```{r}
+palette_safety()
+```
+
+## Auditing the figure you are about to submit
+
+A safe palette is not a safe figure. Once a plot has been extended with your own
+scale, shrunk to fit a journal column, or asked to distinguish groups by colour
+alone, the palette's guarantee no longer describes what a reader will see.
+`check_figure()` reads a built plot and reports what it measured, next to the
+threshold it was measured against, so each verdict can be argued with.
+
+```{r}
+grouped <- ggplot(crop_yield, aes(fertiliser, yield, colour = treatment)) +
+  geom_point(alpha = 0.7) +
+  scale_colour_depictr() +
+  theme_depictr()
+
+check_figure(grouped)
+```
+
+Two rows are worth dwelling on. `geometry_contrast` measures each encoding colour
+against the panel background, and the palette's orange sits at 2.25 against white,
+below the 3:1 that WCAG asks of a graphical object [@wcag22]. `redundant_encoding`
+is zero because nothing but colour tells the two treatments apart. Mapping shape
+as well, and letting the darker vermillion do the second colour's work, clears
+both:
+
+```{r}
+mended <- ggplot(crop_yield, aes(fertiliser, yield, colour = treatment,
+                                 shape = treatment)) +
+  geom_point(alpha = 0.7) +
+  scale_colour_manual(values = c("#005b96", "#d55e00")) +
+  theme_depictr()
+
+check_figure(mended)[, c("check", "measured", "threshold", "verdict")]
+```
+
+The audit also takes a stated output width, which is where most figure text
+quietly fails. Text is drawn in points, so a figure saved seven inches wide and
+then printed in an 8.9 cm column arrives at half the size it looked on screen:
+
+```{r}
+subset(check_figure(grouped, width_cm = 8.9), check == "text_size")
+```
+
+One limitation is worth stating plainly, because the package is the one making
+the accessibility claim. The eight-colour qualitative palette clears every
+colour-vision check and fails the greyscale check: its orange and its sky blue
+differ by 0.79 in CIE lightness, so a black-and-white printer renders them as the
+same grey. The Okabe-Ito guarantee is about hue confusion and was never a claim
+about greyscale. Rather than move the threshold so that depictr's own defaults
+pass, the check reports the number and the claim has been narrowed to match. A
+figure that may be printed in black and white wants fewer groups, a sequential
+palette, or a redundant shape or line type.
+
+```{r}
+eight <- data.frame(g = factor(letters[1:8]), x = 1:8, y = 1:8)
+p8 <- ggplot(eight, aes(x, y, colour = g)) +
+  geom_point() +
+  scale_colour_depictr() +
+  theme_depictr()
+
+subset(check_figure(p8), check == "greyscale_separability")
+```
+
 Set the look once for a whole script with `depictr_options()` (base size, base
 family, brand and accent colours, or a custom palette), instead of passing the
 same arguments to every call. Called with no arguments it reports the current

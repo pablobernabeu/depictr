@@ -47,23 +47,25 @@ depictr_reference <- function() depictr_opt("reference")
 
 # Colour-vision-deficiency (CVD) simulation ----------------------------------
 #
-# Machado, Oliveira & Fernandes (2009) physiologically-based model, severity
-# 1.0. The transforms operate in *linear* RGB, so colours are linearised from
-# sRGB, multiplied by the per-deficiency matrix, then re-encoded to sRGB.
+# Machado, Oliveira & Fernandes (2009) physiologically-based model. The
+# transforms operate in *linear* RGB, so colours are linearised from sRGB,
+# multiplied by the per-deficiency matrix, then re-encoded to sRGB.
 # Reference: Machado GM, Oliveira MM, Fernandes LAF (2009), "A physiologically-
 # based model for simulation of color vision deficiency", IEEE TVCG 15(6),
-# 1291-1298. Matrices as published for the three dichromacies.
+# 1291-1298. Matrices as published for the three dichromacies at full severity;
+# partial severities interpolate towards the identity. The list order fixes the
+# order deficiencies are reported in, and matches the Python twin.
 
 .cvd_matrices <- list(
-  deutan = matrix(c(
-     0.367322,  0.860646, -0.227968,
-     0.280085,  0.672501,  0.047413,
-    -0.011820,  0.042940,  0.968881
-  ), nrow = 3, byrow = TRUE),
   protan = matrix(c(
      0.152286,  1.052583, -0.204868,
      0.114503,  0.786281,  0.099216,
     -0.003882, -0.048116,  1.051998
+  ), nrow = 3, byrow = TRUE),
+  deutan = matrix(c(
+     0.367322,  0.860646, -0.227968,
+     0.280085,  0.672501,  0.047413,
+    -0.011820,  0.042940,  0.968881
   ), nrow = 3, byrow = TRUE),
   tritan = matrix(c(
      1.255528, -0.076749, -0.178779,
@@ -82,27 +84,51 @@ depictr_reference <- function() depictr_opt("reference")
   ifelse(c <= 0.0031308, c * 12.92, 1.055 * c^(1 / 2.4) - 0.055)
 }
 
-#' Simulate colour-vision deficiency on a set of colours
+#' Simulate how colours appear under a colour-vision deficiency
 #'
-#' Approximates how `cols` appear under deuteranopia, protanopia or tritanopia
-#' using the Machado et al. (2009) severity-1.0 model in linear-RGB space.
+#' Maps each colour to the colour a reader with a given form and severity of
+#' colour-vision deficiency would perceive, using the physiologically-based
+#' model of Machado, Oliveira and Fernandes (2009). The transformation is
+#' defined on linear-light RGB, so a colour is decoded from sRGB to linear RGB
+#' (the IEC 61966-2-1 transfer functions), transformed, then re-encoded.
 #'
-#' @param cols Character vector of colours (anything [grDevices::col2rgb()]
-#'   understands).
-#' @param type One of `"none"`, `"deutan"`, `"protan"`, `"tritan"`. `"none"`
-#'   returns the colours unchanged (normalised to hex).
-#' @return A character vector of hex colours the same length as `cols`.
-#' @noRd
-cvd_simulate <- function(cols, type = c("none", "deutan", "protan", "tritan")) {
-  type <- match.arg(type)
-  rgb <- grDevices::col2rgb(cols) / 255   # 3 x n, sRGB in [0, 1]
-  if (type == "none") {
-    return(grDevices::rgb(rgb[1, ], rgb[2, ], rgb[3, ]))
+#' This is the simulator behind [palette_preview()]'s `cvd` argument, behind
+#' [palette_safety()], and behind the colour-separability rows of
+#' [check_figure()].
+#'
+#' @param colours Character vector of colours, in any form
+#'   [grDevices::col2rgb()] understands.
+#' @param deficiency The deficiency to simulate: `"protan"` or `"deutan"`
+#'   (the two red-green forms) or `"tritan"` (blue-yellow).
+#' @param severity Severity in `[0, 1]`. Zero leaves the colours unchanged and
+#'   one is the full deficiency. Intermediate values interpolate the transform
+#'   towards the identity, an approximation to Machado et al.'s per-severity
+#'   matrices.
+#'
+#' @return A character vector of lower-case hex colours, the same length as
+#'   `colours`.
+#' @references
+#' \insertRef{machado2009}{depictr}
+#' @export
+#' @examples
+#' simulate_cvd(c("#005b96", "#e69f00"), "deutan")
+#'
+#' # Half severity moves the colours only part of the way.
+#' simulate_cvd(c("#005b96", "#e69f00"), "deutan", severity = 0.5)
+simulate_cvd <- function(colours, deficiency, severity = 1) {
+  if (!is.character(deficiency) || length(deficiency) != 1 ||
+      is.na(deficiency) || !deficiency %in% names(.cvd_matrices)) {
+    stop("`deficiency` must be one of 'protan', 'deutan' or 'tritan'.",
+         call. = FALSE)
   }
-  lin <- .srgb_to_linear(rgb)               # 3 x n
-  out_lin <- .cvd_matrices[[type]] %*% lin  # 3 x n
-  out <- .linear_to_srgb(out_lin)
-  grDevices::rgb(out[1, ], out[2, ], out[3, ])
+  if (!is.numeric(severity) || length(severity) != 1 || is.na(severity) ||
+      severity < 0 || severity > 1) {
+    stop("`severity` must lie in [0, 1].", call. = FALSE)
+  }
+  m <- (1 - severity) * diag(3) + severity * .cvd_matrices[[deficiency]]
+  rgb <- grDevices::col2rgb(colours) / 255   # 3 x n, sRGB in [0, 1]
+  out <- .linear_to_srgb(m %*% .srgb_to_linear(rgb))
+  tolower(grDevices::rgb(out[1, ], out[2, ], out[3, ]))
 }
 
 # Perceptual distance and the colourblind-safety check -----------------------
@@ -125,32 +151,101 @@ cvd_simulate <- function(cols, type = c("none", "deutan", "protan", "tritan")) {
   cbind(L = 116 * fy - 16, a = 500 * (fx - fy), b = 200 * (fy - fz))
 }
 
-#' Smallest pairwise CIE76 colour distance within a set
+#' Smallest pairwise CIE76 colour difference within a set
 #'
 #' Lower bound on how distinguishable a set of colours is: the minimum Euclidean
-#' distance in CIE Lab space across all colour pairs. Larger is safer.
+#' distance in CIE Lab space across all colour pairs. Larger is safer. The pair
+#' is walked in the same order as the Python twin so that a tie between two
+#' equally close pairs resolves to the same pair in both engines.
+#'
+#' @return A list with `distance` and `pair`, the one-based indices of the two
+#'   closest colours.
 #' @noRd
-.min_pairwise_distance <- function(cols) {
+.min_pairwise_delta_e <- function(cols) {
   lab <- .srgb_to_lab(cols)
-  if (nrow(lab) < 2) return(Inf)
-  d <- as.matrix(stats::dist(lab))
-  diag(d) <- Inf
-  min(d)
+  n <- nrow(lab)
+  best <- Inf
+  pair <- c(1L, 1L)
+  for (i in seq_len(n - 1)) {
+    for (j in seq(i + 1, n)) {
+      d <- sqrt(sum((lab[i, ] - lab[j, ])^2))
+      if (d < best) {
+        best <- d
+        pair <- c(i, j)
+      }
+    }
+  }
+  list(distance = best, pair = pair)
 }
 
-#' Colourblind-safety summary for a qualitative palette
+#' Check that a palette stays distinguishable under each deficiency
 #'
-#' For each colour-vision type (including normal vision) it reports the smallest
-#' perceptual (CIE Lab) distance between any pair of palette colours after
-#' simulating that deficiency. A larger minimum distance means the palette stays
-#' more distinguishable. Used by the package's automated accessibility test.
+#' For normal vision and each deficiency at full severity, the palette's colours
+#' are converted to CIE L*a*b* and the smallest pairwise colour difference
+#' (CIE76 Delta-E) is found. The lower this minimum, the more likely two
+#' categories are to be confused. A palette counts as safe when the minimum
+#' across all four conditions is at least `threshold`.
 #'
-#' @param cols Palette colours. Defaults to the built-in qualitative palette.
-#' @return A named numeric vector, one minimum distance per vision type.
-#' @noRd
-palette_cvd_safety <- function(cols = depictr_palette()) {
-  types <- c("none", "deutan", "protan", "tritan")
-  vapply(types, function(tp) {
-    .min_pairwise_distance(cvd_simulate(cols, tp))
-  }, numeric(1))
+#' The default `threshold` of 5 is calibrated against the reference
+#' colourblind-safe palette: the Okabe-Ito set's tightest pair (reddish purple
+#' against grey) sits at Delta-E 7.4 under full deuteranopia, so the cut must
+#' lie below that to pass the recommended palette, while still flagging colours
+#' that become near-identical under a deficiency. The difference includes
+#' lightness, which survives colour-vision deficiency, so two colours that share
+#' a hue but differ in lightness are correctly treated as distinguishable. Full
+#' severity is the worst case; most colour-vision deficiency is milder.
+#'
+#' This looks at a palette in the abstract. To audit a finished figure, which
+#' uses only as many colours as it has groups and has text and a background
+#' besides, see [check_figure()].
+#'
+#' @param colours The palette to test. Defaults to the depictr qualitative
+#'   palette. Needs at least two colours: a pairwise distance over fewer than
+#'   two has no value, rather than an infinitely safe one.
+#' @param threshold The smallest acceptable Delta-E.
+#'
+#' @return A list with `min_delta_e` (the worst case across conditions),
+#'   `by_condition` (a named numeric vector, one minimum Delta-E for normal
+#'   vision and for each deficiency), `worst_condition` and `worst_pair` (the
+#'   closest colours and where they were closest), `safe` and `threshold`.
+#' @references
+#' \insertRef{okabe2008}{depictr}
+#'
+#' \insertRef{machado2009}{depictr}
+#' @export
+#' @examples
+#' palette_safety()
+#'
+#' # Two colours a hair apart are flagged.
+#' palette_safety(c("#005b96", "#015c97"))
+palette_safety <- function(colours = NULL, threshold = 5) {
+  # `colours %||% depictr_palette()` would have swapped in the default palette
+  # for an empty vector, reporting on eight colours the caller never passed.
+  colours <- if (is.null(colours)) depictr_palette() else as.character(colours)
+  if (length(colours) < 2) {
+    # Otherwise the no-pair sentinel below survives to the result, which then
+    # claims safe = TRUE at an infinite distance and names one colour as both
+    # halves of the worst pair.
+    stop("`colours` needs at least two colours to have a pairwise distance.",
+         call. = FALSE)
+  }
+  conditions <- c("normal", names(.cvd_matrices))
+  closest <- lapply(conditions, function(cond) {
+    seen <- if (cond == "normal") colours else simulate_cvd(colours, cond)
+    .min_pairwise_delta_e(seen)
+  })
+  names(closest) <- conditions
+  by_condition <- vapply(closest, function(x) x$distance, numeric(1))
+  worst_condition <- conditions[[which.min(by_condition)]]
+  min_delta_e <- by_condition[[worst_condition]]
+  list(
+    min_delta_e = round(min_delta_e, 2),
+    by_condition = round(by_condition, 2),
+    worst_condition = worst_condition,
+    worst_pair = colours[closest[[worst_condition]]$pair],
+    # The verdict uses the unrounded distance, so a palette is never rounded
+    # up over the threshold it actually misses.
+    safe = min_delta_e >= threshold,
+    threshold = threshold
+  )
 }
