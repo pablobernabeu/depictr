@@ -171,7 +171,7 @@ one colourblind-aware palette and one set of label conventions.
 - [`power_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/power_curve_plot.md):
   power against sample size.
 
-## Theming and reporting
+## Theming, accessibility and reporting
 
 - [`theme_depictr()`](https://pablobernabeu.github.io/depictr/reference/theme_depictr.md):
   the shared theme.
@@ -186,6 +186,15 @@ one colourblind-aware palette and one set of label conventions.
 
 - [`palette_preview()`](https://pablobernabeu.github.io/depictr/reference/palette_preview.md):
   preview the palettes.
+
+- [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md):
+  audit a finished figure for accessibility.
+
+- [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md):
+  check a palette's colour-vision safety.
+
+- [`simulate_cvd()`](https://pablobernabeu.github.io/depictr/reference/simulate_cvd.md):
+  simulate a colour-vision deficiency.
 
 - [`format_terms()`](https://pablobernabeu.github.io/depictr/reference/format_terms.md):
   tidy raw coefficient names for display.

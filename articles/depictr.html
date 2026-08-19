@@ -217,12 +217,132 @@ colour-vision deficiency, so you can check a palette as a deuteranope
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/palette_preview.html">palette_preview</a></span><span class="op">(</span>cvd <span class="op">=</span> <span class="st">"deutan"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="depictr_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="672"></p>
+<p>The simulation is available on its own as
+<code><a href="../reference/simulate_cvd.html">simulate_cvd()</a></code>, and <code><a href="../reference/palette_safety.html">palette_safety()</a></code> turns it
+into a verdict: for normal vision and each deficiency at full severity
+it reports the smallest perceptual distance between any two colours in a
+palette, so the accessibility claim is measured rather than
+asserted.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/palette_safety.html">palette_safety</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code>$min_delta_e
+[1] 7.4
+
+$by_condition
+normal protan deutan tritan 
+ 33.43  18.15   7.40  16.18 
+
+$worst_condition
+[1] "deutan"
+
+$worst_pair
+[1] "#cc79a7" "#999999"
+
+$safe
+[1] TRUE
+
+$threshold
+[1] 5</code></pre>
+</div>
+<div class="section level2">
+<h2 id="auditing-the-figure-you-are-about-to-submit">Auditing the figure you are about to submit<a class="anchor" aria-label="anchor" href="#auditing-the-figure-you-are-about-to-submit"></a>
+</h2>
+<p>A safe palette is not a safe figure. Once a plot has been extended
+with your own scale, shrunk to fit a journal column, or asked to
+distinguish groups by colour alone, the palette’s guarantee no longer
+describes what a reader will see. <code><a href="../reference/check_figure.html">check_figure()</a></code> reads a
+built plot and reports what it measured, next to the threshold it was
+measured against, so each verdict can be argued with.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">grouped</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">fertiliser</span>, <span class="va">yield</span>, colour <span class="op">=</span> <span class="va">treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/scale_colour_depictr.html">scale_colour_depictr</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_depictr.html">theme_depictr</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/check_figure.html">check_figure</a></span><span class="op">(</span><span class="va">grouped</span><span class="op">)</span></span></code></pre></div>
+<pre><code>                       check measured threshold verdict
+1        colour_separability   119.21       5.0    pass
+2 colour_separability_protan   108.92       5.0    pass
+3 colour_separability_deutan   121.29       5.0    pass
+4 colour_separability_tritan    77.90       5.0    pass
+5     greyscale_separability    33.34       5.0    pass
+6                  text_size     8.80       6.0    pass
+7              text_contrast     8.45       4.5    pass
+8          geometry_contrast     2.25       3.0    fail
+9         redundant_encoding     0.00       1.0    fail
+                                                             detail
+1           Closest pair #005b96 and #e69f00 of 2 encoding colours.
+2           Closest pair #005b96 and #e69f00 of 2 encoding colours.
+3           Closest pair #005b96 and #e69f00 of 2 encoding colours.
+4           Closest pair #005b96 and #e69f00 of 2 encoding colours.
+5                Closest pair #005b96 and #e69f00 in CIE lightness.
+6 Smallest text 8.80 pt, drawn at 17.78 cm and printed at 17.78 cm.
+7                          Lowest-contrast text #4d4d4d on #ffffff.
+8                        Lowest-contrast colour #e69f00 on #ffffff.
+9                            Colour alone distinguishes the groups.</code></pre>
+<p>Two rows are worth dwelling on. <code>geometry_contrast</code>
+measures each encoding colour against the panel background, and the
+palette’s orange sits at 2.25 against white, below the 3:1 that WCAG
+asks of a graphical object <span class="citation">(<a href="#ref-wcag22">World Wide Web Consortium, 2023</a>)</span>.
+<code>redundant_encoding</code> is zero because nothing but colour tells
+the two treatments apart. Mapping shape as well, and letting the darker
+vermillion do the second colour’s work, clears both:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mended</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">fertiliser</span>, <span class="va">yield</span>, colour <span class="op">=</span> <span class="va">treatment</span>,</span>
+<span>                                 shape <span class="op">=</span> <span class="va">treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_colour_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#005b96"</span>, <span class="st">"#d55e00"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_depictr.html">theme_depictr</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/check_figure.html">check_figure</a></span><span class="op">(</span><span class="va">mended</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"check"</span>, <span class="st">"measured"</span>, <span class="st">"threshold"</span>, <span class="st">"verdict"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
+<pre><code>                       check measured threshold verdict
+1        colour_separability   111.87       5.0    pass
+2 colour_separability_protan    89.87       5.0    pass
+3 colour_separability_deutan   107.07       5.0    pass
+4 colour_separability_tritan    98.50       5.0    pass
+5     greyscale_separability    16.92       5.0    pass
+6                  text_size     8.80       6.0    pass
+7              text_contrast     8.45       4.5    pass
+8          geometry_contrast     3.87       3.0    pass
+9         redundant_encoding     1.00       1.0    pass</code></pre>
+<p>The audit also takes a stated output width, which is where most
+figure text quietly fails. Text is drawn in points, so a figure saved
+seven inches wide and then printed in an 8.9 cm column arrives at half
+the size it looked on screen:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="fu"><a href="../reference/check_figure.html">check_figure</a></span><span class="op">(</span><span class="va">grouped</span>, width_cm <span class="op">=</span> <span class="fl">8.9</span><span class="op">)</span>, <span class="va">check</span> <span class="op">==</span> <span class="st">"text_size"</span><span class="op">)</span></span></code></pre></div>
+<pre><code>      check measured threshold verdict
+6 text_size      4.4         6    fail
+                                                            detail
+6 Smallest text 8.80 pt, drawn at 17.78 cm and printed at 8.90 cm.</code></pre>
+<p>One limitation is worth stating plainly, because the package is the
+one making the accessibility claim. The eight-colour qualitative palette
+clears every colour-vision check and fails the greyscale check: its
+orange and its sky blue differ by 0.79 in CIE lightness, so a
+black-and-white printer renders them as the same grey. The Okabe-Ito
+guarantee is about hue confusion and was never a claim about greyscale.
+Rather than move the threshold so that depictr’s own defaults pass, the
+check reports the number and the claim has been narrowed to match. A
+figure that may be printed in black and white wants fewer groups, a
+sequential palette, or a redundant shape or line type.</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">eight</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>g <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">]</span><span class="op">)</span>, x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, y <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">)</span></span>
+<span><span class="va">p8</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">eight</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, colour <span class="op">=</span> <span class="va">g</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/scale_colour_depictr.html">scale_colour_depictr</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_depictr.html">theme_depictr</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="fu"><a href="../reference/check_figure.html">check_figure</a></span><span class="op">(</span><span class="va">p8</span><span class="op">)</span>, <span class="va">check</span> <span class="op">==</span> <span class="st">"greyscale_separability"</span><span class="op">)</span></span></code></pre></div>
+<pre><code>                   check measured threshold verdict
+5 greyscale_separability     0.79         5    fail
+                                              detail
+5 Closest pair #56b4e9 and #e69f00 in CIE lightness.</code></pre>
 <p>Set the look once for a whole script with
 <code><a href="../reference/depictr_options.html">depictr_options()</a></code> (base size, base family, brand and accent
 colours, or a custom palette), instead of passing the same arguments to
 every call. Called with no arguments it reports the current
 settings:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/depictr_options.html">depictr_options</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code>$base_size
 [1] 11
@@ -246,11 +366,11 @@ $na_value
 [1] "grey80"</code></pre>
 <p>Supplying arguments sets them for every later plot and returns the
 previous values, so you can put the look back afterwards:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">old</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/depictr_options.html">depictr_options</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">13</span>, accent <span class="op">=</span> <span class="st">"#b3589a"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/coefficient_plot.html">coefficient_plot</a></span><span class="op">(</span><span class="va">fit</span>, title <span class="op">=</span> <span class="st">"Set once, applied everywhere"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="depictr_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="672"></p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<p><img src="depictr_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" alt="" width="672"></p>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">depictr_options</span>, <span class="va">old</span><span class="op">)</span>   <span class="co"># restore the previous settings</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -283,6 +403,10 @@ that are friendly to colorblind people</em>. <a href="https://jfly.uni-koeln.de/
 Wickham, H. (2016). <em><span class="nocase">ggplot2</span>:
 <span>Elegant</span> graphics for data analysis</em> (2nd ed.).
 Springer. <a href="https://doi.org/10.1007/978-3-319-24277-4" class="external-link">https://doi.org/10.1007/978-3-319-24277-4</a>
+</div>
+<div id="ref-wcag22" class="csl-entry">
+World Wide Web Consortium. (2023). <em><span>Web Content Accessibility
+Guidelines</span> (<span>WCAG</span>) 2.2</em>. W3C Recommendation, <a href="https://www.w3.org/TR/WCAG22/" class="external-link uri">https://www.w3.org/TR/WCAG22/</a>.
 </div>
 </div>
 </div>

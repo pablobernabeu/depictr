@@ -106,13 +106,23 @@
 <div class="section level2">
 <h2 id="whats-in-the-box">What’s in the box<a class="anchor" aria-label="anchor" href="#whats-in-the-box"></a>
 </h2>
-<p>The functions fall into seven families that follow the analysis workflow. Exploratory plots and a descriptive summary table open it. The model-estimate views come next (forest plots, model comparison, predictions, interactions and random effects), then residual diagnostics with the standard classification curves, and then posterior summaries and power curves. Further families cover principal components, clustering and survival, time series, and the shared theme with composition, saving and reporting helpers. The <a href="https://pablobernabeu.github.io/depictr/reference/index.html">reference</a> lists every function by family.</p>
+<p>The functions fall into seven families that follow the analysis workflow. Exploratory plots and a descriptive summary table open it. The model-estimate views come next (forest plots, model comparison, predictions, interactions and random effects), then residual diagnostics with the standard classification curves, and then posterior summaries and power curves. Further families cover principal components, clustering and survival, time series, and the shared theme with the accessibility checks, composition, saving and reporting helpers. The <a href="https://pablobernabeu.github.io/depictr/reference/index.html">reference</a> lists every function by family.</p>
 <p>Heavier modelling back-ends (<code>lme4</code>, <code>broom</code>, <code>simr</code>) are optional (in <code>Suggests</code>) and used only when present. The core functions, examples, tests and vignettes run on base <code>lm</code>/<code>glm</code> and the bundled data alone.</p>
+</div>
+<div class="section level2">
+<h2 id="accessibility-measured-rather-than-asserted">Accessibility, measured rather than asserted<a class="anchor" aria-label="anchor" href="#accessibility-measured-rather-than-asserted"></a>
+</h2>
+<p>The default palette is the Okabe-Ito set, and that choice is checked. The package ships a simulator of colour-vision deficiency based on the model of Machado, Oliveira and Fernandes (2009), and <code><a href="reference/palette_safety.html">palette_safety()</a></code> measures how far apart the palette’s colours stay under each deficiency.</p>
+<p>A safe palette is not a safe figure, though, so <code><a href="reference/check_figure.html">check_figure()</a></code> audits the plot you are about to submit: colour separability under each dichromacy and in greyscale, text size against a stated output width, WCAG contrast for text and geometry, and whether any distinction rests on colour alone. Each row reports the value it measured next to the threshold, so a verdict can be argued with.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/check_figure.html">check_figure</a></span><span class="op">(</span><span class="fu"><a href="reference/explore_distribution.html">explore_distribution</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">RT</span>, group <span class="op">=</span> <span class="va">condition</span><span class="op">)</span>,</span>
+<span>             width_cm <span class="op">=</span> <span class="fl">8.9</span><span class="op">)</span></span></code></pre></div>
+<p>Two limits are worth knowing. The colourblind-safety guarantee covers the eight base colours; past those the palette interpolates and <code><a href="reference/depictr_palette.html">depictr_palette()</a></code> warns. And the guarantee is about hue confusion rather than greyscale: the palette’s orange and sky blue differ by only 0.79 in CIE lightness, so they print as the same grey. A figure that may be printed in black and white wants fewer groups, a sequential palette, or a redundant shape or line type.</p>
 </div>
 <div class="section level2">
 <h2 id="a-first-plot">A first plot<a class="anchor" aria-label="anchor" href="#a-first-plot"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pablobernabeu.github.io/depictr/">depictr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">rainfall</span> <span class="op">+</span> <span class="va">fertiliser</span> <span class="op">+</span> <span class="va">soil_ph</span> <span class="op">+</span> <span class="va">treatment</span>, data <span class="op">=</span> <span class="va">crop_yield</span><span class="op">)</span></span>

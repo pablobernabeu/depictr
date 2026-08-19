@@ -2,6 +2,46 @@
 
 ## depictr (development version)
 
+### Auditing a finished figure
+
+- **New
+  [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md),
+  an accessibility and honesty audit of the figure you are about to
+  submit.** Until now the package could vouch for its palette and say
+  nothing about a finished plot, which is the thing a reader actually
+  sees. Give it anything a depictr function returns, including a plot
+  extended afterwards with `+`, and it introspects the build and returns
+  a tidy table: the separability of the encoding colours under each
+  dichromacy and in greyscale, the smallest text size against a stated
+  physical output width, the WCAG contrast of the text and of the
+  geometry against their backgrounds, and whether any distinction is
+  carried by colour alone. Every row carries the value it measured
+  beside the threshold it was measured against, so a verdict can be
+  argued with.
+- **The colour-vision helpers are exported.**
+  [`simulate_cvd()`](https://pablobernabeu.github.io/depictr/reference/simulate_cvd.md)
+  and
+  [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
+  were internal here while the Python twin exported both, so the
+  advertised parity did not hold. They now match in name, arguments,
+  return shape and refusal wording.
+  [`simulate_cvd()`](https://pablobernabeu.github.io/depictr/reference/simulate_cvd.md)
+  gains a `severity` argument and returns lower-case hex, as the Python
+  twin does;
+  [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
+  returns the full report (the worst condition, the closest pair, the
+  verdict) rather than a bare vector of distances.
+- **The accessibility claim has been narrowed to what is true.** The
+  default eight-colour palette clears every colour-vision check and
+  fails the new greyscale check: its orange (`#e69f00`) and sky blue
+  (`#56b4e9`) differ by 0.79 in CIE lightness, so a black-and-white
+  printer renders them as the same grey. The Okabe-Ito guarantee is
+  about hue confusion and was never a claim about greyscale. The
+  threshold has been left where it is rather than moved so the package’s
+  own defaults pass, and
+  [`vignette("depictr")`](https://pablobernabeu.github.io/depictr/articles/depictr.md)
+  now states the limitation where the claim is made.
+
 ### Figures that misreported the data
 
 - **`quantile_residuals()` produced nonsense for a

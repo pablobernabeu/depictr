@@ -20,6 +20,7 @@
 <url><loc>https://pablobernabeu.github.io/depictr/reference/arrange_plots.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/reference/binned_residual_plot.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/reference/calibration_plot.html</loc></url>
+<url><loc>https://pablobernabeu.github.io/depictr/reference/check_figure.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/reference/clinical_trial.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/reference/cluster_plot.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/reference/coefficient_plot.html</loc></url>
@@ -57,6 +58,7 @@
 <url><loc>https://pablobernabeu.github.io/depictr/reference/optimizer_fixef_plot.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/reference/outlier_plot.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/reference/palette_preview.html</loc></url>
+<url><loc>https://pablobernabeu.github.io/depictr/reference/palette_safety.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/reference/pca_plot.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/reference/posterior_plot.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/reference/power_curve_plot.html</loc></url>
@@ -73,6 +75,7 @@
 <url><loc>https://pablobernabeu.github.io/depictr/reference/scree_plot.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/reference/seasonal_plot.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/reference/silhouette_plot.html</loc></url>
+<url><loc>https://pablobernabeu.github.io/depictr/reference/simulate_cvd.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/reference/summary_table.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/reference/survival_plot.html</loc></url>
 <url><loc>https://pablobernabeu.github.io/depictr/reference/theme_depictr.html</loc></url>

@@ -135,9 +135,10 @@ Posterior summaries and power analysis curves.
 - [`power_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/power_curve_plot.md)
   : Plot a power analysis curve
 
-## Theming and reporting
+## Theming, accessibility and reporting
 
-A shared theme and colourblind-aware palette, label helpers, plot
+A shared theme and colourblind-aware palette, the colour-vision tools
+that check the palette and audit a finished figure, label helpers, plot
 composition and saving, and a one-figure model report.
 
 - [`theme_depictr()`](https://pablobernabeu.github.io/depictr/reference/theme_depictr.md)
@@ -150,6 +151,12 @@ composition and saving, and a one-figure model report.
   : depictr colour and fill scales
 - [`palette_preview()`](https://pablobernabeu.github.io/depictr/reference/palette_preview.md)
   : Preview the depictr palettes
+- [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  : Audit a finished figure for accessibility and honesty
+- [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
+  : Check that a palette stays distinguishable under each deficiency
+- [`simulate_cvd()`](https://pablobernabeu.github.io/depictr/reference/simulate_cvd.md)
+  : Simulate how colours appear under a colour-vision deficiency
 - [`format_terms()`](https://pablobernabeu.github.io/depictr/reference/format_terms.md)
   : Tidy raw coefficient names for display
 - [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
