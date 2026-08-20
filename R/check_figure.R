@@ -4,9 +4,9 @@
 # plot ought to contain, which is the same idiom the test suite uses. That way
 # it also sees whatever was added after depictr handed the plot back: a
 # replacement scale, a different theme, an extra layer. Two passes over the
-# build supply everything. The layer data give the colours that actually encode
-# groups, and the rendered gtable gives the text that will actually be drawn,
-# at the point size and in the colour it will be drawn in.
+# build supply everything. The layer data give the colours that encode groups,
+# and the rendered gtable gives the text that will actually be drawn, at the
+# point size and in the colour it will be drawn in.
 
 # WCAG 2.2 contrast floors, used as published rather than tuned so that any
 # particular figure passes: 4.5:1 for text at normal size (success criterion
@@ -20,10 +20,10 @@
 #' Checks a figure as it will be submitted, rather than the palette it was built
 #' from. [palette_safety()] can promise that the eight colours depictr ships
 #' stay apart under colour-vision deficiency, but it knows nothing about the
-#' figure in front of you: how many of those colours it actually uses, what you
-#' replaced them with, how small the text will be once the figure is squeezed
-#' into a journal column, or whether the only thing separating two groups is
-#' their colour. `check_figure()` reads the built plot and answers those
+#' figure in front of you: how many of those colours it uses, what you replaced
+#' them with, how small the text will be once the figure is squeezed into a
+#' journal column, or whether the only thing separating two groups is their
+#' colour. `check_figure()` reads the built plot and answers those
 #' questions with numbers.
 #'
 #' Every row carries the value it measured next to the threshold it was measured
@@ -76,7 +76,9 @@
 #' than moved to let the package's own defaults through.
 #'
 #' @param plot A plot, as returned by any depictr plotting function, including
-#'   one extended afterwards with `+`.
+#'   one extended afterwards with `+`. A multi-panel composite is refused: its
+#'   panels have their own scales, themes and text, and one table of numbers
+#'   cannot describe them all. Check each panel on its own.
 #' @param width_cm The width, in centimetres, that the figure will occupy in the
 #'   finished document. Defaults to 17.78 cm, the seven inches [save_plot()]
 #'   draws at, which means no scaling.

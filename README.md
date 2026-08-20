@@ -18,16 +18,15 @@ plot can be refined further with the usual `+` syntax.
 
 This is the R half of a sibling pair. [The Python
 package](https://pablobernabeu.github.io/depictr-py/) of the same name covers
-most of the same workflow on top of [plotnine](https://plotnine.org); see its
-README for the handful of functions that are not ported and the few places
+most of the same workflow on top of [plotnine](https://plotnine.org). Its README
+lists the handful of functions that have yet to be ported and the few places
 where the two differ.
 
 ## Gallery
 
 A grouped density (the default palette is a colourblind-safe set based on
-Okabe-Ito) and
-Kaplan-Meier survival curves with confidence bands and a number-at-risk table,
-each from a single function call:
+Okabe-Ito) and Kaplan-Meier survival curves with confidence bands and a
+number-at-risk table, each from a single function call:
 
 ![Grouped density of response times by priming condition, in the Okabe-Ito palette](man/figures/README-distribution.png)
 
@@ -43,13 +42,12 @@ remotes::install_github("pablobernabeu/depictr")
 ## What's in the box
 
 The functions fall into seven families that follow the analysis workflow.
-Exploratory plots and a descriptive summary table open it. The
-model-estimate views come next (forest plots, model
-comparison, predictions, interactions and random effects), then residual
-diagnostics with the standard classification curves, and then posterior
-summaries and power curves. Further families cover principal components,
-clustering and survival, time series, and the shared theme with the
-accessibility checks, composition, saving and reporting helpers. The
+Exploratory plots and a descriptive summary table open it. The model-estimate
+views come next (forest plots, model comparison, predictions, interactions and
+random effects), then residual diagnostics with the standard classification
+curves, and then posterior summaries and power curves. Further families cover
+principal components, clustering and survival, time series, and the shared theme
+with the accessibility checks, composition, saving and reporting helpers. The
 [reference](https://pablobernabeu.github.io/depictr/reference/index.html) lists
 every function by family.
 
@@ -57,7 +55,7 @@ Heavier modelling back-ends (`lme4`, `broom`, `simr`) are optional (in
 `Suggests`) and used only when present. The core functions, examples, tests and
 vignettes run on base `lm`/`glm` and the bundled data alone.
 
-## Accessibility, measured rather than asserted
+## Measured accessibility
 
 The default palette is the Okabe-Ito set, and that choice is checked. The package
 ships a simulator of colour-vision deficiency based on the model of Machado,
@@ -65,10 +63,11 @@ Oliveira and Fernandes (2009), and `palette_safety()` measures how far apart the
 palette's colours stay under each deficiency.
 
 A safe palette is not a safe figure, though, so `check_figure()` audits the plot
-you are about to submit: colour separability under each dichromacy and in
-greyscale, text size against a stated output width, WCAG contrast for text and
-geometry, and whether any distinction rests on colour alone. Each row reports the
-value it measured next to the threshold, so a verdict can be argued with.
+you are about to submit. It measures how separable the encoding colours are under
+each dichromacy and in greyscale, how small the text becomes at a stated output
+width, how well text and geometry contrast with their backgrounds under WCAG, and
+whether any distinction rests on colour alone. Each row reports the value it
+measured next to the threshold, so a verdict can be argued with.
 
 ```r
 check_figure(explore_distribution(lexical_decision, RT, group = condition),
@@ -76,11 +75,11 @@ check_figure(explore_distribution(lexical_decision, RT, group = condition),
 ```
 
 Two limits are worth knowing. The colourblind-safety guarantee covers the eight
-base colours; past those the palette interpolates and `depictr_palette()` warns.
-And the guarantee is about hue confusion rather than greyscale: the palette's
-orange and sky blue differ by only 0.79 in CIE lightness, so they print as the
-same grey. A figure that may be printed in black and white wants fewer groups, a
-sequential palette, or a redundant shape or line type.
+base colours, and past those the palette interpolates, with a warning from
+`depictr_palette()`. The guarantee is also confined to hue confusion: in
+greyscale the palette's orange and sky blue differ by only 0.79 in CIE lightness,
+so they print as the same grey. A figure that may be printed in black and white wants fewer
+groups, a sequential palette, or a redundant shape or line type.
 
 ## A first plot
 
@@ -119,9 +118,9 @@ bundled data.
 
 ## How depictr relates to other packages
 
-depictr aims for breadth and consistency across the workflow, and complements
-the specialised packages rather than replacing them. For a deeper treatment of
-any one area, several remain valuable, among them
+depictr aims for breadth and consistency across the workflow, and it complements
+the specialised packages. Several of those remain the better choice for a deeper
+treatment of any one area, among them
 [`ggstatsplot`](https://www.indrapatil.com/ggstatsplot/) (statistical
 details on plots), [`sjPlot`](https://strengejacke.github.io/sjPlot/) and the
 [easystats](https://easystats.github.io/easystats/) family (`see`, `parameters`,

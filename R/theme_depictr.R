@@ -150,7 +150,7 @@ scale_fill_depictr <- function(n = NULL, palette = NULL,
 
 #' The depictr ggplot2 theme
 #'
-#' A clean, minimal theme used by every plotting function in the package. It is
+#' The minimal theme used by every plotting function in the package. It is
 #' a light modification of [ggplot2::theme_minimal()] with subtle gridlines,
 #' centred titles and comfortable margins.
 #'

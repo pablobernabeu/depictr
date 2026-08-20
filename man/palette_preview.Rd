@@ -34,8 +34,8 @@ relative luminance), so labels stay readable on both light and dark colours.
 Set \code{cvd} to render the swatches as they would appear under a colour-vision
 deficiency, using the Machado et al. (2009) simulation. The tiles are
 recoloured to the simulated appearance while the labels keep the \emph{original}
-hex code, so you can check at a glance whether two groups would still be
-told apart by a colourblind reader.
+hex code, so you can see whether two groups would still be told apart by a
+colourblind reader.
 }
 \examples{
 palette_preview()

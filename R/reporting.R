@@ -11,8 +11,8 @@
 #' Set `cvd` to render the swatches as they would appear under a colour-vision
 #' deficiency, using the Machado et al. (2009) simulation. The tiles are
 #' recoloured to the simulated appearance while the labels keep the *original*
-#' hex code, so you can check at a glance whether two groups would still be
-#' told apart by a colourblind reader.
+#' hex code, so you can see whether two groups would still be told apart by a
+#' colourblind reader.
 #'
 #' @param n Number of colours to preview.
 #' @param type Palette type to preview: `"qualitative"`, `"sequential"`,
@@ -90,9 +90,17 @@ palette_preview <- function(n = 8, type = c("qualitative", "sequential",
 
 # Relative luminance (WCAG 2.x) of one or more colours, in [0, 1].
 #
-# Used to choose a legible text colour against a coloured background: linearise
-# each sRGB channel, then take the standard 0.2126/0.7152/0.0722 weighting.
-# Vectorised over `cols`; returns a numeric vector the same length as `cols`.
+# Linearise each sRGB channel, then take the standard 0.2126/0.7152/0.0722
+# weighting. Vectorised over `cols`, returning a numeric vector of the same
+# length. Two things call it: the tile and bar labels that need a legible text
+# colour against a coloured background, and the contrast ratios `check_figure()`
+# reports.
+#
+# The 0.03928 breakpoint below is the one the WCAG guidelines print, and it
+# differs slightly from the IEC 61966-2-1 figure of 0.04045 that
+# `.srgb_to_linear()` uses elsewhere in the package. The published figure is
+# kept here so that a contrast ratio can be recomputed from the standard alone,
+# and the Python twin's `_relative_luminance()` does the same.
 .relative_luminance <- function(cols) {
   rgb <- grDevices::col2rgb(cols) / 255
   lin <- ifelse(rgb <= 0.03928, rgb / 12.92, ((rgb + 0.055) / 1.055)^2.4)

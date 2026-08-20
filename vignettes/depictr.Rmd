@@ -23,13 +23,12 @@ options(cli.num_colors = 1, cli.hyperlink = FALSE, crayon.enabled = FALSE,
 
 # Figures on the package website sit on a warm off-white page in light mode and
 # are inverted by pkgdown in dark mode, so an opaque background would read as a
-# pale slab one way and a black plate the other. Two things paint one. The
-# device
-# canvas is made transparent by `dev.args` above, and theme_depictr() then
-# inherits theme_minimal()'s white plot.background, which is drawn over that
-# canvas, so it is cleared as each figure is printed. This is deliberately a
-# vignette-level choice: theme_depictr() keeps its opaque background, which is
-# what a figure saved for a paper wants.
+# pale slab one way and a black plate the other. Two layers paint that
+# background, and both have to go. The device canvas is made transparent by
+# `dev.args` above, and theme_depictr() then inherits theme_minimal()'s white
+# plot.background, which is drawn over that canvas, so it is cleared as each
+# figure is printed. This is deliberately a vignette-level choice: theme_depictr()
+# keeps its opaque background, which is what a figure saved for a paper wants.
 transparent_bg <- ggplot2::theme(
   plot.background  = ggplot2::element_rect(fill = NA, colour = NA),
   panel.background = ggplot2::element_rect(fill = NA, colour = NA)
@@ -102,8 +101,8 @@ residual_diagnostics_plot(fit)
 ```
 
 For uncertainty, `posterior_plot()` summarises posterior or simulation draws as
-a distribution per parameter. These are the real fixed-effect posterior draws
-from a Bayesian fit of the lexical-decision model, shipped with the package.
+a distribution per parameter. These are the fixed-effect posterior draws from a
+Bayesian fit of the lexical-decision model, shipped with the package.
 
 ```{r}
 draws <- readRDS(system.file("extdata", "lexdec_draws.rds",
@@ -166,7 +165,7 @@ palette_preview(cvd = "deutan")
 The simulation is available on its own as `simulate_cvd()`, and `palette_safety()`
 turns it into a verdict: for normal vision and each deficiency at full severity it
 reports the smallest perceptual distance between any two colours in a palette, so
-the accessibility claim is measured rather than asserted.
+the accessibility claim comes with a number attached.
 
 ```{r}
 palette_safety()
@@ -214,15 +213,15 @@ then printed in an 8.9 cm column arrives at half the size it looked on screen:
 subset(check_figure(grouped, width_cm = 8.9), check == "text_size")
 ```
 
-One limitation is worth stating plainly, because the package is the one making
-the accessibility claim. The eight-colour qualitative palette clears every
+One limitation belongs here, beside the claim it qualifies, since the package is
+the one making that claim. The eight-colour qualitative palette clears every
 colour-vision check and fails the greyscale check: its orange and its sky blue
 differ by 0.79 in CIE lightness, so a black-and-white printer renders them as the
 same grey. The Okabe-Ito guarantee is about hue confusion and was never a claim
-about greyscale. Rather than move the threshold so that depictr's own defaults
-pass, the check reports the number and the claim has been narrowed to match. A
-figure that may be printed in black and white wants fewer groups, a sequential
-palette, or a redundant shape or line type.
+about greyscale. The threshold stays where it is, the check reports the number,
+and the claim has been narrowed to match. A figure that may be printed in black
+and white wants fewer groups, a sequential palette, or a redundant shape or line
+type.
 
 ```{r}
 eight <- data.frame(g = factor(letters[1:8]), x = 1:8, y = 1:8)
@@ -234,10 +233,10 @@ p8 <- ggplot(eight, aes(x, y, colour = g)) +
 subset(check_figure(p8), check == "greyscale_separability")
 ```
 
-Set the look once for a whole script with `depictr_options()` (base size, base
-family, brand and accent colours, or a custom palette), instead of passing the
-same arguments to every call. Called with no arguments it reports the current
-settings:
+Set the look once for a whole script with `depictr_options()`. It carries the
+base size and family, the brand and accent colours and a custom palette, so the
+same arguments need not travel with every call. Called with no arguments it
+reports the current settings:
 
 ```{r}
 depictr_options()

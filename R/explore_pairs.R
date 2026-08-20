@@ -102,8 +102,8 @@ pair_correlation <- function(x, y, method) {
 #' @noRd
 pairs_panel <- function(d, xvar, yvar, i, j, k, group, pal, point_alpha,
                         method = "pearson") {
-  # Keep axis text only on the outer edge (bottom row / left column) so the
-  # matrix stays clean; variable names live on the diagonal.
+  # Keep axis text only on the outer edge (bottom row / left column), so the
+  # inner cells carry no repeated axes. Variable names live on the diagonal.
   show_x <- i == k
   show_y <- j == 1 && i != j
   base <- theme_depictr(grid = "none") +

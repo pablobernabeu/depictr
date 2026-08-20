@@ -5,9 +5,11 @@
 #' Shows how many of the positive cases are captured as a growing share of the
 #' population is targeted in order of predicted score. It is the customary chart
 #' for judging a classifier's value for ranking and targeting, as in marketing,
-#' triage and fraud detection. The diagonal marks the no-model baseline and the
-#' upper envelope a perfect model. Pass a *named list* of models / (actual,
-#' score) pairs to overlay several colour-coded gains curves with a legend.
+#' triage and fraud detection. The diagonal marks the no-model baseline, and a
+#' second reference line marks a perfect model. Pass a *named list* of models /
+#' (actual, score) pairs to overlay several colour-coded gains curves with a
+#' legend. The perfect-model line is then omitted, since it depends on the
+#' prevalence of the outcome and the overlaid models need not share one.
 #'
 #' @param x A binomial `glm`; the vector of observed outcomes (0/1, logical or a
 #'   two-level factor with the positive class second); or a *named* list of
@@ -41,8 +43,10 @@ gain_plot <- function(x, score = NULL, colour = depictr_brand(),
   multi <- attr(models, "multi")
 
   gs <- lapply(models, function(m) gain_table(m$actual, m$score))
-  # The perfect-model envelope depends on prevalence; with one model it is drawn,
-  # with several (possibly differing prevalence) we omit it to keep things clean.
+  # The perfect-model envelope bends at the prevalence of the outcome, so it
+  # describes one model's data. Overlaid models need not share a prevalence, and
+  # a single envelope would then be right for at most one of them, so it is drawn
+  # only in the single-model case.
   prevalence <- mean(models[[1]]$actual == 1)
 
   p <- ggplot2::ggplot() +

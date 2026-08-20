@@ -37,9 +37,11 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 Shows how many of the positive cases are captured as a growing share of the
 population is targeted in order of predicted score. It is the customary chart
 for judging a classifier's value for ranking and targeting, as in marketing,
-triage and fraud detection. The diagonal marks the no-model baseline and the
-upper envelope a perfect model. Pass a \emph{named list} of models / (actual,
-score) pairs to overlay several colour-coded gains curves with a legend.
+triage and fraud detection. The diagonal marks the no-model baseline, and a
+second reference line marks a perfect model. Pass a \emph{named list} of models /
+(actual, score) pairs to overlay several colour-coded gains curves with a
+legend. The perfect-model line is then omitted, since it depends on the
+prevalence of the outcome and the overlaid models need not share one.
 }
 \examples{
 # Targeting only pays off when the positive class is scarce, so the example

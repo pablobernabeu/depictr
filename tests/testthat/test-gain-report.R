@@ -8,6 +8,29 @@ test_that("gain_plot() and lift_plot() work from glm and vectors", {
                "both positive and negative")
 })
 
+test_that("gain_plot() drops the perfect-model line when models are overlaid", {
+  # The envelope bends at the prevalence of the outcome, so it describes one
+  # model's data. Overlaid models need not share a prevalence, so the reference
+  # help page promises the line only for the single-model case.
+  full <- glm(adverse_event ~ biomarker + age + arm,
+              data = clinical_trial, family = binomial)
+  reduced <- glm(adverse_event ~ biomarker, data = clinical_trial,
+                 family = binomial)
+
+  reference_layers <- function(p) {
+    built <- ggplot2::ggplot_build(p)
+    sum(vapply(built$data, function(d) {
+      !is.null(d$colour) && all(d$colour == depictr_reference())
+    }, logical(1)))
+  }
+
+  # One model: the no-model diagonal and the perfect-model envelope.
+  expect_identical(reference_layers(gain_plot(full)), 2L)
+  # Several: the diagonal alone.
+  expect_identical(
+    reference_layers(gain_plot(list(Full = full, Reduced = reduced))), 1L)
+})
+
 test_that("gain_table() captures all positives at full depth", {
   g <- depictr:::gain_table(c(0, 1, 0, 1), c(0.1, 0.9, 0.2, 0.8))
   expect_equal(g$population[1], 0)
