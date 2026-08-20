@@ -146,10 +146,10 @@ distribution):</p>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
-<h2 id="classification-on-a-genuinely-imbalanced-outcome">Classification on a genuinely imbalanced outcome<a class="anchor" aria-label="anchor" href="#classification-on-a-genuinely-imbalanced-outcome"></a>
+<h2 id="classification-on-an-imbalanced-outcome">Classification on an imbalanced outcome<a class="anchor" aria-label="anchor" href="#classification-on-an-imbalanced-outcome"></a>
 </h2>
-<p>The adverse-event outcome is imbalanced, which is exactly when the
-precision-recall, gains and lift charts earn their keep. depictr’s
+<p>The adverse-event outcome is imbalanced, the case the
+precision-recall, gains and lift charts are built for. depictr’s
 classification plots each read a binomial <code>glm</code> directly, a
 pair of vectors or, to compare several models, a named list of
 models.</p>
@@ -235,7 +235,7 @@ ROC curve marks, so the two agree:</p>
 <h2 id="uncertainty">Uncertainty<a class="anchor" aria-label="anchor" href="#uncertainty"></a>
 </h2>
 <p><code><a href="../reference/posterior_plot.html">posterior_plot()</a></code> summarises draws (posterior, bootstrap,
-simulation) as a distribution per parameter. Here are the real posterior
+simulation) as a distribution per parameter. Here are the posterior
 draws from a Bayesian fit of the lexical-decision model, shown as
 point-and-interval forests.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
@@ -256,7 +256,7 @@ point-and-interval forests.</p>
 <p><code><a href="../reference/power_curve_plot.html">power_curve_plot()</a></code> reads a
 <code><a href="https://rdrr.io/pkg/simr/man/powerCurve.html" class="external-link">simr::powerCurve()</a></code> object or a tidy data frame, so a slow
 power simulation does not have to be re-run to redraw it. The package
-ships a real <code>powerCurve</code> object from a <code>simr</code>
+ships a <code>powerCurve</code> object produced by a <code>simr</code>
 analysis of the lexical-decision design, which simulated power for the
 word-frequency slope as the number of participants grows. We read it
 straight from disk.</p>

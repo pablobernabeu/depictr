@@ -91,12 +91,12 @@ residual_diagnostics_plot(gfit, title = "Adverse-event model")
 
 ![](diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-7-1.png)
 
-## Classification on a genuinely imbalanced outcome
+## Classification on an imbalanced outcome
 
-The adverse-event outcome is imbalanced, which is exactly when the
-precision-recall, gains and lift charts earn their keep. depictr’s
-classification plots each read a binomial `glm` directly, a pair of
-vectors or, to compare several models, a named list of models.
+The adverse-event outcome is imbalanced, the case the precision-recall,
+gains and lift charts are built for. depictr’s classification plots each
+read a binomial `glm` directly, a pair of vectors or, to compare several
+models, a named list of models.
 
 The ROC curve reports the AUC. Passing `youden = TRUE` marks the
 Youden’s J operating point (the threshold maximising sensitivity +
@@ -224,8 +224,8 @@ confusion_matrix_plot(gfit, threshold = "youden", normalise = "row")
 
 [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
 summarises draws (posterior, bootstrap, simulation) as a distribution
-per parameter. Here are the real posterior draws from a Bayesian fit of
-the lexical-decision model, shown as point-and-interval forests.
+per parameter. Here are the posterior draws from a Bayesian fit of the
+lexical-decision model, shown as point-and-interval forests.
 
 ``` r
 
@@ -248,8 +248,8 @@ posterior_plot(draws[c("conditionunrelated", "modalityauditory",
 reads a
 [`simr::powerCurve()`](https://rdrr.io/pkg/simr/man/powerCurve.html)
 object or a tidy data frame, so a slow power simulation does not have to
-be re-run to redraw it. The package ships a real `powerCurve` object
-from a `simr` analysis of the lexical-decision design, which simulated
+be re-run to redraw it. The package ships a `powerCurve` object produced
+by a `simr` analysis of the lexical-decision design, which simulated
 power for the word-frequency slope as the number of participants grows.
 We read it straight from disk.
 

@@ -87,8 +87,8 @@ residual_diagnostics_plot(fit)
 For uncertainty,
 [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
 summarises posterior or simulation draws as a distribution per
-parameter. These are the real fixed-effect posterior draws from a
-Bayesian fit of the lexical-decision model, shipped with the package.
+parameter. These are the fixed-effect posterior draws from a Bayesian
+fit of the lexical-decision model, shipped with the package.
 
 ``` r
 
@@ -185,8 +185,8 @@ and
 [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
 turns it into a verdict: for normal vision and each deficiency at full
 severity it reports the smallest perceptual distance between any two
-colours in a palette, so the accessibility claim is measured rather than
-asserted.
+colours in a palette, so the accessibility claim comes with a number
+attached.
 
 ``` r
 
@@ -298,16 +298,16 @@ subset(check_figure(grouped, width_cm = 8.9), check == "text_size")
                                                                 detail
     6 Smallest text 8.80 pt, drawn at 17.78 cm and printed at 8.90 cm.
 
-One limitation is worth stating plainly, because the package is the one
-making the accessibility claim. The eight-colour qualitative palette
-clears every colour-vision check and fails the greyscale check: its
-orange and its sky blue differ by 0.79 in CIE lightness, so a
+One limitation belongs here, beside the claim it qualifies, since the
+package is the one making that claim. The eight-colour qualitative
+palette clears every colour-vision check and fails the greyscale check:
+its orange and its sky blue differ by 0.79 in CIE lightness, so a
 black-and-white printer renders them as the same grey. The Okabe-Ito
 guarantee is about hue confusion and was never a claim about greyscale.
-Rather than move the threshold so that depictr’s own defaults pass, the
-check reports the number and the claim has been narrowed to match. A
-figure that may be printed in black and white wants fewer groups, a
-sequential palette, or a redundant shape or line type.
+The threshold stays where it is, the check reports the number, and the
+claim has been narrowed to match. A figure that may be printed in black
+and white wants fewer groups, a sequential palette, or a redundant shape
+or line type.
 
 ``` r
 
@@ -326,10 +326,10 @@ subset(check_figure(p8), check == "greyscale_separability")
     5 Closest pair #56b4e9 and #e69f00 in CIE lightness.
 
 Set the look once for a whole script with
-[`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md)
-(base size, base family, brand and accent colours, or a custom palette),
-instead of passing the same arguments to every call. Called with no
-arguments it reports the current settings:
+[`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md).
+It carries the base size and family, the brand and accent colours and a
+custom palette, so the same arguments need not travel with every call.
+Called with no arguments it reports the current settings:
 
 ``` r
 

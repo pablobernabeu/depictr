@@ -46,8 +46,8 @@ object.
 Set `cvd` to render the swatches as they would appear under a
 colour-vision deficiency, using the Machado et al. (2009) simulation.
 The tiles are recoloured to the simulated appearance while the labels
-keep the *original* hex code, so you can check at a glance whether two
-groups would still be told apart by a colourblind reader.
+keep the *original* hex code, so you can see whether two groups would
+still be told apart by a colourblind reader.
 
 ## References
 

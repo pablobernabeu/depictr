@@ -27,14 +27,14 @@ R users can also retrieve this citation directly with
 
 ## The developer
 
-depictr is developed by **Pablo Bernabeu**, a researcher in the
-Department of Education at the University of Oxford. His work spans
-cognitive psychology and neuroscience, linguistics, education and
-digital technologies, drawing on a range of methods that include
-behavioural and EEG experiments, corpus analysis and computational
-modelling. He is a Fellow of the Software Sustainability Institute
-(2020), recognised for his work on R-based tools for data presentation,
-and holds a PhD in Psychology from Lancaster University.
+depictr is developed by Pablo Bernabeu, a researcher in the Department
+of Education at the University of Oxford. His work spans cognitive
+psychology and neuroscience, linguistics, education and digital
+technologies, drawing on a range of methods that include behavioural and
+EEG experiments, corpus analysis and computational modelling. He is a
+Fellow of the Software Sustainability Institute (2020), recognised for
+his work on R-based tools for data presentation, and holds a PhD in
+Psychology from Lancaster University.
 
 More about his work is at
 [pablobernabeu.github.io](https://pablobernabeu.github.io), on

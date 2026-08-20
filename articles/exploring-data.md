@@ -192,8 +192,8 @@ group_comparison_plot(crop_yield, yield, treatment, differences = TRUE,
 [`dumbbell_plot()`](https://pablobernabeu.github.io/depictr/reference/dumbbell_plot.md)
 compares one value between two groups across a set of categories: the
 two group values per category are joined by a segment, so the size and
-direction of each gap is clear at a glance. Here it contrasts younger
-and older respondents’ life satisfaction by region.
+direction of each gap can be read off directly. Here it contrasts
+younger and older respondents’ life satisfaction by region.
 
 ``` r
 

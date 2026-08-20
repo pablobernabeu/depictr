@@ -5,11 +5,11 @@ built from.
 [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
 can promise that the eight colours depictr ships stay apart under
 colour-vision deficiency, but it knows nothing about the figure in front
-of you: how many of those colours it actually uses, what you replaced
-them with, how small the text will be once the figure is squeezed into a
-journal column, or whether the only thing separating two groups is their
-colour. `check_figure()` reads the built plot and answers those
-questions with numbers.
+of you: how many of those colours it uses, what you replaced them with,
+how small the text will be once the figure is squeezed into a journal
+column, or whether the only thing separating two groups is their colour.
+`check_figure()` reads the built plot and answers those questions with
+numbers.
 
 ## Usage
 
@@ -28,7 +28,9 @@ check_figure(
 - plot:
 
   A plot, as returned by any depictr plotting function, including one
-  extended afterwards with `+`.
+  extended afterwards with `+`. A multi-panel composite is refused: its
+  panels have their own scales, themes and text, and one table of
+  numbers cannot describe them all. Check each panel on its own.
 
 - width_cm:
 

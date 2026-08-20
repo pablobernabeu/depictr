@@ -4,21 +4,21 @@
 
 ### Auditing a finished figure
 
-- **New
+- New
   [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md),
   an accessibility and honesty audit of the figure you are about to
-  submit.** Until now the package could vouch for its palette and say
-  nothing about a finished plot, which is the thing a reader actually
-  sees. Give it anything a depictr function returns, including a plot
-  extended afterwards with `+`, and it introspects the build and returns
-  a tidy table: the separability of the encoding colours under each
-  dichromacy and in greyscale, the smallest text size against a stated
-  physical output width, the WCAG contrast of the text and of the
+  submit. Until now the package could vouch for its palette and say
+  nothing about a finished plot, which is the thing a reader sees. Give
+  it anything a depictr function returns, including a plot extended
+  afterwards with `+`, and it introspects the build and returns a tidy
+  table. The rows cover the separability of the encoding colours under
+  each dichromacy and in greyscale, the smallest text size against a
+  stated physical output width, the WCAG contrast of the text and of the
   geometry against their backgrounds, and whether any distinction is
   carried by colour alone. Every row carries the value it measured
   beside the threshold it was measured against, so a verdict can be
   argued with.
-- **The colour-vision helpers are exported.**
+- The colour-vision helpers are exported.
   [`simulate_cvd()`](https://pablobernabeu.github.io/depictr/reference/simulate_cvd.md)
   and
   [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
@@ -27,40 +27,40 @@
   return shape and refusal wording.
   [`simulate_cvd()`](https://pablobernabeu.github.io/depictr/reference/simulate_cvd.md)
   gains a `severity` argument and returns lower-case hex, as the Python
-  twin does;
+  twin does.
   [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
-  returns the full report (the worst condition, the closest pair, the
-  verdict) rather than a bare vector of distances.
-- **The accessibility claim has been narrowed to what is true.** The
-  default eight-colour palette clears every colour-vision check and
-  fails the new greyscale check: its orange (`#e69f00`) and sky blue
-  (`#56b4e9`) differ by 0.79 in CIE lightness, so a black-and-white
-  printer renders them as the same grey. The Okabe-Ito guarantee is
-  about hue confusion and was never a claim about greyscale. The
-  threshold has been left where it is rather than moved so the package’s
-  own defaults pass, and
+  returns the full report, naming the worst condition, the closest pair
+  and the verdict. The old return was a bare vector of distances.
+- The accessibility claim has been narrowed to what is true. The default
+  eight-colour palette clears every colour-vision check and fails the
+  new greyscale check: its orange (`#e69f00`) and sky blue (`#56b4e9`)
+  differ by 0.79 in CIE lightness, so a black-and-white printer renders
+  them as the same grey. The Okabe-Ito guarantee is about hue confusion
+  and was never a claim about greyscale. The threshold stays where it
+  is, and
   [`vignette("depictr")`](https://pablobernabeu.github.io/depictr/articles/depictr.md)
-  now states the limitation where the claim is made.
+  now states the limitation where the claim is made, so the package’s
+  own defaults are held to the same standard as anybody else’s.
 
 ### Figures that misreported the data
 
-- **`quantile_residuals()` produced nonsense for a
-  `cbind(successes, failures)` binomial model.** The two-column response
+- `quantile_residuals()` produced nonsense for a
+  `cbind(successes, failures)` binomial model. The two-column response
   matrix was flattened to a vector and the raw success counts were then
   multiplied by the trial totals a second time, so the residuals of a
   well-specified model centred far from zero and the Q-Q diagnostic
   looked catastrophically misspecified. The matrix response now supplies
   its counts and trial totals directly, and the residuals are standard
   normal again where they should be.
-- **[`ridgeline_plot()`](https://pablobernabeu.github.io/depictr/reference/ridgeline_plot.md)
-  stacked its overlaps upside down.** The row sort meant to draw the top
+- [`ridgeline_plot()`](https://pablobernabeu.github.io/depictr/reference/ridgeline_plot.md)
+  stacked its overlaps upside down. The row sort meant to draw the top
   ridge first is a no-op, because ggplot2 draws ribbon groups in
   factor-level order, so each upper ridge painted over the one below it,
   the opposite of the conventional ridgeline overlap. The draw order is
   now carried by the group aesthetic, with the colour assignment
   unchanged.
-- **`random_effects_plot(sort = TRUE)` froze every facet in the first
-  facet’s order.** With more than one term the level factor was shared
+- `random_effects_plot(sort = TRUE)` froze every facet in the first
+  facet’s order. With more than one term the level factor was shared
   across panels, so only the first panel came out sorted and the rest
   zig-zagged. Each facet now orders its own levels, with the plain level
   names kept on the axis.
@@ -69,89 +69,95 @@
   is no longer run through
   [`format_terms()`](https://pablobernabeu.github.io/depictr/reference/format_terms.md),
   which turned a colon into a multiplication sign and blanked
-  underscores; only a title recovered from the power-curve object, which
+  underscores. Only a title recovered from the power-curve object, which
   is a raw term name, is tidied.
-- **[`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
-  drew a phantom arm for a group that does not exist.** An `NA` in
-  `group` became a level of its own, matching no observation, so the
-  plot gained an all-censored curve for a group nobody was in, and under
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  drew a phantom arm for a group that does not exist. An `NA` in `group`
+  became a level of its own, matching no observation, so the plot gained
+  an all-censored curve for a group nobody was in, and under
   `logrank = TRUE` it failed outright. Missing groups are now dropped
   with a message saying how many.
-- **[`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
-  silently discarded non-finite follow-up times.** Dropping a case from
-  a Kaplan-Meier fit changes the denominator, and so every step of the
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  silently discarded non-finite follow-up times. Dropping a case from a
+  Kaplan-Meier fit changes the denominator, and so every step of the
   curve and every cell of the number-at-risk table, while the figure
   carries no trace of it. It now refuses them, with the same message as
-  the Python twin: whether to drop or impute is the analyst’s decision,
-  not the plotting layer’s. This replaces a silent drop, so it is a
-  behaviour change for anyone who relied on the old handling.
-- **[`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
-  interpolated past its accessibility guarantee without saying so.**
+  the Python twin, since whether to drop or impute is the analyst’s
+  decision to make. This replaces a silent drop, so it is a behaviour
+  change for anyone who relied on the old handling.
+- [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
+  interpolated past its accessibility guarantee without saying so.
   Beyond the eight Okabe-Ito base colours the palette is a ramp, and the
   colour-vision-deficiency guarantee that is this package’s reason for
-  existing stops holding; the interpolated palette fails the package’s
-  own safety check. It now warns at the point of interpolation, and only
-  for the built-in palette, since a user-supplied one carries no such
-  claim. The documentation is qualified to match.
-- **[`summary_table()`](https://pablobernabeu.github.io/depictr/reference/summary_table.md)
-  counted missing-group records in `Overall` and in no group column**,
-  so the per-group sizes silently fell short of the headline N. They now
+  existing stops holding, so the interpolated palette fails the
+  package’s own safety check. It now warns at the point of
+  interpolation, and only for the built-in palette, since a
+  user-supplied one carries no such claim. The documentation is
+  qualified to match.
+- [`summary_table()`](https://pablobernabeu.github.io/depictr/reference/summary_table.md)
+  counted missing-group records in `Overall` and in no group column, so
+  the per-group sizes silently fell short of the headline N. They now
   get a `Missing` column of their own.
-- **A seeded plot leaked its seed into the caller’s random stream** in a
+- A seeded plot leaked its seed into the caller’s random stream in a
   session that had not yet drawn a random number, so the documented
   reproducibility guarantee quietly failed in exactly the fresh session
   that would rely on it.
 - `compare_models(facet = TRUE)` now honours
-  `depictr_options(reference = )` for its per-panel reference line;
+  `depictr_options(reference = )` for its per-panel reference line.
   [`seasonal_plot()`](https://pablobernabeu.github.io/depictr/reference/seasonal_plot.md)
   no longer labels a frequency-7 series Mon..Sun, an alignment a plain
-  `ts` cannot know; and a mistyped `labels` key now warns instead of
-  leaving the raw parameter name on the plot.
+  `ts` cannot know. And a mistyped `labels` key now warns, so the raw
+  parameter name no longer sits on the plot.
 
 ### Degenerate input
 
 - [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
-  now says when it drops observations with a missing status, with the
-  same wording as the missing-group message, instead of dropping them
-  silently; a status that is missing for every observation is an error.
-  This brings the third kind of incomplete survival input into line with
-  the other two (a missing group is announced, a non-finite time
-  refused).
+  now says when it drops observations with a missing status, in the
+  wording of the missing-group message. The drop was previously silent.
+  A status that is missing for every observation is an error. This
+  brings the third kind of incomplete survival input into line with the
+  other two, a missing group being announced and a non-finite time
+  refused.
 - [`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md)
   checks that `clusters` has one entry per row of `data` before dropping
   incomplete rows. A vector sized to the complete rows used to slip past
   the late check, because subsetting it with the logical index padded it
-  with `NA`, and then died in the distance computation; it is now
+  with `NA`, and then died in the distance computation. It is now
   refused with the same message
   [`cluster_plot()`](https://pablobernabeu.github.io/depictr/reference/cluster_plot.md)
   uses.
 - [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md)
   no longer fails on a rank-deficient `lm` with a raw “differing number
   of rows” error. [`confint()`](https://rdrr.io/r/stats/confint.html)
-  keeps aliased terms as `NA` rows while `coef(summary())` drops them;
-  the intervals are now cut to the estimated terms, with a message
+  keeps aliased terms as `NA` rows while `coef(summary())` drops them,
+  so the intervals are now cut to the estimated terms, with a message
   naming the aliased terms that were left out.
 - [`cluster_plot()`](https://pablobernabeu.github.io/depictr/reference/cluster_plot.md)
   and
   [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
   drop zero-variance columns with a message when `scale = TRUE`, as
   [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md)
-  already did, instead of failing with a raw k-means error.
+  already did, so a raw k-means error no longer escapes.
   [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
-  names the values of `k_range` it cannot evaluate rather than narrowing
-  the search in silence, and
+  now names the values of `k_range` it cannot evaluate instead of
+  dropping them from the search without a word, and
   [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md)
-  labels an undefined correlation `n/a` instead of printing `r = NA`
+  labels an undefined correlation `n/a` where it once printed `r = NA`
   beside a raw [`stats::cor()`](https://rdrr.io/r/stats/cor.html)
   warning.
 
 ### Metadata and documentation
 
 - The declared minimum dependency versions are now installed and tested
-  by a CI job. The patchwork floor is raised from 1.2.0 to 1.3.0 —
-  verified by execution, not inference: 1.2.0 cannot run
+  by a CI job. The patchwork floor is raised from 1.2.0 to 1.3.0. That
+  was verified by running it: 1.2.0 cannot run
   [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
   at all, because `patchwork::free(type =, side =)` arrived in 1.3.0.
+- [`gain_plot()`](https://pablobernabeu.github.io/depictr/reference/gain_plot.md)
+  documents that the perfect-model reference line is drawn for a single
+  model only, which is what the code has always done, and a test now
+  pins it. The line bends at the prevalence of the outcome, and overlaid
+  models need not share a prevalence.
 - [`model_fit_table()`](https://pablobernabeu.github.io/depictr/reference/model_fit_table.md)
   documents that a single model is enough, which is what the code always
   accepted, and
@@ -187,8 +193,7 @@
   for. They previously ran on an outcome that was 94 per cent positive,
   so the gain curve sat on the diagonal and lift hovered at one.
 - The calibration example fits a model and plots its predicted
-  probabilities, a reliability curve being a check on a fitted model
-  rather than on a raw score.
+  probabilities, since a reliability curve is a check on a fitted model.
 - The power-curve article names the effect the shipped simulation
   actually covers, and its no-simr branch reads a summary derived from
   that simulation, so the two branches agree by construction.
@@ -227,8 +232,8 @@
   [`optimizer_fixef_plot()`](https://pablobernabeu.github.io/depictr/reference/optimizer_fixef_plot.md)
   and
   [`power_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/power_curve_plot.md)
-  reference pages describe what each plot shows rather than the
-  prototype gists they grew from.
+  reference pages describe what each plot shows. Both pages previously
+  described the prototype gists the plots grew from.
 - On the documentation site, source chunks are set a little smaller than
   the output and the prose, so a typical line fits the narrower home and
   article columns without horizontal scrolling, and the copy button
@@ -239,18 +244,18 @@
 ### Fixes
 
 - [`roc_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/roc_curve_plot.md)
-  rejects a `ci` that resolves to fewer than one bootstrap resample with
-  a clear error, instead of silently drawing an all-`NA` band and an
-  `[NA, NA]` AUC annotation.
+  rejects a `ci` that resolves to fewer than one bootstrap resample,
+  with a clear error. Until then it drew an all-`NA` band and an
+  `[NA, NA]` AUC annotation, saying nothing.
 
 ### Data
 
-- In `wellbeing_survey`, region now genuinely shifts stress and income,
-  which flow through to life satisfaction, so the region-grouped plots
-  (faceted densities, ridgelines, the region dendrogram) compare real
-  contrasts rather than four samples of the same distribution. The
-  bundled datasets are regenerated by `data-raw/generate_datasets.R` as
-  before.
+- In `wellbeing_survey`, region now shifts stress and income, which flow
+  through to life satisfaction. The region-grouped plots (faceted
+  densities, ridgelines, the region dendrogram) therefore compare four
+  distinct distributions where earlier they compared four samples of
+  one. The bundled datasets are regenerated by
+  `data-raw/generate_datasets.R` as before.
 
 ### Citation
 
@@ -266,8 +271,8 @@
 - The
   [`vif_plot()`](https://pablobernabeu.github.io/depictr/reference/vif_plot.md)
   example fits deliberately collinear predictors, so the plot shows
-  inflated VIFs sitting above the threshold line instead of
-  near-identical bars around 1 with the line off the axis.
+  inflated VIFs sitting above the threshold line. The earlier example
+  produced near-identical bars around 1, with the line off the axis.
 - [`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md)
   describes what `brand` and `accent` actually drive, and
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
@@ -364,8 +369,8 @@ out of, and generalises, three earlier plotting functions
 - [`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md)
   and
   [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
-  help choose and validate the number of clusters (silhouette widths;
-  elbow and average-silhouette diagnostics).
+  help choose and validate the number of clusters (silhouette widths,
+  plus elbow and average-silhouette diagnostics).
 
 ### Time series
 

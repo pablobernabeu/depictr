@@ -4,11 +4,11 @@ A reproducibly simulated cross-sectional wellbeing survey for
 descriptive, correlation, regression and missing-data examples.
 `life_satisfaction` responds meaningfully to its predictors: higher
 stress lowers it, more sleep and exercise raise it, log-income has a
-real positive effect (about +0.4 per natural-log unit), and age has a
-mild inverted-U (peaking in mid-life). `education` is an ordered factor.
-Income is missing more often at higher stress (missing at random);
-because income genuinely predicts the outcome, this missingness is
-informative for the missing-data examples.
+positive effect of about +0.4 per natural-log unit, and age has a mild
+inverted-U (peaking in mid-life). `education` is an ordered factor.
+Income is missing more often at higher stress (missing at random), and
+because income predicts the outcome, this missingness is informative for
+the missing-data examples.
 
 ## Usage
 
