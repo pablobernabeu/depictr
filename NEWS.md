@@ -1,4 +1,4 @@
-# depictr (development version)
+# depictr 0.3.0
 
 ## Auditing a finished figure
 

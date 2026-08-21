@@ -1,43 +1,68 @@
 ## Submission
 
-This is the first submission of depictr (version 0.2.2), a unified toolkit of
-publication-ready plots that span the analysis workflow: exploratory data
-analysis, model estimates and predictions, diagnostics and classification,
-multivariate and survival methods, time series, uncertainty and reporting.
-Every plotting function returns a 'ggplot2' object (or a 'patchwork' object
-for composite panels).
+This is a new submission. depictr has not been on CRAN before. The version
+number is 0.3.0 rather than 0.1.0 because the package already has a public
+release history on GitHub and Zenodo; this is the first release offered to CRAN,
+so the standard new-submission note is expected.
+
+depictr is a unified toolkit of publication-ready plots that span the analysis
+workflow: exploratory data analysis, model estimates and predictions,
+diagnostics and classification, multivariate and survival methods, time series,
+uncertainty and reporting. Every plotting function returns a 'ggplot2' object,
+or a 'patchwork' object for composite panels.
 
 ## R CMD check results
 
-0 errors | 0 warnings | 2 notes
+0 errors | 0 warnings | 1 note
 
-The first is the standard "new submission" note for a first release. The second
-is local only: this machine has no pandoc on the check subprocess PATH, so the
-run also reports that 'README.md' and 'NEWS.md' cannot be checked. That note
-does not arise where pandoc is present, including the GitHub Actions runs listed
-below.
+The note is the standard one for a first release, reproduced in full:
+
+```
+* checking CRAN incoming feasibility ... [15s] NOTE
+Maintainer: 'Pablo Bernabeu <pcbernabeu@gmail.com>'
+
+New submission
+```
 
 ## Test environments
 
-* local: Windows 11, R 4.6.1 (R CMD check --as-cran, 2026-07-23)
-* GitHub Actions: ubuntu-latest (release, devel, oldrel-1),
-  windows-latest (release and devel), macOS-latest (release)
+* Local: Windows 11, R 4.6.1. `R CMD check --as-cran` run on the built tarball
+  on 2026-08-21. Result: 1 note, the one shown above.
+* Local: Windows 11, R 4.6.1. `R CMD check` run on the same tarball on
+  2026-08-21 with `_R_CHECK_DEPENDS_ONLY_=true`, so that none of the suggested
+  packages were on the library path. Result: OK, with no errors, warnings or
+  notes. The test suite ran there in full, with 1224 tests passing and 17
+  skipped by the guards that stand in front of the suggested back-ends.
+
+The same sources also pass on GitHub Actions across ubuntu-latest (release,
+devel and oldrel-1), windows-latest (release and devel) and macOS-latest
+(release). The most recent run was on 2026-08-20, at the commit this tarball was
+built from, so it covers the same code but not the version number now in
+DESCRIPTION.
 
 ## Notes
 
 * The heavier modelling back-ends that some functions can consume (lme4,
-  lmerTest, broom, simr, survival, ggdist, posterior, cluster, boot) are in
-  Suggests and used conditionally, so the package installs and passes check
-  without them. Every example, test and vignette runs either on base models
-  ('lm', 'glm') and the bundled simulated datasets or, where a Bayesian or
-  mixed-model result is shown, on a small precomputed model object shipped in
-  inst/extdata. No heavyweight fitting toolchain is needed at check time.
+  lmerTest, broom, simr, survival, ggdist, posterior, cluster and boot) are in
+  Suggests and used conditionally, so the package installs and checks without
+  them. The depends-only run listed above is the evidence for that. colorspace
+  is suggested for one test only, as an independent implementation of the
+  Machado colour-vision transforms against which the package's own transforms
+  are compared; that test skips when colorspace is absent.
+* Every example, test and vignette runs either on base models ('lm', 'glm') and
+  the bundled simulated datasets or, where a Bayesian or mixed-model result is
+  shown, on a small precomputed model object shipped in inst/extdata. No
+  heavyweight fitting toolchain is needed at check time, and nothing reaches the
+  network or requires a credential.
 * Example variants that render several multi-panel figures are wrapped in
   `\donttest{}`, which keeps each example file inside the five-second budget.
+  With `--run-donttest` the slowest example measured 2.8 seconds elapsed here.
   The first call of every example remains runnable.
 * Any "possibly misspelled words" reported for the DESCRIPTION are technical
-  terms, acronyms and package names such as 'ggplot2', 'lme4', 'Bayesian' and
-  'Okabe', all of them listed in inst/WORDLIST.
+  terms, acronyms and package names such as 'ggplot2', 'lme4', 'Bayesian',
+  'Okabe' and 'ROC', all of them listed in inst/WORDLIST. The machine used for
+  the runs above has no aspell dictionary installed, so those runs could not
+  reproduce that part of the incoming check.
 * The five bundled datasets are reproducibly simulated and contain no personal
   or proprietary data. They are regenerated by data-raw/generate_datasets.R.
 
