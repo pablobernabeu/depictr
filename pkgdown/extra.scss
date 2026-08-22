@@ -175,15 +175,97 @@ h3 { font-size: 1.25rem; margin-top: 1.8rem; }
   color: var(--brand-amber);
   font-weight: 600;
 }
+// Focus as well as hover. The base rule above outweighs the navbar's shared
+// `.nav-link:focus` colour, so without naming focus here the App link was the
+// one navbar item that gave a keyboard user no answer at all.
 .navbar .nav-item:has(.fa-play) .nav-link:hover,
-.navbar .nav-link:has(.fa-play):hover { color: var(--brand-amber-light); }
+.navbar .nav-item:has(.fa-play) .nav-link:focus,
+.navbar .nav-link:has(.fa-play):hover,
+.navbar .nav-link:has(.fa-play):focus { color: var(--brand-amber-light); }
 // Give the App link room to breathe before the search box that follows it.
 .navbar .navbar-nav .nav-item:has(.fa-play) { margin-right: .9rem; }
 
-// The icon buttons on the right (search, github, light switch)
-.navbar .navbar-nav .nav-link .fa,
-.navbar #search-input { color: rgba(255, 255, 255, .85); }
+// The icons in the navbar — the App link's play triangle, the GitHub mark, the
+// light switch — take their colour from the link that carries them. Pinned to a
+// fixed white, as they were, each icon ignored every state its own label
+// answered: the play triangle stayed white beside an amber label, and neither
+// the GitHub mark nor the light switch brightened under the pointer or under
+// keyboard focus.
+.navbar .navbar-nav .nav-link .fa { color: inherit; }
+
+// Bootstrap swaps the browser's focus outline for a soft glow in the theme
+// primary, which is a deep accent meant for a light page; on the navy band it
+// lands at about 1.2:1, so tabbing through the navbar showed nothing at all.
+// White reads on this ground in either mode, as the search field below assumes.
+.navbar .navbar-brand:focus-visible,
+.navbar .nav-link:focus-visible,
+.navbar .navbar-toggler:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 .2rem rgba(255, 255, 255, .55);
+  border-radius: 5px;
+}
+
+// The search box sits inside the navy band in both modes, so it is dressed for
+// that ground rather than left to Bootstrap's form colours. Setting only its
+// text colour, as this file used to, left the field on `.form-control`'s own
+// ground, and that ground follows the page: navy in dark mode but warm paper in
+// light. In light mode the result was white text on near-white paper, about
+// 1.03:1, so the grey placeholder showed but whatever you typed was invisible.
+// Ground, border, placeholder, focus ring and the browser's own clear button
+// are now set together, so the field reads the same either way.
+.navbar #search-input {
+  background-color: rgba(255, 255, 255, .12);
+  // .40 rather than a fainter hairline: composited over the navy band that
+  // lands at about 3.7:1, the ratio WCAG asks of the visible boundary of a
+  // form control, whereas the field's own ground sits at only 1.5:1 against
+  // the band and cannot carry the edge on its own.
+  border-color: rgba(255, 255, 255, .40);
+  color: #fff;
+}
+.navbar #search-input::placeholder { color: rgba(255, 255, 255, .62); }
+.navbar #search-input:hover { background-color: rgba(255, 255, 255, .18); }
+.navbar #search-input:focus {
+  background-color: rgba(255, 255, 255, .18);
+  border-color: var(--brand-teal, var(--brand-violet, #21A6A6));
+  // A white ring rather than an accent one: the accent is a different hue on
+  // each site, and against the navy band white is the one glow that reads at
+  // the same strength on all of them.
+  box-shadow: 0 0 0 .2rem rgba(255, 255, 255, .28);
+  color: #fff;
+}
+// Chrome and Edge draw the clear button of a type="search" field as a dark
+// mask, which all but disappears against the navy ground.
+.navbar #search-input::-webkit-search-cancel-button {
+  filter: invert(1);
+  opacity: .6;
+  cursor: pointer;
+}
+.navbar #search-input::-webkit-search-cancel-button:hover { opacity: 1; }
+
+// The results panel is a fixed 320px dropped from the LEFT edge of a field that
+// sits near the right of the navbar, so on any window narrower than about
+// 1300px it hangs off the side of the page — and the footer's full-bleed band
+// sets `body { overflow-x: hidden }`, so the overhang is clipped rather than
+// scrollable and the end of every result is simply cut off. Anchoring it to the
+// field's right edge keeps it on the page; the cap covers the narrow window
+// where even a right-aligned panel would not fit. The autocomplete library
+// writes `left: 0; right: auto` inline, and an inline declaration beats a
+// stylesheet one, so BOTH offsets need the !important — overriding only `left`
+// leaves `right: auto` in force and the panel simply falls back to where it was.
+.navbar .algolia-autocomplete .aa-dropdown-menu {
+  left: auto !important;
+  right: 0 !important;
+  max-width: calc(100vw - 1.5rem);
+}
 .navbar-nav .dropdown-menu { border-color: var(--bs-border-color); }
+// The released-version chip beside the wordmark carries Bootstrap's
+// `.text-muted`, whose grey is tuned for the paper page. The navbar is navy in
+// both modes, so in light mode the chip fell to 2.8:1 against it. The soft white
+// the search placeholder uses reads at 7:1 on this ground either way. The
+// `!important` answers Bootstrap's own, which the utility class carries.
+.navbar .nav-text,
+.navbar .text-muted { color: rgba(255, 255, 255, .62) !important; }
+
 // Dropdown rows: a clear brand-tinted hover, legible in both modes.
 .navbar .dropdown-menu {
   --bs-dropdown-link-hover-bg: rgba(31, 111, 168, .14);
@@ -206,17 +288,33 @@ h3 { font-size: 1.25rem; margin-top: 1.8rem; }
 }
 .template-home .page-header h1 { font-size: 2.9rem; margin-bottom: .2rem; }
 
-// The lead paragraph (first paragraph after the title) set larger and calmer
+// The lead paragraph (first paragraph after the title) set larger and calmer,
+// which is how the mkdocs twin sets its tagline. pkgdown 2.x wraps the whole
+// README in a `div.section.level1`, so neither of the first two selectors
+// reaches that paragraph any more and the lead had quietly gone back to body
+// text; the third reaches through the wrapper. The first two are kept for the
+// older builds that put the paragraph directly in the column.
 .template-home main > .row > .col-md-9 > p:first-of-type,
-.template-home :is(.contents, main) > p:first-of-type {
+.template-home :is(.contents, main) > p:first-of-type,
+.template-home :is(.contents, main) > .section.level1 > p:first-of-type {
   font-size: 1.18rem;
   line-height: 1.6;
   color: var(--brand-muted);
 }
 
-// Badges row
+// Badges row. pkgdown caps the width of an image inside `main` but not of one
+// inside the sidebar, which is where the home page's status badges live, so
+// between the md and lg breakpoints the widest of them ran past the right edge
+// of a column only 156px wide. The footer's full-bleed band sets
+// `body { overflow-x: hidden }`, so the overhang was clipped rather than merely
+// off-screen: there was no way to scroll to it.
 .template-home :is(.contents, main) .badge,
-.template-home img[src*="badge"] { margin: 0 .15rem .35rem 0; }
+.template-home img[src*="badge"],
+aside img[src*="badge"] {
+  margin: 0 .15rem .35rem 0;
+  max-width: 100%;
+  height: auto;
+}
 
 // Logo in the hero
 .template-home .page-header img,
@@ -360,10 +458,27 @@ div.sourceCode { display: flow-root; }
 // The code block is deep-navy in BOTH modes, but pkgdown's light-mode syntax
 // colours are tuned for a light background and wash out on it (comments come
 // out near-black, for instance). Re-map the tokens to one high-contrast,
-// brand-coherent palette that reads the same in light and dark. The selector
-// `pre.sourceCode code span.X` matches pkgdown's dark rule specificity, and,
-// being appended after it, wins in both modes.
-pre.sourceCode code {
+// brand-coherent palette that reads the same in light and dark.
+//
+// The theme has to be named as well as the block. `pre.sourceCode code span.X`
+// weighs exactly what pkgdown's `[data-bs-theme="dark"] pre code span.X` weighs,
+// and pkgdown appends its dark colours after this file, so on a tie of
+// specificity order handed dark mode back to pkgdown: comments came out
+// near-white, louder than the code they annotate, and the keywords, strings and
+// constants bore no relation to the same block seen in light mode. Adding the
+// theme to the selector settles it on specificity instead.
+//
+// The block need not carry `.sourceCode` either. A fence written with no
+// language still goes through downlit, which emits the same `fu`/`va`/`op`
+// spans but leaves the `<pre>` bare, so such a block took the output ground set
+// further down (raised navy) while its tokens kept pkgdown's light palette:
+// measured 1.43:1 for a variable and 2.05:1 for a function call on lexsync,
+// scopusflow and theoryforge. `:not(.sourceCode)` carries the same weight as
+// `.sourceCode`, so both halves outrank pkgdown in both themes.
+pre.sourceCode code,
+pre:not(.sourceCode) code,
+[data-bs-theme="dark"] pre.sourceCode code,
+[data-bs-theme="dark"] pre:not(.sourceCode) code {
   span.co, span.do { color: #8FA9B5; font-style: italic; }              // comments
   span.st, span.sc, span.ss, span.vs, span.ch, span.bu,
   span.im { color: #9DE0A6; }                                           // strings
@@ -371,7 +486,7 @@ pre.sourceCode code {
   span.kw, span.cf, span.dt { color: #F6928F; font-weight: 600; }       // keywords, control
   span.op { color: #AAB7BF; }                                           // operators
   span.dv, span.fl, span.bn, span.an, span.in { color: #CBD6A6; }       // numbers
-  span.cn, span.cv, span.at, span.ot { color: #6FD3D3; }                // constants (TRUE/NULL), args
+  span.cn, span.cv, span.at, span.ot { color: #8FC9EA; }                // constants (TRUE/NULL), args
   span.va { color: #DCE6EC; }                                           // variables
   span.al, span.er, span.wa { color: #F0888F; }                         // warnings, errors
   span.pp { color: #D6C2E8; }                                           // preprocessor
@@ -425,7 +540,26 @@ table.table th, table.table td {
   font-weight: 600;
   border-bottom: none;
 }
+// --brand-ink is the page itself on the dark theme, so the header band measured
+// 1.08:1 against it and vanished; with the bottom border switched off just above
+// there was then nothing at all between the column titles and the first row of
+// data. The raised navy gives the band back and the accent draws the boundary.
+[data-bs-theme="dark"] :is(.contents, main) table thead th,
+[data-bs-theme="dark"] table.table thead th {
+  background: var(--brand-ink-raised);
+  border-bottom: 2px solid var(--brand-teal, var(--brand-violet, #21A6A6));
+}
 :is(.contents, main) table td code, :is(.contents, main) table th code { white-space: nowrap; }
+// A header cell is the one place in the prose where inline code sits on the navy
+// ink rather than on the paper, so it cannot keep the deep accent it wears
+// everywhere else: on the band that measures about 1.7:1. White on a faint tint
+// keeps it reading as a code chip. Note the `code` is a child of the `th`, so a
+// descendant form such as `th :not(pre) > code` would match nothing.
+:is(.contents, main) table thead th code,
+table.table thead th code {
+  color: #fff;
+  background: rgba(255, 255, 255, .16);
+}
 
 // Breathing room beneath figures (a plot renders as a lone image in its
 // paragraph).
@@ -454,7 +588,23 @@ table.table th, table.table td {
 a { text-underline-offset: .15em; }
 // Content links: underline on hover so the highlight is unmistakable in both
 // modes, on top of the amber hover colour set through --bs-link-hover-color.
-:is(.contents, main) a:hover, #pkgdown-sidebar a:hover { text-decoration: underline; }
+//
+// Buttons and heading anchors are excluded. A button already answers the
+// pointer by filling in, and an underline inside one reads as a mistake;
+// Bootstrap says as much with `.btn { text-decoration: none }`, but that sits
+// at specificity (0,1,0) and this selector at (0,2,1) outranked it, so the
+// About page's Copy and Download .bib controls grew an underline under the
+// pointer. A heading anchor holds no text to underline.
+:is(.contents, main) a:hover:not(.btn):not(.anchor),
+:is(#pkgdown-sidebar, aside) a:hover:not(.btn):not(.anchor) { text-decoration: underline; }
+
+// Stated for the focused and pressed states as well, and at a weight that beats
+// any later hover rule, so a button never carries a link's underline.
+:is(.contents, main) a.btn:hover,
+:is(.contents, main) a.btn:focus,
+:is(.contents, main) a.btn:active,
+:is(#pkgdown-sidebar, aside) a.btn:hover,
+.btn:hover, .btn:focus, .btn:active { text-decoration: none; }
 
 // Outline buttons (About page's Copy and Download .bib controls) take their
 // colour from --bs-primary, too dark on the navy dark-mode page; use the light
@@ -586,4 +736,88 @@ table.table::-webkit-scrollbar-corner { background: transparent; }
   // scrolls under the branded scrollbar.
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+// ---------------------------------------------------------------------------
+// Bibliographies — hanging indent
+// ---------------------------------------------------------------------------
+// A reference list is read by running the eye down the author surnames, which
+// only works if the first line of each entry is the one at the left margin.
+// That is the APA convention and it is what a reader of this field expects.
+//
+// Two shapes are covered: a vignette's own `## References` section, where the
+// entries are the paragraphs following that heading, and the standalone
+// References article, whose entries are wrapped in a `.references` div because
+// there is no heading to anchor to.
+:is(.contents, main) {
+  h2#references ~ p,
+  .references p {
+    padding-left: 2.2em;
+    text-indent: -2.2em;
+    // A long DOI cannot be broken mid-token by default, and an unbroken one
+    // would push past the hanging indent it is meant to sit inside.
+    overflow-wrap: anywhere;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Print
+// ---------------------------------------------------------------------------
+// A browser prints text colours but leaves backgrounds out unless the reader
+// asks for them, and it prints whichever theme was on screen. Every ground this
+// file darkens — the code and output blocks, the table header band, the navbar,
+// the footer — therefore reaches the paper as bare white still carrying the
+// light text written for a dark ground, so a reader in dark mode printed blank
+// code blocks and an empty header row. Print is ink on paper: the chrome goes,
+// since a navigation bar has nothing to say on a sheet, and everything else is
+// restated in black. Syntax colour goes too, the palette having been mapped for
+// the navy ground rather than for paper.
+@media print {
+  .navbar,
+  footer,
+  .btn-copy-ex { display: none !important; }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  pre,
+  [data-bs-theme="dark"] pre,
+  :is(.contents, main) pre:not(.sourceCode) {
+    background: #fff !important;
+    color: #000 !important;
+    border: 1px solid #767676 !important;
+    white-space: pre-wrap;
+  }
+  pre code,
+  pre code span { color: #000 !important; }
+
+  :is(.contents, main) table thead th,
+  table.table thead th {
+    background: #fff !important;
+    color: #000 !important;
+    border-bottom: 1px solid #000 !important;
+  }
+
+  :not(pre) > code {
+    background: none !important;
+    color: #000 !important;
+  }
+
+  a { color: #000; }
+
+  // The dark theme states several colours directly rather than through a
+  // variable, and a direct colour survives on to the paper: the headings, the
+  // home wordmark and the reference-index group titles would all print
+  // near-white on white.
+  [data-bs-theme="dark"] h1,
+  [data-bs-theme="dark"] h2,
+  [data-bs-theme="dark"] h3,
+  [data-bs-theme="dark"] h4,
+  [data-bs-theme="dark"] .template-home .page-header h1,
+  [data-bs-theme="dark"] .template-reference-index .section > h2 { color: #000 !important; }
+  [data-bs-theme="dark"] .template-reference-index .section-desc p { color: #333 !important; }
+
+  pre, table, figure, img { break-inside: avoid; }
 }
