@@ -447,6 +447,20 @@ pre code { font-size: .85rem; }
 // beside the floated hex logo; without the same treatment the copy button's
 // wrapper stays full width and the button strands outside the block.
 div.sourceCode { display: flow-root; }
+
+// On a phone pkgdown widens a code block to the gutter, but it does so with
+// `div > div > pre`, which asks the block to sit exactly two divs deep. A source
+// block usually does; the bare pre knitr writes the output into usually does
+// not, so a block and the output printed beneath it ended up twelve pixels apart
+// — and which of the two moved depended on how deep the section happened to be.
+// Every block in the prose gets the same treatment here, so a pair still reads
+// as a pair.
+@media (max-width: 575.98px) {
+  :is(.contents, main) pre {
+    margin-left: calc(var(--bs-gutter-x) * -.5);
+    margin-right: calc(var(--bs-gutter-x) * -.5);
+  }
+}
 :not(pre) > code {
   background: rgba(31, 111, 168, .10);
   color: var(--brand-primary-ink);
@@ -532,6 +546,16 @@ blockquote p:last-child { margin-bottom: 0; }
 :is(.contents, main) table th, :is(.contents, main) table td,
 table.table th, table.table td {
   padding: .4rem .55rem;
+}
+// A caption is neither a th nor a td, so the cell inset above never reached it:
+// the note under a table began .55rem to the left of the first column it
+// describes, which reads as a missing margin. Bootstrap drops the caption below
+// the table and gives it vertical padding only, so only the horizontal inset is
+// wanted here.
+:is(.contents, main) table caption,
+table.table caption {
+  padding-left: .55rem;
+  padding-right: .55rem;
 }
 :is(.contents, main) table thead th, table.table thead th {
   background: var(--brand-ink);
@@ -626,17 +650,26 @@ footer {
   // escaping pkgdown's centred container, and the two footer sentences
   // read as left-aligned rows.
   display: block;
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
+  // 100vw counts the scrollbar, so the band came out fifteen pixels wider than
+  // the viewport and hung seven past each edge. extra.js measures the scrollbar
+  // and publishes it as --scrollbar-width, which takes those pixels back; where
+  // the script has not run the fallback is the old 100vw, so the band is never
+  // narrower than the window.
+  width: calc(100vw - var(--scrollbar-width, 0px));
+  margin-left: calc(50% - (100vw - var(--scrollbar-width, 0px)) / 2);
   padding: 2rem clamp(1rem, 2.5vw, 2rem) 2.4rem;
   background: var(--brand-ink);
   border-top: 3px solid var(--brand-teal);
   color: rgba(255, 255, 255, .78);
 }
 
-// The 100vw band overshoots the content area by the scrollbar width; clip
-// that overshoot rather than growing a horizontal scrollbar (page content
-// never needs one: wide code blocks scroll inside their own box).
+// A backstop, not the fix. The footer used to overshoot by the scrollbar width
+// and this clipped it, at the cost of eight pixels of phantom horizontal scroll
+// on every page and of a clip that hid anything else that overflowed — which is
+// how a clipped search panel and a badge running out of its column both went
+// unnoticed. The band is measured properly now; this stays only so that a page
+// content never grows a horizontal scrollbar, wide code blocks and tables having
+// their own.
 body { overflow-x: hidden; }
 
 // pkgdown's own stylesheet floats the two blocks side by side; both read
@@ -728,7 +761,11 @@ table.table::-webkit-scrollbar-corner { background: transparent; }
 :is(.contents, main) pre:not(.sourceCode) {
   background: var(--brand-ink-raised);
   border-color: rgba(31, 111, 168, .18);
-  border-left: 3px solid var(--brand-teal, var(--brand-violet, #21A6A6));
+  // The accent rule is painted inside the box rather than added to the border.
+  // At 3px where the source block above has 1px it pushed the output text two
+  // pixels to the right of the code it belongs to, and on a monospace column
+  // that step is visible; an inset shadow takes no layout space at all.
+  box-shadow: inset 3px 0 0 var(--brand-teal, var(--brand-violet, #21A6A6));
   // A chunk that prints its own text, a generated Graphviz DOT source say,
   // cannot be divided line by line at the source, so let output wrap rather
   // than force a horizontal scroll. Source keeps its exact layout: its long
