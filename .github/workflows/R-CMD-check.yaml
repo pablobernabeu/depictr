@@ -48,7 +48,7 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6  # v2.12.1
+      - uses: r-lib/actions/setup-r-dependencies@465b7d8e732ca3921382b1674c59bada9cbf3399  # v2.13.0
         with:
           extra-packages: any::rcmdcheck
           needs: check
@@ -95,7 +95,7 @@ jobs:
       # before Deriv gained compiled code at all -- NeedsCompilation: no, pure R
       # over methods -- so it cannot fail this way on any R. Drop the pin once
       # Deriv declares its R requirement, or once oldrel-3 has moved past R 4.3.
-      - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6  # v2.12.1
+      - uses: r-lib/actions/setup-r-dependencies@465b7d8e732ca3921382b1674c59bada9cbf3399  # v2.13.0
         with:
           extra-packages: any::testthat, Deriv@4.2.0
           needs: check
@@ -147,7 +147,7 @@ jobs:
       # changed its output would fail this job on a commit that touched nothing.
       # The package dependencies come along because roxygen loads the package to
       # read its roxygen blocks.
-      - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6  # v2.12.1
+      - uses: r-lib/actions/setup-r-dependencies@465b7d8e732ca3921382b1674c59bada9cbf3399  # v2.13.0
         with:
           extra-packages: roxygen2@8.0.0
           needs: check
