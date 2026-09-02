@@ -48,7 +48,7 @@ jobs:
         # anthropics is outside the small set of publishers whose actions this
         # repository trusts on a floating major tag, so the action is pinned to
         # the exact release commit named in the trailing comment.
-        uses: anthropics/claude-code-action@6b082c41935b4c8a3b8b0ef85ba4ba4d9eeb8975 # v1.0.189
+        uses: anthropics/claude-code-action@a874e9ecd7bb36efdad65429c6b35815f5a08f10 # v1.0.210
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: >
