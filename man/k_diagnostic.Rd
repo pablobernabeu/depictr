@@ -50,7 +50,7 @@ with one row per \code{k}), \code{attr(p, "suggested")} (the chosen \code{k}) an
 Computes a cluster-quality diagnostic across a range of \code{k} and draws the
 diagnostic curve, with the suggested \code{k} highlighted. Three criteria are
 available: the average silhouette width (maximised), the total within-cluster
-sum of squares "elbow" (the point of maximum curvature), and the gap statistic
+sum of squares 'elbow' (the point of maximum curvature), and the gap statistic
 (the smallest \code{k} whose gap is within one standard error of the next, using
 the Tibshirani et al. heuristic).
 }
@@ -60,12 +60,7 @@ p <- k_diagnostic(crop_yield, k_range = 2:6,
 attr(p, "suggested")
 }
 \references{
-Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the interpretation
-and validation of cluster analysis. \emph{Journal of Computational and Applied
-Mathematics}, 20, 53-65. \doi{10.1016/0377-0427(87)90125-7}
+\insertRef{rousseeuw1987}{depictr}
 
-Tibshirani, R., Walther, G., & Hastie, T. (2001). Estimating the number of
-clusters in a data set via the gap statistic. \emph{Journal of the Royal
-Statistical Society: Series B}, 63(2), 411-423.
-\doi{10.1111/1467-9868.00293}
+\insertRef{tibshirani2001}{depictr}
 }

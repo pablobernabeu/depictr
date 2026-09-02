@@ -7,8 +7,10 @@
 depictr_palette(n = NULL, type = c("qualitative", "sequential", "diverging"))
 }
 \arguments{
-\item{n}{Number of colours to return. If \code{NULL} (the default) the full
-qualitative palette is returned. For the qualitative palette an \code{n} larger
+\item{n}{Number of colours to return. If \code{NULL} (the default) the
+qualitative palette returns all eight of its colours unless
+\code{options(depictr.palette = )} supplies a different set, and the sequential
+and diverging ramps return seven. For the qualitative palette an \code{n} larger
 than the available base colours is interpolated; the sequential and
 diverging palettes are ramps and accept any \code{n}. Interpolating the built-in
 qualitative palette beyond its eight base colours loses the

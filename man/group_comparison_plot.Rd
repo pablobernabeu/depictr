@@ -37,7 +37,7 @@ group_comparison_plot(
 difference(s) against a reference group, each with a bootstrap confidence
 interval, turning the plot into a full estimation plot via
 \code{\link[=estimation_plot]{estimation_plot()}}. The return value is then a 'patchwork' object. Defaults
-to \code{FALSE} (the plain group-means plot, fully backward-compatible).}
+to \code{FALSE}, the plain group-means plot.}
 
 \item{reference}{Reference group for the difference panel when
 \code{differences = TRUE}; defaults to the first level of \code{group}. Ignored

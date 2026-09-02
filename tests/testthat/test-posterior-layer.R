@@ -67,6 +67,11 @@ test_that("posterior_plot() default style is the half-eye distribution", {
                          logical(1))))
 })
 
+test_that("an unrecognised style is refused rather than silently swapped", {
+  expect_error(posterior_plot(sim_draws(), style = "foo"),
+               "should be one of")
+})
+
 test_that("ROPE band is drawn as a shaded rectangle behind the data", {
   skip_if_not_installed("ggdist")
   p <- posterior_plot(sim_draws(), rope = c(-0.1, 0.1))

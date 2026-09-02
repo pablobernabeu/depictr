@@ -62,8 +62,7 @@ operating point can be marked.
 A named list overlays one curve per element, e.g.
 \code{roc_curve_plot(list("Full" = fit_full, "Reduced" = fit_reduced))}. Each
 element may be a \code{glm}, a length-2 list/data frame of \verb{(actual, score)}, or an
-outcome vector paired with the matching element of a \code{score} list. Single-model
-calls are unchanged.
+outcome vector paired with the matching element of a \code{score} list.
 }
 \examples{
 gfit <- glm(accuracy ~ word_frequency + condition + RT,

@@ -29,7 +29,7 @@ Defaults to a muted grey for present cells and the colourblind-safe
 
 \item{legend_inside}{When \code{TRUE} (and \code{sort = TRUE}), draw the legend inside
 the panel, in the top-right (where the most-complete columns put a solid
-"Present" block, so it hides no "Missing" mark) instead of in a right-hand
+'Present' block, so it hides no 'Missing' mark) instead of in a right-hand
 margin. Defaults to \code{FALSE}.}
 
 \item{title}{Plot title.}

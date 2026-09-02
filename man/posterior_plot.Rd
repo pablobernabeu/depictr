@@ -32,8 +32,8 @@ Details).}
 
 \item{style}{One of \code{"halfeye"} (density slab + interval, the default),
 \code{"interval"} (point and two nested intervals, no slab), \code{"gradient"} (a
-colour-graded interval) or \code{"dots"} (a quantile dotplot). Unknown values
-and a missing 'ggdist' fall back to \code{"interval"}.}
+colour-graded interval) or \code{"dots"} (a quantile dotplot). A missing
+'ggdist' falls back to \code{"interval"}.}
 
 \item{point}{Central summary: \code{"median"} or \code{"mean"}.}
 
@@ -48,7 +48,7 @@ outer width is used for the caption and the displayed interval mass.}
 
 \item{reference_line}{Position of a vertical reference line, or \code{NULL}/\code{NA}
 to omit it. There is no universally meaningful reference for every
-parameter, so this defaults to \code{0} (the usual "no effect" line for
+parameter, so this defaults to \code{0} (the usual 'no effect' line for
 differences and slopes) but should be set or cleared deliberately.}
 
 \item{rope}{Optional length-2 numeric \code{c(lo, hi)} giving a region of

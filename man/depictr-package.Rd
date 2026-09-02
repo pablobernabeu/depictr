@@ -31,7 +31,7 @@ conventions.
 \item \code{\link[=estimation_plot]{estimation_plot()}}: group differences with bootstrap intervals.
 \item \code{\link[=dumbbell_plot]{dumbbell_plot()}}: a two-group comparison across categories.
 \item \code{\link[=scatter_trend]{scatter_trend()}}: scatter plot with a fitted trend.
-\item \code{\link[=summary_table]{summary_table()}}: a "Table 1" style descriptive summary.
+\item \code{\link[=summary_table]{summary_table()}}: a 'Table 1' style descriptive summary.
 }
 }
 

@@ -33,7 +33,7 @@ matrix/data frame, or a tidy data frame of posterior summaries.}
 \item{labels, interaction, intercept}{See \code{\link[=compare_models]{compare_models()}}. A positional
 \code{labels} vector has one entry per frequentist term, in the order
 \code{\link[=tidy_estimates]{tidy_estimates()}} returns them, once the intercept has been dropped.
-\code{intercept} defaults to \code{TRUE} here, matching the original behaviour.}
+\code{intercept} defaults to \code{TRUE} here.}
 
 \item{facet, scales}{Layout controls. Because a Bayesian model almost always
 carries a large intercept alongside small slopes, the comparison defaults
@@ -63,10 +63,7 @@ plot, with the two sources distinguished by the first two colours of the
 colourblind-safe \code{\link[=depictr_palette]{depictr_palette()}} (brand blue and orange).
 }
 \details{
-This is the modernised successor to the original \code{frequentist_bayesian_plot()}
-gist, which built on \code{brms::mcmc_plot()} to show the full Bayesian posterior
-with the frequentist estimate overlaid. That namesake behaviour is restored
-here: when \code{bayesian} carries posterior \emph{draws} (a \code{brms}/\code{rstanarm} fit, a
+When \code{bayesian} carries posterior \emph{draws} (a \code{brms}/\code{rstanarm} fit, a
 \code{posterior} draws object, a draws matrix, or a long/wide draws data frame),
 the full posterior \emph{distribution} is drawn per term (a 'ggdist' half-eye)
 and the frequentist point and confidence interval is overlaid at the same

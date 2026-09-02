@@ -21,12 +21,12 @@ depictr_options(
 
 \item{brand}{The depictr brand colour, used for plot titles and single-series
 geoms. It coincides with the default palette's first colour but does not
-alter a palette; use \code{palette} for that. Returned by \code{depictr_brand()}.}
+alter a palette; use \code{palette} for that.}
 
-\item{accent}{A secondary highlight colour. Returned by \code{depictr_accent()}.}
+\item{accent}{A secondary highlight colour, for the one element a figure
+draws attention to.}
 
-\item{reference}{The colour used for reference / annotation lines. Returned
-by \code{depictr_reference()}.}
+\item{reference}{The colour used for reference / annotation lines.}
 
 \item{palette}{An optional custom qualitative palette: a character vector of
 hex colours used by \code{\link[=depictr_palette]{depictr_palette()}} (type \code{"qualitative"}) and the
@@ -47,8 +47,11 @@ shared look of every plot once, at the top of a script or in your
 options are honoured by \code{\link[=theme_depictr]{theme_depictr()}} (base size, base family and the
 brand colour used for titles), by \code{\link[=depictr_palette]{depictr_palette()}} and the
 \code{\link[=scale_colour_depictr]{scale_colour_depictr()}} family (an optional custom qualitative palette), and
-by the colour accessors \code{depictr_brand()}, \code{depictr_accent()} and
-\code{depictr_reference()}.
+by every plotting function that draws a single series, a highlighted element
+or a reference line. The resolved brand, accent and reference colours are the
+\code{depictr_brand()}, \code{depictr_accent()} and \code{depictr_reference()} defaults seen
+in those functions' argument lists; they are filled in for you, so set the
+options here rather than calling them.
 }
 \details{
 Called with no arguments, \code{depictr_options()} returns the currently resolved

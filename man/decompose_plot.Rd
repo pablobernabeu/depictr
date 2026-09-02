@@ -30,8 +30,7 @@ components. Ignored for the classical method.}
 
 \item{confidence}{Whether to draw a confidence ribbon around the trend
 component. The band is a normal-approximation interval based on the
-remainder's standard deviation (see Details). \code{FALSE} reproduces the
-previous behaviour exactly.}
+remainder's standard deviation (see Details).}
 
 \item{level}{Coverage of the trend confidence ribbon (a single number
 strictly between 0 and 1).}

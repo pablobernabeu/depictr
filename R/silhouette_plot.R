@@ -27,11 +27,10 @@
 #'
 #' @return A [ggplot2::ggplot] object. The per-observation silhouette table is
 #'   attached as the attribute `"silhouette"` and the average width as
-#'   `"avg_width"`.
+#'   `"avg_width"`. The table's `cluster` and `neighbor` columns carry the
+#'   assignments passed in `clusters`, as does each band label.
 #' @references
-#' Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the interpretation
-#' and validation of cluster analysis. *Journal of Computational and Applied
-#' Mathematics*, 20, 53-65. \doi{10.1016/0377-0427(87)90125-7}
+#' \insertRef{rousseeuw1987}{depictr}
 #' @export
 #' @examples
 #' cl <- kmeans(scale(crop_yield[c("rainfall", "fertiliser", "soil_ph",
@@ -55,7 +54,8 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
   # Order: by cluster, then by descending width within cluster, and assign a
   # plotting index so bars stack neatly within each cluster block.
   sil <- sil[order(sil$cluster, -sil$sil_width), , drop = FALSE]
-  sil$cluster <- factor(sil$cluster)
+  sil$cluster <- factor(prep$levels[sil$cluster], levels = prep$levels)
+  sil$neighbor <- factor(prep$levels[sil$neighbor], levels = prep$levels)
   sil$index <- seq_len(nrow(sil))
 
   avg_by_cluster <- tapply(sil$sil_width, sil$cluster, mean)
@@ -127,7 +127,7 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
 #' Computes a cluster-quality diagnostic across a range of `k` and draws the
 #' diagnostic curve, with the suggested `k` highlighted. Three criteria are
 #' available: the average silhouette width (maximised), the total within-cluster
-#' sum of squares "elbow" (the point of maximum curvature), and the gap statistic
+#' sum of squares 'elbow' (the point of maximum curvature), and the gap statistic
 #' (the smallest `k` whose gap is within one standard error of the next, using
 #' the Tibshirani et al. heuristic).
 #'
@@ -153,14 +153,9 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
 #'   with one row per `k`), `attr(p, "suggested")` (the chosen `k`) and
 #'   `attr(p, "method")`.
 #' @references
-#' Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the interpretation
-#' and validation of cluster analysis. *Journal of Computational and Applied
-#' Mathematics*, 20, 53-65. \doi{10.1016/0377-0427(87)90125-7}
+#' \insertRef{rousseeuw1987}{depictr}
 #'
-#' Tibshirani, R., Walther, G., & Hastie, T. (2001). Estimating the number of
-#' clusters in a data set via the gap statistic. *Journal of the Royal
-#' Statistical Society: Series B*, 63(2), 411-423.
-#' \doi{10.1111/1467-9868.00293}
+#' \insertRef{tibshirani2001}{depictr}
 #' @export
 #' @examples
 #' p <- k_diagnostic(crop_yield, k_range = 2:6,
@@ -317,7 +312,8 @@ sil_prepare <- function(data, clusters, cols, scale, distance) {
       stop("`clusters` must have one entry per object in the `dist`.",
            call. = FALSE)
     }
-    return(list(clusters = as.integer(as.factor(clusters)), dist = data))
+    f <- droplevels(as.factor(clusters))
+    return(list(clusters = as.integer(f), levels = levels(f), dist = data))
   }
   if (is.data.frame(data)) {
     if (is.null(cols)) {
@@ -346,7 +342,10 @@ sil_prepare <- function(data, clusters, cols, scale, distance) {
          call. = FALSE)
   }
   if (scale) mat <- scale(mat)
-  list(clusters = as.integer(as.factor(cl)),
+  f <- droplevels(as.factor(cl))
+  # The widths are computed on integer codes, but the caller's own labels are
+  # what the bands and the attached table must carry, so keep the levels here.
+  list(clusters = as.integer(f), levels = levels(f),
        dist = stats::dist(mat, method = distance))
 }
 

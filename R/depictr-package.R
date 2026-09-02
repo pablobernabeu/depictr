@@ -24,7 +24,7 @@
 #'   \item [estimation_plot()]: group differences with bootstrap intervals.
 #'   \item [dumbbell_plot()]: a two-group comparison across categories.
 #'   \item [scatter_trend()]: scatter plot with a fitted trend.
-#'   \item [summary_table()]: a "Table 1" style descriptive summary.
+#'   \item [summary_table()]: a 'Table 1' style descriptive summary.
 #' }
 #'
 #' @section Multivariate and survival:

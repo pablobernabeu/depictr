@@ -8,11 +8,12 @@
 #' Built with 'patchwork', so it shares the package theme and palette.
 #'
 #' @param data A data frame.
-#' @param cols Numeric columns to include. If `NULL`, all numeric columns are
-#'   used (up to `max_cols`).
+#' @param cols Numeric columns to include. If `NULL`, every numeric column is
+#'   used, so a wide frame needs `cols` to keep within `max_cols`.
 #' @param group Optional grouping variable mapped to colour.
-#' @param max_cols Safety cap on the number of variables (a k-by-k matrix grows
-#'   quickly).
+#' @param max_cols Largest number of variables accepted, since a k-by-k matrix
+#'   grows quickly. More than this is an error, so the matrix never quietly
+#'   drops a variable.
 #' @param point_alpha Point transparency in the scatter panels.
 #' @param method Correlation method for the upper-triangle coefficients, passed
 #'   to [stats::cor()]: `"pearson"`, `"spearman"` or `"kendall"`. A pair whose

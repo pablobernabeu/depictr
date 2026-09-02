@@ -15,8 +15,10 @@
 #' the package's own colour-distance check. That case warns rather than handing
 #' back colours under a guarantee it cannot keep.
 #'
-#' @param n Number of colours to return. If `NULL` (the default) the full
-#'   qualitative palette is returned. For the qualitative palette an `n` larger
+#' @param n Number of colours to return. If `NULL` (the default) the
+#'   qualitative palette returns all eight of its colours unless
+#'   `options(depictr.palette = )` supplies a different set, and the sequential
+#'   and diverging ramps return seven. For the qualitative palette an `n` larger
 #'   than the available base colours is interpolated; the sequential and
 #'   diverging palettes are ramps and accept any `n`. Interpolating the built-in
 #'   qualitative palette beyond its eight base colours loses the
@@ -157,8 +159,9 @@ scale_fill_depictr <- function(n = NULL, palette = NULL,
 #' The default `base_size` and `base_family` come from the global options
 #' `depictr.base_size` and `depictr.base_family` (see [depictr_options()]), so
 #' the package-wide font size can be set once; passing the arguments explicitly
-#' overrides them. The title colour is the resolved `depictr_brand()`, which in
-#' turn honours `options(depictr.brand = )`.
+#' overrides them. The title is drawn in the brand colour, the same one that
+#' appears as the `depictr_brand()` default across the package, which honours
+#' `options(depictr.brand = )`.
 #'
 #' @param base_size Base font size, in points. Defaults to the
 #'   `depictr.base_size` option.

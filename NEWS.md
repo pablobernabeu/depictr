@@ -28,6 +28,12 @@
   are summary statistics now takes the summary path, as the documentation
   describes. On that path a frequentist model with a factor predictor no longer
   raises a spurious warning about unused `b_`-prefixed `labels` keys.
+* `silhouette_plot()` recoded the clustering it was given to 1..k, so band
+  labels, the fill levels and the `"silhouette"` attribute named clusters the
+  caller never used. Labels such as `"low"`, `"mid"` and `"high"`, or
+  `cutree()`-style codes with gaps, are now carried through to the figure and
+  the attached table, whose `neighbor` column is a factor of those labels
+  rather than an integer code.
 * Positional `labels` in `coefficient_plot()` were applied after the rows had
   been reversed for the default `order = "none"`, so the first label landed on
   the last term and, with `order = "ascending"`, labels were dealt out by
@@ -36,6 +42,46 @@
   does to the rows. `compare_models()` and `frequentist_bayesian_plot()` accept
   the positional vector their documentation promised, one entry per distinct
   term, where any positional vector previously failed with a length error.
+* `timeseries_plot()` threw away a factor `group`'s level order, refactoring the
+  series by first appearance, so a deliberate ordering of the legend and of the
+  colours assigned to the groups was lost. A factor now keeps its levels, as
+  `survival_plot()` already did; a character group still orders by first
+  appearance.
+* `vif_plot()` reported design-matrix VIFs for a `glm` or a weighted `lm`. The
+  generalised VIF of Fox and Monette, which the page cites and `car::vif()`
+  reports, is built from the estimated coefficient covariance, and only that
+  carries the fitting weights. The values now come from `vcov()` and agree with
+  `car::vif()` for an `lm`, a weighted `lm` and a `glm` alike; unweighted `lm`
+  figures are unchanged where the model has an intercept, and a model fitted
+  without one now reports uncentred values, with a warning, as `car::vif()`
+  does. A model with aliased coefficients, for which no VIF exists, is refused
+  instead of drawing implausibly large bars.
+
+## Metadata and documentation
+
+* The references cited by `estimation_plot()`, `vif_plot()`, `silhouette_plot()`
+  and `k_diagnostic()` are drawn from `inst/REFERENCES.bib` like every other
+  citation, rather than being written out by hand on the page. With the keys in
+  the bibliography, `vignette("multivariate-and-survival")` cites Rousseeuw
+  (1987) and Tibshirani et al. (2001) itself, so both appear in its References
+  section instead of sending the reader to a help page for them.
+* `explore_pairs()` documents that more numeric columns than `max_cols` is an
+  error naming the count. The page read as though the extra columns were
+  trimmed, which is what the Python twin does.
+* `posterior_plot()` no longer claims that an unrecognised `style` falls back to
+  `"interval"`; it is an error, and only a missing 'ggdist' falls back.
+* `depictr_options()` and `theme_depictr()` describe the brand, accent and
+  reference colours by what they are used for, and explain that the
+  `depictr_brand()`, `depictr_accent()` and `depictr_reference()` defaults in
+  other functions' argument lists are those colours resolved for the caller
+  rather than functions to call.
+* Six reference pages drop passing remarks about how the function used to
+  behave, which said nothing about what it does now.
+* `depictr_palette()` says how many colours `n = NULL` returns: eight for the
+  qualitative palette unless `options(depictr.palette = )` supplies another set,
+  and seven for the sequential and diverging ramps.
+* Reference pages quote ordinary words in prose with single quotation marks,
+  matching the vignettes and the rest of the package.
 
 # depictr 0.3.0
 

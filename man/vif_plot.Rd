@@ -27,15 +27,15 @@ Computes a variance inflation factor for each \emph{term} in a model and shows
 them as a bar chart, with a reference line at the usual rule of thumb
 (\code{threshold}). High bars flag predictors whose coefficients are unstable
 because they are collinear with the others. Values are computed from base R
-(no 'car' dependency).
+(no 'car' dependency) and match those of \code{car::vif()}.
 }
 \details{
 For single-degree-of-freedom terms this is the ordinary VIF, \eqn{1/(1-R^2)}.
 For terms that span several design-matrix columns (multi-level factors, or
 spline/polynomial bases) the function reports the generalised VIF of Fox and
-Monette (1992): with \eqn{R} the correlation matrix of the (centred)
-predictor columns, \eqn{R_{11}} the block for the term and \eqn{R_{22}} the
-block for the remaining columns,
+Monette (1992): with \eqn{R} the correlation matrix implied by the estimated
+coefficient covariance, \eqn{R_{11}} the block for the term and
+\eqn{R_{22}} the block for the remaining coefficients,
 \deqn{\mathrm{GVIF} = \frac{\det(R_{11})\,\det(R_{22})}{\det(R)}.}
 When every term has a single degree of freedom the bars are the ordinary
 VIFs, on a plain "Variance inflation factor" axis with the reference line at
@@ -45,6 +45,10 @@ term equals \eqn{\sqrt{\mathrm{VIF}}}) and the reference line moves to
 \eqn{\sqrt{\mathrm{threshold}}} accordingly. The x-axis is kept tight to the
 data: when every bar is comfortably below the threshold the line is reported
 in the caption rather than drawn into a wide empty band.
+
+A model fitted without an intercept warns, since its columns are uncentred
+and the factors are then inflated by the predictors' means, as \code{car::vif()}
+also warns.
 }
 \examples{
 # Two deliberately collinear predictors: soil moisture is largely driven by
@@ -60,7 +64,5 @@ fit2 <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
 vif_plot(fit2)
 }
 \references{
-Fox, J., & Monette, G. (1992). Generalized collinearity diagnostics.
-\emph{Journal of the American Statistical Association}, 87(417), 178-183.
-\doi{10.1080/01621459.1992.10475190}
+\insertRef{fox1992}{depictr}
 }

@@ -36,7 +36,8 @@ distances (ignored when \code{data} is a \code{dist}).}
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object. The per-observation silhouette table is
 attached as the attribute \code{"silhouette"} and the average width as
-\code{"avg_width"}.
+\code{"avg_width"}. The table's \code{cluster} and \code{neighbor} columns carry the
+assignments passed in \code{clusters}, as does each band label.
 }
 \description{
 Draws a silhouette plot for a clustering: one horizontal bar per observation,
@@ -58,7 +59,5 @@ silhouette_plot(crop_yield, cl,
                 cols = c("rainfall", "fertiliser", "soil_ph", "yield"))
 }
 \references{
-Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the interpretation
-and validation of cluster analysis. \emph{Journal of Computational and Applied
-Mathematics}, 20, 53-65. \doi{10.1016/0377-0427(87)90125-7}
+\insertRef{rousseeuw1987}{depictr}
 }

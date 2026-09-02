@@ -1,6 +1,6 @@
 # Descriptive summary table ("Table 1") --------------------------------------
 
-#' A "Table 1" style descriptive summary
+#' A 'Table 1' style descriptive summary
 #'
 #' Builds the kind of descriptive table that opens many empirical papers:
 #' numeric variables are summarised as mean (SD), categorical variables as

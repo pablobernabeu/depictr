@@ -52,7 +52,15 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
            call. = FALSE)
     }
     df <- data.frame(time = x[[tcol]], value = x[[vcol]])
-    df$series <- if (is.null(gcol)) "series" else as.character(x[[gcol]])
+    # Respect a user-set factor order on the group column, which fixes both the
+    # legend order and the palette assignment; otherwise use first appearance.
+    gv <- if (is.null(gcol)) "series" else x[[gcol]]
+    glevels <- if (is.factor(gv)) {
+      levels(droplevels(gv))
+    } else {
+      unique(as.character(gv))
+    }
+    df$series <- factor(as.character(gv), levels = glevels)
     x_lab <- x_lab %||% tcol
     y_lab <- y_lab %||% vcol
   } else if (stats::is.ts(x)) {
@@ -67,7 +75,9 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
     x_lab <- x_lab %||% "Time"
   }
   y_lab <- y_lab %||% "Value"
-  df$series <- factor(df$series, levels = unique(df$series))
+  if (!is.factor(df$series)) {
+    df$series <- factor(df$series, levels = unique(df$series))
+  }
   # Order by series then time so the moving average (and the drawn lines) follow
   # time order even when the input data frame is unsorted.
   df <- df[order(df$series, df$time), , drop = FALSE]
@@ -224,8 +234,7 @@ acf_plot <- function(x, lag_max = NULL, type = c("correlation", "partial"),
 #'   components. Ignored for the classical method.
 #' @param confidence Whether to draw a confidence ribbon around the trend
 #'   component. The band is a normal-approximation interval based on the
-#'   remainder's standard deviation (see Details). `FALSE` reproduces the
-#'   previous behaviour exactly.
+#'   remainder's standard deviation (see Details).
 #' @param level Coverage of the trend confidence ribbon (a single number
 #'   strictly between 0 and 1).
 #' @param title Plot title.

@@ -2,7 +2,7 @@
 
 #' Forest (coefficient) plot
 #'
-#' Draws a horizontal point-and-interval ("forest") plot of model estimates.
+#' Draws a horizontal point-and-interval ('forest') plot of model estimates.
 #' The input can be a fitted model (anything [tidy_estimates()] understands) or
 #' a data frame of pre-computed estimates.
 #'

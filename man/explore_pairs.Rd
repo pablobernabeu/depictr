@@ -18,13 +18,14 @@ explore_pairs(
 \arguments{
 \item{data}{A data frame.}
 
-\item{cols}{Numeric columns to include. If \code{NULL}, all numeric columns are
-used (up to \code{max_cols}).}
+\item{cols}{Numeric columns to include. If \code{NULL}, every numeric column is
+used, so a wide frame needs \code{cols} to keep within \code{max_cols}.}
 
 \item{group}{Optional grouping variable mapped to colour.}
 
-\item{max_cols}{Safety cap on the number of variables (a k-by-k matrix grows
-quickly).}
+\item{max_cols}{Largest number of variables accepted, since a k-by-k matrix
+grows quickly. More than this is an error, so the matrix never quietly
+drops a variable.}
 
 \item{point_alpha}{Point transparency in the scatter panels.}
 

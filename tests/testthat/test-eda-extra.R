@@ -28,6 +28,11 @@ test_that("explore_pairs() needs numeric columns and respects max_cols", {
                   max_cols = 2),
     "Too many"
   )
+  # With `cols = NULL` a wide frame is refused rather than trimmed, so the
+  # matrix never quietly drops variables.
+  wide <- as.data.frame(matrix(rnorm(90), ncol = 9))
+  expect_error(explore_pairs(wide),
+               "Too many columns (9 > max_cols = 8).", fixed = TRUE)
 })
 
 test_that("outlier_plot() flags outliers and validates input", {

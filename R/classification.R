@@ -36,8 +36,7 @@
 #' A named list overlays one curve per element, e.g.
 #' `roc_curve_plot(list("Full" = fit_full, "Reduced" = fit_reduced))`. Each
 #' element may be a `glm`, a length-2 list/data frame of `(actual, score)`, or an
-#' outcome vector paired with the matching element of a `score` list. Single-model
-#' calls are unchanged.
+#' outcome vector paired with the matching element of a `score` list.
 #'
 #' @return A [ggplot2::ggplot] object. The AUC(s) are stored in
 #'   `attr(plot, "auc")` (a named vector when several models are supplied).

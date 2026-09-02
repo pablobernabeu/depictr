@@ -2,7 +2,7 @@
 % Please edit documentation in R/summary_table.R
 \name{summary_table}
 \alias{summary_table}
-\title{A "Table 1" style descriptive summary}
+\title{A 'Table 1' style descriptive summary}
 \usage{
 summary_table(
   data,

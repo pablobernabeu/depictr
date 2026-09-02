@@ -39,8 +39,11 @@ depictr_opt <- function(name) {
 #' options are honoured by [theme_depictr()] (base size, base family and the
 #' brand colour used for titles), by [depictr_palette()] and the
 #' [scale_colour_depictr()] family (an optional custom qualitative palette), and
-#' by the colour accessors `depictr_brand()`, `depictr_accent()` and
-#' `depictr_reference()`.
+#' by every plotting function that draws a single series, a highlighted element
+#' or a reference line. The resolved brand, accent and reference colours are the
+#' `depictr_brand()`, `depictr_accent()` and `depictr_reference()` defaults seen
+#' in those functions' argument lists; they are filled in for you, so set the
+#' options here rather than calling them.
 #'
 #' Called with no arguments, `depictr_options()` returns the currently resolved
 #' values (option if set, otherwise package default). Called with named
@@ -54,10 +57,10 @@ depictr_opt <- function(name) {
 #' @param base_family Base font family for [theme_depictr()].
 #' @param brand The depictr brand colour, used for plot titles and single-series
 #'   geoms. It coincides with the default palette's first colour but does not
-#'   alter a palette; use `palette` for that. Returned by `depictr_brand()`.
-#' @param accent A secondary highlight colour. Returned by `depictr_accent()`.
-#' @param reference The colour used for reference / annotation lines. Returned
-#'   by `depictr_reference()`.
+#'   alter a palette; use `palette` for that.
+#' @param accent A secondary highlight colour, for the one element a figure
+#'   draws attention to.
+#' @param reference The colour used for reference / annotation lines.
 #' @param palette An optional custom qualitative palette: a character vector of
 #'   hex colours used by [depictr_palette()] (type `"qualitative"`) and the
 #'   discrete scales in place of the built-in Okabe-Ito set. `NULL` restores the

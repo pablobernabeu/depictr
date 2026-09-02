@@ -81,7 +81,7 @@ would rescale the outcome too.}
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Draws a horizontal point-and-interval ("forest") plot of model estimates.
+Draws a horizontal point-and-interval ('forest') plot of model estimates.
 The input can be a fitted model (anything \code{\link[=tidy_estimates]{tidy_estimates()}} understands) or
 a data frame of pre-computed estimates.
 }

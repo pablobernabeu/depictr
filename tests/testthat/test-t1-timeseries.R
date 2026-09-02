@@ -126,3 +126,23 @@ test_that("conf_level is validated to (0, 1)", {
   expect_error(acf_plot(x, conf_level = c(0.9, 0.95)), "single number")
   expect_s3_class(acf_plot(x, conf_level = 0.99), "ggplot")
 })
+
+test_that("a factor group keeps its level order", {
+  dfg <- data.frame(
+    t = rep(1:5, 2),
+    v = rnorm(10),
+    g = factor(rep(c("b", "a"), each = 5), levels = c("a", "b"))
+  )
+  p <- timeseries_plot(dfg, t, v, group = g)
+  expect_equal(levels(p$data$series), c("a", "b"))
+
+  # An unused level is dropped rather than claiming a colour.
+  dfg$g <- factor(as.character(dfg$g), levels = c("a", "b", "c"))
+  expect_equal(levels(timeseries_plot(dfg, t, v, group = g)$data$series),
+               c("a", "b"))
+
+  # A character group still orders by first appearance.
+  dfg$g <- rep(c("b", "a"), each = 5)
+  expect_equal(levels(timeseries_plot(dfg, t, v, group = g)$data$series),
+               c("b", "a"))
+})

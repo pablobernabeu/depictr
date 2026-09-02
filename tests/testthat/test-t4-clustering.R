@@ -41,6 +41,28 @@ test_that("a clusters vector sized to the complete rows is refused up front", {
   expect_s3_class(silhouette_plot(d, cl10), "ggplot")
 })
 
+test_that("silhouette_plot() keeps the cluster labels it was given", {
+  # Regression: the assignments were recoded to 1..k, so bands and the
+  # attached table could not be matched back to the caller's clustering.
+  set.seed(1)
+  cl <- kmeans(scale(crop_yield[cols]), 3)$cluster
+  labelled <- c("low", "mid", "high")[cl]
+  p <- silhouette_plot(crop_yield, labelled, cols = cols)
+
+  tab <- attr(p, "silhouette")
+  expect_equal(sort(unique(as.character(tab$cluster))),
+               sort(unique(labelled)))
+  expect_equal(sort(unique(as.character(tab$neighbor))),
+               sort(unique(labelled)))
+  band_labels <- ggplot2::ggplot_build(p)$data[[3]]$label
+  expect_true(all(grepl("^(low|mid|high)  \\(n=", band_labels)))
+
+  # Codes with gaps keep their own values rather than becoming 1, 2, 3.
+  gapped <- silhouette_plot(crop_yield, c(2, 5, 9)[cl], cols = cols)
+  expect_equal(sort(unique(as.character(attr(gapped, "silhouette")$cluster))),
+               c("2", "5", "9"))
+})
+
 test_that("base_silhouette() matches cluster::silhouette to numerical tolerance", {
   skip_if_not_installed("cluster")
   set.seed(42)

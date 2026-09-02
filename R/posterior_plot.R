@@ -24,8 +24,8 @@
 #'   Details).
 #' @param style One of `"halfeye"` (density slab + interval, the default),
 #'   `"interval"` (point and two nested intervals, no slab), `"gradient"` (a
-#'   colour-graded interval) or `"dots"` (a quantile dotplot). Unknown values
-#'   and a missing 'ggdist' fall back to `"interval"`.
+#'   colour-graded interval) or `"dots"` (a quantile dotplot). A missing
+#'   'ggdist' falls back to `"interval"`.
 #' @param point Central summary: `"median"` or `"mean"`.
 #' @param widths Two interval widths (inner and outer), as probabilities. The
 #'   outer width is used for the caption and the displayed interval mass.
@@ -35,7 +35,7 @@
 #'   [format_terms()].
 #' @param reference_line Position of a vertical reference line, or `NULL`/`NA`
 #'   to omit it. There is no universally meaningful reference for every
-#'   parameter, so this defaults to `0` (the usual "no effect" line for
+#'   parameter, so this defaults to `0` (the usual 'no effect' line for
 #'   differences and slopes) but should be set or cleared deliberately.
 #' @param rope Optional length-2 numeric `c(lo, hi)` giving a region of
 #'   practical equivalence to shade behind the distributions.

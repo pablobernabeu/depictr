@@ -52,9 +52,8 @@ For a \code{glm}, the default panels are made GLM-aware (\code{glm_panels = TRUE
 for binary or count models, and the Q-Q panel uses \emph{randomised quantile}
 residuals (Dunn & Smyth, 1996), which are standard normal under a correctly
 specified model regardless of the response family. The scale-location and
-leverage panels are unchanged. For an \code{lm} the behaviour is identical to
-before. Set \code{glm_panels = FALSE} to force the classic \code{lm}-style panels for a
-\code{glm} as well.
+leverage panels are unchanged. Set \code{glm_panels = FALSE} to force the classic
+\code{lm}-style panels for a \code{glm} as well.
 }
 \examples{
 fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)

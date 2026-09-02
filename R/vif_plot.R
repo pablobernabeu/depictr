@@ -6,14 +6,14 @@
 #' them as a bar chart, with a reference line at the usual rule of thumb
 #' (`threshold`). High bars flag predictors whose coefficients are unstable
 #' because they are collinear with the others. Values are computed from base R
-#' (no 'car' dependency).
+#' (no 'car' dependency) and match those of `car::vif()`.
 #'
 #' For single-degree-of-freedom terms this is the ordinary VIF, \eqn{1/(1-R^2)}.
 #' For terms that span several design-matrix columns (multi-level factors, or
 #' spline/polynomial bases) the function reports the generalised VIF of Fox and
-#' Monette (1992): with \eqn{R} the correlation matrix of the (centred)
-#' predictor columns, \eqn{R_{11}} the block for the term and \eqn{R_{22}} the
-#' block for the remaining columns,
+#' Monette (1992): with \eqn{R} the correlation matrix implied by the estimated
+#' coefficient covariance, \eqn{R_{11}} the block for the term and
+#' \eqn{R_{22}} the block for the remaining coefficients,
 #' \deqn{\mathrm{GVIF} = \frac{\det(R_{11})\,\det(R_{22})}{\det(R)}.}
 #' When every term has a single degree of freedom the bars are the ordinary
 #' VIFs, on a plain "Variance inflation factor" axis with the reference line at
@@ -23,6 +23,10 @@
 #' \eqn{\sqrt{\mathrm{threshold}}} accordingly. The x-axis is kept tight to the
 #' data: when every bar is comfortably below the threshold the line is reported
 #' in the caption rather than drawn into a wide empty band.
+#'
+#' A model fitted without an intercept warns, since its columns are uncentred
+#' and the factors are then inflated by the predictors' means, as `car::vif()`
+#' also warns.
 #'
 #' @param model A fitted `lm` or `glm` model with at least two predictors.
 #' @param threshold Reference value for the ordinary VIF, drawn as a line. For
@@ -35,9 +39,7 @@
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @references
-#' Fox, J., & Monette, G. (1992). Generalized collinearity diagnostics.
-#' \emph{Journal of the American Statistical Association}, 87(417), 178-183.
-#' \doi{10.1080/01621459.1992.10475190}
+#' \insertRef{fox1992}{depictr}
 #' @export
 #' @examples
 #' # Two deliberately collinear predictors: soil moisture is largely driven by
@@ -130,26 +132,44 @@ vif_plot <- function(model, threshold = 5,
 
 #' Generalised variance inflation factors, one per model term
 #'
-#' Groups the design-matrix columns belonging to each model term and returns the
+#' Groups the coefficients belonging to each model term and returns the
 #' Fox-Monette generalised VIF together with the adjusted value
 #' `GVIF^(1/(2*df))` that puts every term on a common scale. Single-df terms
 #' reduce to the ordinary VIF.
 #' @return A data frame with columns `term`, `df`, `gvif` and `gvif_adj`.
 #' @noRd
 gvif_terms <- function(model) {
-  X <- stats::model.matrix(model)
-  assign <- attr(X, "assign")
+  assign <- attr(stats::model.matrix(model), "assign")
   term_labels <- attr(stats::terms(model), "term.labels")
 
-  # Drop the intercept column (assign == 0); it is not a predictor.
+  # An aliased coefficient leaves the covariance singular (and, with
+  # `complete = TRUE`, padded with NA), so no VIF exists for those terms.
+  if (anyNA(stats::coef(model))) {
+    stop("`model` has aliased coefficients, so no VIF is defined; drop the ",
+         "redundant term(s) first.", call. = FALSE)
+  }
+
+  # Fox and Monette work from the estimated coefficient covariance rather than
+  # from the raw design matrix. The two agree for an unweighted `lm`, but for a
+  # glm or a weighted fit only the covariance carries the fitting weights, and
+  # only it matches what `car::vif()` reports.
+  V <- stats::vcov(model)
+  # Drop the intercept (assign == 0); it is not a predictor.
   keep <- assign != 0
-  X <- X[, keep, drop = FALSE]
+  # Without an intercept the columns are not centred, so the correlations, and
+  # with them the VIFs, are inflated by the predictors' means. `car::vif()`
+  # warns here for the same reason.
+  if (!any(assign == 0)) {
+    warning("`model` has no intercept, so the VIFs are computed from ",
+            "uncentred columns and may not be meaningful.", call. = FALSE)
+  }
+  V <- V[keep, keep, drop = FALSE]
   assign <- assign[keep]
-  if (ncol(X) < 2) {
+  if (ncol(V) < 2) {
     stop("VIF needs at least two predictor columns.", call. = FALSE)
   }
 
-  R <- stats::cor(X)
+  R <- stats::cov2cor(V)
   detR <- det(R)
   terms_present <- sort(unique(assign))
 

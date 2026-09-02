@@ -32,8 +32,8 @@ errors.}
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Displays the conditional modes ("BLUPs") of a mixed model's random effects as
-a sorted point-and-interval ("caterpillar") plot. It is the usual way to
+Displays the conditional modes ('BLUPs') of a mixed model's random effects as
+a sorted point-and-interval ('caterpillar') plot. It is the usual way to
 inspect by-group departures from the average, and to identify unusual groups.
 }
 \examples{

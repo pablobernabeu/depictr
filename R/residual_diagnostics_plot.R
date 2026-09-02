@@ -13,9 +13,8 @@
 #' for binary or count models, and the Q-Q panel uses *randomised quantile*
 #' residuals (Dunn & Smyth, 1996), which are standard normal under a correctly
 #' specified model regardless of the response family. The scale-location and
-#' leverage panels are unchanged. For an `lm` the behaviour is identical to
-#' before. Set `glm_panels = FALSE` to force the classic `lm`-style panels for a
-#' `glm` as well.
+#' leverage panels are unchanged. Set `glm_panels = FALSE` to force the classic
+#' `lm`-style panels for a `glm` as well.
 #'
 #' @param model A fitted `lm` or `glm` model.
 #' @param which Character vector choosing which panels to show, any of

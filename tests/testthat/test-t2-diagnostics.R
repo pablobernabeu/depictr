@@ -152,3 +152,68 @@ test_that("vif_plot() still errors with fewer than two predictor columns", {
   fit <- lm(yield ~ rainfall, data = crop_yield)
   expect_error(vif_plot(fit), "at least two predictor")
 })
+
+test_that("gvif_terms() uses the coefficient covariance for weighted fits", {
+  # The design-matrix correlation and the coefficient covariance agree only for
+  # an unweighted lm; for a glm or a weighted fit the fitting weights matter,
+  # and the Fox-Monette definition (what car::vif() reports) uses the latter.
+  ref_gvif <- function(model) {
+    V <- stats::vcov(model)
+    assign <- attr(stats::model.matrix(model), "assign")
+    keep <- assign != 0
+    R <- stats::cov2cor(V[keep, keep, drop = FALSE])
+    assign <- assign[keep]
+    detR <- det(R)
+    vapply(sort(unique(assign)), function(t) {
+      cols <- which(assign == t)
+      others <- which(assign != t)
+      det(R[cols, cols, drop = FALSE]) *
+        det(R[others, others, drop = FALSE]) / detR
+    }, numeric(1))
+  }
+
+  set.seed(11)
+  n <- 200
+  x1 <- rnorm(n)
+  x2 <- 0.9 * x1 + rnorm(n, sd = 0.4)
+  x3 <- rnorm(n)
+  counts <- rpois(n, exp(0.2 + 0.3 * x1 - 0.2 * x2 + 0.1 * x3))
+
+  pois <- glm(counts ~ x1 + x2 + x3, family = poisson)
+  expect_equal(gvif_terms(pois)$gvif, ref_gvif(pois), tolerance = 1e-10)
+
+  wfit <- lm(counts ~ x1 + x2 + x3, weights = runif(n, 0.2, 3))
+  expect_equal(gvif_terms(wfit)$gvif, ref_gvif(wfit), tolerance = 1e-10)
+
+  # The weights genuinely move the answer, so the test would fail against a
+  # design-matrix computation.
+  X <- stats::model.matrix(wfit)[, -1, drop = FALSE]
+  design_gvif <- diag(solve(stats::cor(X)))
+  expect_false(isTRUE(all.equal(gvif_terms(wfit)$gvif, unname(design_gvif),
+                                tolerance = 1e-4)))
+})
+
+test_that("gvif_terms() refuses a model with aliased coefficients", {
+  set.seed(12)
+  n <- 30
+  d <- data.frame(x1 = rnorm(n), x3 = rnorm(n))
+  d$x2 <- 2 * d$x1
+  d$y <- rnorm(n)
+  expect_error(vif_plot(lm(y ~ x1 + x2 + x3, data = d)), "aliased")
+})
+
+test_that("gvif_terms() warns when the model has no intercept", {
+  # Without an intercept the columns are uncentred, so the figures are not the
+  # centred VIFs a reader expects; the warning is what car::vif() gives too.
+  set.seed(13)
+  n <- 100
+  x1 <- rnorm(n, mean = 5)
+  x2 <- 0.8 * x1 + rnorm(n, sd = 0.5)
+  y <- x1 - x2 + rnorm(n)
+  fit <- lm(y ~ 0 + x1 + x2)
+  expect_warning(gvif_terms(fit), "no intercept")
+  expect_warning(vif_plot(fit), "no intercept")
+
+  # An intercept is the ordinary case and stays quiet.
+  expect_silent(gvif_terms(lm(y ~ x1 + x2)))
+})
