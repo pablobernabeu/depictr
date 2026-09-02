@@ -96,3 +96,53 @@ test_that("the standardise label names the x-only convention", {
   expect_equal(coefficient_plot(fit, standardise = TRUE, x_lab = "beta")$labels$x,
                "beta")
 })
+
+test_that("positional labels follow the term order for every `order`", {
+  # Regression: labels were applied after order_terms() reversed the rows, so
+  # the first label landed on the last term and vice versa.
+  fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
+  want <- c(rainfall = "L_rain", fertiliser = "L_fert", soil_ph = "L_soil")
+  for (ord in c("none", "ascending", "descending")) {
+    p <- coefficient_plot(fit, labels = unname(want), order = ord)
+    expect_equal(as.character(p$data$label), unname(want[p$data$term]),
+                 info = ord)
+  }
+  # With order = "none" the labels read top to bottom in term order.
+  p <- coefficient_plot(fit, labels = unname(want))
+  expect_equal(rev(levels(p$data$label)), unname(want))
+  # The intercept is counted only when it is kept.
+  p <- coefficient_plot(fit, intercept = TRUE, labels = c("Int", unname(want)))
+  expect_equal(as.character(p$data$label[p$data$term == "(Intercept)"]), "Int")
+})
+
+test_that("compare_models() and frequentist_bayesian_plot() take positional labels", {
+  # Regression: the stacked table has one row per term and source, so a vector
+  # with one entry per term failed the length check.
+  m1 <- lm(yield ~ rainfall + fertiliser, data = crop_yield)
+  m2 <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
+  p <- compare_models(A = m1, B = m2, labels = c("L_rain", "L_fert", "L_soil"))
+  expect_equal(rev(levels(p$data$label)), c("L_rain", "L_fert", "L_soil"))
+  expect_error(compare_models(A = m1, B = m2, labels = c("a", "b")),
+               "has length 2 but there are 3 terms")
+
+  # Summary path.
+  bayes <- tidy_estimates(m1)
+  p <- frequentist_bayesian_plot(m1, bayes, intercept = FALSE,
+                                 labels = c("L_rain", "L_fert"))
+  expect_setequal(as.character(p$data$label), c("L_rain", "L_fert"))
+  # Distribution path: labels follow the frequentist terms.
+  set.seed(1)
+  draws <- data.frame(rainfall = rnorm(200), fertiliser = rnorm(200))
+  p <- frequentist_bayesian_plot(m1, draws, intercept = FALSE,
+                                 labels = c("L_rain", "L_fert"))
+  freq <- Find(function(l) "estimate" %in% names(l$data), p$layers)$data
+  expect_equal(as.character(freq$label[match(c("rainfall", "fertiliser"),
+                                             freq$term)]),
+               c("L_rain", "L_fert"))
+  post <- Find(function(l) ".value" %in% names(l$data), p$layers)$data
+  expect_setequal(as.character(unique(post$label)), c("L_rain", "L_fert"))
+  expect_error(
+    frequentist_bayesian_plot(m1, draws, intercept = FALSE, labels = "one"),
+    "has length 1 but there are 2 terms"
+  )
+})

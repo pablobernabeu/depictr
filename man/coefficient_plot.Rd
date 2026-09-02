@@ -38,9 +38,10 @@ often overwhelms the other terms.}
 \code{"ascending"} or \code{"descending"}.}
 
 \item{labels}{Optional display labels for the terms. Either a character
-vector the same length as the number of terms (in plotting order) or a
-named vector mapping raw term names to labels. If \code{NULL}, names are tidied
-with \code{\link[=format_terms]{format_terms()}}.}
+vector with one entry per term, in the order \code{\link[=tidy_estimates]{tidy_estimates()}} returns
+them once the intercept has been dropped (top to bottom of the plot when
+\code{order = "none"}), or a named vector mapping raw term names to labels. If
+\code{NULL}, names are tidied with \code{\link[=format_terms]{format_terms()}}.}
 
 \item{interaction}{Passed to \code{\link[=format_terms]{format_terms()}} to control how interaction
 terms are rendered (ignored when \code{labels} is supplied).}

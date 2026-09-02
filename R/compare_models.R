@@ -17,7 +17,9 @@
 #' @param intercept Whether to keep the intercept term. Defaults to `FALSE`.
 #' @param order Order terms by their average estimate across sources:
 #'   `"none"`, `"ascending"` or `"descending"`.
-#' @param labels Optional display labels (see [coefficient_plot()]).
+#' @param labels Optional display labels (see [coefficient_plot()]). A
+#'   positional vector has one entry per distinct term, in the order the terms
+#'   first appear across the sources, once the intercept has been dropped.
 #' @param interaction Passed to [format_terms()].
 #' @param dodge_width Vertical spacing between sources sharing a term.
 #' @param reference_line Position of a vertical reference line (`NA` to omit).
@@ -123,6 +125,9 @@ compare_models <- function(...,
     auto <- pretty_coef_map(s)
     if (!is.null(auto)) break
   }
+  # The stacked table has one row per term and source, so a positional
+  # `labels` vector is keyed by the distinct terms before the row-wise lookup.
+  labels <- position_labels(est$term, labels)
   labels <- merge_pretty_labels(labels, auto)
   est$label <- make_labels(est$term, labels, interaction)
 

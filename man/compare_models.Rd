@@ -41,7 +41,9 @@ names of \code{...}.}
 \item{order}{Order terms by their average estimate across sources:
 \code{"none"}, \code{"ascending"} or \code{"descending"}.}
 
-\item{labels}{Optional display labels (see \code{\link[=coefficient_plot]{coefficient_plot()}}).}
+\item{labels}{Optional display labels (see \code{\link[=coefficient_plot]{coefficient_plot()}}). A
+positional vector has one entry per distinct term, in the order the terms
+first appear across the sources, once the intercept has been dropped.}
 
 \item{interaction}{Passed to \code{\link[=format_terms]{format_terms()}}.}
 

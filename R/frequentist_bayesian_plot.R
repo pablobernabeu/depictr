@@ -26,7 +26,9 @@
 #' @param bayesian A Bayesian model, a `posterior` draws object, a draws
 #'   matrix/data frame, or a tidy data frame of posterior summaries.
 #' @param conf_level Confidence/credible level for models.
-#' @param labels,interaction,intercept See [compare_models()].
+#' @param labels,interaction,intercept See [compare_models()]. A positional
+#'   `labels` vector has one entry per frequentist term, in the order
+#'   [tidy_estimates()] returns them, once the intercept has been dropped.
 #'   `intercept` defaults to `TRUE` here, matching the original behaviour.
 #' @param facet,scales Layout controls. Because a Bayesian model almost always
 #'   carries a large intercept alongside small slopes, the comparison defaults
@@ -98,15 +100,16 @@ frequentist_bayesian_plot <- function(frequentist,
   }
   bayes_label <- "Bayesian analysis"
 
-  # Prettify coefficient names to the effect (variable) name by default, from
-  # the frequentist model (e.g. "conditionunrelated" -> "condition"); the same
-  # map applies to the frequentist estimates and the b_-stripped Bayesian draw
-  # names, and any user-supplied `labels` take precedence.
-  labels <- merge_pretty_labels(labels, pretty_coef_map(frequentist))
-
   # The namesake behaviour: when the Bayesian side carries actual draws, render
   # the full posterior distribution and overlay the frequentist point + CI.
   if (has_draws(bayesian)) {
+    # Prettify coefficient names to the effect (variable) name by default,
+    # from the frequentist model (e.g. "conditionunrelated" -> "condition");
+    # the same map applies to the frequentist estimates and the b_-stripped
+    # Bayesian draw names, and any user-supplied `labels` take precedence. The
+    # summary path leaves this to compare_models(), which builds the same map
+    # and must judge the user's own `labels` keys before the merge.
+    labels <- merge_pretty_labels(labels, pretty_coef_map(frequentist))
     return(fbp_distribution(
       frequentist = frequentist, bayesian = bayesian,
       conf_level = conf_level, labels = labels, interaction = interaction,
@@ -116,7 +119,10 @@ frequentist_bayesian_plot <- function(frequentist,
     ))
   }
 
-  # Summary path: the familiar two-source forest plot.
+  # Summary path: the familiar two-source forest plot. A summary matrix, as
+  # brms::fixef() returns, carries its terms as row names, which
+  # tidy_estimates() reads from a data frame.
+  if (is.matrix(bayesian)) bayesian <- as.data.frame(bayesian)
   args <- list(frequentist, bayesian)
   names(args) <- c(freq_label, bayes_label)
 
@@ -158,13 +164,8 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
   bayes_colour <- pal[1]
   freq_colour  <- pal[2]
 
-  # Bayesian draws -> long, labelled by canonical display label.
   draws <- extract_draws(bayesian)
-  draws$label <- make_labels(draws$term, labels, interaction)
-
-  # Frequentist summaries -> the same canonical label space.
   freq <- tidy_estimates(frequentist, conf_level = conf_level)
-  freq$label <- make_labels(freq$term, labels, interaction)
 
   if (!intercept) {
     drop <- c("(Intercept)", "Intercept", "b_Intercept")
@@ -174,6 +175,14 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
   if (nrow(draws) == 0) {
     stop("No Bayesian terms left to plot.", call. = FALSE)
   }
+
+  # Both sides are labelled in one canonical label space. A positional
+  # `labels` vector follows the frequentist terms, the side whose order the
+  # user can see; the draws are one row per sample, so it cannot be matched
+  # to them by position.
+  labels <- position_labels(freq$term, labels)
+  draws$label <- make_labels(draws$term, labels, interaction)
+  freq$label <- make_labels(freq$term, labels, interaction)
 
   # Shared, reversed factor levels (top-to-bottom reading order), driven by the
   # Bayesian terms with any frequentist-only terms appended.

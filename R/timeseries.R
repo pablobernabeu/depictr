@@ -462,6 +462,13 @@ resolve_forecast <- function(forecast, x, df, frequency = NULL, level = 0.95) {
            call. = FALSE)
     }
     fc <- ts_forecast(x, h = forecast, frequency = frequency, level = level)
+    if (!stats::is.ts(x)) {
+      # A numeric `x` is wrapped in a ts that starts at time 1, so the times
+      # ts_forecast() returns are in cycle units the history knows nothing
+      # about; the history sits at seq_along(x) or at the user's `time`.
+      # Continue that axis instead, one typical spacing per step.
+      fc$time <- forecast_steps(df$time, nrow(fc))
+    }
   }
   # Reconcile the forecast times with the historical axis. ts_forecast() (and a
   # forecast::forecast object) return decimal-year `time` values, but the
@@ -475,6 +482,19 @@ resolve_forecast <- function(forecast, x, df, frequency = NULL, level = 0.95) {
   anchor <- data.frame(time = last_obs$time, fit = last_obs$value,
                        lwr = last_obs$value, upr = last_obs$value)
   rbind(anchor, fc)
+}
+
+#' The next `h` times on the history's own axis
+#'
+#' Steps on from the last observed time by the median spacing of the history
+#' (one unit for a single observation), so the result keeps the class of
+#' `hist_time`: a `Date` axis gains days and a `POSIXct` one seconds.
+#' @noRd
+forecast_steps <- function(hist_time, h) {
+  hist_time <- sort(hist_time)
+  n <- length(hist_time)
+  step <- if (n > 1) stats::median(diff(as.numeric(hist_time))) else 1
+  hist_time[n] + step * seq_len(h)
 }
 
 #' Reconcile forecast times with the class of the historical time axis

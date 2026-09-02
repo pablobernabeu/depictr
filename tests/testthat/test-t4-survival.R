@@ -294,3 +294,54 @@ test_that("a missing status is dropped with a message, not in silence", {
   # Complete statuses stay silent.
   expect_silent(survival_plot(tt, c(1, 0, 1, 1, 0, 0)))
 })
+
+test_that("a factor or character status is refused, not silently recoded", {
+  # Regression: as.integer() turned a factor into its level codes, which then
+  # passed as the 1/2 convention with the alphabetically first level taken as
+  # censored, and a character vector into NA, giving a flat curve at 1.
+  tt <- c(1, 2, 3, 4, 5, 6)
+  ev <- c(1, 0, 1, 1, 0, 1)
+  msg <- "must be numeric (0/1 or 1/2) or logical"
+  expect_error(survival_plot(tt, factor(ifelse(ev == 1, "event", "no event"))),
+               msg, fixed = TRUE)
+  expect_error(survival_plot(tt, ifelse(ev == 1, "event", "censored")),
+               msg, fixed = TRUE)
+  expect_error(
+    survival_plot(data.frame(time = tt, status = factor(ev))), msg, fixed = TRUE
+  )
+  # The numeric and logical codings are unchanged.
+  ref <- depictr:::km_input(tt, ev, NULL, 0.95)
+  expect_equal(depictr:::km_input(tt, ev == 1, NULL, 0.95)$curve, ref$curve)
+  expect_equal(depictr:::km_input(tt, ev + 1, NULL, 0.95)$curve, ref$curve)
+})
+
+test_that("survival_plot() honours `group` and `status` with a data frame", {
+  # Regression: the data-frame path read the grouping only from a column named
+  # group, strata or arm, so `group = "treatment"` drew one pooled curve.
+  set.seed(3)
+  n <- 60
+  df <- data.frame(t = rexp(n, 0.1), ev = rbinom(n, 1, 0.7),
+                   treatment = rep(c("a", "b"), each = n / 2),
+                   arm = rep(c("x", "y", "z"), n / 3))
+  names(df)[1:2] <- c("time", "status")
+  by_name <- survival_plot(df, group = "treatment")
+  by_vector <- survival_plot(df, group = df$treatment)
+  expect_equal(levels(by_name$data$group), c("a", "b"))
+  expect_equal(by_vector$data, by_name$data)
+  # The explicit grouping wins over a conventionally named column ...
+  expect_equal(levels(survival_plot(df)$data$group), c("x", "y", "z"))
+  # ... and so does an explicit status, given as a name or a vector.
+  df$death <- 1L - df$status
+  ref <- survival_plot(df$time, df$death, group = df$treatment)
+  expect_equal(survival_plot(df, status = "death", group = "treatment")$data,
+               ref$data)
+  expect_equal(survival_plot(df, status = df$death, group = "treatment")$data,
+               ref$data)
+  # A name that matches no column, or a vector of the wrong length, is an error.
+  expect_error(survival_plot(df, group = "dose"),
+               "`group` names a column, 'dose', that the data frame does not have")
+  expect_error(survival_plot(df, group = c("a", "b")),
+               "one entry per row")
+  expect_error(survival_plot(df[, c("time", "treatment")], group = "treatment"),
+               "needs `time` and `status` columns")
+})

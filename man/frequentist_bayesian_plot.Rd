@@ -30,7 +30,9 @@ matrix/data frame, or a tidy data frame of posterior summaries.}
 
 \item{conf_level}{Confidence/credible level for models.}
 
-\item{labels, interaction, intercept}{See \code{\link[=compare_models]{compare_models()}}.
+\item{labels, interaction, intercept}{See \code{\link[=compare_models]{compare_models()}}. A positional
+\code{labels} vector has one entry per frequentist term, in the order
+\code{\link[=tidy_estimates]{tidy_estimates()}} returns them, once the intercept has been dropped.
 \code{intercept} defaults to \code{TRUE} here, matching the original behaviour.}
 
 \item{facet, scales}{Layout controls. Because a Bayesian model almost always

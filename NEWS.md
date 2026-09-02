@@ -1,3 +1,42 @@
+# depictr (development version)
+
+## Figures that misreported the data
+
+* `survival_plot()` silently mis-coded a factor or character `status`. A factor
+  was coerced to its level codes and read under the `survival::Surv()` 1/2
+  convention, so whichever level sorted first was taken as censored whatever it
+  meant, and a character vector became `NA` throughout and drew a flat curve at
+  one. Both are now refused with an error that says to recode the indicator
+  first, as the `status` documentation always promised for any other coding.
+* `survival_plot()` ignored `group` when `time` was a data frame, reading the
+  arm only from a column named `group`, `strata` or `arm`, so
+  `survival_plot(df, group = "treatment")` drew a single pooled curve with no
+  legend, log-rank test or risk-table rows. A column name or a vector with one
+  entry per row is now honoured for both `group` and `status`, and takes
+  precedence over the conventionally named column; a name that matches no column
+  is an error.
+* `timeseries_plot()` drew an integer-horizon forecast of a numeric `x` at the
+  wrong positions. The forecaster works on a `ts` that starts at time one, so its
+  times came back in cycle units while the history sat at the observation index
+  or the user's `time`; the overlay jumped from the last observation back to
+  about `x = n / frequency`, and on a `Date` axis landed in the year 4. The
+  forecast now continues the history's own axis by its typical spacing.
+* `frequentist_bayesian_plot()` read a `brms::fixef()` matrix as posterior
+  draws, since every matrix counted as draws. The summary was melted column-wise
+  into one posterior per summary statistic, with `Estimate`, `Est.Error`, `Q2.5`
+  and `Q97.5` drawn as terms beside the frequentist ones. A matrix whose columns
+  are summary statistics now takes the summary path, as the documentation
+  describes. On that path a frequentist model with a factor predictor no longer
+  raises a spurious warning about unused `b_`-prefixed `labels` keys.
+* Positional `labels` in `coefficient_plot()` were applied after the rows had
+  been reversed for the default `order = "none"`, so the first label landed on
+  the last term and, with `order = "ascending"`, labels were dealt out by
+  estimate rank rather than by term. A positional vector now follows the order
+  of `tidy_estimates()`, top to bottom in the default layout, whatever `order`
+  does to the rows. `compare_models()` and `frequentist_bayesian_plot()` accept
+  the positional vector their documentation promised, one entry per distinct
+  term, where any positional vector previously failed with a length error.
+
 # depictr 0.3.0
 
 ## Auditing a finished figure

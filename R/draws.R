@@ -11,15 +11,25 @@
 #' Is `x` a recognised source of posterior draws?
 #'
 #' TRUE for fitted Bayesian models (brms/rstanarm), posterior `draws` objects,
-#' and matrices. Data frames are *not* claimed here, because a tidy data frame
-#' of posterior *summaries* (estimate/conf.low/...) must keep flowing down the
-#' summary path; `has_draws()` disambiguates those two data-frame cases.
+#' and matrices whose columns are not posterior summaries. Data frames are
+#' *not* claimed here, because a tidy data frame of posterior *summaries*
+#' (estimate/conf.low/...) must keep flowing down the summary path;
+#' `has_draws()` disambiguates those two data-frame cases. A matrix is held to
+#' the same test, since `brms::fixef()` returns its summary as a matrix with
+#' one row per term, which melted column-wise would draw a posterior per
+#' summary statistic.
 #' @noRd
 is_draws_source <- function(x) {
   inherits(x, c("brmsfit", "stanreg", "draws", "draws_df", "draws_matrix",
                 "draws_array", "draws_list", "draws_rvars")) ||
-    is.matrix(x)
+    (is.matrix(x) && !any(colnames(x) %in% summary_columns))
 }
+
+#' Column names that mark a table of posterior summaries rather than draws
+#' @noRd
+summary_columns <- c("estimate", "Estimate", "conf.low", "conf.high",
+                     "std.error", "2.5 %", "97.5 %", "l-95% CI", "u-95% CI",
+                     "Q2.5", "Q97.5")
 
 #' Does this object actually carry per-draw samples (not just summaries)?
 #'
@@ -37,11 +47,7 @@ has_draws <- function(x) {
   has_index <- any(c(".chain", ".iteration", ".draw") %in% nm)
   par_col <- intersect(c("parameter", "term", ".variable", "variable"), nm)
   val_col <- intersect(c("value", ".value", "draw"), nm)
-  summary_cols <- intersect(
-    c("estimate", "Estimate", "conf.low", "conf.high", "std.error",
-      "2.5 %", "97.5 %", "l-95% CI", "u-95% CI", "Q2.5", "Q97.5"),
-    nm
-  )
+  summary_cols <- intersect(summary_columns, nm)
 
   # Long draws: a parameter column AND a per-draw value column, and crucially no
   # summary columns (otherwise it is a tidy summary table that happens to have a

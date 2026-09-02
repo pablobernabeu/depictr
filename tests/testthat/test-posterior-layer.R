@@ -323,3 +323,26 @@ test_that("extract_draws() reads a posterior draws object", {
 # The brmsfit extraction path (posterior::as_draws_df dispatch) is verified
 # manually against a real fit in dev/; CI covers the draws-object and
 # data-frame paths above, so depictr needs no heavy brms dependency.
+
+test_that("a brms::fixef() summary matrix takes the summary path", {
+  # Regression: every matrix counted as draws, so the fixef() summary was
+  # melted column-wise into one posterior per summary statistic.
+  fx <- readRDS(system.file("extdata", "brms_fixef_lexdec.rds",
+                            package = "depictr"))
+  expect_true(is.matrix(fx))
+  expect_false(depictr:::has_draws(fx))
+  # A matrix of draws with parameter columns is still draws.
+  expect_true(depictr:::has_draws(matrix(rnorm(20), ncol = 2,
+                                         dimnames = list(NULL, c("a", "b")))))
+
+  fit <- lm(RT ~ condition + modality + word_frequency,
+            data = lexical_decision)
+  # No warning either: the automatic factor-level keys added for the
+  # frequentist model must not be reported as unused `labels`.
+  expect_no_warning(p <- frequentist_bayesian_plot(fit, fx))
+  expect_s3_class(p, "ggplot")
+  expect_setequal(unique(as.character(p$data$label)),
+                  c("Intercept", "condition", "modality", "word frequency"))
+  expect_setequal(as.character(unique(p$data$source)),
+                  c("Frequentist analysis", "Bayesian analysis"))
+})

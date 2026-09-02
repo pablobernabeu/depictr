@@ -15,9 +15,10 @@
 #' @param order Order the terms by estimate: `"none"` (keep input order),
 #'   `"ascending"` or `"descending"`.
 #' @param labels Optional display labels for the terms. Either a character
-#'   vector the same length as the number of terms (in plotting order) or a
-#'   named vector mapping raw term names to labels. If `NULL`, names are tidied
-#'   with [format_terms()].
+#'   vector with one entry per term, in the order [tidy_estimates()] returns
+#'   them once the intercept has been dropped (top to bottom of the plot when
+#'   `order = "none"`), or a named vector mapping raw term names to labels. If
+#'   `NULL`, names are tidied with [format_terms()].
 #' @param interaction Passed to [format_terms()] to control how interaction
 #'   terms are rendered (ignored when `labels` is supplied).
 #' @param point_colour,reference_colour Colours for the estimates and the
@@ -111,6 +112,9 @@ coefficient_plot <- function(x,
     stop("No terms left to plot (did you drop the only term?).", call. = FALSE)
   }
 
+  # Key a positional `labels` vector by the terms before they are reordered,
+  # so each label stays with its term whatever `order` does to the rows.
+  labels <- position_labels(est$term, labels)
   est <- order_terms(est, order)
 
   est$label <- make_labels(est$term, labels, interaction)
@@ -339,6 +343,23 @@ warn_unused_labels <- function(terms, labels) {
             call. = FALSE)
   }
   invisible(NULL)
+}
+
+#' Key a positional `labels` vector by the distinct terms it stands for
+#'
+#' A positional vector is matched to the distinct terms in the order they are
+#' first met, so a caller that labels a reordered, stacked or long table can
+#' look every row up by name instead of by position. Named or absent labels
+#' are returned as they are.
+#' @noRd
+position_labels <- function(terms, labels) {
+  if (is.null(labels) || !is.null(names(labels))) return(labels)
+  terms <- unique(terms)
+  if (length(labels) != length(terms)) {
+    stop("`labels` has length ", length(labels), " but there are ",
+         length(terms), " terms to label.", call. = FALSE)
+  }
+  stats::setNames(labels, terms)
 }
 
 #' Build display labels for a set of terms

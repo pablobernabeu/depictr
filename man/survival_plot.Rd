@@ -27,16 +27,19 @@ survival_plot(
 must be finite: a missing or infinite one is an error rather than a silent
 exclusion, since dropping it would move the number at risk unannounced.}
 
-\item{status}{Event indicator when \code{time} is a vector. Either the 0/1
+\item{status}{Event indicator: a vector, or a column name when \code{time} is a
+data frame (by default its \code{status} or \code{event} column). Either the 0/1
 convention (\code{0} = censored, \code{1} = event) or the \code{\link[survival:Surv]{survival::Surv()}} 1/2
 convention (\code{1} = censored, \code{2} = event) is accepted; logical values are
-also allowed. Other codings raise an error. Observations whose status is
-missing are dropped with a message, since they record neither an event nor
-a censoring.}
+also allowed. Other codings, including a factor or character indicator,
+raise an error, since which level means an event cannot be inferred.
+Observations whose status is missing are dropped with a message, since
+they record neither an event nor a censoring.}
 
-\item{group}{Optional grouping variable (a vector, or a column name when
-\code{time} is a data frame). Observations whose group is missing are dropped
-with a message, since they belong to no arm.}
+\item{group}{Optional grouping variable: a vector, or a column name when
+\code{time} is a data frame (by default its \code{group}, \code{strata} or \code{arm} column,
+if any). Observations whose group is missing are dropped with a message,
+since they belong to no arm.}
 
 \item{conf_level}{Confidence level for the limits (\code{NA} to omit them).}
 

@@ -187,3 +187,38 @@ test_that("a frequency-7 series is labelled by season index, not weekday", {
   pw <- seasonal_plot(y, season_labels = wd)
   expect_setequal(unique(as.character(pw$data$season)), wd)
 })
+
+test_that("an integer forecast horizon continues a numeric `x` on its own axis", {
+  # Regression: a numeric `x` was wrapped in a ts starting at time 1, so the
+  # forecast times came back in cycle units (1 + h / frequency) and the overlay
+  # jumped from the last observation back to about x = n / frequency; on a
+  # Date axis it landed in the year 4.
+  set.seed(1)
+  vals <- 100 + 10 * sin(2 * pi * seq_len(36) / 12) + rnorm(36)
+  fc_times <- function(p) {
+    p$layers[[length(p$layers)]]$data$time
+  }
+  # Default axis: the observation index.
+  p <- timeseries_plot(vals, forecast = 6, frequency = 12)
+  expect_equal(fc_times(p), c(36, 37:42))
+  # A numeric `time`.
+  p <- timeseries_plot(vals, time = 2000:2035, forecast = 6, frequency = 12)
+  expect_equal(fc_times(p), c(2035, 2036:2041))
+  # Irregular spacing continues at the typical step.
+  p <- timeseries_plot(vals, time = c(seq(2, 70, by = 2), 100),
+                       forecast = 3, frequency = 12)
+  expect_equal(fc_times(p), c(100, 102, 104, 106))
+  # A Date axis, stepping by the median gap in days.
+  months <- seq(as.Date("2020-01-01"), by = "month", length.out = 36)
+  p <- timeseries_plot(vals, time = months, forecast = 6, frequency = 12)
+  ft <- fc_times(p)
+  expect_s3_class(ft, "Date")
+  expect_equal(ft[1], as.Date("2022-12-01"))
+  expect_true(all(ft > as.Date("2022-12-01") - 1))
+  expect_equal(as.numeric(diff(ft)), rep(31, 6))
+  # A ts keeps its decimal-year axis.
+  p <- timeseries_plot(ms_ts(), forecast = 6)
+  y <- ms_ts()
+  expect_equal(fc_times(p)[-1], as.numeric(stats::time(y))[length(y)] +
+                 seq_len(6) / stats::frequency(y))
+})
