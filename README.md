@@ -2,6 +2,7 @@
 
 <!-- badges: start -->
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21266308.svg)](https://doi.org/10.5281/zenodo.21266308)
+[![CRAN status](https://www.r-pkg.org/badges/version/depictr)](https://CRAN.R-project.org/package=depictr)
 [![R-CMD-check](https://github.com/pablobernabeu/depictr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/pablobernabeu/depictr/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/license/MIT)
@@ -33,6 +34,14 @@ number-at-risk table, each from a single function call:
 ![Kaplan-Meier survival curves by treatment arm, with confidence bands, censoring marks, a log-rank test and a number-at-risk table](man/figures/README-survival.png)
 
 ## Installation
+
+depictr is on [CRAN](https://CRAN.R-project.org/package=depictr):
+
+```r
+install.packages("depictr")
+```
+
+The development version installs from GitHub:
 
 ```r
 # install.packages("remotes")
