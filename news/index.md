@@ -2,6 +2,8 @@
 
 ## depictr 0.3.0
 
+CRAN release: 2026-09-01
+
 ### Auditing a finished figure
 
 - New

@@ -38,6 +38,15 @@ censoring marks, a log-rank test and a number-at-risk table
 
 ## Installation
 
+depictr is on [CRAN](https://CRAN.R-project.org/package=depictr):
+
+``` r
+
+install.packages("depictr")
+```
+
+The development version installs from GitHub:
+
 ``` r
 
 # install.packages("remotes")

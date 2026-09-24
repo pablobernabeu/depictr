@@ -99,7 +99,11 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
+<p>depictr is on <a href="https://CRAN.R-project.org/package=depictr" class="external-link">CRAN</a>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"depictr"</span><span class="op">)</span></span></code></pre></div>
+<p>The development version installs from GitHub:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"pablobernabeu/depictr"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -114,7 +118,7 @@
 </h2>
 <p>The default palette is the Okabe-Ito set, and that choice is checked. The package ships a simulator of colour-vision deficiency based on the model of Machado, Oliveira and Fernandes (2009), and <code><a href="reference/palette_safety.html">palette_safety()</a></code> measures how far apart the palette’s colours stay under each deficiency.</p>
 <p>A safe palette is not a safe figure, though, so <code><a href="reference/check_figure.html">check_figure()</a></code> audits the plot you are about to submit. It measures how separable the encoding colours are under each dichromacy and in greyscale, how small the text becomes at a stated output width, how well text and geometry contrast with their backgrounds under WCAG, and whether any distinction rests on colour alone. Each row reports the value it measured next to the threshold, so a verdict can be argued with.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/check_figure.html">check_figure</a></span><span class="op">(</span><span class="fu"><a href="reference/explore_distribution.html">explore_distribution</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">RT</span>, group <span class="op">=</span> <span class="va">condition</span><span class="op">)</span>,</span>
 <span>             width_cm <span class="op">=</span> <span class="fl">8.9</span><span class="op">)</span></span></code></pre></div>
 <p>Two limits are worth knowing. The colourblind-safety guarantee covers the eight base colours, and past those the palette interpolates, with a warning from <code><a href="reference/depictr_palette.html">depictr_palette()</a></code>. The guarantee is also confined to hue confusion: in greyscale the palette’s orange and sky blue differ by only 0.79 in CIE lightness, so they print as the same grey. A figure that may be printed in black and white wants fewer groups, a sequential palette, or a redundant shape or line type.</p>
@@ -122,7 +126,7 @@
 <div class="section level2">
 <h2 id="a-first-plot">A first plot<a class="anchor" aria-label="anchor" href="#a-first-plot"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pablobernabeu.github.io/depictr/">depictr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">rainfall</span> <span class="op">+</span> <span class="va">fertiliser</span> <span class="op">+</span> <span class="va">soil_ph</span> <span class="op">+</span> <span class="va">treatment</span>, data <span class="op">=</span> <span class="va">crop_yield</span><span class="op">)</span></span>
@@ -182,6 +186,7 @@
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
+<li><a href="https://cloud.r-project.org/package=depictr" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/pablobernabeu/depictr/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/pablobernabeu/depictr/issues" class="external-link">Report a bug</a></li>
 </ul>
@@ -223,6 +228,7 @@
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://doi.org/10.5281/zenodo.21266308" class="external-link"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.21266308.svg" alt="DOI"></a></li>
+<li><a href="https://CRAN.R-project.org/package=depictr" class="external-link"><img src="https://www.r-pkg.org/badges/version/depictr" alt="CRAN status"></a></li>
 <li><a href="https://github.com/pablobernabeu/depictr/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/pablobernabeu/depictr/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
 <li><a href="https://opensource.org/license/MIT" class="external-link"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a></li>
