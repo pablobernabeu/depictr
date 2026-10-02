@@ -22,8 +22,12 @@ pca_plot(
 \item{cols}{When \code{x} is a data frame, the numeric columns to analyse
 (default: all numeric).}
 
-\item{group}{Optional grouping variable (a column name when \code{x} is a data
-frame, or a vector the length of the data) mapped to colour.}
+\item{group}{Optional grouping variable mapped to colour. When \code{x} is a data
+frame, give a column of \code{x}, unquoted or as a string, or a vector with one
+value per row of \code{x}. Rows with missing values count, although the
+analysis drops them. When \code{x} is a \code{\link[stats:prcomp]{stats::prcomp()}} object, give a vector
+with one value per observation. A name that matches no column, or a vector
+of another length, is an error.}
 
 \item{components}{Length-2 integer vector: which components to plot.}
 
@@ -46,6 +50,20 @@ Runs a principal component analysis on the numeric columns of a data frame
 (or takes an existing \code{\link[stats:prcomp]{stats::prcomp()}} object) and draws a biplot: the
 observations projected onto two components, with the variable loadings shown
 as arrows. Optionally colour the observations by a grouping variable.
+}
+\details{
+Each arrow is a variable's loadings on the two components, taken from the
+rotation matrix and multiplied by a factor that all the arrows share. The
+factor makes the largest coordinate of any arrow three quarters of the
+largest absolute score. Both axes use that one factor, as \code{\link[stats:biplot]{stats::biplot()}} uses one
+ratio for both, and the aspect ratio is fixed at 1. An arrow's angle on the
+page is therefore its angle in loading space, whatever the size of the
+figure. The panel's height and width follow the ranges of its two axes, so a
+figure of another shape leaves blank space around the panel. Because the
+scores are drawn as they are and the arrows as loadings, the angle between
+two arrows does not estimate the correlation between their variables. Arrows
+and labels are drawn in a neutral dark grey (\code{grey20}), which is not in the
+default palette, so no arrow reads as part of a group.
 }
 \examples{
 pca_plot(crop_yield, cols = c("rainfall", "fertiliser", "soil_ph", "yield"),

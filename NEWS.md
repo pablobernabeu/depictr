@@ -165,6 +165,21 @@
   at a time. An unsorted `time` is also put in order before forecasting, as it
   already was for the moving average.
 
+* `pca_plot()` now fixes the aspect ratio, so the angles drawn between the
+  loading arrows are their angles in loading space whatever the size of the
+  device. The panel's height and width follow the ranges of its axes, so a
+  figure of another shape gains blank space around the panel. The arrows and
+  their labels are drawn in a neutral dark grey (`grey20`) in place of the
+  accent, which is also the palette's fourth colour and so tied the variables
+  to the fourth group. A misspelt `group` column, a column name passed with a
+  `prcomp` object and a `group` vector of the wrong length are now errors. The
+  first put one point in a level named after the misspelling and the rest in
+  `NA`. The second put every point in one level named after the column, and
+  the third was padded with `NA` or recycled in silence. `group` also takes an
+  unquoted column name, as elsewhere in the package. A `prcomp` object fitted
+  with `retx = FALSE` has no scores to draw, and it is now refused with a
+  message that says so.
+
 ## Degenerate input
 
 * `survival_plot()` truncated a non-integer status code, so `c(0, 0.5, 1)` was

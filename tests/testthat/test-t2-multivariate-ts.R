@@ -29,16 +29,40 @@ test_that("scree_plot uses brand bars and the accent for the cumulative overlay"
   expect_false("#e23b3b" %in% built_aes(p, "colour"))
 })
 
-test_that("pca_plot draws brand points and accent loadings (single-group)", {
+test_that("pca_plot draws brand points and grey loadings (single-group)", {
   cols <- c("rainfall", "fertiliser", "soil_ph", "yield")
   p <- pca_plot(crop_yield, cols = cols)
   expect_no_warning(b <- ggplot2::ggplot_build(p))
 
   expect_identical(unique(b$data[[1]]$colour), depictr_brand())  # observations
-  # Loading arrows and labels share the single accent (was #e23b3b / #b1262d).
+  # Loading arrows and labels share one neutral grey (was #e23b3b / #b1262d,
+  # then the accent).
+  geoms <- vapply(p$layers, function(l) class(l$geom)[1], character(1))
+  for (g in c("GeomSegment", "GeomLabel")) {
+    expect_identical(unique(b$data[[which(geoms == g)]]$colour), "grey20")
+  }
   load_cols <- built_aes(p, "colour")
-  expect_true(depictr_accent() %in% load_cols)
-  expect_false(any(c("#e23b3b", "#b1262d") %in% load_cols))
+  expect_false(any(c("#e23b3b", "#b1262d", depictr_accent()) %in% load_cols))
+})
+
+test_that("pca_plot loadings share no colour with any group", {
+  # The accent is the palette's fourth colour, so with four groups the arrows
+  # used to read as belonging to the fourth.
+  cols <- c("rainfall", "fertiliser", "soil_ph", "yield")
+  four <- rep(c("a", "b", "c", "d"), length.out = nrow(crop_yield))
+  p <- pca_plot(crop_yield, cols = cols, group = four)
+  expect_no_warning(b <- ggplot2::ggplot_build(p))
+  rgb_of <- function(x) {
+    grDevices::rgb(t(grDevices::col2rgb(x)), maxColorValue = 255)
+  }
+  geoms <- vapply(p$layers, function(l) class(l$geom)[1], character(1))
+  loading_cols <- unique(c(b$data[[which(geoms == "GeomSegment")]]$colour,
+                           b$data[[which(geoms == "GeomLabel")]]$colour))
+  group_cols <- unique(b$data[[1]]$colour)
+  expect_length(group_cols, 4)
+  expect_false(any(
+    rgb_of(loading_cols) %in% rgb_of(c(group_cols, depictr_palette()))
+  ))
 })
 
 test_that("pca_plot grouped colours come from the qualitative palette", {
