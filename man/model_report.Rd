@@ -15,8 +15,10 @@ model_report(
 \arguments{
 \item{model}{A fitted \code{lm} or \code{glm} model.}
 
-\item{predictor}{Focal predictor for the effect panel. If \code{NULL}, the first
-numeric predictor (or, failing that, the first predictor) is used.}
+\item{predictor}{Focal predictor for the effect panel, given as in
+\code{\link[=effects_plot]{effects_plot()}}. If \code{NULL}, the first numeric variable in the formula (or,
+failing that, the first variable) is used, so a model with
+\code{log(rainfall)} shows the effect of \code{rainfall}.}
 
 \item{standardise}{Whether the coefficient panel shows standardised
 coefficients (each scaled by its predictor's standard deviation). Defaults

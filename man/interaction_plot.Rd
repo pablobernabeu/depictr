@@ -21,12 +21,16 @@ interaction_plot(
 \arguments{
 \item{model}{A fitted model (\code{lm}, \code{glm}, \code{merMod}, ...).}
 
-\item{predictor}{Name of the focal predictor on the x-axis (string).}
+\item{predictor}{Name of the focal predictor on the x-axis (string), given
+as in \code{\link[=effects_plot]{effects_plot()}}: \code{"log(rainfall)"} means \code{rainfall}.}
 
-\item{moderator}{Name of the moderating predictor, mapped to colour (string).}
+\item{moderator}{Name of the moderating predictor, mapped to colour
+(string), given in the same way as \code{predictor}. It must be a different
+variable.}
 
-\item{moderator_values}{For a numeric moderator, the values to show. Defaults
-to the 10th, 50th and 90th percentiles.}
+\item{moderator_values}{For a numeric moderator, the values to show, on the
+variable's own scale. Defaults to the 10th, 50th and 90th percentiles in
+the estimation sample.}
 
 \item{conf_level}{Confidence level for the bands/intervals.}
 
@@ -45,6 +49,11 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 Shows how the predicted relationship between a focal predictor and the
 response changes across the levels (or representative values) of a second,
 moderating predictor. Other predictors are held at typical values.
+}
+\details{
+The grid is built as in \code{\link[=effects_plot]{effects_plot()}}. It holds the raw variables, so
+transformed terms are predicted as fitted. Typical values come from the
+estimation sample, and an offset is held at its mean on the link scale.
 }
 \examples{
 fit <- lm(yield ~ fertiliser * treatment + rainfall, data = crop_yield)

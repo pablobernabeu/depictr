@@ -10,8 +10,10 @@
 #' report appendix.
 #'
 #' @param model A fitted `lm` or `glm` model.
-#' @param predictor Focal predictor for the effect panel. If `NULL`, the first
-#'   numeric predictor (or, failing that, the first predictor) is used.
+#' @param predictor Focal predictor for the effect panel, given as in
+#'   [effects_plot()]. If `NULL`, the first numeric variable in the formula (or,
+#'   failing that, the first variable) is used, so a model with
+#'   `log(rainfall)` shows the effect of `rainfall`.
 #' @param standardise Whether the coefficient panel shows standardised
 #'   coefficients (each scaled by its predictor's standard deviation). Defaults
 #'   to `TRUE`, which keeps the panel readable in this compact overview by
@@ -36,12 +38,15 @@ model_report <- function(model, predictor = NULL, standardise = TRUE,
   if (!inherits(model, "lm")) {
     stop("`model` must be an 'lm' or 'glm' object.", call. = FALSE)
   }
-  mf <- stats::model.frame(model)
-  preds <- names(mf)[-1]
+  raw <- model_raw_data(model)
+  preds <- raw$predictors
   if (length(preds) == 0) stop("The model has no predictors.", call. = FALSE)
   if (is.null(predictor)) {
-    numeric_preds <- preds[vapply(mf[preds], is.numeric, logical(1))]
+    numeric_preds <- setdiff(preds[vapply(raw$data[preds], is.numeric,
+                                          logical(1))], raw$categorical)
     predictor <- if (length(numeric_preds)) numeric_preds[1] else preds[1]
+  } else {
+    predictor <- resolve_predictor(predictor, raw, "predictor")
   }
 
   p_coef <- coefficient_plot(

@@ -19,7 +19,10 @@ effects_plot(
 \arguments{
 \item{model}{A fitted model (\code{lm}, \code{glm}, \code{merMod}, ...).}
 
-\item{predictor}{Name of the focal predictor (string).}
+\item{predictor}{Name of the focal predictor (string): a variable in the
+model's formula, or a model-frame name such as \code{"log(rainfall)"}, which
+stands for the one variable it transforms. A term built from several
+variables, such as \code{"I(rainfall * fertiliser)"}, is refused.}
 
 \item{conf_level}{Confidence level for the interval.}
 
@@ -42,13 +45,35 @@ frequent level for factors). A confidence band (numeric predictor) or
 confidence intervals (factor predictor) convey uncertainty.
 }
 \details{
+The prediction grid holds the variables the formula names, on their own
+scale, and \code{\link[stats:predict]{stats::predict()}} re-applies each transformation to it. A model
+with terms such as \code{log(rainfall)}, \code{poly(fertiliser, 2)}, \code{splines::ns()},
+\code{scale()}, \code{factor()} or \code{I()} is therefore predicted as fitted, and the
+x-axis shows the raw variable. Typical values and the range of the focal
+predictor are taken over the rows the model was fitted to. A numeric
+variable that enters only through \code{factor()} is held at its most frequent
+value. A variable that enters only through a transformation is recovered
+from the data named in the model's call, so such a model fitted to
+workspace vectors without \verb{data =} is refused. A term computed from
+statistics of its rows, such as \code{I(x - mean(x))}, is refused too, since
+\code{predict()} would compute it afresh over the grid. Centre such a variable in
+the data, or use \code{scale()}, which \code{predict()} re-applies as fitted.
+
+An offset, whether an \code{offset()} term or the \code{offset} argument, is held at
+its mean over the rows the model was fitted to, on the link scale. For a
+Poisson rate model with \code{offset(log(exposure))}, the line is the expected
+count at the geometric-mean exposure. The offset stays at its mean when the
+focal predictor enters it too, as in \code{log(exposure) + offset(log(exposure))},
+so the line then shows the predictor's effect beyond the offset. The y-axis
+label ends in "at the mean offset".
+
 Predictions and standard errors come from \code{\link[stats:predict]{stats::predict()}}; \code{glm}
 predictions are formed on the link scale and back-transformed, so a binomial
 model shows predicted probabilities. Mixed models fitted with
 \code{\link[lme4:lmer]{lme4::lmer()}}/\code{\link[lme4:glmer]{lme4::glmer()}} are supported too: predictions use only the
-fixed effects (\code{re.form = NA}) and standard errors come from the fixed-effect
-design matrix and \code{vcov()}. Works with \code{lm}, \code{glm} and \code{merMod}; other model
-classes are attempted on a best-effort basis.
+fixed effects (as \code{re.form = NA} does) and standard errors come from the
+fixed-effect design matrix and \code{vcov()}. Works with \code{lm}, \code{glm} and
+\code{merMod}; other model classes are attempted on a best-effort basis.
 }
 \examples{
 fit <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)

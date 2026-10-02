@@ -125,6 +125,24 @@
   cairo, the old devices are used, with a message or a warning saying what the
   file lacks.
 
+* `effects_plot()`, `interaction_plot()` and `model_report()` failed on any
+  model with a transformed term (`log()`, `poly()`, `ns()`, `scale()`,
+  `factor()`, `I()`) or an offset. Where a transformed term sat beside its raw
+  variable, they drew a flat effect line or coincident interaction lines
+  without complaint. The prediction grid is now built from the raw variables,
+  so `predict()` re-applies every transformation, and offsets are held at their
+  sample mean on the link scale, as the y-axis label now says. A model-frame
+  name such as `"log(rainfall)"` stands for the variable it transforms, and the
+  x-axis shows that variable.
+* The raw values behind a transformed term come from the data named in the
+  model's call. A model fitted to workspace vectors without `data =` is
+  therefore refused, where it could silently plot its fitted values against the
+  grid, and so is a data frame that has changed since the fit or a formula that
+  reads one with `$`. A term computed from statistics of its rows, such as
+  `I(x - mean(x))`, is refused as well, since `predict()` would compute it
+  afresh over the grid. Beside its raw variable, such a term used to shift the
+  line without complaint.
+
 ## Degenerate input
 
 * `survival_plot()` truncated a non-integer status code, so `c(0, 0.5, 1)` was
