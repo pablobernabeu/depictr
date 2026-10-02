@@ -61,6 +61,28 @@
   departures from the line. The weights now scale each observation's variance,
   as they do in the fit.
 
+* A brms posterior passed as a `posterior` draws object was read as a plain
+  table. `frequentist_bayesian_plot()` silently pooled `b_Intercept` with
+  `Intercept`, the intercept brms reports for centred predictors, into one
+  slab. It also drew the sampler's log density and every random effect as
+  parameters. `posterior_plot()` stopped with an error about duplicated factor
+  levels. Draws objects now keep their population-level (`b_`) parameters,
+  named without the prefix as for a brms fit, with a message naming what was
+  dropped. A `labels` key for one of them is written without the prefix too.
+  In both functions, two parameters whose draws would share a label are now an
+  error, and `lp__` and `lprior` are never drawn as parameters, whatever form
+  the draws take. For a `stanreg` fit, the group-level `b[...]` and
+  `Sigma[...]` draws are no longer read as fixed effects either.
+* When `bayesian` holds draws, `frequentist_bayesian_plot()` now draws only the
+  terms both inputs share, and a message names any it dropped. A `sigma` in the
+  posterior, or a frequentist term with no posterior, no longer takes a row of
+  its own. Inputs that share no terms are an error.
+* A `brms::fixef()` matrix was read as draws, so it came out as four
+  'parameters' named after its columns. `frequentist_bayesian_plot()` now takes
+  the summary path for it, and `posterior_plot()`, which needs draws, refuses
+  it. The summary path also no longer warns about label keys you never
+  supplied.
+
 # depictr 0.3.0
 
 ## Auditing a finished figure

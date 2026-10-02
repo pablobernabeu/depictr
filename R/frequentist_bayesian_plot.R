@@ -13,18 +13,25 @@
 #' `posterior` draws object, a draws matrix, or a long/wide draws data frame),
 #' the full posterior *distribution* is drawn per term (a 'ggdist' half-eye)
 #' and the frequentist point and confidence interval is overlaid at the same
-#' position. When `bayesian` is only a tidy table of posterior *summaries*
-#' (columns such as `term`, `estimate`, `conf.low`/`conf.high`, or the
-#' `Estimate`, `l-95% CI`, `u-95% CI` of `brms::fixef()`), the function shows the
-#' familiar two-source forest plot via [compare_models()].
+#' position. When `bayesian` is only a table of posterior *summaries*, the
+#' function shows the familiar two-source forest plot via [compare_models()].
+#' It reads tidy columns (`term`, `estimate`, `conf.low`, `conf.high`), the
+#' `Estimate`, `Q2.5` and `Q97.5` of the matrix `brms::fixef()` returns, and the
+#' `l-95% CI` and `u-95% CI` of `summary(fit)$fixed`.
 #'
 #' Terms are aligned by their canonical display label, so the `brms`-style `b_`
-#' prefix is reconciled automatically against the frequentist term names.
+#' prefix is reconciled automatically against the frequentist term names. Draws
+#' are read as in [posterior_plot()], so a draws object holding `b_` parameters
+#' keeps only those, and two terms that would share a label are an error. With
+#' draws, only the terms both sides share are drawn, and a message names any
+#' dropped, such as a `sigma` in the posterior. The forest plot of summaries
+#' draws every term of either input.
 #'
 #' @param frequentist A frequentist model (e.g. from `lm`, `glm` or
 #'   `lmerTest::lmer`) or a tidy data frame of estimates.
 #' @param bayesian A Bayesian model, a `posterior` draws object, a draws
-#'   matrix/data frame, or a tidy data frame of posterior summaries.
+#'   matrix/data frame, a tidy data frame of posterior summaries or a summary
+#'   matrix such as `brms::fixef()` returns.
 #' @param conf_level Confidence/credible level for models.
 #' @param labels,interaction,intercept See [compare_models()]. On both paths,
 #'   an unnamed `labels` vector takes the frequentist terms first, then any
@@ -100,15 +107,16 @@ frequentist_bayesian_plot <- function(frequentist,
   }
   bayes_label <- "Bayesian analysis"
 
-  # Prettify coefficient names to the effect (variable) name by default, from
-  # the frequentist model (e.g. "conditionunrelated" -> "condition"); the same
-  # map applies to the frequentist estimates and the b_-stripped Bayesian draw
-  # names, and any user-supplied `labels` take precedence.
-  labels <- merge_pretty_labels(labels, pretty_coef_map(frequentist))
-
   # The namesake behaviour: when the Bayesian side carries actual draws, render
   # the full posterior distribution and overlay the frequentist point + CI.
   if (has_draws(bayesian)) {
+    # Prettify coefficient names to the effect (variable) name by default, from
+    # the frequentist model (e.g. "conditionunrelated" -> "condition"); the same
+    # map applies to the frequentist estimates and the b_-stripped Bayesian draw
+    # names, and any user-supplied `labels` take precedence. The summary path
+    # leaves this to compare_models(), which builds the same map itself and
+    # must see the user's own `labels` to judge which keys match nothing.
+    labels <- merge_pretty_labels(labels, pretty_coef_map(frequentist))
     return(fbp_distribution(
       frequentist = frequentist, bayesian = bayesian,
       conf_level = conf_level, labels = labels, interaction = interaction,
@@ -118,7 +126,10 @@ frequentist_bayesian_plot <- function(frequentist,
     ))
   }
 
-  # Summary path: the familiar two-source forest plot.
+  # Summary path: the familiar two-source forest plot. A summary matrix, as
+  # brms::fixef() returns, keeps its terms in the row names, which
+  # tidy_estimates() reads from a data frame.
+  if (is.matrix(bayesian)) bayesian <- as.data.frame(bayesian)
   args <- list(frequentist, bayesian)
   names(args) <- c(freq_label, bayes_label)
 
@@ -149,8 +160,9 @@ frequentist_bayesian_plot <- function(frequentist,
 #' Draws a 'ggdist' half-eye per term from the Bayesian draws and overlays the
 #' frequentist estimate and confidence interval at the same y position, in the
 #' two leading colours of [depictr_palette()]. Terms are matched by canonical
-#' label so `b_`-prefixed Bayesian names line up with the frequentist ones.
-#' Falls back to point + interval slabs when 'ggdist' is unavailable.
+#' label so `b_`-prefixed Bayesian names line up with the frequentist ones, and
+#' only the matched terms are drawn. Falls back to point + interval slabs when
+#' 'ggdist' is unavailable.
 #' @noRd
 fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
                              interaction, intercept, freq_label, bayes_label,
@@ -189,15 +201,41 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
     stop("No Bayesian terms left to plot.", call. = FALSE)
   }
 
-  # Shared, reversed factor levels (top-to-bottom reading order), driven by the
-  # Bayesian terms with any frequentist-only terms appended.
-  lvls <- unique(c(draws$label, freq$label))
-  lvls <- rev(lvls)
+  # Within each side, two terms under one label would share a row, and on the
+  # Bayesian side their draws would pool into one slab.
+  check_label_clash(draws$term, draws$label)
+  check_label_clash(freq$term, freq$label)
+
+  # Only the terms both sides share are drawn. A slab with no frequentist
+  # overlay (a posterior's sigma, say), or an overlay with no slab, compares
+  # nothing.
+  b_terms <- draws[!duplicated(draws$term), c("term", "label")]
+  f_terms <- freq[!duplicated(freq$term), c("term", "label")]
+  shared <- intersect(b_terms$label, f_terms$label)
+  if (!length(shared)) {
+    stop("The frequentist and Bayesian inputs share no terms. Frequentist: ",
+         and_list(f_terms$term), ". Bayesian: ", and_list(b_terms$term), ".",
+         call. = FALSE)
+  }
+  b_only <- b_terms$term[!b_terms$label %in% shared]
+  f_only <- f_terms$term[!f_terms$label %in% shared]
+  if (length(b_only) || length(f_only)) {
+    message("Dropped the terms the two inputs do not share.",
+            if (length(b_only)) {
+              paste0(" Bayesian only: ", and_list(b_only), ".")
+            },
+            if (length(f_only)) {
+              paste0(" Frequentist only: ", and_list(f_only), ".")
+            })
+    draws <- draws[draws$label %in% shared, , drop = FALSE]
+    freq  <- freq[freq$label %in% shared, , drop = FALSE]
+  }
+
+  # Shared, reversed factor levels (top-to-bottom reading order), in the order
+  # of the Bayesian terms.
+  lvls <- rev(unique(draws$label))
   draws$label <- factor(draws$label, levels = lvls)
   freq$label  <- factor(freq$label,  levels = lvls)
-  # Keep only frequentist rows that match a plotted (Bayesian) term, plus carry
-  # any extras for completeness of the legend.
-  freq <- freq[!is.na(freq$label), , drop = FALSE]
 
   ref <- if (is.null(reference_line) || all(is.na(reference_line))) {
     NA_real_

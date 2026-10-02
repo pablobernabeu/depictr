@@ -13,7 +13,16 @@
 #' `rstanarm`), a `posterior` *draws* object, a wide data frame or matrix with
 #' one column of draws per parameter, or a long data frame (a parameter column
 #' and a value column). For fitted models only the fixed-effect (population)
-#' parameters are kept, with the `brms` `b_` prefix stripped.
+#' parameters are kept, with the `brms` `b_` prefix stripped. A draws object
+#' that holds `b_` parameters, as `posterior::as_draws_df()` returns for a
+#' `brms` fit, is read the same way, with a message naming the variables it
+#' dropped. Pass it through `as.data.frame()` to keep the other variables, as a
+#' model of your own whose names happen to start with `b_` may need. The log
+#' densities `lp__` and `lprior` are never drawn as parameters. Two parameters
+#' that would share a display label, such as the `b_Intercept` and centred
+#' `Intercept` of a plain table of `brms` draws, are an error until one is
+#' renamed with `labels`. A matrix of posterior summaries, such as
+#' `brms::fixef()` returns, holds no draws and is refused.
 #'
 #' The slab styles use the 'ggdist' package. When 'ggdist' is not installed the
 #' function falls back to the point-and-nested-interval display (equivalent to
@@ -32,7 +41,8 @@
 #' @param interaction Passed to [format_terms()] for the parameter labels.
 #' @param labels Optional named character vector renaming parameters, e.g.
 #'   `c(conditionunrelated = "condition")`. Unmatched parameters fall back to
-#'   [format_terms()].
+#'   [format_terms()]. For a `brms` fit, or a draws object holding `b_`
+#'   parameters, the names are given without the `b_` prefix.
 #' @param reference_line Position of a vertical reference line, or `NULL`/`NA`
 #'   to omit it. There is no universally meaningful reference for every
 #'   parameter, so this defaults to `0` (the usual "no effect" line for
@@ -114,6 +124,8 @@ posterior_plot <- function(draws,
   # data frame still flows through the original draws_to_long() so its existing
   # tests and behaviour are preserved exactly.
   long <- normalise_posterior_draws(draws)
+  # Dropping the log densities, or draws that are all NA, can leave nothing.
+  if (!nrow(long)) stop("No parameters left to plot.", call. = FALSE)
 
   params <- unique(long$term)
   warn_unused_labels(params, labels)
@@ -135,7 +147,9 @@ posterior_plot <- function(draws,
   }))
 
   lab_of <- function(term) make_labels(term, labels, interaction)
-  lvls <- rev(lab_of(params))
+  param_labels <- lab_of(params)
+  check_label_clash(params, param_labels)
+  lvls <- rev(param_labels)
   label_for <- function(term) factor(lab_of(term), levels = lvls)
   summ$label <- label_for(summ$term)
   long$label <- label_for(long$term)
@@ -305,11 +319,13 @@ prob_direction <- function(v, ref = 0) {
 #'
 #' A plain long/wide data frame uses the original `draws_to_long()` path so its
 #' established behaviour and tests are untouched; richer Bayesian inputs (fits,
-#' draws objects, matrices) route through `extract_draws()`.
+#' draws objects, matrices) route through `extract_draws()`. A `draws_df` is a
+#' data frame too, and is claimed first because the plain path would keep every
+#' variable of a brms posterior.
 #' @noRd
 normalise_posterior_draws <- function(draws) {
-  if (is.data.frame(draws)) {
-    long <- draws_to_long(draws)
+  if (is.data.frame(draws) && !inherits(draws, "draws")) {
+    long <- drop_log_densities(draws_to_long(draws), "parameter")
     return(data.frame(term = long$parameter, .value = long$value,
                       stringsAsFactors = FALSE))
   }

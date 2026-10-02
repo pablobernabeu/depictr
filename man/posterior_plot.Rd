@@ -44,7 +44,8 @@ outer width is used for the caption and the displayed interval mass.}
 
 \item{labels}{Optional named character vector renaming parameters, e.g.
 \code{c(conditionunrelated = "condition")}. Unmatched parameters fall back to
-\code{\link[=format_terms]{format_terms()}}.}
+\code{\link[=format_terms]{format_terms()}}. For a \code{brms} fit, or a draws object holding \code{b_}
+parameters, the names are given without the \code{b_} prefix.}
 
 \item{reference_line}{Position of a vertical reference line, or \code{NULL}/\code{NA}
 to omit it. There is no universally meaningful reference for every
@@ -95,7 +96,16 @@ Draws may be supplied in many shapes: a fitted Bayesian model (\code{brms} or
 \code{rstanarm}), a \code{posterior} \emph{draws} object, a wide data frame or matrix with
 one column of draws per parameter, or a long data frame (a parameter column
 and a value column). For fitted models only the fixed-effect (population)
-parameters are kept, with the \code{brms} \code{b_} prefix stripped.
+parameters are kept, with the \code{brms} \code{b_} prefix stripped. A draws object
+that holds \code{b_} parameters, as \code{posterior::as_draws_df()} returns for a
+\code{brms} fit, is read the same way, with a message naming the variables it
+dropped. Pass it through \code{as.data.frame()} to keep the other variables, as a
+model of your own whose names happen to start with \code{b_} may need. The log
+densities \code{lp__} and \code{lprior} are never drawn as parameters. Two parameters
+that would share a display label, such as the \code{b_Intercept} and centred
+\code{Intercept} of a plain table of \code{brms} draws, are an error until one is
+renamed with \code{labels}. A matrix of posterior summaries, such as
+\code{brms::fixef()} returns, holds no draws and is refused.
 
 The slab styles use the 'ggdist' package. When 'ggdist' is not installed the
 function falls back to the point-and-nested-interval display (equivalent to

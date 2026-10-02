@@ -26,7 +26,8 @@ frequentist_bayesian_plot(
 \code{lmerTest::lmer}) or a tidy data frame of estimates.}
 
 \item{bayesian}{A Bayesian model, a \code{posterior} draws object, a draws
-matrix/data frame, or a tidy data frame of posterior summaries.}
+matrix/data frame, a tidy data frame of posterior summaries or a summary
+matrix such as \code{brms::fixef()} returns.}
 
 \item{conf_level}{Confidence/credible level for models.}
 
@@ -70,13 +71,19 @@ here: when \code{bayesian} carries posterior \emph{draws} (a \code{brms}/\code{r
 \code{posterior} draws object, a draws matrix, or a long/wide draws data frame),
 the full posterior \emph{distribution} is drawn per term (a 'ggdist' half-eye)
 and the frequentist point and confidence interval is overlaid at the same
-position. When \code{bayesian} is only a tidy table of posterior \emph{summaries}
-(columns such as \code{term}, \code{estimate}, \code{conf.low}/\code{conf.high}, or the
-\code{Estimate}, \verb{l-95\% CI}, \verb{u-95\% CI} of \code{brms::fixef()}), the function shows the
-familiar two-source forest plot via \code{\link[=compare_models]{compare_models()}}.
+position. When \code{bayesian} is only a table of posterior \emph{summaries}, the
+function shows the familiar two-source forest plot via \code{\link[=compare_models]{compare_models()}}.
+It reads tidy columns (\code{term}, \code{estimate}, \code{conf.low}, \code{conf.high}), the
+\code{Estimate}, \code{Q2.5} and \code{Q97.5} of the matrix \code{brms::fixef()} returns, and the
+\verb{l-95\% CI} and \verb{u-95\% CI} of \code{summary(fit)$fixed}.
 
 Terms are aligned by their canonical display label, so the \code{brms}-style \code{b_}
-prefix is reconciled automatically against the frequentist term names.
+prefix is reconciled automatically against the frequentist term names. Draws
+are read as in \code{\link[=posterior_plot]{posterior_plot()}}, so a draws object holding \code{b_} parameters
+keeps only those, and two terms that would share a label are an error. With
+draws, only the terms both sides share are drawn, and a message names any
+dropped, such as a \code{sigma} in the posterior. The forest plot of summaries
+draws every term of either input.
 }
 \examples{
 # Summary path: a tidy "Bayesian" summary as a data frame. The summary here

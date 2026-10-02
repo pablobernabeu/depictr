@@ -247,9 +247,14 @@ test_that("fbp distribution path falls back to point+interval without ggdist", {
   freq <- lm(life_satisfaction ~ stress, data = wellbeing_survey)
   set.seed(13)
   draws <- data.frame(b_stress = rnorm(1000, -0.3, 0.1))
+  # The draws hold no intercept, so the frequentist one is dropped, with a
+  # message of its own.
   expect_message(
-    p <- frequentist_bayesian_plot(freq, draws),
-    "ggdist.*is not installed"
+    expect_message(
+      p <- frequentist_bayesian_plot(freq, draws),
+      "ggdist.*is not installed"
+    ),
+    "Frequentist only: \\(Intercept\\)\\."
   )
   gc <- geom_classes(p)
   expect_false("GeomSlabinterval" %in% gc)
@@ -294,7 +299,7 @@ test_that("has_draws() distinguishes draws from summary tables", {
   # Tidy summary tables are NOT draws.
   summ <- data.frame(term = "x", estimate = 1, conf.low = 0, conf.high = 2)
   expect_false(depictr:::has_draws(summ))
-  # brms::fixef()-style summary is NOT draws.
+  # A summary(brmsfit)$fixed-style summary is NOT draws.
   fx <- data.frame(Estimate = 1, `l-95% CI` = 0, `u-95% CI` = 2,
                    check.names = FALSE)
   expect_false(depictr:::has_draws(fx))
@@ -314,12 +319,246 @@ test_that("extract_draws() reads a posterior draws object", {
     posterior::draws_matrix(b_x = rnorm(200), b_y = rnorm(200))
   )
   ed <- depictr:::extract_draws(dd)
-  # Population-level names are kept as-is here (no stripping in the generic
-  # posterior path); the b_ prefix is reconciled later by format_terms().
-  expect_true(all(c("b_x", "b_y") %in% unique(ed$term)))
+  # Population-level parameters lose their b_ prefix, as they do when the
+  # brmsfit itself is passed, so one `labels` key reaches the frequentist term
+  # and its posterior alike.
+  expect_setequal(unique(ed$term), c("x", "y"))
   expect_true(all(c("term", ".value", ".draw") %in% names(ed)))
 })
 
 # The brmsfit extraction path (posterior::as_draws_df dispatch) is verified
 # manually against a real fit in dev/; CI covers the draws-object and
 # data-frame paths above, so depictr needs no heavy brms dependency.
+
+# ---- brms draws objects, fixef() matrices and label clashes -----------------
+
+# Mimics the variables posterior::as_draws_df() returns for a brms fit of
+# y ~ x, in brms's order. Beside the population-level b_ parameters there are
+# the residual SD, the intercept of the centred predictors (which brms reports
+# alongside b_Intercept) and the two log densities.
+brms_shaped_draws <- function(n = 400, seed = 21) {
+  set.seed(seed)
+  posterior::as_draws_df(data.frame(
+    b_Intercept = rnorm(n, 2, 0.1),
+    b_x         = rnorm(n, 0.5, 0.05),
+    sigma       = abs(rnorm(n, 1, 0.05)),
+    Intercept   = rnorm(n, 2.3, 0.1),
+    lprior      = rnorm(n, -6),
+    lp__        = rnorm(n, -90)
+  ))
+}
+
+kept_b_message <- paste0(
+  "^Kept the 2 population-level \\(b_\\) parameters and dropped 4 others: ",
+  "sigma, Intercept, lprior, lp__\\."
+)
+
+# The distinct y labels across a plot's layers.
+drawn_labels <- function(p) {
+  unique(unlist(lapply(p$layers, function(l) {
+    if (is.data.frame(l$data) && "label" %in% names(l$data)) {
+      as.character(unique(l$data$label))
+    }
+  })))
+}
+
+test_that("posterior_plot() keeps the b_ parameters of a brms draws object", {
+  # Regression: a draws_df is a data frame, so it took the wide path that keeps
+  # every variable, and b_Intercept and the centred Intercept then clashed as
+  # factor levels ("factor level [6] is duplicated"). A draws_matrix failed the
+  # same way through extract_draws().
+  skip_if_not_installed("posterior")
+  dd <- brms_shaped_draws()
+  for (d in list(dd, posterior::as_draws_matrix(dd))) {
+    expect_no_warning(expect_message(
+      p <- posterior_plot(d, style = "interval"), kept_b_message
+    ))
+    expect_setequal(drawn_labels(p), c("Intercept", "x"))
+    # The Intercept row summarises b_Intercept alone.
+    summ <- p$layers[[which(geom_classes(p) == "GeomLinerange")[1]]]$data
+    expect_equal(summ$centre[summ$label == "Intercept"],
+                 stats::median(dd$b_Intercept))
+  }
+})
+
+test_that("the variables a draws object loses are summarised by prefix", {
+  skip_if_not_installed("posterior")
+  set.seed(22)
+  vars <- c("b_Intercept", "b_conditionunrelated", "sd_item__Intercept",
+            "sd_participant__Intercept", "sigma", "Intercept",
+            sprintf("r_item[w%d,Intercept]", 1:3),
+            sprintf("r_participant[p%d,Intercept]", 1:2), "lprior", "lp__")
+  m <- matrix(rnorm(100 * length(vars)), ncol = length(vars),
+              dimnames = list(NULL, vars))
+  dd <- posterior::as_draws_df(posterior::as_draws_matrix(m))
+  msgs <- character(0)
+  ed <- withCallingHandlers(
+    depictr:::extract_draws(dd),
+    message = function(cond) {
+      msgs <<- c(msgs, conditionMessage(cond))
+      invokeRestart("muffleMessage")
+    }
+  )
+  expect_length(msgs, 1)
+  expect_match(
+    msgs,
+    paste0("Kept the 2 population-level (b_) parameters and dropped 11 ",
+           "others: sd_ (2), sigma, Intercept, r_item (3), r_participant (2), ",
+           "lprior, lp__."),
+    fixed = TRUE
+  )
+  expect_setequal(unique(ed$term), c("Intercept", "conditionunrelated"))
+})
+
+test_that("frequentist_bayesian_plot() reads a brms draws object unpooled", {
+  # Regression: the two intercepts were pooled into one 'Intercept' slab of
+  # twice the draws, beside slabs for lp__, lprior and sigma.
+  skip_if_not_installed("posterior")
+  skip_if_not_installed("ggdist")
+  set.seed(23)
+  d <- data.frame(x = rnorm(60))
+  d$y <- 2 + 0.5 * d$x + rnorm(60)
+  fit <- lm(y ~ x, data = d)
+  dd <- brms_shaped_draws(n = 400)
+  for (b in list(dd, posterior::as_draws_matrix(dd))) {
+    expect_message(
+      p <- frequentist_bayesian_plot(fit, b, facet = FALSE), kept_b_message
+    )
+    slab <- p$layers[[slab_layer_idx(p)]]$data
+    expect_setequal(as.character(unique(slab$label)), c("Intercept", "x"))
+    expect_equal(sum(slab$label == "Intercept"), 400L)
+    expect_equal(sort(slab$.value[slab$label == "Intercept"]),
+                 sort(dd$b_Intercept))
+  }
+})
+
+test_that("a brms::fixef() matrix takes the summary path", {
+  # Regression: every matrix counted as draws, so the fixef() summary was
+  # melted column-wise into half-eyes named Estimate, Est.Error, Q2.5 and
+  # Q97.5.
+  fx <- readRDS(system.file("extdata", "brms_fixef_lexdec.rds",
+                            package = "depictr"))
+  expect_true(is.matrix(fx))
+  expect_false(depictr:::has_draws(fx))
+  # A matrix of draws with parameter columns is still draws.
+  expect_true(depictr:::has_draws(matrix(rnorm(20), ncol = 2,
+                                         dimnames = list(NULL, c("a", "b")))))
+
+  fit <- lm(RT ~ condition + modality + word_frequency,
+            data = lexical_decision)
+  expect_no_warning(p <- frequentist_bayesian_plot(fit, fx))
+  expect_false("GeomSlabinterval" %in% geom_classes(p))
+  expect_setequal(unique(as.character(p$data$label)),
+                  c("Intercept", "condition", "modality", "word frequency"))
+  # The Bayesian rows carry the fixef() estimates and quantiles.
+  bayes <- p$data[p$data$source == "Bayesian analysis", ]
+  wf <- bayes[bayes$label == "word frequency", ]
+  expect_equal(wf$estimate, fx["word_frequency", "Estimate"])
+  expect_equal(c(wf$conf.low, wf$conf.high),
+               unname(fx["word_frequency", c("Q2.5", "Q97.5")]))
+})
+
+test_that("posterior_plot() refuses a matrix of posterior summaries", {
+  fx <- readRDS(system.file("extdata", "brms_fixef_lexdec.rds",
+                            package = "depictr"))
+  expect_error(posterior_plot(fx), "holds posterior summaries .*not draws")
+})
+
+test_that("the summary path warns only about label keys the user supplied", {
+  # Regression: the automatic b_-prefixed factor-level keys were merged into
+  # `labels` before compare_models() judged them, so it warned about
+  # b_treatmentenhanced, a key nobody had written.
+  fit <- lm(yield ~ treatment + rainfall, data = crop_yield)
+  expect_no_warning(frequentist_bayesian_plot(fit, tidy_estimates(fit)))
+  # A key the user mistyped still warns, and names only that key.
+  expect_warning(
+    frequentist_bayesian_plot(fit, tidy_estimates(fit),
+                              labels = c(rainfal = "Rainfall")),
+    "^`labels` keys not found among the parameters: rainfal\\. "
+  )
+})
+
+test_that("two parameters that would share a label are an error naming both", {
+  # A plain table keeps every column, so brms's two intercepts would be drawn
+  # as one: posterior_plot() failed on a duplicated factor level and
+  # frequentist_bayesian_plot() pooled their draws into one slab.
+  set.seed(24)
+  n <- 400
+  draws <- data.frame(b_Intercept = rnorm(n, 2, 0.1),
+                      Intercept   = rnorm(n, 2.3, 0.1),
+                      b_x         = rnorm(n, 0.5, 0.05))
+  clash <- paste0("^Parameters b_Intercept and Intercept share the label ",
+                  "'Intercept'; rename one with `labels`\\.$")
+  expect_error(posterior_plot(draws), clash)
+  d <- data.frame(x = rnorm(60))
+  d$y <- 2 + 0.5 * d$x + rnorm(60)
+  expect_error(frequentist_bayesian_plot(lm(y ~ x, data = d), draws), clash)
+  expect_error(
+    posterior_plot(data.frame(b_x = rnorm(n), x = rnorm(n))),
+    "^Parameters b_x and x share the label 'x'"
+  )
+  # A label for one of them resolves the clash.
+  p <- posterior_plot(draws, style = "interval",
+                      labels = c(Intercept = "Intercept (centred)"))
+  expect_setequal(drawn_labels(p), c("Intercept", "Intercept (centred)", "x"))
+})
+
+test_that("frequentist_bayesian_plot() draws only the terms both inputs share", {
+  # Regression: a posterior's sigma was drawn as a slab with no frequentist
+  # counterpart, and a frequentist term with no posterior stood alone too.
+  set.seed(25)
+  d <- data.frame(x = rnorm(80), z = rnorm(80))
+  d$y <- 1 + 0.5 * d$x + rnorm(80)
+  fit <- lm(y ~ x + z, data = d)
+  n <- 400
+  draws <- data.frame(b_Intercept = rnorm(n, 1, 0.1),
+                      b_x         = rnorm(n, 0.5, 0.05),
+                      sigma       = abs(rnorm(n, 1, 0.05)))
+  expect_message(
+    p <- frequentist_bayesian_plot(fit, draws, facet = FALSE),
+    paste0("^Dropped the terms the two inputs do not share\\. ",
+           "Bayesian only: sigma\\. Frequentist only: z\\.")
+  )
+  expect_setequal(drawn_labels(p), c("Intercept", "x"))
+  # Inputs with no term in common are refused.
+  expect_error(
+    frequentist_bayesian_plot(fit, data.frame(a = rnorm(n), b = rnorm(n))),
+    "^The frequentist and Bayesian inputs share no terms\\."
+  )
+})
+
+test_that("lp__ and lprior are never drawn as parameters", {
+  set.seed(26)
+  n <- 400
+  draws <- data.frame(a = rnorm(n), lprior = rnorm(n, -5),
+                      lp__ = rnorm(n, -90))
+  dropped <- paste0("^Dropped lprior and lp__, which are log densities, ",
+                    "not model parameters\\.")
+  expect_message(p <- posterior_plot(draws, style = "interval"), dropped)
+  expect_setequal(drawn_labels(p), "a")
+  expect_message(ed <- depictr:::extract_draws(draws), dropped)
+  expect_setequal(unique(ed$term), "a")
+})
+
+test_that("draws holding only log densities are refused plainly", {
+  # Dropping lp__ and lprior can leave no parameter at all, and the empty table
+  # then failed inside ggplot2 with an error about `data`.
+  set.seed(27)
+  only_lp <- data.frame(lp__ = rnorm(100, -50), lprior = rnorm(100, -5))
+  for (d in list(only_lp, as.matrix(only_lp))) {
+    expect_error(suppressMessages(posterior_plot(d)),
+                 "^No parameters left to plot\\.$")
+  }
+})
+
+test_that("an rstanarm fit keeps only its regression coefficients", {
+  # rstanarm's as.matrix() also carries every group-level coefficient b[...]
+  # and covariance element Sigma[...], which are not fixed effects. rstanarm
+  # is not a dependency, so the column filter is tested on its own.
+  cols <- c("(Intercept)", "x", "b[(Intercept) participant:p1]",
+            "b[(Intercept) participant:p2]",
+            "Sigma[participant:(Intercept),(Intercept)]", "sigma",
+            "mean_PPD", "log-posterior")
+  expect_identical(depictr:::rstanarm_fixed_columns(cols),
+                   c("(Intercept)", "x"))
+})

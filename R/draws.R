@@ -5,20 +5,50 @@
 # rstanarm fits, a posterior 'draws' object, a wide draws matrix/data frame, or
 # an already-long table) into one long data frame with the columns
 # `term`, `.value` and `.draw`. Only fixed-effect parameters are retained from
-# fitted models, with the 'brms' `b_` prefix stripped so terms line up with the
-# frequentist side.
+# fitted models and from draws objects that hold brms's `b_` parameters, with
+# the `b_` prefix stripped so terms line up with the frequentist side. The log
+# densities `lp__` and `lprior` are dropped from every source.
+
+#' Column names that mark a table of posterior summaries, not of draws
+#'
+#' `brms::fixef()` returns Estimate, Est.Error, Q2.5 and Q97.5. The `l-95% CI`
+#' pair comes from `summary(fit)$fixed`, and the rest from broom-style tables
+#' and `confint()`.
+#' @noRd
+summary_columns <- c("estimate", "Estimate", "Est.Error", "std.error",
+                     "conf.low", "conf.high", "2.5 %", "97.5 %",
+                     "l-95% CI", "u-95% CI", "Q2.5", "Q97.5")
+
+#' Variables a sampler or brms records that are never model parameters
+#'
+#' `lp__` is Stan's log posterior density and `lprior` the log prior density
+#' that brms adds.
+#' @noRd
+log_density_variables <- c("lp__", "lprior")
+
+#' Test whether `x` is a matrix of posterior summaries, as from `brms::fixef()`
+#'
+#' Melted column by column, such a matrix would be drawn as one 'parameter' per
+#' summary statistic, so it is told apart from a draws matrix by its column
+#' names.
+#' @noRd
+is_summary_matrix <- function(x) {
+  is.matrix(x) && !inherits(x, "draws") &&
+    any(colnames(x) %in% summary_columns)
+}
 
 #' Is `x` a recognised source of posterior draws?
 #'
 #' TRUE for fitted Bayesian models (brms/rstanarm), posterior `draws` objects,
-#' and matrices. Data frames are *not* claimed here, because a tidy data frame
-#' of posterior *summaries* (estimate/conf.low/...) must keep flowing down the
-#' summary path; `has_draws()` disambiguates those two data-frame cases.
+#' and matrices other than summary matrices. Data frames are *not* claimed here,
+#' because a tidy data frame of posterior *summaries* (estimate/conf.low/...)
+#' must keep flowing down the summary path; `has_draws()` disambiguates those
+#' two data-frame cases.
 #' @noRd
 is_draws_source <- function(x) {
   inherits(x, c("brmsfit", "stanreg", "draws", "draws_df", "draws_matrix",
                 "draws_array", "draws_list", "draws_rvars")) ||
-    is.matrix(x)
+    (is.matrix(x) && !is_summary_matrix(x))
 }
 
 #' Does this object actually carry per-draw samples (not just summaries)?
@@ -37,11 +67,7 @@ has_draws <- function(x) {
   has_index <- any(c(".chain", ".iteration", ".draw") %in% nm)
   par_col <- intersect(c("parameter", "term", ".variable", "variable"), nm)
   val_col <- intersect(c("value", ".value", "draw"), nm)
-  summary_cols <- intersect(
-    c("estimate", "Estimate", "conf.low", "conf.high", "std.error",
-      "2.5 %", "97.5 %", "l-95% CI", "u-95% CI", "Q2.5", "Q97.5"),
-    nm
-  )
+  summary_cols <- intersect(summary_columns, nm)
 
   # Long draws: a parameter column AND a per-draw value column, and crucially no
   # summary columns (otherwise it is a tidy summary table that happens to have a
@@ -65,7 +91,8 @@ has_draws <- function(x) {
 #' Extract a tidy long table of draws from any supported source
 #'
 #' @return A data frame with columns `term` (character), `.value` (numeric) and
-#'   `.draw` (integer). NA values are dropped, matching `draws_to_long()`.
+#'   `.draw` (integer). NA values are dropped, matching `draws_to_long()`, and so
+#'   are `lp__` and `lprior`, with a message.
 #' @noRd
 extract_draws <- function(x) {
   long <- if (inherits(x, "brmsfit")) {
@@ -76,6 +103,12 @@ extract_draws <- function(x) {
                            "draws_list", "draws_rvars"))) {
     extract_draws_posterior(x)
   } else if (is.matrix(x)) {
+    if (is_summary_matrix(x)) {
+      stop("This matrix holds posterior summaries (columns ",
+           and_list(intersect(colnames(x), summary_columns)),
+           "), not draws. Pass the draws themselves, such as ",
+           "posterior::as_draws_df(fit).", call. = FALSE)
+    }
     extract_draws_matrix(x)
   } else if (is.data.frame(x)) {
     extract_draws_df(x)
@@ -83,7 +116,7 @@ extract_draws <- function(x) {
     stop("Don't know how to extract posterior draws from an object of class <",
          paste(class(x), collapse = "/"), ">.", call. = FALSE)
   }
-  finalise_draws(long)
+  finalise_draws(drop_log_densities(long))
 }
 
 #' @noRd
@@ -110,20 +143,87 @@ extract_draws_brms <- function(x) {
 extract_draws_rstanarm <- function(x) {
   ensure_installed("rstanarm", "to extract draws from a 'stanreg' object")
   m <- as.matrix(x)
-  # rstanarm's as.matrix() carries auxiliary parameters (sigma, etc.); keep the
-  # regression coefficients, which is everything bar the known auxiliaries.
-  aux <- c("sigma", "(phi)", "reciprocal_dispersion", "mean_PPD",
-           "log-posterior", "shape", "nu", "tau", "alpha", "lambda")
-  keep <- setdiff(colnames(m), aux)
-  m <- m[, keep, drop = FALSE]
+  m <- m[, rstanarm_fixed_columns(colnames(m)), drop = FALSE]
   extract_draws_matrix(m)
 }
 
+#' The regression-coefficient columns of an rstanarm draws matrix
+#'
+#' rstanarm's as.matrix() carries the auxiliary parameters (sigma, etc.) and,
+#' for a mixed model, every group-level coefficient `b[...]` and covariance
+#' element `Sigma[...]`. The regression coefficients are everything else.
+#' @noRd
+rstanarm_fixed_columns <- function(nm) {
+  aux <- c("sigma", "(phi)", "reciprocal_dispersion", "mean_PPD",
+           "log-posterior", "shape", "nu", "tau", "alpha", "lambda")
+  nm[!nm %in% aux & !grepl("^(b|Sigma)\\[", nm)]
+}
+
+#' Draws from a posterior `draws` object
+#'
+#' brms names its population-level parameters `b_...`. A draws object made from
+#' a brms fit also holds the intercept of the centred predictors (`Intercept`,
+#' beside `b_Intercept`), the residual SD, every group-level effect and the log
+#' densities. When any `b_` variable is present only those are kept, named
+#' without the prefix as for a brms fit itself, and one message summarises the
+#' rest. Without `b_` variables only the log densities go, in `extract_draws()`.
 #' @noRd
 extract_draws_posterior <- function(x) {
   ensure_installed("posterior", "to handle a posterior 'draws' object")
   df <- as.data.frame(posterior::as_draws_df(x))
-  wide_to_long_draws(df)
+  vars <- setdiff(names(df), c(".chain", ".iteration", ".draw"))
+  b_vars <- grep("^b_", vars, value = TRUE)
+  if (!length(b_vars)) return(wide_to_long_draws(df))
+  dropped <- setdiff(vars, b_vars)
+  if (length(dropped)) {
+    message(sprintf(
+      "Kept the %d population-level (b_) %s and dropped %d %s: %s.",
+      length(b_vars), if (length(b_vars) == 1) "parameter" else "parameters",
+      length(dropped), if (length(dropped) == 1) "other" else "others",
+      summarise_variables(dropped)
+    ))
+  }
+  out <- df[b_vars]
+  names(out) <- sub("^b_", "", b_vars)
+  wide_to_long_draws(out)
+}
+
+#' Name a set of draws variables compactly, grouped by prefix
+#'
+#' Indexed variables are grouped by the name before the bracket (`r_item[...]`
+#' becomes `r_item`) and brms's group-level variables by their leading prefix
+#' (`sd_item__Intercept` becomes `sd_`). A group carries its size in brackets,
+#' in order of first appearance, so a model with hundreds of random effects
+#' still yields a one-line message.
+#' @noRd
+summarise_variables <- function(vars) {
+  indexed <- grepl("[", vars, fixed = TRUE)
+  prefixed <- !indexed & grepl("^[[:alnum:]]+_.*__", vars)
+  key <- vars
+  key[indexed] <- sub("\\[.*$", "", vars[indexed])
+  key[prefixed] <- sub("^([[:alnum:]]+_).*$", "\\1", vars[prefixed])
+  keys <- unique(key)
+  n <- tabulate(match(key, keys), nbins = length(keys))
+  grouped <- keys %in% key[indexed | prefixed] | n > 1
+  paste(ifelse(grouped, sprintf("%s (%d)", keys, n), keys), collapse = ", ")
+}
+
+#' Drop the log densities from a long draws table, with a message
+#' @param long A long draws table.
+#' @param col The column holding the parameter names.
+#' @noRd
+drop_log_densities <- function(long, col = "term") {
+  hit <- long[[col]] %in% log_density_variables
+  if (!any(hit)) return(long)
+  found <- unique(long[[col]][hit])
+  message(if (length(found) == 1) {
+    sprintf("Dropped %s, which is a log density, not a model parameter.",
+            found)
+  } else {
+    sprintf("Dropped %s, which are log densities, not model parameters.",
+            and_list(found))
+  })
+  long[!hit, , drop = FALSE]
 }
 
 #' @noRd
@@ -184,4 +284,36 @@ finalise_draws <- function(long) {
   long$.draw <- as.integer(long$.draw)
   rownames(long) <- NULL
   long
+}
+
+#' Refuse two parameters that would be drawn under one label
+#'
+#' Two terms with one display label would share a row, so posterior_plot()
+#' would fail on a duplicated factor level and frequentist_bayesian_plot() would
+#' pool their draws into one slab. brms's `b_Intercept` and `Intercept` are the
+#' usual pair, since both format to "Intercept".
+#' @param terms,labels Parallel vectors of raw terms and their display labels.
+#' @noRd
+check_label_clash <- function(terms, labels) {
+  keep <- !duplicated(terms)
+  terms <- terms[keep]
+  labels <- labels[keep]
+  shared <- unique(labels[duplicated(labels)])
+  if (!length(shared)) return(invisible(NULL))
+  clauses <- vapply(shared, function(l) {
+    sprintf("%s share the label '%s'", and_list(terms[labels == l]), l)
+  }, character(1))
+  pair <- length(shared) == 1 && sum(labels == shared) == 2
+  stop("Parameters ", paste(clauses, collapse = ", and "), "; ",
+       if (pair) "rename one" else "give each its own label",
+       " with `labels`.", call. = FALSE)
+}
+
+#' Join names as "a, b and c"
+#' @noRd
+and_list <- function(x) {
+  x <- as.character(x)
+  n <- length(x)
+  if (n < 2) return(paste(x, collapse = ""))
+  paste(paste(x[-n], collapse = ", "), "and", x[n])
 }
