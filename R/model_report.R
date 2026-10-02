@@ -18,7 +18,8 @@
 #'   putting predictors on a common scale; set `FALSE` for raw estimates.
 #' @param title Overall title.
 #' @param subtitle Overall subtitle. If `NULL`, a line of fit statistics
-#'   (number of observations, R-squared and AIC) is used.
+#'   (number of observations, R-squared and AIC) is used. For a `glm`, the
+#'   R-squared is the deviance R-squared described in [model_fit_table()].
 #'
 #' @return A 'patchwork' object (printable like a [ggplot2::ggplot]).
 #' @export
@@ -64,7 +65,7 @@ model_report <- function(model, predictor = NULL, standardise = TRUE,
     aicf <- formatC(aic, digits = 1, format = "f")
     # A plotmath subtitle so the statistical letters n and R are italic.
     subtitle <- if (inherits(model, "glm")) {
-      bquote(italic(n) * " = " * .(nc) * "    |    pseudo-" * italic(R)^2 *
+      bquote(italic(n) * " = " * .(nc) * "    |    deviance " * italic(R)^2 *
                " = " * .(r2f) * "    |    AIC = " * .(aicf))
     } else {
       bquote(italic(n) * " = " * .(nc) * "    |    " * italic(R)^2 *

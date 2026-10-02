@@ -21,6 +21,28 @@
   are unchanged and remain the safer form. The documentation of `order` now says
   which end the largest estimate lands at.
 
+* `model_fit_table()` and the `model_report()` subtitle misreported R² for `glm`
+  models. McFadden's ratio was applied to every family, so a Gaussian `glm`
+  could report a negative value and a quasi-likelihood family reported `NA`.
+  The null model was refitted with `update()`. That used more rows than the
+  model when a predictor had missing values, dropped an offset written in the
+  formula, put an intercept in the null of a model fitted without one and gave
+  `NA` for a model fitted inside a function. Every `glm`, including
+  quasi-likelihood and negative binomial fits, now reports the deviance R²,
+  1 - D/D0, computed from the deviances the fit already holds. It equals the
+  ordinary R² for a Gaussian model with the identity link and McFadden's R²
+  for binary logistic regression, so a binary logistic value changes only
+  where the old refit went wrong. Values for Poisson, grouped binomial, Gamma
+  and other models change by definition. The `model_report()` subtitle now
+  calls it the deviance R², where it said pseudo-R².
+* For mixed models fitted by REML with `lme4::lmer()`, `model_fit_table()` now
+  takes AIC, BIC and the log-likelihood from a maximum-likelihood refit and
+  says so in a message. REML criteria cannot be compared between models with
+  different fixed effects, which is the comparison the model-estimates
+  vignette makes. If a refit fails, a warning says so and that model's
+  criteria are `NA`. The `R2` column stays `NA` for mixed models, as the help
+  page now documents.
+
 # depictr 0.3.0
 
 ## Auditing a finished figure

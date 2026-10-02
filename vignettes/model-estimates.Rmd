@@ -124,8 +124,18 @@ compare_models(Reduced = reduced, Full = fit, order = "descending")
 knitr::kable(model_fit_table(Reduced = reduced, Full = fit))
 ```
 
-For `glm` models the `R2` column reports McFadden's pseudo-R-squared
-[@mcfadden1974] in place of the ordinary coefficient of determination.
+Both the reduced and the full model were fitted by restricted maximum
+likelihood (REML), the default of `lmer()`. A REML likelihood is the
+likelihood of the residuals left once the fixed effects are removed. It
+changes with the fixed effects, so REML criteria cannot compare models that
+differ in them, as these two do. `model_fit_table()` therefore takes AIC, BIC
+and the log-likelihood from a maximum-likelihood refit, as `anova()` does for
+lme4 fits, and says so in a message. The `R2` column reads `NA` for mixed
+models, since no single R-squared is standard for them. For a `glm`, it
+reports the deviance R-squared [@cameron1997], the share of the null deviance
+that the predictors explain. That equals the ordinary R-squared for a
+Gaussian model with the identity link and McFadden's pseudo-R-squared
+[@mcfadden1974] for binary logistic regression.
 
 ## Predicted values and interactions
 

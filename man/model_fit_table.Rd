@@ -18,8 +18,36 @@ A data frame with one row per model and columns \code{model}, \code{n}, \code{df
 \description{
 Collects the usual model-comparison statistics into one tidy data frame, one
 row per model. These comprise the number of observations, the degrees of
-freedom, AIC, BIC, the log-likelihood, an R-squared (ordinary for \code{lm} and
-McFadden's pseudo-R-squared for \code{glm}) and the root-mean-square error.
+freedom, AIC, BIC, the log-likelihood, an R-squared and the root-mean-square
+error.
+}
+\details{
+The R-squared depends on the kind of model. An \code{lm} reports the ordinary
+coefficient of determination. Every \code{glm}, including quasi-likelihood
+families and negative binomial fits from \code{MASS::glm.nb()}, reports the
+deviance R-squared, \eqn{1 - D/D_0}. Here \eqn{D} is the residual deviance
+of the model and \eqn{D_0} the deviance of the null model, which
+\code{\link[stats:glm]{stats::glm()}} fits to the same rows with the same prior weights and
+offset. The null model has an intercept only if the model has one. Both
+deviances are stored with the fit, so nothing is refitted. The value is the
+share of the null deviance that the predictors explain, the
+Kullback-Leibler R-squared of Cameron and Windmeijer (1997). It equals the
+ordinary R-squared for a Gaussian model with the identity link and
+McFadden's (1974) pseudo-R-squared for binary logistic regression. For
+Poisson, grouped binomial, Gamma and other models, the two measures differ.
+Mixed models (\code{merMod}) report an R-squared of \code{NA}, since no single
+definition is standard for them.
+
+A linear mixed model fitted with \code{\link[lme4:lmer]{lme4::lmer()}} by restricted maximum
+likelihood (REML, its default) is refitted by maximum likelihood with
+\code{\link[lme4:refitML]{lme4::refitML()}}. Its AIC, BIC and log-likelihood come from the refit, and
+a message says so. A REML likelihood is the likelihood of the residuals left
+once the fixed effects are removed. Two models with different fixed effects
+therefore have REML likelihoods of different data, and their criteria cannot
+be compared. The \code{anova()} method for lme4 fits refits them by maximum
+likelihood for the same reason. If a refit fails, a warning says so, and
+that model's \code{df}, \code{AIC}, \code{BIC} and \code{logLik} are \code{NA}. The other columns
+describe the model as supplied.
 }
 \examples{
 m1 <- lm(yield ~ rainfall, data = crop_yield)
@@ -29,5 +57,7 @@ m3 <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment,
 model_fit_table(simple = m1, medium = m2, full = m3)
 }
 \references{
+\insertRef{cameron1997}{depictr}
+
 \insertRef{mcfadden1974}{depictr}
 }

@@ -26,7 +26,8 @@ putting predictors on a common scale; set \code{FALSE} for raw estimates.}
 \item{title}{Overall title.}
 
 \item{subtitle}{Overall subtitle. If \code{NULL}, a line of fit statistics
-(number of observations, R-squared and AIC) is used.}
+(number of observations, R-squared and AIC) is used. For a \code{glm}, the
+R-squared is the deviance R-squared described in \code{\link[=model_fit_table]{model_fit_table()}}.}
 }
 \value{
 A 'patchwork' object (printable like a \link[ggplot2:ggplot]{ggplot2::ggplot}).

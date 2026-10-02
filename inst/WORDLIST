@@ -2,12 +2,16 @@ BLUPs
 CMD
 Color
 Colourblind
+Kullback
+Leibler
 Okabe
 PACF
+Poisson
 ROC
 Raincloud
 VIF
 VIFs
+Windmeijer
 Zipf
 allFit
 bayesian
