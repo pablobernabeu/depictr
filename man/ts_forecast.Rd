@@ -2,12 +2,13 @@
 % Please edit documentation in R/timeseries.R
 \name{ts_forecast}
 \alias{ts_forecast}
-\title{Forecast a seasonal series with STL plus seasonal-naive drift}
+\title{Forecast a seasonal series with STL and a random walk with drift}
 \usage{
-ts_forecast(x, h = 12, frequency = NULL, level = 0.95)
+ts_forecast(x, h = 12, frequency = NULL, level = 0.95, lambda = NULL)
 }
 \arguments{
-\item{x}{A \code{ts} object, or a numeric vector (then \code{frequency} is required).}
+\item{x}{A \code{ts} object, or a numeric vector (then \code{frequency} is required).
+It needs more than two full cycles of observations.}
 
 \item{h}{Forecast horizon: the number of future steps (a positive integer).}
 
@@ -16,6 +17,16 @@ a \code{ts}.}
 
 \item{level}{Prediction-interval coverage (a single number strictly between 0
 and 1).}
+
+\item{lambda}{Optional Box-Cox transformation parameter. \code{NULL}, the default,
+forecasts the series as it is. \code{0} forecasts its logarithm, and any other
+number forecasts \code{(x^lambda - 1) / lambda}. Every observation must then be
+positive. The forecasts and limits are transformed back to the original
+scale, where the point forecast is the median of the forecast
+distribution, without the bias adjustment that would make it the mean
+(Hyndman & Athanasopoulos, 2021, Section 5.6). A forecast or limit beyond
+the range the transformation can reach comes back as \code{0} (for a positive
+\code{lambda}) or \code{Inf} (for a negative one).}
 }
 \value{
 A data frame with one row per forecast step and columns \code{time} (the
@@ -23,29 +34,51 @@ future times, on the same scale as \code{\link[stats:time]{stats::time()}}), \co
 \code{upr}.
 }
 \description{
-A lightweight, dependency-free forecaster for a single seasonal series. The
-series is decomposed with \code{\link[stats:stl]{stats::stl()}} into trend, seasonal and remainder.
-The trend is extrapolated linearly from its last \code{frequency} fitted values
-(the recent local slope), the seasonal pattern is carried forward by repeating
-the last full cycle of the seasonal component (a seasonal-naive forecast), and
-the point forecast is their sum.
+A dependency-free forecaster for a single seasonal series, which forecasts
+by decomposition (Hyndman & Athanasopoulos, 2021, Section 5.7).
+\code{\link[stats:stl]{stats::stl()}} with \code{s.window = "periodic"} estimates a seasonal component
+that repeats unchanged in every cycle (Cleveland et al., 1990). The
+seasonally adjusted series, the data minus that component, is forecast with a
+random walk with drift, and the last cycle of the seasonal component is added
+back. The result reproduces
+\code{forecast::stlf(x, method = "rwdrift", s.window = "periodic")}.
 }
 \details{
-Prediction intervals are a random-walk-style normal band: the one-step
-standard deviation is estimated from the STL remainder and the interval at
-horizon \code{h} is \verb{fit +/- z * sigma * sqrt(h)}, so the band necessarily widens
-with the horizon. This mirrors how seasonal-naive forecast variance
-accumulates over time and gives an honest, monotonically growing uncertainty
-band without pulling in a heavy modelling dependency. For a fully specified
-statistical model use, for example, \code{forecast::forecast()} and pass the
-resulting fit/interval columns to \code{\link[=timeseries_plot]{timeseries_plot()}} directly.
+The prediction interval at horizon \code{h} is \verb{fit +/- z * sigma_h}, with
+\code{z = qnorm((1 + level) / 2)}. The forecast standard deviation is that of a
+random walk with drift, \code{sigma_h = sigma * sqrt(h * (1 + h / (T - 1)))}
+(Hyndman & Athanasopoulos, 2021, Section 5.5), where \code{sigma} is the standard
+deviation of the steps of the seasonally adjusted series and \code{T} the length
+of the series. The band widens with the horizon, and the second term carries
+the uncertainty in the estimated drift.
+
+The model assumes a seasonal pattern that adds to the level of the series
+and stays the same from cycle to cycle. When the seasonal swing grows with
+the level, as in \code{AirPassengers}, forecast on the log scale with
+\code{lambda = 0}. The band treats the seasonal component as known, so it leaves
+out the uncertainty in estimating it. In a rolling-origin backtest on five
+classic series whose seasonal swing does not grow with their level, the
+nominal 95\% band covered 92\% of one-step-ahead outcomes
+(\code{dev/ts_forecast_backtest.R} in the source repository). From three to 12
+steps ahead, it covered 99\%. The band therefore runs somewhat narrow at the
+shortest horizons and wide further out, where the uncertainty of a random
+walk keeps growing while these series stay close to their trend. For a
+different model, fit it with, for example, \code{forecast::forecast()} and pass
+its columns to \code{\link[=timeseries_plot]{timeseries_plot()}} as a data frame.
 }
 \examples{
-fc <- ts_forecast(AirPassengers, h = 12)
+# The seasonal swing of AirPassengers grows with the number of passengers,
+# so it is forecast on the log scale.
+fc <- ts_forecast(AirPassengers, h = 12, lambda = 0)
 head(fc)
-# Interval width grows with the horizon
-diff(fc$upr - fc$lwr) >= 0
+# On that scale, the band widens with the horizon
+diff(log(fc$upr) - log(fc$lwr)) > 0
+}
+\references{
+\insertRef{cleveland1990}{depictr}
+
+\insertRef{hyndman2021}{depictr}
 }
 \seealso{
-\code{\link[=timeseries_plot]{timeseries_plot()}}
+\code{\link[=timeseries_plot]{timeseries_plot()}}, \code{\link[=decompose_plot]{decompose_plot()}}
 }

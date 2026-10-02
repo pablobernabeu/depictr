@@ -55,7 +55,8 @@ conventions.
 \item \code{\link[=acf_plot]{acf_plot()}}: autocorrelation / partial autocorrelation.
 \item \code{\link[=decompose_plot]{decompose_plot()}}: trend / seasonal / remainder decomposition.
 \item \code{\link[=seasonal_plot]{seasonal_plot()}}: seasonal subseries across cycles.
-\item \code{\link[=ts_forecast]{ts_forecast()}}: a simple forecast with prediction intervals.
+\item \code{\link[=ts_forecast]{ts_forecast()}}: STL plus random walk with drift, with prediction
+intervals.
 }
 }
 

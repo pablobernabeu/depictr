@@ -143,6 +143,28 @@
   afresh over the grid. Beside its raw variable, such a term used to shift the
   line without complaint.
 
+* `ts_forecast()`, and the forecast overlay of `timeseries_plot()`, drew
+  prediction intervals far too narrow. In rolling-origin backtests on eight
+  classic series, the nominal 95% band covered about 60% of one-step-ahead
+  outcomes. The documentation credited its square-root widening to seasonal
+  naive forecasting, whose variance does not grow that way. Forecasts now come
+  from a random walk with drift on the STL-seasonally-adjusted series, with the
+  last seasonal cycle added back, which reproduces
+  `forecast::stlf(method = "rwdrift", s.window = "periodic")`. A new `lambda`
+  argument in both functions applies a Box-Cox (or log) transformation for a
+  seasonal swing that grows with the level, and a caption on the overlay names
+  the interval and the method. A series of exactly two cycles now gets the
+  package's own message, and `decompose_plot()` gains `s_window`. The
+  vignette's claim that STL lets the seasonal component evolve held only for a
+  window this release exposes for the first time.
+* `timeseries_plot()` drew the forecast of a numeric `x` in the wrong place.
+  The forecaster counted time in cycles from 1, while the history sits at the
+  observation index or at the supplied `time`. The overlay therefore jumped
+  back towards the start of the axis, and on a `Date` axis it landed in the
+  year 4. The forecast now continues the history's own axis, one typical step
+  at a time. An unsorted `time` is also put in order before forecasting, as it
+  already was for the moving average.
+
 ## Degenerate input
 
 * `survival_plot()` truncated a non-integer status code, so `c(0, 0.5, 1)` was

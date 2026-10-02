@@ -1,7 +1,9 @@
+Athanasopoulos
 BLUPs
 CMD
 Color
 Colourblind
+Hyndman
 Kullback
 LZW
 Leibler
@@ -16,6 +18,8 @@ VIFs
 Windmeijer
 Zipf
 allFit
+backtest
+backtests
 bayesian
 brms
 cairo

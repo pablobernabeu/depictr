@@ -44,7 +44,8 @@
 #'   \item [acf_plot()]: autocorrelation / partial autocorrelation.
 #'   \item [decompose_plot()]: trend / seasonal / remainder decomposition.
 #'   \item [seasonal_plot()]: seasonal subseries across cycles.
-#'   \item [ts_forecast()]: a simple forecast with prediction intervals.
+#'   \item [ts_forecast()]: STL plus random walk with drift, with prediction
+#'     intervals.
 #' }
 #'
 #' @section Model estimates and inference:

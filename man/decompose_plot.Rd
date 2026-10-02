@@ -9,6 +9,7 @@ decompose_plot(
   frequency = NULL,
   method = c("stl", "classical"),
   robust = FALSE,
+  s_window = "periodic",
   confidence = FALSE,
   level = 0.95,
   title = NULL
@@ -20,13 +21,22 @@ decompose_plot(
 \item{frequency}{Number of observations per period (e.g. 12 for monthly
 data); taken from \code{x} when it is a \code{ts}.}
 
-\item{method}{\code{"stl"} (loess-based) or \code{"classical"}
-(\code{\link[stats:decompose]{stats::decompose()}}).}
+\item{method}{\code{"stl"} (loess-based, Cleveland et al., 1990) or
+\code{"classical"} (\code{\link[stats:decompose]{stats::decompose()}}). STL needs more than two full cycles
+of data, and classical decomposition at least two.}
 
 \item{robust}{For \code{method = "stl"}, whether to fit a robust STL
 (\code{\link[stats:stl]{stats::stl()}} with \code{robust = TRUE}), which down-weights outliers in the
 loess fits so that an unusual point bleeds less into the trend and seasonal
 components. Ignored for the classical method.}
+
+\item{s_window}{For \code{method = "stl"}, the seasonal window, passed to
+\code{\link[stats:stl]{stats::stl()}} as \code{s.window}. The default, \code{"periodic"}, estimates one
+seasonal value per position in the cycle and repeats it in every cycle, as
+classical decomposition does. An odd whole number of at least 7 lets the
+seasonal component change from cycle to cycle. It is the number of
+consecutive cycles that go into each seasonal value, so a smaller window
+lets the pattern change faster. Ignored for the classical method.}
 
 \item{confidence}{Whether to draw a confidence ribbon around the trend
 component. The band is a normal-approximation interval based on the
@@ -58,7 +68,12 @@ decompose_plot(AirPassengers)
 decompose_plot(AirPassengers, method = "classical")
 # Robust STL with a confidence ribbon on the trend
 decompose_plot(AirPassengers, robust = TRUE, confidence = TRUE)
+# A seasonal component free to grow with the level of the series
+decompose_plot(AirPassengers, s_window = 13)
 }
+}
+\references{
+\insertRef{cleveland1990}{depictr}
 }
 \seealso{
 \code{\link[=ts_forecast]{ts_forecast()}}, \code{\link[=seasonal_plot]{seasonal_plot()}}

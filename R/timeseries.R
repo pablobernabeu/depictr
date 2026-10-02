@@ -17,16 +17,22 @@
 #'   is computed, so unsorted input is handled correctly.
 #' @param forecast Optional forecast overlay for a single (non-grouped) series.
 #'   Either an integer horizon (number of future steps) to forecast with the
-#'   built-in STL + seasonal-naive-with-drift method (see [ts_forecast()]), or a
+#'   built-in STL plus random walk with drift (see [ts_forecast()]), or a
 #'   pre-computed forecast supplied as a data frame with columns `time`, `fit`
 #'   and (optionally) `lwr`/`upr`, for instance from a fitted
 #'   `forecast::forecast()` object. The point forecast continues the line and a
-#'   shaded prediction-interval ribbon, which widens with the horizon, is drawn
-#'   behind it.
+#'   shaded prediction-interval ribbon is drawn behind it. The built-in
+#'   forecast is captioned with its coverage and method, and its band widens
+#'   with the horizon on the scale it is made on (see `lambda`). For a numeric
+#'   `x`, it is made from the values in time order and continues the history's
+#'   own time axis, one typical step at a time.
 #' @param frequency Number of observations per period, used only to coerce a
 #'   numeric `x` to a `ts` when an integer `forecast` horizon is requested.
 #' @param level Prediction-interval coverage for the built-in forecast (a single
 #'   number strictly between 0 and 1, e.g. `0.95`).
+#' @param lambda Optional Box-Cox transformation for the built-in forecast,
+#'   passed to [ts_forecast()]. `0` forecasts on the log scale, which suits a
+#'   series whose seasonal swing grows with its level.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
 #' @param point Whether to add points as well as the line.
 #' @param title,x_lab,y_lab Title and axis labels.
@@ -37,12 +43,14 @@
 #' @examples
 #' timeseries_plot(AirPassengers, rolling = 12,
 #'                 title = "Air passengers", y_lab = "Passengers")
-#' # 24-month forecast with a 90% prediction interval
-#' timeseries_plot(AirPassengers, forecast = 24, level = 0.9)
+#' # 24-month forecast with a 90% prediction interval, made on the log scale
+#' # because the seasonal swing grows with the number of passengers
+#' timeseries_plot(AirPassengers, forecast = 24, level = 0.9, lambda = 0)
 timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
                             rolling = NULL, forecast = NULL, frequency = NULL,
-                            level = 0.95, palette = NULL, point = FALSE,
-                            title = NULL, x_lab = NULL, y_lab = NULL) {
+                            level = 0.95, lambda = NULL, palette = NULL,
+                            point = FALSE, title = NULL, x_lab = NULL,
+                            y_lab = NULL) {
   if (is.data.frame(x)) {
     tcol <- resolve_var(x, rlang::enquo(time), "time")
     vcol <- resolve_var(x, rlang::enquo(value), "value")
@@ -128,7 +136,7 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
            call. = FALSE)
     }
     fc <- resolve_forecast(forecast, x, df, frequency = frequency,
-                           level = level)
+                           level = level, lambda = lambda)
     if (!is.null(fc$lwr) && !is.null(fc$upr)) {
       p <- p + ggplot2::geom_ribbon(
         data = fc, ggplot2::aes(x = .data$time, ymin = .data$lwr,
@@ -141,6 +149,9 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
       colour = depictr_accent(), linewidth = 0.8, linetype = "longdash",
       na.rm = TRUE, inherit.aes = FALSE
     )
+    # A reader cannot tell from the ribbon alone what it covers or how it was
+    # made. A forecast the caller computed is theirs to describe.
+    if (!is.data.frame(forecast)) caption <- forecast_caption(level, lambda)
   }
 
   if (multi) p <- p + ggplot2::scale_colour_manual(values = pal, name = NULL)
@@ -216,12 +227,20 @@ acf_plot <- function(x, lag_max = NULL, type = c("correlation", "partial"),
 #' @param x A `ts` object, or a numeric vector (then `frequency` is required).
 #' @param frequency Number of observations per period (e.g. 12 for monthly
 #'   data); taken from `x` when it is a `ts`.
-#' @param method `"stl"` (loess-based) or `"classical"`
-#'   ([stats::decompose()]).
+#' @param method `"stl"` (loess-based, Cleveland et al., 1990) or
+#'   `"classical"` ([stats::decompose()]). STL needs more than two full cycles
+#'   of data, and classical decomposition at least two.
 #' @param robust For `method = "stl"`, whether to fit a robust STL
 #'   ([stats::stl()] with `robust = TRUE`), which down-weights outliers in the
 #'   loess fits so that an unusual point bleeds less into the trend and seasonal
 #'   components. Ignored for the classical method.
+#' @param s_window For `method = "stl"`, the seasonal window, passed to
+#'   [stats::stl()] as `s.window`. The default, `"periodic"`, estimates one
+#'   seasonal value per position in the cycle and repeats it in every cycle, as
+#'   classical decomposition does. An odd whole number of at least 7 lets the
+#'   seasonal component change from cycle to cycle. It is the number of
+#'   consecutive cycles that go into each seasonal value, so a smaller window
+#'   lets the pattern change faster. Ignored for the classical method.
 #' @param confidence Whether to draw a confidence ribbon around the trend
 #'   component. The band is a normal-approximation interval based on the
 #'   remainder's standard deviation (see Details). `FALSE` reproduces the
@@ -238,6 +257,8 @@ acf_plot <- function(x, lag_max = NULL, type = c("correlation", "partial"),
 #' rather than a formal sampling-distribution interval.
 #'
 #' @return A 'patchwork' object (printable like a [ggplot2::ggplot]).
+#' @references
+#' \insertRef{cleveland1990}{depictr}
 #' @seealso [ts_forecast()], [seasonal_plot()]
 #' @export
 #' @examples
@@ -246,11 +267,15 @@ acf_plot <- function(x, lag_max = NULL, type = c("correlation", "partial"),
 #' decompose_plot(AirPassengers, method = "classical")
 #' # Robust STL with a confidence ribbon on the trend
 #' decompose_plot(AirPassengers, robust = TRUE, confidence = TRUE)
+#' # A seasonal component free to grow with the level of the series
+#' decompose_plot(AirPassengers, s_window = 13)
 #' }
 decompose_plot <- function(x, frequency = NULL,
                            method = c("stl", "classical"), robust = FALSE,
-                           confidence = FALSE, level = 0.95, title = NULL) {
+                           s_window = "periodic", confidence = FALSE,
+                           level = 0.95, title = NULL) {
   method <- match.arg(method)
+  s_window <- validate_s_window(s_window)
   if (!stats::is.ts(x)) {
     if (is.null(frequency)) {
       stop("Supply `frequency` when `x` is not a ts object.", call. = FALSE)
@@ -270,7 +295,9 @@ decompose_plot <- function(x, frequency = NULL,
   tt <- as.numeric(stats::time(x))
 
   if (method == "stl") {
-    dec <- stats::stl(x, s.window = "periodic", robust = robust)$time.series
+    check_stl_length(length(x), stats::frequency(x),
+                     "for an STL decomposition")
+    dec <- stats::stl(x, s.window = s_window, robust = robust)$time.series
     comps <- data.frame(
       trend = as.numeric(dec[, "trend"]),
       seasonal = as.numeric(dec[, "seasonal"]),
@@ -334,42 +361,74 @@ decompose_plot <- function(x, frequency = NULL,
   p
 }
 
-#' Forecast a seasonal series with STL plus seasonal-naive drift
+#' Forecast a seasonal series with STL and a random walk with drift
 #'
-#' A lightweight, dependency-free forecaster for a single seasonal series. The
-#' series is decomposed with [stats::stl()] into trend, seasonal and remainder.
-#' The trend is extrapolated linearly from its last `frequency` fitted values
-#' (the recent local slope), the seasonal pattern is carried forward by repeating
-#' the last full cycle of the seasonal component (a seasonal-naive forecast), and
-#' the point forecast is their sum.
+#' A dependency-free forecaster for a single seasonal series, which forecasts
+#' by decomposition (Hyndman & Athanasopoulos, 2021, Section 5.7).
+#' [stats::stl()] with `s.window = "periodic"` estimates a seasonal component
+#' that repeats unchanged in every cycle (Cleveland et al., 1990). The
+#' seasonally adjusted series, the data minus that component, is forecast with a
+#' random walk with drift, and the last cycle of the seasonal component is added
+#' back. The result reproduces
+#' `forecast::stlf(x, method = "rwdrift", s.window = "periodic")`.
 #'
-#' Prediction intervals are a random-walk-style normal band: the one-step
-#' standard deviation is estimated from the STL remainder and the interval at
-#' horizon `h` is `fit +/- z * sigma * sqrt(h)`, so the band necessarily widens
-#' with the horizon. This mirrors how seasonal-naive forecast variance
-#' accumulates over time and gives an honest, monotonically growing uncertainty
-#' band without pulling in a heavy modelling dependency. For a fully specified
-#' statistical model use, for example, `forecast::forecast()` and pass the
-#' resulting fit/interval columns to [timeseries_plot()] directly.
+#' The prediction interval at horizon `h` is `fit +/- z * sigma_h`, with
+#' `z = qnorm((1 + level) / 2)`. The forecast standard deviation is that of a
+#' random walk with drift, `sigma_h = sigma * sqrt(h * (1 + h / (T - 1)))`
+#' (Hyndman & Athanasopoulos, 2021, Section 5.5), where `sigma` is the standard
+#' deviation of the steps of the seasonally adjusted series and `T` the length
+#' of the series. The band widens with the horizon, and the second term carries
+#' the uncertainty in the estimated drift.
+#'
+#' The model assumes a seasonal pattern that adds to the level of the series
+#' and stays the same from cycle to cycle. When the seasonal swing grows with
+#' the level, as in `AirPassengers`, forecast on the log scale with
+#' `lambda = 0`. The band treats the seasonal component as known, so it leaves
+#' out the uncertainty in estimating it. In a rolling-origin backtest on five
+#' classic series whose seasonal swing does not grow with their level, the
+#' nominal 95% band covered 92% of one-step-ahead outcomes
+#' (`dev/ts_forecast_backtest.R` in the source repository). From three to 12
+#' steps ahead, it covered 99%. The band therefore runs somewhat narrow at the
+#' shortest horizons and wide further out, where the uncertainty of a random
+#' walk keeps growing while these series stay close to their trend. For a
+#' different model, fit it with, for example, `forecast::forecast()` and pass
+#' its columns to [timeseries_plot()] as a data frame.
 #'
 #' @param x A `ts` object, or a numeric vector (then `frequency` is required).
+#'   It needs more than two full cycles of observations.
 #' @param h Forecast horizon: the number of future steps (a positive integer).
 #' @param frequency Number of observations per period; taken from `x` when it is
 #'   a `ts`.
 #' @param level Prediction-interval coverage (a single number strictly between 0
 #'   and 1).
+#' @param lambda Optional Box-Cox transformation parameter. `NULL`, the default,
+#'   forecasts the series as it is. `0` forecasts its logarithm, and any other
+#'   number forecasts `(x^lambda - 1) / lambda`. Every observation must then be
+#'   positive. The forecasts and limits are transformed back to the original
+#'   scale, where the point forecast is the median of the forecast
+#'   distribution, without the bias adjustment that would make it the mean
+#'   (Hyndman & Athanasopoulos, 2021, Section 5.6). A forecast or limit beyond
+#'   the range the transformation can reach comes back as `0` (for a positive
+#'   `lambda`) or `Inf` (for a negative one).
 #'
 #' @return A data frame with one row per forecast step and columns `time` (the
 #'   future times, on the same scale as [stats::time()]), `fit`, `lwr` and
 #'   `upr`.
-#' @seealso [timeseries_plot()]
+#' @references
+#' \insertRef{cleveland1990}{depictr}
+#'
+#' \insertRef{hyndman2021}{depictr}
+#' @seealso [timeseries_plot()], [decompose_plot()]
 #' @export
 #' @examples
-#' fc <- ts_forecast(AirPassengers, h = 12)
+#' # The seasonal swing of AirPassengers grows with the number of passengers,
+#' # so it is forecast on the log scale.
+#' fc <- ts_forecast(AirPassengers, h = 12, lambda = 0)
 #' head(fc)
-#' # Interval width grows with the horizon
-#' diff(fc$upr - fc$lwr) >= 0
-ts_forecast <- function(x, h = 12, frequency = NULL, level = 0.95) {
+#' # On that scale, the band widens with the horizon
+#' diff(log(fc$upr) - log(fc$lwr)) > 0
+ts_forecast <- function(x, h = 12, frequency = NULL, level = 0.95,
+                        lambda = NULL) {
   if (!stats::is.ts(x)) {
     if (is.null(frequency)) {
       stop("Supply `frequency` when `x` is not a ts object.", call. = FALSE)
@@ -386,54 +445,60 @@ ts_forecast <- function(x, h = 12, frequency = NULL, level = 0.95) {
     stop("`level` must be a single number strictly between 0 and 1.",
          call. = FALSE)
   }
+  if (!is.null(lambda) &&
+      (!is.numeric(lambda) || length(lambda) != 1 || !is.finite(lambda))) {
+    stop("`lambda` must be NULL or a single finite number.", call. = FALSE)
+  }
   freq <- stats::frequency(x)
   if (freq < 2) {
     stop("`ts_forecast()` needs a seasonal series (frequency >= 2).",
          call. = FALSE)
   }
   n <- length(x)
-  if (n < 2 * freq) {
-    stop("Need at least two full cycles (", 2 * freq,
-         " observations) to forecast.", call. = FALSE)
+  check_stl_length(n, freq, "to forecast")
+
+  y <- as.numeric(x)
+  if (!is.null(lambda)) {
+    if (any(y <= 0, na.rm = TRUE)) {
+      stop("A Box-Cox `lambda` needs every observation to be positive.",
+           call. = FALSE)
+    }
+    y <- box_cox(y, lambda)
   }
+  # The transformed values keep the series' place in the cycle, which the
+  # periodic STL uses to pool each season's values.
+  y_ts <- stats::ts(y, start = stats::start(x), frequency = freq)
+  seasonal <- as.numeric(
+    stats::stl(y_ts, s.window = "periodic")$time.series[, "seasonal"]
+  )
+  sa <- y - seasonal
 
-  dec <- stats::stl(x, s.window = "periodic")$time.series
-  trend <- as.numeric(dec[, "trend"])
-  seasonal <- as.numeric(dec[, "seasonal"])
-  remainder <- as.numeric(dec[, "remainder"])
-
-  # Local linear extrapolation of the trend from its last full cycle.
-  last_idx <- seq.int(n - freq + 1L, n)
-  tr_fit <- stats::lm(y ~ t, data = data.frame(t = last_idx,
-                                               y = trend[last_idx]))
-  future_idx <- seq.int(n + 1L, n + h)
-  trend_fc <- stats::predict(tr_fit,
-                             newdata = data.frame(t = future_idx))
-
-  # Seasonal-naive: repeat the seasonal component of the last full cycle. Index
-  # by the season position (1..freq) so the right month/quarter is carried
-  # forward regardless of where the ts starts within its cycle.
-  cyc <- as.integer(stats::cycle(x))
-  last_cycle_idx <- seq.int(n - freq + 1L, n)
-  # Seasonal value keyed by season position.
-  season_value <- stats::setNames(seasonal[last_cycle_idx],
-                                  cyc[last_cycle_idx])
-  last_pos <- cyc[n]
-  season_pos <- ((last_pos - 1L + seq_len(h)) %% freq) + 1L
-  seasonal_fc <- as.numeric(season_value[as.character(season_pos)])
-
-  fit <- as.numeric(trend_fc) + seasonal_fc
-
-  sigma <- stats::sd(remainder, na.rm = TRUE)
+  # Random walk with drift on the seasonally adjusted series. The drift is the
+  # mean step and sigma the standard deviation of the steps, which equals the
+  # residual standard error of the drift model.
+  steps <- diff(sa)
+  drift <- mean(steps)
+  sigma <- stats::sd(steps)
+  hh <- seq_len(h)
+  # The periodic seasonal component repeats every cycle, so its last cycle
+  # holds one value per season, carried forward in step with the forecast.
+  seasonal_fc <- seasonal[n - freq + ((hh - 1L) %% freq) + 1L]
+  fit <- sa[n] + hh * drift + seasonal_fc
+  # The h-step variance h * sigma^2 of the walk, plus h^2 times the variance
+  # sigma^2 / (n - 1) of the estimated drift.
+  se <- sigma * sqrt(hh * (1 + hh / (n - 1)))
   z <- stats::qnorm((1 + level) / 2)
-  half <- z * sigma * sqrt(seq_len(h))
+  lwr <- fit - z * se
+  upr <- fit + z * se
+  if (!is.null(lambda)) {
+    fit <- inv_box_cox(fit, lambda)
+    lwr <- inv_box_cox(lwr, lambda)
+    upr <- inv_box_cox(upr, lambda)
+  }
 
   delta <- stats::deltat(x)
   last_time <- as.numeric(stats::time(x))[n]
-  future_time <- last_time + delta * seq_len(h)
-
-  data.frame(time = future_time, fit = fit, lwr = fit - half,
-             upr = fit + half)
+  data.frame(time = last_time + delta * hh, fit = fit, lwr = lwr, upr = upr)
 }
 
 # ---- internal helpers ------------------------------------------------------
@@ -441,11 +506,13 @@ ts_forecast <- function(x, h = 12, frequency = NULL, level = 0.95) {
 #' Resolve the `forecast` argument of `timeseries_plot()` to a tidy data frame
 #'
 #' Accepts either an integer horizon (dispatching to [ts_forecast()] on the
-#' original `ts`/numeric input) or a pre-computed data frame with at least
-#' `time` and `fit` columns. The data frame is prepended with the last observed
-#' point so the overlaid forecast line joins the history without a gap.
+#' `ts`, or on a numeric input's values in time order) or a pre-computed data
+#' frame with at least `time` and `fit` columns. The data frame is prepended
+#' with the last observed point so the overlaid forecast line joins the history
+#' without a gap.
 #' @noRd
-resolve_forecast <- function(forecast, x, df, frequency = NULL, level = 0.95) {
+resolve_forecast <- function(forecast, x, df, frequency = NULL, level = 0.95,
+                             lambda = NULL) {
   if (is.data.frame(forecast)) {
     if (!all(c("time", "fit") %in% names(forecast))) {
       stop("A forecast data frame must have `time` and `fit` columns.",
@@ -461,7 +528,18 @@ resolve_forecast <- function(forecast, x, df, frequency = NULL, level = 0.95) {
            "for a data frame supply a pre-computed forecast data frame.",
            call. = FALSE)
     }
-    fc <- ts_forecast(x, h = forecast, frequency = frequency, level = level)
+    # A numeric `x` is forecast from `df$value`, its values in time order, so
+    # that an unsorted `time` extends the series as drawn.
+    y <- if (stats::is.ts(x)) x else df$value
+    fc <- ts_forecast(y, h = forecast, frequency = frequency, level = level,
+                      lambda = lambda)
+    if (!stats::is.ts(x)) {
+      # A numeric `x` is wrapped in a ts that starts at time 1, so
+      # ts_forecast() returns times in cycle units the history knows nothing
+      # about. The history sits at seq_along(x) or at the caller's `time`, so
+      # the forecast continues that axis, one typical spacing per step.
+      fc$time <- forecast_steps(df$time, nrow(fc))
+    }
   }
   # Reconcile the forecast times with the historical axis. ts_forecast() (and a
   # forecast::forecast object) return decimal-year `time` values, but the
@@ -475,6 +553,88 @@ resolve_forecast <- function(forecast, x, df, frequency = NULL, level = 0.95) {
   anchor <- data.frame(time = last_obs$time, fit = last_obs$value,
                        lwr = last_obs$value, upr = last_obs$value)
   rbind(anchor, fc)
+}
+
+#' The next `h` times on the history's own axis
+#'
+#' Steps on from the last observed time by the median spacing of the history,
+#' or by one unit for a single observation. The result keeps the class of
+#' `hist_time`, so a `Date` axis gains days and a `POSIXct` one seconds.
+#' @noRd
+forecast_steps <- function(hist_time, h) {
+  hist_time <- sort(hist_time)
+  n <- length(hist_time)
+  step <- if (n > 1) stats::median(diff(as.numeric(hist_time))) else 1
+  hist_time[n] + step * seq_len(h)
+}
+
+#' Caption naming the coverage and method of the built-in forecast's ribbon
+#' @noRd
+forecast_caption <- function(level, lambda = NULL) {
+  method <- "STL + random walk with drift"
+  if (!is.null(lambda)) {
+    method <- if (lambda == 0) {
+      paste(method, "on the log scale")
+    } else {
+      sprintf("%s, Box-Cox lambda = %g", method, lambda)
+    }
+  }
+  sprintf("Shaded: %g%% prediction interval (%s).", 100 * level, method)
+}
+
+#' Refuse a series too short for stats::stl()
+#'
+#' stl() stops on `n <= 2 * frequency` with "series is not periodic or has less
+#' than two periods", which reads as a complaint about the frequency.
+#' @noRd
+check_stl_length <- function(n, freq, purpose) {
+  if (n <= 2 * freq) {
+    stop("Need more than two full cycles (at least ", floor(2 * freq) + 1,
+         " observations) ", purpose, ".", call. = FALSE)
+  }
+  invisible(n)
+}
+
+#' Validate the STL seasonal window
+#'
+#' stl() rounds the window to a whole number and raises an even one to the next
+#' odd number, and its documentation, following Cleveland et al. (1990), asks
+#' for at least 7. Such windows are refused here, since stl() would change them
+#' without a word. An abbreviation of "periodic" is accepted, as stl() accepts
+#' it.
+#' @noRd
+validate_s_window <- function(s_window) {
+  if (is.character(s_window) && length(s_window) == 1 &&
+      !is.na(pmatch(s_window, "periodic"))) {
+    return("periodic")
+  }
+  if (!is.numeric(s_window) || length(s_window) != 1 ||
+      !is.finite(s_window) || s_window < 7 || s_window %% 2 != 1) {
+    stop("`s_window` must be \"periodic\" or an odd whole number of at ",
+         "least 7.", call. = FALSE)
+  }
+  s_window
+}
+
+#' Box-Cox transformation of positive values, and its inverse
+#'
+#' The inverse maps a value beyond the range the transformation can reach to
+#' the edge of the positive half-line it stands for. That edge is 0 for a
+#' positive `lambda`, whose transformation nears `-1 / lambda` as values fall
+#' towards 0, and `Inf` for a negative one, whose transformation nears it as
+#' values grow.
+#' @noRd
+box_cox <- function(y, lambda) {
+  if (lambda == 0) log(y) else (y^lambda - 1) / lambda
+}
+
+# The inverse of box_cox(), described above.
+inv_box_cox <- function(z, lambda) {
+  if (lambda == 0) return(exp(z))
+  base <- lambda * z + 1
+  out <- base^(1 / lambda)
+  out[which(base <= 0)] <- if (lambda > 0) 0 else Inf
+  out
 }
 
 #' Reconcile forecast times with the class of the historical time axis
