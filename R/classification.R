@@ -309,7 +309,8 @@ confusion_matrix_plot <- function(x, predicted = NULL, threshold = 0.5,
   if (inherits(x, "glm")) {
     resp <- stats::model.response(stats::model.frame(x))
     actual_bin <- as_binary(resp)
-    fit <- as.numeric(stats::fitted(x))
+    # Unpadded, like the response (see binary_inputs()).
+    fit <- as.numeric(x$fitted.values)
     if (is.character(threshold)) {
       threshold <- match.arg(threshold, "youden")
       io <- drop_incomplete(actual_bin, fit)
@@ -445,8 +446,11 @@ as_binary <- function(y, positive = NULL) {
 #' @noRd
 binary_inputs <- function(x, score) {
   if (inherits(x, "glm")) {
+    # The model's own components, both one per row of the fit. fitted() would
+    # pad with NA the rows na.exclude left out, while the model frame never
+    # holds them, which would set each outcome beside another row's score.
     actual <- as_binary(stats::model.response(stats::model.frame(x)))
-    sc <- as.numeric(stats::fitted(x))
+    sc <- as.numeric(x$fitted.values)
     return(drop_incomplete(actual, sc))
   }
   if (is.null(score)) {

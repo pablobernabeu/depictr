@@ -43,6 +43,24 @@
   criteria are `NA`. The `R2` column stays `NA` for mixed models, as the help
   page now documents.
 
+* A `glm` fitted with `na.action = na.exclude` broke the classification and
+  diagnostic plots. Its fitted values are padded with `NA` to the length of the
+  data while its response is not, and the plots paired the two. The ROC,
+  precision-recall, threshold, gain and lift plots and the confusion matrix
+  failed, and `calibration_plot()` silently dropped bins and drew the rest with
+  other rows' outcomes. In the Q-Q panel of `residual_diagnostics_plot()`, the
+  quantile residuals set each response against another row's fitted value, and
+  for a Gaussian model they were all `NA`, so the panel was empty. All of them
+  now use the model's own unpadded components. `residual_diagnostics_plot()` and
+  `influence_plot()` also leave the excluded rows out of their frames, for an
+  `lm` as for a `glm`. They no longer warn about removing those rows, and the
+  2p/n leverage line of `influence_plot()` no longer counts them.
+* The quantile residuals in the Q-Q panel of `residual_diagnostics_plot()`
+  ignored prior weights in Gaussian and Gamma models. Every observation was given
+  the same scale, so a correctly specified weighted model showed spurious
+  departures from the line. The weights now scale each observation's variance,
+  as they do in the fit.
+
 # depictr 0.3.0
 
 ## Auditing a finished figure

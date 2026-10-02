@@ -26,11 +26,13 @@ influence_plot <- function(model, n_label = 3, colour = depictr_brand(),
   if (!inherits(model, "lm")) {
     stop("`model` must be an 'lm' or 'glm' object.", call. = FALSE)
   }
-  df <- data.frame(
+  # Without the rows na.exclude left out, which would otherwise count towards n
+  # in the 2p/n leverage threshold.
+  df <- drop_excluded_rows(data.frame(
     leverage = stats::hatvalues(model),
     residual = stats::rstudent(model),
     cook = stats::cooks.distance(model)
-  )
+  ), model)
   df$label <- rownames(df)
   p <- length(stats::coef(model))
   n <- nrow(df)

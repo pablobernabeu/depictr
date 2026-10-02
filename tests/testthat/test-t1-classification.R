@@ -105,3 +105,50 @@ test_that("confusion_matrix_plot() keeps the model's real class names", {
     "ggplot"
   )
 })
+
+test_that("a glm fitted with na.exclude is plotted as its na.omit twin", {
+  # Under na.exclude, fitted() is padded with NA to the data's length while the
+  # model frame, and so the response, is not. Pairing the two set each outcome
+  # beside another row's score. The curves and the confusion matrix failed, and
+  # calibration_plot() silently drew 3 of its 10 bins with the wrong rates.
+  d <- lexical_decision
+  d$RT_na <- d$RT
+  d$RT_na[seq(1, nrow(d), length.out = 50)] <- NA
+  fit_with <- function(na) {
+    glm(accuracy ~ word_frequency + RT_na, data = d, family = binomial,
+        na.action = na)
+  }
+  fe <- fit_with(na.exclude)
+  fo <- fit_with(na.omit)
+  expect_length(stats::fitted(fe), nrow(d))
+
+  plots <- list(roc = roc_curve_plot, pr = pr_curve_plot,
+                threshold = threshold_plot, gain = gain_plot,
+                lift = lift_plot, calibration = calibration_plot)
+  reported <- c(roc = "auc", pr = "average_precision",
+                threshold = "thresholds")
+  for (nm in names(plots)) {
+    expect_silent(pe <- plots[[nm]](fe))
+    po <- plots[[nm]](fo)
+    expect_identical(ggplot2::ggplot_build(pe)$data,
+                     ggplot2::ggplot_build(po)$data,
+                     label = paste(nm, "layer data"))
+    if (nm %in% names(reported)) {
+      expect_identical(attr(pe, reported[[nm]]), attr(po, reported[[nm]]),
+                       label = paste(nm, reported[[nm]]))
+    }
+  }
+  # The calibration bins themselves, not only what is drawn of them.
+  expect_identical(calibration_plot(fe)$data, calibration_plot(fo)$data)
+  # A named list of models takes the same route.
+  aucs <- attr(roc_curve_plot(list(exclude = fe, omit = fo)), "auc")
+  expect_identical(aucs[["exclude"]], aucs[["omit"]])
+
+  for (threshold in list(0.5, "youden")) {
+    ce <- confusion_matrix_plot(fe, threshold = threshold)
+    co <- confusion_matrix_plot(fo, threshold = threshold)
+    expect_identical(ce$data, co$data)
+    expect_identical(attr(ce, "threshold"), attr(co, "threshold"))
+    expect_equal(sum(ce$data$Freq), stats::nobs(fe))
+  }
+})

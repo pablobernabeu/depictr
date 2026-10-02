@@ -12,7 +12,9 @@
 #' (Gelman & Hill, 2007; see [binned_residual_plot()]), which is readable even
 #' for binary or count models, and the Q-Q panel uses *randomised quantile*
 #' residuals (Dunn & Smyth, 1996), which are standard normal under a correctly
-#' specified model regardless of the response family. The scale-location and
+#' specified model regardless of the response family. In a Gaussian or Gamma
+#' model, prior weights enter these residuals as they enter the fit, through
+#' each observation's variance. The scale-location and
 #' leverage panels are unchanged. For an `lm` the behaviour is identical to
 #' before. Set `glm_panels = FALSE` to force the classic `lm`-style panels for a
 #' `glm` as well.
@@ -60,12 +62,12 @@ residual_diagnostics_plot <- function(model,
   which <- match.arg(which, several.ok = TRUE)
   use_glm <- isTRUE(glm_panels) && inherits(model, "glm")
 
-  df <- data.frame(
+  df <- drop_excluded_rows(data.frame(
     fitted = stats::fitted(model),
     resid = stats::residuals(model),
     std_resid = stats::rstandard(model),
     leverage = stats::hatvalues(model)
-  )
+  ), model)
   df$sqrt_abs <- sqrt(abs(df$std_resid))
 
   panels <- list()
@@ -134,6 +136,25 @@ residual_diagnostics_plot <- function(model,
 }
 
 # ---- internal helpers ------------------------------------------------------
+
+#' Drop the rows a fit with `na.action = na.exclude` left out
+#'
+#' Under `na.exclude`, fitted values, residuals and influence measures are
+#' padded with `NA` at the rows the fit left out, so a frame built from them
+#' has one row per row of the data. Removing exactly those rows gives the frame
+#' of the same model fitted with `na.omit`, so the plots draw the same points
+#' and count the same observations.
+#'
+#' @param df A data frame built from the padded per-observation measures.
+#' @param model The fitted `lm` or `glm` they came from.
+#' @noRd
+drop_excluded_rows <- function(df, model) {
+  omit <- model$na.action
+  if (inherits(omit, "exclude") && length(omit)) {
+    df <- df[-as.integer(omit), , drop = FALSE]
+  }
+  df
+}
 
 #' @noRd
 diag_scatter <- function(df, x, y, x_lab, y_lab, title, alpha, smooth,

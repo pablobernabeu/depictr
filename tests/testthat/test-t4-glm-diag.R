@@ -122,6 +122,153 @@ test_that("quantile residuals handle a cbind(successes, failures) response", {
   expect_gt(stats::ks.test(as.numeric(qr), "pnorm")$p.value, 0.05)
 })
 
+test_that("quantile residuals of an na.exclude fit are the na.omit ones, padded", {
+  # Under na.exclude, fitted() and residuals() are padded with NA to the data's
+  # length while the model frame is not. The residuals paired the padded fitted
+  # values with the unpadded response, recycling one against the other, and
+  # took the Gaussian scale from padded residuals, so every value came out NA.
+  d <- lexical_decision
+  d$RT_na <- d$RT
+  d$RT_na[seq(1, nrow(d), length.out = 50)] <- NA
+  fit_with <- list(
+    binomial = function(na) {
+      glm(accuracy ~ word_frequency + RT_na, data = d, family = binomial,
+          na.action = na)
+    },
+    gaussian = function(na) {
+      glm(RT_na ~ word_frequency + condition, data = d, na.action = na)
+    },
+    lm = function(na) lm(RT_na ~ word_frequency + condition, data = d,
+                         na.action = na)
+  )
+  for (nm in names(fit_with)) {
+    fe <- fit_with[[nm]](na.exclude)
+    fo <- fit_with[[nm]](na.omit)
+    expect_silent(qe <- depictr:::quantile_residuals(fe, seed = 3))
+    qo <- depictr:::quantile_residuals(fo, seed = 3)
+    expect_true(isTRUE(attr(qe, "quantile")))
+    # One value per row of the data, NA exactly where the fit left a row out.
+    expect_length(qe, nrow(d))
+    expect_identical(unname(which(is.na(qe))), as.integer(fe$na.action),
+                     label = paste(nm, "NA positions"))
+    expect_equal(as.numeric(qe[!is.na(qe)]), as.numeric(qo),
+                 label = paste(nm, "residuals"))
+  }
+})
+
+test_that("quantile residuals honour prior weights in the Gaussian and Gamma scales", {
+  # Under prior weights w, the variance of observation i is phi * V(mu_i) / w_i.
+  # One scale served every observation, so with weights 1 and 16 the second
+  # group's residuals had an SD of 0.25 under a correctly specified model.
+  withr::local_seed(2026)
+  n <- 2000
+  x <- stats::rnorm(n)
+  w <- rep(c(1, 16), each = n / 2)
+
+  y <- 1 + 0.5 * x + stats::rnorm(n, sd = 2 / sqrt(w))
+  fits <- list(glm = glm(y ~ x, weights = w), lm = lm(y ~ x, weights = w))
+  for (nm in names(fits)) {
+    qr <- as.numeric(depictr:::quantile_residuals(fits[[nm]]))
+    sds <- tapply(qr, w, stats::sd)
+    expect_gt(min(sds), 0.9, label = paste(nm, "smallest group SD"))
+    expect_lt(max(sds), 1.1, label = paste(nm, "largest group SD"))
+    # For a Gaussian model, the quantile residual is the weighted residual
+    # divided by sigma.
+    expect_equal(qr, unname(sqrt(w) * stats::residuals(fits[[nm]], "response") /
+                              stats::sigma(fits[[nm]])),
+                 tolerance = 1e-8)
+  }
+
+  mu <- exp(0.5 + 0.3 * x)
+  yg <- stats::rgamma(n, shape = 4 * w, rate = 4 * w / mu)
+  gfit <- glm(yg ~ x, weights = w, family = Gamma(link = "log"))
+  qr <- as.numeric(depictr:::quantile_residuals(gfit))
+  sds <- tapply(qr, w, stats::sd)
+  expect_gt(min(sds), 0.9, label = "Gamma smallest group SD")
+  expect_lt(max(sds), 1.1, label = "Gamma largest group SD")
+})
+
+test_that("an observation with zero prior weight has no quantile residual", {
+  # It takes no part in the fit, so nobs() leaves it out. Dividing its variance
+  # by a zero weight would otherwise give it a residual of 0 (Gaussian) or
+  # -8.1, the clamped tail (Gamma).
+  withr::local_seed(17)
+  n <- 200
+  x <- stats::rnorm(n)
+  w <- rep(1, n)
+  w[c(3, 50)] <- 0
+  y <- 1 + x + stats::rnorm(n)
+  yg <- stats::rgamma(n, shape = 5, rate = 5 / exp(0.2 * x))
+  fits <- list(
+    gaussian = list(glm(y ~ x, weights = w),
+                    glm(y ~ x, subset = w > 0)),
+    Gamma = list(glm(yg ~ x, weights = w, family = Gamma(link = "log")),
+                 glm(yg ~ x, subset = w > 0, family = Gamma(link = "log")))
+  )
+  for (nm in names(fits)) {
+    # summary.glm() warns that its dispersion estimate leaves them out.
+    expect_warning(qr <- depictr:::quantile_residuals(fits[[nm]][[1]]),
+                   "zero weight")
+    expect_identical(unname(which(is.na(qr))), c(3L, 50L),
+                     label = paste(nm, "NA positions"))
+    # The others are those of the same model fitted without the two rows.
+    expect_equal(as.numeric(qr[-c(3, 50)]),
+                 as.numeric(depictr:::quantile_residuals(fits[[nm]][[2]])),
+                 label = paste(nm, "residuals"))
+  }
+})
+
+test_that("diagnostic plots draw an na.exclude fit as its na.omit twin", {
+  # A Gaussian glm under na.exclude drew an empty Q-Q panel, and every frame
+  # built from padded values carried the excluded rows. ggplot2 warned that it
+  # removed them, and influence_plot() counted them in the 2p/n leverage line.
+  d <- lexical_decision
+  d$RT_na <- d$RT
+  d$RT_na[seq(1, nrow(d), length.out = 50)] <- NA
+  fit_with <- list(
+    gaussian = function(na) {
+      glm(RT_na ~ word_frequency + condition, data = d, na.action = na)
+    },
+    binomial = function(na) {
+      glm(accuracy ~ word_frequency + RT_na, data = d, family = binomial,
+          na.action = na)
+    },
+    lm = function(na) lm(RT_na ~ word_frequency + condition, data = d,
+                         na.action = na)
+  )
+  # Builds each panel under na.exclude and na.omit, checks that the first
+  # builds without warnings and that both draw the same layer data.
+  same_panels <- function(nm, draw, panels = 1L) {
+    pe <- draw(fit_with[[nm]](na.exclude))
+    po <- draw(fit_with[[nm]](na.omit))
+    if (!inherits(pe, "patchwork")) {
+      pe <- list(pe)
+      po <- list(po)
+    }
+    lapply(seq_len(panels), function(k) {
+      expect_no_warning(be <- ggplot2::ggplot_build(pe[[k]]))
+      expect_identical(be$data, ggplot2::ggplot_build(po[[k]])$data,
+                       label = paste(nm, "panel", k, "layer data"))
+      be
+    })
+  }
+  n_fit <- nrow(d) - 50
+
+  # The GLM panels: binned residuals, quantile-residual Q-Q, scale-location
+  # and residuals against leverage.
+  built <- same_panels("gaussian", residual_diagnostics_plot, panels = 4)
+  expect_equal(nrow(built[[2]]$data[[1]]), n_fit, label = "Gaussian Q-Q points")
+  built <- same_panels("binomial", function(m) {
+    residual_diagnostics_plot(m, which = "qq", seed = 1)
+  })
+  expect_equal(nrow(built[[1]]$data[[1]]), n_fit, label = "binomial Q-Q points")
+  # The classic panels, as an lm gets them.
+  same_panels("lm", function(m) {
+    residual_diagnostics_plot(m, which = c("resid_fitted", "qq"))
+  }, panels = 2)
+  same_panels("gaussian", influence_plot)
+})
+
 test_that("residual_diagnostics_plot() is glm-aware but lm is unchanged", {
   gfit <- glm(adverse_event ~ biomarker + age + arm,
               data = clinical_trial, family = binomial)

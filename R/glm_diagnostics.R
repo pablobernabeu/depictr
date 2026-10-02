@@ -142,6 +142,13 @@ binned_residual_data <- function(model, bins = NULL,
 #' \eqn{(0,1)}), regardless of the response distribution, which makes the normal
 #' Q-Q plot interpretable even for binary or count GLMs.
 #'
+#' Prior weights \eqn{w_i} enter each fitted distribution as they enter the
+#' fit, through the variance \eqn{\phi V(\mu_i) / w_i}. The Gaussian standard
+#' deviation is therefore \eqn{\sqrt{\phi / w_i}} and the Gamma shape
+#' \eqn{w_i / \phi}, and binomial weights are numbers of trials. Poisson
+#' residuals do not use the weights. An observation with zero prior weight
+#' takes no part in the fit and gets `NA`.
+#'
 #' Supported families: gaussian, binomial, poisson and Gamma (all relying only
 #' on base R distribution functions, so no extra dependency is needed). For
 #' other families the function returns deviance residuals (with an attribute
@@ -150,8 +157,10 @@ binned_residual_data <- function(model, bins = NULL,
 #' @param model A fitted `glm` (or `lm`, treated as Gaussian).
 #' @param seed Optional integer seed for the randomisation of discrete
 #'   residuals, for reproducibility.
-#' @return A numeric vector of residuals, with attribute `quantile` (logical)
-#'   indicating whether true quantile residuals were produced.
+#' @return A numeric vector of residuals as long as [stats::residuals()]
+#'   returns, so padded with `NA` at the rows that `na.action = na.exclude`
+#'   left out of the fit. Its attribute `quantile` (logical) indicates whether
+#'   true quantile residuals were produced.
 #' @noRd
 quantile_residuals <- function(model, seed = NULL) {
   if (!is.null(seed)) {
@@ -169,11 +178,13 @@ quantile_residuals <- function(model, seed = NULL) {
   }
 
   fam <- if (inherits(model, "glm")) stats::family(model)$family else "gaussian"
-  mu <- stats::fitted(model)
+  # The model's own components hold one value per row of the fit. fitted() and
+  # residuals() pad with NA the rows na.exclude left out, while the model frame
+  # never holds them, so mixing the two would recycle one against the other.
+  mu <- model$fitted.values
   y <- stats::model.response(stats::model.frame(model))
-  # Prior weights (binomial may store proportions with weights = trial counts).
-  w <- model$prior.weights
-  if (is.null(w)) w <- rep(1, length(mu))
+  # Prior weights: a glm always stores them, an lm only when it was weighted.
+  w <- model$prior.weights %||% model$weights %||% rep(1, length(mu))
 
   unsupported <- function() {
     r <- stats::residuals(model, type = "deviance")
@@ -182,8 +193,14 @@ quantile_residuals <- function(model, seed = NULL) {
   }
 
   if (fam == "gaussian") {
-    sigma <- sqrt(sum(stats::residuals(model)^2) / stats::df.residual(model))
-    u <- stats::pnorm(as.numeric(y), mean = mu, sd = sigma)
+    # Observation i has variance phi / w_i, where phi is the weighted residual
+    # variance: the dispersion of a glm, sigma squared for an lm.
+    phi <- if (inherits(model, "glm")) {
+      summary(model)$dispersion
+    } else {
+      stats::sigma(model)^2
+    }
+    u <- stats::pnorm(as.numeric(y), mean = mu, sd = sqrt(phi / w))
   } else if (fam == "binomial") {
     # y may be 0/1, logical, factor, a proportion with trial weights, or a
     # cbind(successes, failures) matrix. The matrix response carries the counts
@@ -191,14 +208,15 @@ quantile_residuals <- function(model, seed = NULL) {
     # each success count with the wrong trial size.
     if (is.matrix(y)) {
       counts <- y[, 1]
-      w <- rowSums(y)
+      size <- rowSums(y)
     } else {
       yy <- as.numeric(y)
       if (is.factor(y)) yy <- as.numeric(y) - 1
-      counts <- round(yy * w)
+      size <- w
+      counts <- round(yy * size)
     }
-    a <- stats::pbinom(counts - 1, size = w, prob = mu)
-    b <- stats::pbinom(counts, size = w, prob = mu)
+    a <- stats::pbinom(counts - 1, size = size, prob = mu)
+    b <- stats::pbinom(counts, size = size, prob = mu)
     u <- stats::runif(length(mu), pmin(a, b), pmax(a, b))
   } else if (fam == "poisson") {
     yy <- as.numeric(y)
@@ -206,8 +224,8 @@ quantile_residuals <- function(model, seed = NULL) {
     b <- stats::ppois(yy, lambda = mu)
     u <- stats::runif(length(mu), a, b)
   } else if (fam == "Gamma") {
-    disp <- summary(model)$dispersion
-    shape <- 1 / disp
+    # Shape w_i / phi and mean mu_i, so the variance is phi * mu_i^2 / w_i.
+    shape <- w / summary(model)$dispersion
     u <- stats::pgamma(as.numeric(y), shape = shape, rate = shape / mu)
   } else {
     return(unsupported())
@@ -215,6 +233,12 @@ quantile_residuals <- function(model, seed = NULL) {
 
   u <- pmin(pmax(u, .Machine$double.eps), 1 - .Machine$double.eps)
   r <- stats::qnorm(u)
+  # An observation with zero prior weight takes no part in the fit (nobs()
+  # leaves it out too), so there is no fitted distribution to place it in.
+  r[w == 0] <- NA_real_
+  # Put back, as NA, the rows na.exclude left out, so that every branch returns
+  # as many values as residuals() does, the deviance fallback included.
+  r <- stats::naresid(model$na.action, r)
   attr(r, "quantile") <- TRUE
   r
 }
