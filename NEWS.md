@@ -176,6 +176,22 @@
   why. The arm is now dropped with the missing statuses, as it already was for
   a character `group`.
 
+## Auditing a finished figure
+
+* `check_figure()` measured all text against the plot background, so text on a
+  coloured facet strip or legend box was judged against a background it is not
+  drawn on: white strip text on a dark strip failed and unreadable grey strip text
+  passed. Each text is now measured against its own background, with a
+  translucent fill taken as the colour it shows over what lies beneath it. Large
+  text (18 pt, or 14 pt bold, as printed) is held to the 3:1 that WCAG asks of it,
+  where it used to be held to 4.5:1. The `text_contrast` row reports the text that
+  falls furthest short of its own threshold and gives that threshold, and its
+  detail names the text's printed size and weight. A translucent plot or panel
+  background is also measured as the colour it shows. Its alpha used to be
+  dropped, so `geometry_contrast` moves for such a figure. The
+  relative-luminance code now cites the current WCAG 2.2 definition and its
+  0.04045 breakpoint, which changes no ratio.
+
 # depictr 0.3.0
 
 ## Auditing a finished figure

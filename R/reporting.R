@@ -96,14 +96,15 @@ palette_preview <- function(n = 8, type = c("qualitative", "sequential",
 # colour against a coloured background, and the contrast ratios `check_figure()`
 # reports.
 #
-# The 0.03928 breakpoint below is the one the WCAG guidelines print, and it
-# differs slightly from the IEC 61966-2-1 figure of 0.04045 that
-# `.srgb_to_linear()` uses elsewhere in the package. The published figure is
-# kept here so that a contrast ratio can be recomputed from the standard alone,
-# and the Python twin's `_relative_luminance()` does the same.
+# The linearisation is the sRGB transfer function that `.srgb_to_linear()`
+# applies everywhere else in the package, with its 0.04045 breakpoint, which is
+# the one the WCAG 2.2 definition of relative luminance prints. Before May 2021
+# that definition printed 0.03928, and the W3C's note on the change says the
+# old value had no practical effect: no 8-bit channel value lies between the
+# two, so no ratio differs. The Python twin's `_relative_luminance()` calls its
+# own `_srgb_to_linear()` in the same way.
 .relative_luminance <- function(cols) {
-  rgb <- grDevices::col2rgb(cols) / 255
-  lin <- ifelse(rgb <= 0.03928, rgb / 12.92, ((rgb + 0.055) / 1.055)^2.4)
+  lin <- .srgb_to_linear(grDevices::col2rgb(cols) / 255)
   as.numeric(0.2126 * lin[1, ] + 0.7152 * lin[2, ] + 0.0722 * lin[3, ])
 }
 

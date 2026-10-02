@@ -78,9 +78,19 @@ there is no one background to measure its contrast against, and the two
 engines size a layer's text in different units, which would leave the check
 disagreeing with its Python twin on the same figure.
 
-\code{text_contrast} and \code{geometry_contrast} are the smallest WCAG 2.x contrast
-ratios of, respectively, any drawn text against the plot background and any
-encoding colour against the panel background.
+\code{text_contrast} is the WCAG 2.2 contrast ratio of the text that falls
+furthest short of its own threshold. Each text is measured against the
+background it is drawn on: a facet strip's fill for strip text, the legend
+box's fill for legend text, and the plot background for the rest. A
+translucent fill is measured as the colour it shows over what lies beneath
+it. Text that is large at its printed size, 18 pt or 14 pt in bold, is held
+to 3:1, and other text to 4.5:1, as success criterion 1.4.3 asks. The row's
+\code{threshold} is the one that applies to the text it reports, and its \code{detail}
+names that text's colour, background, printed size and weight.
+
+\code{geometry_contrast} is the smallest WCAG 2.2 contrast ratio of any encoding
+colour against the panel background, or against the plot background where
+the panel paints none.
 
 \code{redundant_encoding} counts how many of shape and line type also vary in a
 layer whose colour varies. Zero means the distinction between groups is

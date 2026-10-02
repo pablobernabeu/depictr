@@ -9,10 +9,15 @@
 # point size and in the colour it will be drawn in.
 
 # WCAG 2.2 contrast floors, used as published rather than tuned so that any
-# particular figure passes: 4.5:1 for text at normal size (success criterion
-# 1.4.3) and 3:1 for graphical objects that carry meaning (1.4.11). They are
-# fixed rather than arguments because they are somebody else's standard.
+# particular figure passes: 4.5:1 for text at normal size and 3:1 for
+# large-scale text (success criterion 1.4.3), and 3:1 for graphical objects that
+# carry meaning (1.4.11). WCAG defines large-scale text as at least 18 point, or
+# 14 point in bold. They are fixed rather than arguments because they are
+# somebody else's standard.
 .wcag_text_contrast <- 4.5
+.wcag_large_text_contrast <- 3
+.wcag_large_text_pt <- 18
+.wcag_large_bold_text_pt <- 14
 .wcag_object_contrast <- 3
 
 #' Audit a finished figure for accessibility and honesty
@@ -54,9 +59,19 @@
 #' engines size a layer's text in different units, which would leave the check
 #' disagreeing with its Python twin on the same figure.
 #'
-#' `text_contrast` and `geometry_contrast` are the smallest WCAG 2.x contrast
-#' ratios of, respectively, any drawn text against the plot background and any
-#' encoding colour against the panel background.
+#' `text_contrast` is the WCAG 2.2 contrast ratio of the text that falls
+#' furthest short of its own threshold. Each text is measured against the
+#' background it is drawn on: a facet strip's fill for strip text, the legend
+#' box's fill for legend text, and the plot background for the rest. A
+#' translucent fill is measured as the colour it shows over what lies beneath
+#' it. Text that is large at its printed size, 18 pt or 14 pt in bold, is held
+#' to 3:1, and other text to 4.5:1, as success criterion 1.4.3 asks. The row's
+#' `threshold` is the one that applies to the text it reports, and its `detail`
+#' names that text's colour, background, printed size and weight.
+#'
+#' `geometry_contrast` is the smallest WCAG 2.2 contrast ratio of any encoding
+#' colour against the panel background, or against the plot background where
+#' the panel paints none.
 #'
 #' `redundant_encoding` counts how many of shape and line type also vary in a
 #' layer whose colour varies. Zero means the distinction between groups is
@@ -136,18 +151,20 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 
   built <- ggplot2::ggplot_build(plot)
   resolved <- .completed_theme(built$plot$theme)
+  # White stands in for the paper under a plot background that paints nothing.
   plot_bg <- .element_background(
-    ggplot2::calc_element("plot.background", resolved)) %||% "#ffffff"
+    ggplot2::calc_element("plot.background", resolved), "#ffffff") %||%
+    "#ffffff"
   panel_bg <- .element_background(
-    ggplot2::calc_element("panel.background", resolved)) %||% plot_bg
+    ggplot2::calc_element("panel.background", resolved), plot_bg) %||% plot_bg
 
   encoding <- .figure_colour_encoding(built)
-  text <- .figure_text(ggplot2::ggplot_gtable(built), resolved)
+  text <- .figure_text(ggplot2::ggplot_gtable(built), resolved, plot_bg)
 
   rows <- c(
     .separability_rows(encoding$colours, min_delta_e),
     list(.text_size_row(text, width_cm, render_width_cm, min_text_pt)),
-    list(.text_contrast_row(text, plot_bg)),
+    list(.text_contrast_row(text, width_cm, render_width_cm)),
     list(.geometry_contrast_row(encoding$colours, panel_bg)),
     list(.redundant_encoding_row(encoding))
   )
@@ -256,12 +273,48 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
   tolower(grDevices::rgb(rgba[1, ], rgba[2, ], rgba[3, ], maxColorValue = 255))
 }
 
-#' The fill of a background element, or NULL when nothing is painted
+#' A colour as drawn over a background, given its alpha
+#'
+#' Each channel, scaled to run from 0 to 1, is
+#' `alpha * colour + (1 - alpha) * background`,
+#' then scaled to 8 bits with `floor(255 * drawn + 0.5)`. The Python twin does
+#' the same arithmetic in the same order, so the two agree to the last bit. A
+#' library that rounds half to even would disagree with it at some alphas.
+#' `alpha` multiplies the colour's own alpha, as grid's `gpar(alpha)` does.
+#' @return Lower-case six-digit hex, one per colour.
 #' @noRd
-.element_background <- function(element) {
+.composite <- function(colour, background, alpha = 1) {
+  fg <- grDevices::col2rgb(colour, alpha = TRUE) / 255
+  a <- fg[4, ] * alpha
+  bg <- as.numeric(grDevices::col2rgb(background)) / 255
+  drawn <- sweep(fg[1:3, , drop = FALSE], 2, a, `*`) + outer(bg, 1 - a)
+  channels <- floor(255 * drawn + 0.5)
+  tolower(grDevices::rgb(channels[1, ], channels[2, ], channels[3, ],
+                         maxColorValue = 255))
+}
+
+#' The colour a fill paints over its parent background, or NULL if it paints
+#' nothing
+#'
+#' A translucent fill is composited over the background it is drawn on, so a
+#' half-transparent black strip on white is measured as the grey it shows.
+#' @noRd
+.painted <- function(fill, parent, alpha = NULL) {
+  fill <- as.character(fill)
+  if (!length(fill) || is.na(fill[[1]]) || !nzchar(fill[[1]])) return(NULL)
+  rgba <- tryCatch(grDevices::col2rgb(fill[[1]], alpha = TRUE),
+                   error = function(e) NULL)
+  alpha <- alpha %||% 1
+  if (is.null(rgba) || rgba[4, 1] * alpha[[1]] == 0) return(NULL)
+  .composite(fill[[1]], parent, alpha[[1]])
+}
+
+#' The colour a background element paints over its parent, or NULL when
+#' nothing is painted
+#' @noRd
+.element_background <- function(element, parent) {
   if (is.null(element) || inherits(element, "element_blank")) return(NULL)
-  hex <- .as_hex(element$fill)
-  if (!length(hex)) NULL else hex[[1]]
+  .painted(element$fill, parent)
 }
 
 #' WCAG 2.x contrast ratio between two colours
@@ -348,22 +401,37 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' out of the measurement. An inside legend sits in a cell of its own rather
 #' than in the panel, so it is still counted.
 #'
-#' @return A data frame of `size` (points) and `colour` (hex), or `NULL` when the
-#'   figure draws no text.
+#' Each text is paired with the background it is drawn on, which WCAG measures
+#' contrast against. The walk carries a background down the tree: a nested
+#' gtable with a cell named "background" or "legend.box.background" (a legend
+#' box, or the box around all the legends) and a gTree with a
+#' child rect named `strip.background*` (a facet strip) set it for everything
+#' beneath them, and the plot background holds elsewhere. Legend keys are never
+#' taken for a background, since text is not drawn on them.
+#'
+#' @param background The plot background, which the outermost gtable's own
+#'   "background" cell paints and which therefore is not read a second time.
+#' @return A data frame of `size` (points), `colour` (hex), `bold` (logical)
+#'   and `background` (hex), or `NULL` when the figure draws no text.
 #' @noRd
-.figure_text <- function(gt, resolved) {
+.figure_text <- function(gt, resolved, background) {
   base <- ggplot2::calc_element("text", resolved)
   found <- list()
-  walk <- function(grob) {
+  walk <- function(grob, bg, face = NULL, root = FALSE) {
     if (is.null(grob)) return(invisible(NULL))
+    # grid stores a gpar fontface as `font`, and a titleGrob can hold it for the
+    # text inside, so the face is inherited down the tree like the background.
+    face <- grob$gp$font %||% grob$gp$fontface %||% face
     if (inherits(grob, "gtable")) {
       cells <- grob$layout$name %||% rep_len("", length(grob$grobs))
+      if (!root) bg <- .cell_background(grob, cells, bg)
       for (index in seq_along(grob$grobs)) {
         if (startsWith(cells[[index]], "panel")) next
-        walk(grob$grobs[[index]])
+        walk(grob$grobs[[index]], bg, face)
       }
     } else if (inherits(grob, "gTree")) {
-      for (child in grob$children) walk(child)
+      bg <- .strip_background(grob$children, bg)
+      for (child in grob$children) walk(child, bg, face)
     }
     if (!inherits(grob, "text")) return(invisible(NULL))
     labels <- as.character(grob$label)
@@ -378,16 +446,46 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
     colours <- .as_hex(grob$gp$col %||% base$colour %||% "black")
     sizes <- sizes[is.finite(sizes)]
     if (!length(sizes) || !length(colours)) return(invisible(NULL))
-    n <- max(length(sizes), length(colours))
+    bold <- (face %||% 1) %in% c(2, 4, "bold", "bold.italic")
+    n <- max(length(sizes), length(colours), length(bold))
     found[[length(found) + 1L]] <<- data.frame(
       size = rep_len(sizes, n), colour = rep_len(colours, n),
+      bold = rep_len(bold, n), background = bg,
       stringsAsFactors = FALSE
     )
     invisible(NULL)
   }
-  walk(gt)
+  walk(gt, background, root = TRUE)
   if (!length(found)) return(NULL)
   do.call(rbind, found)
+}
+
+#' The background a gtable's "background" cell paints, else the parent's
+#'
+#' A legend's guide table holds its box (`legend.background`) in a cell named
+#' "background", listed after the keys and labels it sits behind, so the cell
+#' is looked up before the walk descends. The guide box around all the legends
+#' holds `legend.box.background` in a cell of that name, which works the same
+#' way one level up.
+#' @noRd
+.cell_background <- function(gt, cells, parent) {
+  index <- which(cells %in% c("background", "legend.box.background"))
+  if (!length(index)) return(parent)
+  grob <- gt$grobs[[index[[1]]]]
+  if (!inherits(grob, "rect")) return(parent)
+  .painted(grob$gp$fill, parent, grob$gp$alpha) %||% parent
+}
+
+#' The fill of a facet strip among a gTree's children, else the parent's
+#' @noRd
+.strip_background <- function(children, parent) {
+  for (child in children) {
+    if (inherits(child, "rect") &&
+        startsWith(child$name %||% "", "strip.background")) {
+      return(.painted(child$gp$fill, parent, child$gp$alpha) %||% parent)
+    }
+  }
+  parent
 }
 
 # --- rows -------------------------------------------------------------------
@@ -485,17 +583,31 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
                      .fmt(nominal), .fmt(render_width_cm), .fmt(width_cm)))
 }
 
+#' The text that falls furthest short of its own WCAG threshold
+#'
+#' Each text is measured against its own background and held to 3:1 when it is
+#' large at its printed size (18 pt, or 14 pt in bold) and to 4.5:1 otherwise.
+#' The row reports the text with the smallest ratio relative to its threshold.
+#' Ties go to the smaller printed size, then to the colour and background in
+#' byte order, which is the order the Python twin breaks them in.
 #' @noRd
-.text_contrast_row <- function(text, background) {
+.text_contrast_row <- function(text, width_cm, render_width_cm) {
   if (is.null(text)) {
     return(.check_row("text_contrast", NA_real_, .wcag_text_contrast,
                       "The figure draws no text."))
   }
-  ratios <- .contrast_ratio(text$colour, background)
-  worst <- which.min(ratios)
-  .check_row("text_contrast", ratios[[worst]], .wcag_text_contrast,
-             sprintf("Lowest-contrast text %s on %s.",
-                     text$colour[[worst]], background))
+  printed <- text$size * width_cm / render_width_cm
+  large <- printed >= .wcag_large_text_pt |
+    (text$bold & printed >= .wcag_large_bold_text_pt)
+  threshold <- ifelse(large, .wcag_large_text_contrast, .wcag_text_contrast)
+  ratios <- .contrast_ratio(text$colour, text$background)
+  worst <- order(ratios / threshold, printed, text$colour, text$background,
+                 method = "radix")[[1]]
+  .check_row("text_contrast", ratios[[worst]], threshold[[worst]],
+             sprintf("Lowest-contrast text %s on %s at %s pt%s.",
+                     text$colour[[worst]], text$background[[worst]],
+                     .fmt(printed[[worst]]),
+                     if (text$bold[[worst]]) " bold" else ""))
 }
 
 #' @noRd

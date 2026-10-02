@@ -30,6 +30,24 @@ verdict_for <- function(report, check) {
   report$verdict[report$check == check]
 }
 
+detail_for <- function(report, check) {
+  report$detail[report$check == check]
+}
+
+# The WCAG 2.2 contrast ratio recomputed from the published definition alone,
+# independently of the package code: linearise each sRGB channel at the 0.04045
+# breakpoint, weight the channels, then (L1 + 0.05) / (L2 + 0.05).
+wcag <- function(a, b) {
+  lum <- function(hex) {
+    channel <- as.numeric(grDevices::col2rgb(hex)) / 255
+    lin <- ifelse(channel <= 0.04045, channel / 12.92,
+                  ((channel + 0.055) / 1.055)^2.4)
+    sum(lin * c(0.2126, 0.7152, 0.0722))
+  }
+  la <- lum(a); lb <- lum(b)
+  (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
+}
+
 # --- shape of the result -----------------------------------------------------
 
 test_that("check_figure() returns the standard table shape", {
@@ -100,9 +118,19 @@ test_that("the audit reports the numbers its Python twin reports", {
     "Closest pair #56b4e9 and #e69f00 in CIE lightness."))
   expect_identical(report$detail[6:9], c(
     "Smallest text 8.80 pt, drawn at 17.78 cm and printed at 17.78 cm.",
-    "Lowest-contrast text #4d4d4d on #ffffff.",
+    "Lowest-contrast text #4d4d4d on #ffffff at 8.80 pt.",
     "Lowest-contrast colour #f0e442 on #ffffff.",
     "Colour alone distinguishes the groups."))
+
+  # A dark plot background behind a blank panel: the geometry is measured
+  # against the plot background in both twins. The Python twin used to read the
+  # invisible axes patch here, which is white, and passed the figure at 3.87.
+  dark <- check_figure(good_figure() +
+    theme(plot.background = ggplot2::element_rect(fill = "#333333")))
+  expect_equal(dark$measured,
+               c(111.87, 89.87, 107.07, 98.5, 16.92, 8.8, 1.49, 1.77, 1))
+  expect_identical(dark$detail[dark$check == "geometry_contrast"],
+                   "Lowest-contrast colour #005b96 on #333333.")
 })
 
 # --- the measurements themselves ---------------------------------------------
@@ -157,19 +185,6 @@ test_that("text size scales with the printed width", {
 })
 
 test_that("contrast ratios match the WCAG definition computed independently", {
-  # Recompute the ratio from the published definition alone: linearise each
-  # sRGB channel at the 0.03928 breakpoint, weight the channels, then
-  # (L1 + 0.05) / (L2 + 0.05).
-  wcag <- function(a, b) {
-    lum <- function(hex) {
-      channel <- as.numeric(grDevices::col2rgb(hex)) / 255
-      lin <- ifelse(channel <= 0.03928, channel / 12.92,
-                    ((channel + 0.055) / 1.055)^2.4)
-      sum(lin * c(0.2126, 0.7152, 0.0722))
-    }
-    la <- lum(a); lb <- lum(b)
-    (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
-  }
   # Black on white is the textbook 21:1 anchor.
   expect_equal(round(wcag("#000000", "#ffffff"), 2), 21)
 
@@ -192,12 +207,137 @@ test_that("contrast ratios match the WCAG definition computed independently", {
   expect_equal(measured_for(repainted, "geometry_contrast"),
                round(wcag("#005b96", "#333333"), 2))
   expect_identical(repainted$detail[repainted$check == "text_contrast"],
-                   "Lowest-contrast text #4d4d4d on #eeeeee.")
+                   "Lowest-contrast text #4d4d4d on #eeeeee at 8.80 pt.")
   # A blank plot background paints nothing, so white stands in for the paper.
   blanked <- check_figure(good_figure() +
     theme(plot.background = ggplot2::element_blank()))
   expect_equal(measured_for(blanked, "text_contrast"),
                round(wcag("#4d4d4d", "#ffffff"), 2))
+})
+
+# --- each text against its own background ------------------------------------
+
+# A facetted figure with dark strips. The strip text size is set explicitly
+# because the twins' default strip sizes differ.
+strip_figure <- function(text_colour, strip_fill = "#1a1a1a") {
+  good_figure() + facet_wrap(~treatment) +
+    theme(strip.background = ggplot2::element_rect(fill = strip_fill),
+          strip.text = ggplot2::element_text(colour = text_colour, size = 8.8))
+}
+
+test_that("strip text is measured against the strip it is drawn on", {
+  # White on a near-black strip reads at 17.4:1. Measured against the white plot
+  # background it used to read 1.00 and fail.
+  light <- check_figure(strip_figure("white"))
+  expect_equal(measured_for(light, "text_contrast"), 8.45)
+  expect_identical(verdict_for(light, "text_contrast"), "pass")
+  expect_identical(detail_for(light, "text_contrast"),
+                   "Lowest-contrast text #4d4d4d on #ffffff at 8.80 pt.")
+  # Dark grey on the same strip is unreadable. It used to pass at 8.45, the
+  # value of the axis text, because it was measured against white.
+  dark <- check_figure(strip_figure("#333333"))
+  expect_equal(measured_for(dark, "text_contrast"), 1.38)
+  expect_equal(measured_for(dark, "text_contrast"),
+               round(wcag("#333333", "#1a1a1a"), 2))
+  expect_identical(verdict_for(dark, "text_contrast"), "fail")
+  expect_identical(detail_for(dark, "text_contrast"),
+                   "Lowest-contrast text #333333 on #1a1a1a at 8.80 pt.")
+  # A translucent strip is composited over the plot background before the text
+  # is measured against it: black at alpha 128/255 over white is #7f7f7f.
+  veiled <- check_figure(strip_figure("white", strip_fill = "#00000080"))
+  expect_equal(measured_for(veiled, "text_contrast"),
+               round(wcag("#ffffff", "#7f7f7f"), 2))
+  expect_identical(detail_for(veiled, "text_contrast"),
+                   "Lowest-contrast text #ffffff on #7f7f7f at 8.80 pt.")
+})
+
+test_that("legend text is measured against the legend box", {
+  boxed <- function(text_colour) {
+    good_figure() +
+      theme(legend.background = ggplot2::element_rect(fill = "#222222"),
+            legend.text = ggplot2::element_text(colour = text_colour),
+            legend.title = ggplot2::element_text(colour = "white"))
+  }
+  light <- check_figure(boxed("white"))
+  expect_identical(verdict_for(light, "text_contrast"), "pass")
+  expect_equal(measured_for(light, "text_contrast"), 8.45)
+  dark <- check_figure(boxed("#333333"))
+  expect_equal(measured_for(dark, "text_contrast"),
+               round(wcag("#333333", "#222222"), 2))
+  expect_identical(detail_for(dark, "text_contrast"),
+                   "Lowest-contrast text #333333 on #222222 at 8.80 pt.")
+  # The box around all the legends paints beneath them when each legend's own
+  # background is blank. plotnine does not draw that box, so the Python twin
+  # measures the same theme against the plot background and fails it.
+  outer <- check_figure(good_figure() +
+    theme(legend.box.background = ggplot2::element_rect(fill = "#222222"),
+          legend.background = ggplot2::element_blank(),
+          legend.text = ggplot2::element_text(colour = "white"),
+          legend.title = ggplot2::element_text(colour = "white")))
+  expect_identical(verdict_for(outer, "text_contrast"), "pass")
+  expect_equal(measured_for(outer, "text_contrast"), 8.45)
+})
+
+test_that("a translucent background is measured as the colour it shows", {
+  # Blue at alpha 64/255 over the white plot background shows as #bfbfff. Its
+  # alpha used to be dropped, so the panel was measured as opaque blue.
+  report <- check_figure(good_figure() +
+    theme(panel.background = ggplot2::element_rect(fill = "#0000ff40")))
+  expect_equal(measured_for(report, "geometry_contrast"),
+               round(wcag("#d55e00", "#bfbfff"), 2))
+  expect_identical(detail_for(report, "geometry_contrast"),
+                   "Lowest-contrast colour #d55e00 on #bfbfff.")
+})
+
+test_that("stock dark-theme facets pass the text check", {
+  # theme_dark() draws light strip text on a dark strip. Measured against the
+  # white plot background, it used to fail at 1.26.
+  report <- check_figure(good_figure() + facet_wrap(~treatment) +
+                           theme_dark())
+  expect_identical(verdict_for(report, "text_contrast"), "pass")
+})
+
+test_that("large text is held to 3:1, judged at its printed size", {
+  titled <- function(...) {
+    good_figure() + labs(title = "A title") +
+      theme(plot.title = ggplot2::element_text(colour = "#8c8c8c", ...))
+  }
+  # #8c8c8c on white is 3.36:1, short of 4.5 and clear of the 3 that WCAG 2.2
+  # asks of text at 18 pt or more.
+  large <- check_figure(titled(size = 20, face = "plain"))
+  expect_equal(measured_for(large, "text_contrast"), 3.36)
+  expect_equal(large$threshold[large$check == "text_contrast"], 3)
+  expect_identical(verdict_for(large, "text_contrast"), "pass")
+  expect_identical(detail_for(large, "text_contrast"),
+                   "Lowest-contrast text #8c8c8c on #ffffff at 20.00 pt.")
+  # Bold text counts as large from 14 pt.
+  bold <- check_figure(titled(size = 14, face = "bold"))
+  expect_equal(bold$threshold[bold$check == "text_contrast"], 3)
+  expect_identical(verdict_for(bold, "text_contrast"), "pass")
+  expect_identical(detail_for(bold, "text_contrast"),
+                   "Lowest-contrast text #8c8c8c on #ffffff at 14.00 pt bold.")
+  # The same plain title is not large at 14 pt, so it fails at 4.5.
+  plain <- check_figure(titled(size = 14, face = "plain"))
+  expect_equal(plain$threshold[plain$check == "text_contrast"], 4.5)
+  expect_identical(verdict_for(plain, "text_contrast"), "fail")
+  # Size is judged as printed: the 20 pt title in a half-width column prints at
+  # 10 pt, which is normal-sized text again.
+  shrunk <- check_figure(titled(size = 20, face = "plain"), width_cm = 8.89)
+  expect_equal(shrunk$threshold[shrunk$check == "text_contrast"], 4.5)
+  expect_identical(verdict_for(shrunk, "text_contrast"), "fail")
+  expect_identical(detail_for(shrunk, "text_contrast"),
+                   "Lowest-contrast text #8c8c8c on #ffffff at 10.00 pt.")
+})
+
+test_that("relative luminance follows the current WCAG 2.2 definition", {
+  # The definition's breakpoint is 0.04045. It read 0.03928 before May 2021,
+  # and no 8-bit channel value lies between the two, so no ratio moves.
+  channels <- (0:255) / 255
+  hex <- grDevices::rgb(channels, channels, channels)
+  old <- ifelse(channels <= 0.03928, channels / 12.92,
+                ((channels + 0.055) / 1.055)^2.4)
+  expect_equal(.relative_luminance(hex), old)
+  expect_equal(.relative_luminance(hex), .srgb_to_linear(channels))
 })
 
 test_that("redundant encoding counts the channels that vary alongside colour", {
