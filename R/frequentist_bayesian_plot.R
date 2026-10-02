@@ -26,8 +26,10 @@
 #' @param bayesian A Bayesian model, a `posterior` draws object, a draws
 #'   matrix/data frame, or a tidy data frame of posterior summaries.
 #' @param conf_level Confidence/credible level for models.
-#' @param labels,interaction,intercept See [compare_models()].
-#'   `intercept` defaults to `TRUE` here, matching the original behaviour.
+#' @param labels,interaction,intercept See [compare_models()]. On both paths,
+#'   an unnamed `labels` vector takes the frequentist terms first, then any
+#'   that only the Bayesian input holds. `intercept` defaults to `TRUE` here,
+#'   matching the original behaviour.
 #' @param facet,scales Layout controls. Because a Bayesian model almost always
 #'   carries a large intercept alongside small slopes, the comparison defaults
 #'   to a faceted, free-scaled layout (`facet = TRUE`): each term gets its own
@@ -160,10 +162,22 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
 
   # Bayesian draws -> long, labelled by canonical display label.
   draws <- extract_draws(bayesian)
-  draws$label <- make_labels(draws$term, labels, interaction)
-
   # Frequentist summaries -> the same canonical label space.
   freq <- tidy_estimates(frequentist, conf_level = conf_level)
+
+  # An unnamed `labels` vector is read as compare_models() reads it on the
+  # summary path: one label per term drawn, the frequentist terms first, after
+  # the intercept rule. The draws hold one row per sample, so the vector is
+  # keyed by term name before either side is labelled.
+  if (!is.null(labels) && is.null(names(labels))) {
+    term_names <- unique(c(freq$term, draws$term))
+    is_intercept <- term_names %in% c("(Intercept)", "Intercept", "b_Intercept")
+    if (!intercept) term_names <- term_names[!is_intercept]
+    labels <- key_labels_by_term(labels, term_names,
+                                 pretty_coef_map(frequentist), interaction,
+                                 !intercept && any(is_intercept))
+  }
+  draws$label <- make_labels(draws$term, labels, interaction)
   freq$label <- make_labels(freq$term, labels, interaction)
 
   if (!intercept) {

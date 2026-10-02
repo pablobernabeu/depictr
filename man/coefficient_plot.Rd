@@ -34,13 +34,18 @@ when \code{x} is a model.}
 since the intercept is seldom of interest on a forest plot and its scale
 often overwhelms the other terms.}
 
-\item{order}{Order the terms by estimate: \code{"none"} (keep input order),
-\code{"ascending"} or \code{"descending"}.}
+\item{order}{Order of the terms. \code{"ascending"} puts the smallest estimate at
+the bottom and the largest at the top, so estimates increase up the axis.
+\code{"descending"} does the reverse, and \code{"none"} keeps model order from top
+to bottom. The faceted layout (\code{facet = TRUE}) stacks its panels the
+other way up.}
 
-\item{labels}{Optional display labels for the terms. Either a character
-vector the same length as the number of terms (in plotting order) or a
-named vector mapping raw term names to labels. If \code{NULL}, names are tidied
-with \code{\link[=format_terms]{format_terms()}}.}
+\item{labels}{Optional display labels for the terms. An unnamed vector gives
+one label per term in model order (the order \code{\link[=tidy_estimates]{tidy_estimates()}} returns,
+after the intercept is dropped unless \code{intercept = TRUE}), whatever
+\code{order} is. A named vector mapping raw term names to labels, such as
+\code{c(soil_ph = "Soil pH")}, is safer. If \code{NULL}, names are tidied with
+\code{\link[=format_terms]{format_terms()}}.}
 
 \item{interaction}{Passed to \code{\link[=format_terms]{format_terms()}} to control how interaction
 terms are rendered (ignored when \code{labels} is supplied).}

@@ -15,9 +15,19 @@
 #'   names of `...`.
 #' @param conf_level Confidence/credible level for models.
 #' @param intercept Whether to keep the intercept term. Defaults to `FALSE`.
-#' @param order Order terms by their average estimate across sources:
-#'   `"none"`, `"ascending"` or `"descending"`.
-#' @param labels Optional display labels (see [coefficient_plot()]).
+#' @param order Order of the terms, by their average estimate across sources.
+#'   `"ascending"` puts the smallest estimate at the bottom and the largest at
+#'   the top, so estimates increase up the axis. `"descending"` does the
+#'   reverse, and `"none"` keeps the terms in the order they first appear, from
+#'   top to bottom. The faceted layout (`facet = TRUE`) stacks its panels the
+#'   other way up.
+#' @param labels Optional display labels. An unnamed vector gives one label per
+#'   term, whatever `order` is. The terms are taken in the order they first
+#'   appear across the sources, each source in the order [tidy_estimates()]
+#'   returns, after the intercept is dropped unless `intercept = TRUE`. Terms
+#'   drawn on one row, such as `stress` and brms's `b_stress`, take one label.
+#'   A named vector mapping raw term names to labels, such as
+#'   `c(soil_ph = "Soil pH")`, is safer.
 #' @param interaction Passed to [format_terms()].
 #' @param dodge_width Vertical spacing between sources sharing a term.
 #' @param reference_line Position of a vertical reference line (`NA` to omit).
@@ -102,9 +112,11 @@ compare_models <- function(...,
   # not plotted is not reported as a typo.
   warn_unused_labels(est$term, labels)
 
+  intercept_dropped <- FALSE
   if (!intercept) {
-    est <- est[!est$term %in% c("(Intercept)", "Intercept", "b_Intercept"), ,
-                drop = FALSE]
+    is_intercept <- est$term %in% c("(Intercept)", "Intercept", "b_Intercept")
+    intercept_dropped <- any(is_intercept)
+    est <- est[!is_intercept, , drop = FALSE]
   }
   if (nrow(est) == 0) {
     stop("No terms left to plot.", call. = FALSE)
@@ -122,6 +134,15 @@ compare_models <- function(...,
   for (s in sources) {
     auto <- pretty_coef_map(s)
     if (!is.null(auto)) break
+  }
+  # An unnamed `labels` vector gives one label per term drawn, in the order the
+  # terms first appear across the sources. The stacked table holds each term
+  # once per source, so the vector is keyed by raw term name for the lookup
+  # below. Terms that share a row, such as stress and brms's b_stress, share a
+  # label.
+  if (!is.null(labels) && is.null(base::names(labels))) {
+    labels <- key_labels_by_term(labels, est$term, auto, interaction,
+                                 intercept_dropped)
   }
   labels <- merge_pretty_labels(labels, auto)
   est$label <- make_labels(est$term, labels, interaction)

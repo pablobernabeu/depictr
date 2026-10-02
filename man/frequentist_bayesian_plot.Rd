@@ -30,8 +30,10 @@ matrix/data frame, or a tidy data frame of posterior summaries.}
 
 \item{conf_level}{Confidence/credible level for models.}
 
-\item{labels, interaction, intercept}{See \code{\link[=compare_models]{compare_models()}}.
-\code{intercept} defaults to \code{TRUE} here, matching the original behaviour.}
+\item{labels, interaction, intercept}{See \code{\link[=compare_models]{compare_models()}}. On both paths,
+an unnamed \code{labels} vector takes the frequentist terms first, then any
+that only the Bayesian input holds. \code{intercept} defaults to \code{TRUE} here,
+matching the original behaviour.}
 
 \item{facet, scales}{Layout controls. Because a Bayesian model almost always
 carries a large intercept alongside small slopes, the comparison defaults

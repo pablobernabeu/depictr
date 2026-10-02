@@ -12,12 +12,17 @@
 #' @param intercept Whether to keep the intercept term. Defaults to `FALSE`,
 #'   since the intercept is seldom of interest on a forest plot and its scale
 #'   often overwhelms the other terms.
-#' @param order Order the terms by estimate: `"none"` (keep input order),
-#'   `"ascending"` or `"descending"`.
-#' @param labels Optional display labels for the terms. Either a character
-#'   vector the same length as the number of terms (in plotting order) or a
-#'   named vector mapping raw term names to labels. If `NULL`, names are tidied
-#'   with [format_terms()].
+#' @param order Order of the terms. `"ascending"` puts the smallest estimate at
+#'   the bottom and the largest at the top, so estimates increase up the axis.
+#'   `"descending"` does the reverse, and `"none"` keeps model order from top
+#'   to bottom. The faceted layout (`facet = TRUE`) stacks its panels the
+#'   other way up.
+#' @param labels Optional display labels for the terms. An unnamed vector gives
+#'   one label per term in model order (the order [tidy_estimates()] returns,
+#'   after the intercept is dropped unless `intercept = TRUE`), whatever
+#'   `order` is. A named vector mapping raw term names to labels, such as
+#'   `c(soil_ph = "Soil pH")`, is safer. If `NULL`, names are tidied with
+#'   [format_terms()].
 #' @param interaction Passed to [format_terms()] to control how interaction
 #'   terms are rendered (ignored when `labels` is supplied).
 #' @param point_colour,reference_colour Colours for the estimates and the
@@ -103,17 +108,30 @@ coefficient_plot <- function(x,
   warn_unused_labels(est$term, labels)
   labels <- merge_pretty_labels(labels, pretty_coef_map(x))
 
+  intercept_dropped <- FALSE
   if (!intercept) {
-    est <- est[!est$term %in% c("(Intercept)", "Intercept", "b_Intercept"), ,
-                drop = FALSE]
+    is_intercept <- est$term %in% c("(Intercept)", "Intercept", "b_Intercept")
+    intercept_dropped <- any(is_intercept)
+    est <- est[!is_intercept, , drop = FALSE]
   }
   if (nrow(est) == 0) {
     stop("No terms left to plot (did you drop the only term?).", call. = FALSE)
   }
 
+  # An unnamed `labels` vector is read in model order, so it is attached to the
+  # rows before order_terms() reverses or sorts them, and each label travels
+  # with its own term. Keying it by term name would mis-bind a data frame that
+  # repeats a term.
+  positional <- !is.null(labels) && is.null(names(labels))
+  if (positional) {
+    check_label_count(labels, nrow(est), "the model has", "in model order",
+                      intercept_dropped)
+    est$label <- as.character(labels)
+  }
+
   est <- order_terms(est, order)
 
-  est$label <- make_labels(est$term, labels, interaction)
+  if (!positional) est$label <- make_labels(est$term, labels, interaction)
   est$label <- factor(est$label, levels = est$label)
 
   p <- ggplot2::ggplot(
@@ -339,6 +357,51 @@ warn_unused_labels <- function(terms, labels) {
             call. = FALSE)
   }
   invisible(NULL)
+}
+
+#' Refuse an unnamed `labels` vector that is not one label per term
+#'
+#' Shared by [coefficient_plot()] and, through `key_labels_by_term()`, by
+#' [compare_models()] and [frequentist_bayesian_plot()]. They count their terms
+#' differently but report a mismatch in the same words. The message says the
+#' order the vector is read in, and whether the intercept was dropped before
+#' counting, so the user can check the count against the model.
+#' @param n Number of terms the vector has to label.
+#' @param owner Subject and verb of the message, "the model has" or "the
+#'   models have".
+#' @param read_in The order the vector is read in, for the message.
+#' @param intercept_dropped Whether an intercept was dropped before counting.
+#' @noRd
+check_label_count <- function(labels, n, owner, read_in, intercept_dropped) {
+  if (length(labels) == n) return(invisible(NULL))
+  stop("`labels` has length ", length(labels), " but ", owner, " ", n,
+       if (n == 1) " term" else " terms", " to label (", read_in,
+       if (intercept_dropped) ", after dropping the intercept", ").",
+       call. = FALSE)
+}
+
+#' Key an unnamed `labels` vector by term name, one label per row drawn
+#'
+#' [compare_models()] holds each term once per source, and the distribution
+#' path of [frequentist_bayesian_plot()] holds it once per posterior draw.
+#' Neither can match the vector to its rows by position. Terms that share a
+#' default label, such as `stress` and brms's `b_stress`, are drawn on one row
+#' and take one label. The vector is therefore matched to the distinct default
+#' labels in the order the terms first appear, then keyed by raw term name for
+#' `make_labels()`.
+#' @param terms Raw term names left after the intercept rule, repeats
+#'   included, in the order the vector is read in.
+#' @param auto Automatic label map from `pretty_coef_map()`, or `NULL`.
+#' @param intercept_dropped Whether an intercept was dropped before counting.
+#' @noRd
+key_labels_by_term <- function(labels, terms, auto, interaction,
+                               intercept_dropped) {
+  default <- make_labels(terms, auto, interaction)
+  drawn <- unique(default)
+  check_label_count(labels, length(drawn), "the models have",
+                    "in the order they first appear", intercept_dropped)
+  keyed <- stats::setNames(as.character(labels)[match(default, drawn)], terms)
+  keyed[!duplicated(base::names(keyed))]
 }
 
 #' Build display labels for a set of terms

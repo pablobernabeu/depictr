@@ -38,10 +38,20 @@ names of \code{...}.}
 
 \item{intercept}{Whether to keep the intercept term. Defaults to \code{FALSE}.}
 
-\item{order}{Order terms by their average estimate across sources:
-\code{"none"}, \code{"ascending"} or \code{"descending"}.}
+\item{order}{Order of the terms, by their average estimate across sources.
+\code{"ascending"} puts the smallest estimate at the bottom and the largest at
+the top, so estimates increase up the axis. \code{"descending"} does the
+reverse, and \code{"none"} keeps the terms in the order they first appear, from
+top to bottom. The faceted layout (\code{facet = TRUE}) stacks its panels the
+other way up.}
 
-\item{labels}{Optional display labels (see \code{\link[=coefficient_plot]{coefficient_plot()}}).}
+\item{labels}{Optional display labels. An unnamed vector gives one label per
+term, whatever \code{order} is. The terms are taken in the order they first
+appear across the sources, each source in the order \code{\link[=tidy_estimates]{tidy_estimates()}}
+returns, after the intercept is dropped unless \code{intercept = TRUE}. Terms
+drawn on one row, such as \code{stress} and brms's \code{b_stress}, take one label.
+A named vector mapping raw term names to labels, such as
+\code{c(soil_ph = "Soil pH")}, is safer.}
 
 \item{interaction}{Passed to \code{\link[=format_terms]{format_terms()}}.}
 

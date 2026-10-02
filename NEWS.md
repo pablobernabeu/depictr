@@ -10,6 +10,17 @@
   The panels are now composed with `patchwork::wrap_plots()`, and depictr
   imports patchwork, so `library(depictr)` loads it.
 
+* `coefficient_plot()` attached an unnamed `labels` vector to the wrong
+  coefficients. The labels were assigned after the terms had been reversed or
+  sorted for display, so in `lm(yield ~ rainfall + fertiliser + soil_ph)` soil pH
+  was labelled 'Rainfall'. An unnamed vector is now bound to the terms in model
+  order before any reordering. `compare_models()` and
+  `frequentist_bayesian_plot()` counted one row per term and source, or one per
+  posterior draw, and so refused a vector with one label per term. Both now
+  accept one, read with the terms in the order they first appear. Named labels
+  are unchanged and remain the safer form. The documentation of `order` now says
+  which end the largest estimate lands at.
+
 # depictr 0.3.0
 
 ## Auditing a finished figure
