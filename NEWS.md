@@ -83,6 +83,42 @@
   it. The summary path also no longer warns about label keys you never
   supplied.
 
+* `survival_plot()` read the `status` coding separately in each group. Under the
+  `survival::Surv()` 1/2 convention, a group whose subjects were all censored
+  (all `1`) fits the 0/1 convention as well, so it was read as a group in which
+  every subject had the event, and its curve fell to zero. Codings that mixed
+  the two conventions across groups were accepted silently. The coding is now
+  read once, over all observations.
+* `survival_plot()` silently misread a factor `status`. The factor was coerced
+  to its level codes and read under the 1/2 convention, so whichever level sorted
+  first was taken as censored, whatever it meant. A character `status` became
+  `NA` throughout, with only a coercion warning, and drew a flat curve at one.
+  Both are now refused with an error that says to recode the indicator first.
+* `survival_plot()` ignored its `group` and `status` arguments when `time` was a
+  data frame. It read both from conventionally named columns only (`group`,
+  `strata` or `arm`, and `status` or `event`), so
+  `survival_plot(df, group = "treatment")` drew a single pooled curve with no
+  legend, log-rank test or risk-table rows. A column name or a vector with one
+  entry per row is now honoured for both, and takes precedence over the
+  conventionally named column. A name that matches no column is an error.
+* The number-at-risk table of `survival_plot()` could miscount at its default
+  breaks. `pretty()` returns multiples of a binary floating-point step, so with
+  follow-up up to 1.2 the break labelled 0.6 was 0.6000000000000001, and a
+  subject followed up to exactly 0.6 was left out of the count there. A last
+  break equal to the longest follow-up was lost the same way. The breaks are
+  now rounded to their step before the counts are taken.
+
+## Degenerate input
+
+* `survival_plot()` truncated a non-integer status code, so `c(0, 0.5, 1)` was
+  read as two censored observations and an event. Non-integer codes are now
+  refused with the existing coding message.
+* `survival_plot()` kept an arm whose every `status` was missing when `group`
+  was a factor. The arm stayed in the legend with no curve and a row of zeros
+  in the risk table, and `logrank = TRUE` failed with an error that did not say
+  why. The arm is now dropped with the missing statuses, as it already was for
+  a character `group`.
+
 # depictr 0.3.0
 
 ## Auditing a finished figure

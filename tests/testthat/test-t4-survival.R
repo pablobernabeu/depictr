@@ -294,3 +294,83 @@ test_that("a missing status is dropped with a message, not in silence", {
   # Complete statuses stay silent.
   expect_silent(survival_plot(tt, c(1, 0, 1, 1, 0, 0)))
 })
+
+test_that("an arm whose every status is missing is dropped, not drawn", {
+  # Regression: a factor group's levels were read before the missing statuses
+  # were dropped. An arm left with no observations stayed in the legend with
+  # no curve and a row of zeros in the risk table, and logrank = TRUE failed
+  # with an unattributed data.frame() error. A character group lost the arm as
+  # it should.
+  g <- factor(rep(c("a", "b", "c"), each = 4), levels = c("c", "b", "a"))
+  tt <- rep(1:4, 3) + 0.5
+  st <- c(1, 0, 1, 1, NA, NA, NA, NA, 1, 1, 0, 1)
+  expect_message(
+    p <- survival_plot(tt, st, group = g, risk_table = TRUE, logrank = TRUE),
+    "4 observation(s) with a missing status were dropped.", fixed = TRUE
+  )
+  # The declared order holds for the arms that are left.
+  expect_equal(levels(p[[1]]$data$group), c("c", "a"))
+  expect_setequal(as.character(p[[2]]$data$group), c("c", "a"))
+  ref <- suppressMessages(
+    survival_plot(tt, st, group = as.character(g), logrank = TRUE)
+  )
+  expect_equal(p[[1]]$labels$subtitle, ref$labels$subtitle)
+})
+
+test_that("the default risk-table breaks are the round times they show", {
+  # Regression: pretty() returns multiples of a binary floating-point step, so
+  # with follow-up up to 1.2 the break labelled 0.6 was 0.6000000000000001.
+  # Subjects followed up to exactly 0.2, 0.4 or 0.6 were left out of the count
+  # at that break, and the break at 1.2 lay a hair past the longest follow-up
+  # and was dropped.
+  tt <- c(0.6, 0.6, 0.9, 1.2, 0.2, 0.4)
+  st <- c(0, 1, 1, 0, 1, 0)
+  expect_identical(depictr:::risk_break_default(tt),
+                   c(0, 0.2, 0.4, 0.6, 0.8, 1, 1.2))
+  expect_identical(depictr:::risk_break_default(0.03),
+                   c(0, 0.005, 0.01, 0.015, 0.02, 0.025, 0.03))
+  tab <- survival_plot(tt, st, risk_table = TRUE)[[2]]$data
+  expect_equal(tab$time, c(0, 0.2, 0.4, 0.6, 0.8, 1, 1.2))
+  expect_equal(tab$n_risk, c(6, 6, 5, 4, 2, 1, 1))
+  # The survfit route counts at the same breaks.
+  skip_if_not_installed("survival")
+  sf <- survival::survfit(survival::Surv(tt, st) ~ 1)
+  expect_equal(survival_plot(sf, risk_table = TRUE)[[2]]$data$n_risk,
+               c(6, 6, 5, 4, 2, 1, 1))
+})
+
+test_that("survival_plot() honours `group` and `status` with a data frame", {
+  # Regression: the data-frame path read the grouping only from a column named
+  # group, strata or arm, so `group = "treatment"` drew one pooled curve.
+  set.seed(3)
+  n <- 60
+  df <- data.frame(t = rexp(n, 0.1), ev = rbinom(n, 1, 0.7),
+                   treatment = rep(c("a", "b"), each = n / 2),
+                   arm = rep(c("x", "y", "z"), n / 3))
+  names(df)[1:2] <- c("time", "status")
+  by_name <- survival_plot(df, group = "treatment")
+  by_vector <- survival_plot(df, group = df$treatment)
+  expect_equal(levels(by_name$data$group), c("a", "b"))
+  expect_equal(by_vector$data, by_name$data)
+  # Without an explicit grouping, the conventionally named column is used.
+  expect_equal(levels(survival_plot(df)$data$group), c("x", "y", "z"))
+  # An explicit status wins over the status column, as a name or a vector.
+  df$death <- 1L - df$status
+  ref <- survival_plot(df$time, df$death, group = df$treatment)
+  expect_equal(survival_plot(df, status = "death", group = "treatment")$data,
+               ref$data)
+  expect_equal(survival_plot(df, status = df$death, group = "treatment")$data,
+               ref$data)
+  # A name that matches no column, or a vector of the wrong length, is an error.
+  expect_error(survival_plot(df, group = "dose"),
+               "`group` names a column, 'dose', that the data frame does not have")
+  expect_error(survival_plot(df, group = c("a", "b")),
+               "one entry per row")
+  expect_error(survival_plot(df[, c("time", "treatment")], group = "treatment"),
+               "needs `time` and `status` columns")
+  # With one row, a single string that names a column is still that column.
+  df1 <- data.frame(time = 3, status = 0, death = 1, site = "north")
+  expect_equal(survival_plot(df1, status = "death")$data,
+               survival_plot(3, 1)$data)
+  expect_equal(levels(survival_plot(df1, group = "site")$data$group), "north")
+})

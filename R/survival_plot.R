@@ -28,15 +28,19 @@
 #'   `status` and optional `group` columns, or a `survfit` object. Every time
 #'   must be finite: a missing or infinite one is an error rather than a silent
 #'   exclusion, since dropping it would move the number at risk unannounced.
-#' @param status Event indicator when `time` is a vector. Either the 0/1
+#' @param status Event indicator: a vector, or a column name when `time` is a
+#'   data frame (by default its `status` or `event` column). Either the 0/1
 #'   convention (`0` = censored, `1` = event) or the [survival::Surv()] 1/2
-#'   convention (`1` = censored, `2` = event) is accepted; logical values are
-#'   also allowed. Other codings raise an error. Observations whose status is
-#'   missing are dropped with a message, since they record neither an event nor
-#'   a censoring.
-#' @param group Optional grouping variable (a vector, or a column name when
-#'   `time` is a data frame). Observations whose group is missing are dropped
-#'   with a message, since they belong to no arm.
+#'   convention (`1` = censored, `2` = event) is accepted, read over all groups
+#'   together; logical values are also allowed. Other codings raise an error,
+#'   among them a code that is not a whole number and a factor or character
+#'   indicator, whose values do not say which one is the event. Observations
+#'   whose status is missing are dropped with a message, since they record
+#'   neither an event nor a censoring.
+#' @param group Optional grouping variable: a vector, or a column name when
+#'   `time` is a data frame (by default its `group`, `strata` or `arm` column,
+#'   if any). Observations whose group is missing are dropped with a message,
+#'   since they belong to no arm.
 #' @param conf_level Confidence level for the limits (`NA` to omit them).
 #' @param censor_marks Whether to mark censoring times with a `+`.
 #' @param risk_table Whether to add a number-at-risk table beneath the curves
@@ -187,14 +191,17 @@ km_input <- function(time, status, group, conf_level) {
   if (is.data.frame(time)) {
     df <- time
     tcol <- intersect(c("time", "obs", "follow_up"), names(df))[1]
-    scol <- intersect(c("status", "event"), names(df))[1]
-    gcol <- intersect(c("group", "strata", "arm"), names(df))[1]
-    if (is.na(tcol) || is.na(scol)) {
+    if (is.na(tcol)) {
       stop("A data frame needs `time` and `status` columns.", call. = FALSE)
     }
     tv <- df[[tcol]]
-    sv <- df[[scol]]
-    gv <- if (!is.na(gcol)) df[[gcol]] else NULL
+    # An explicit `status` or `group` (a column name, or a vector with one
+    # entry per row) wins over the conventionally named columns.
+    sv <- km_column(status, df, c("status", "event"), "status")
+    gv <- km_column(group, df, c("group", "strata", "arm"), "group")
+    if (is.null(sv)) {
+      stop("A data frame needs `time` and `status` columns.", call. = FALSE)
+    }
   } else {
     if (is.null(status)) stop("Supply `status` with the times.", call. = FALSE)
     tv <- time
@@ -232,7 +239,14 @@ km_input <- function(time, status, group, conf_level) {
       stop("`status` is missing for every observation.", call. = FALSE)
     }
   }
-  groups <- if (!is.null(glevels)) glevels else unique(gv)
+  # Read the coding once, over every observation. Read group by group, a
+  # 1/2-coded arm with censorings only (all 1) fits the 0/1 convention too and
+  # would be taken for an arm in which everybody had the event.
+  sv <- normalise_status(sv)
+  # Keep the factor order for the arms the drops have left. An arm whose every
+  # status was missing has no observations, and keeping its level left it in
+  # the legend and the risk table with no curve and broke the log-rank test.
+  groups <- if (!is.null(glevels)) glevels[glevels %in% gv] else unique(gv)
   curves <- list()
   censors <- list()
   counts <- list()
@@ -251,6 +265,35 @@ km_input <- function(time, status, group, conf_level) {
        counts = counts)
 }
 
+#' Resolve a `status` or `group` argument against a data frame
+#'
+#' `value` may be `NULL` (take the first of `defaults` present in `df`, or
+#' nothing), a single string naming a column of `df`, or a vector with one
+#' entry per row. A string that names no column is an error, since falling back
+#' to the default column would hide the mistake. The exception is a one-row
+#' `df`, where the string can be read as that row's value.
+#' @noRd
+km_column <- function(value, df, defaults, what) {
+  if (is.null(value)) {
+    col <- intersect(defaults, names(df))[1]
+    return(if (is.na(col)) NULL else df[[col]])
+  }
+  if (is.character(value) && length(value) == 1L) {
+    if (value %in% names(df)) return(df[[value]])
+    # Only a one-row data frame leaves room for reading the string as that
+    # row's value.
+    if (nrow(df) != 1L) {
+      stop("`", what, "` names a column, '", value, "', that the data frame ",
+           "does not have.", call. = FALSE)
+    }
+  }
+  if (length(value) != nrow(df)) {
+    stop("`", what, "` must be a column name or have one entry per row of ",
+         "the data frame.", call. = FALSE)
+  }
+  value
+}
+
 #' Base-R Kaplan-Meier estimate with Greenwood standard errors
 #' @noRd
 km_estimate <- function(time, status, conf_level) {
@@ -261,6 +304,8 @@ km_estimate <- function(time, status, conf_level) {
     stop("`time` must be finite; drop or impute missing follow-up times ",
          "before plotting.", call. = FALSE)
   }
+  # km_input() has already read the coding over all groups, which leaves 0/1
+  # codes unchanged here. The call matters when km_estimate() runs on its own.
   status <- normalise_status(status)
   has_ci <- !is.na(conf_level)
   n_obs <- length(time)
@@ -315,17 +360,28 @@ km_estimate <- function(time, status, conf_level) {
 #'
 #' Accepts logical values and the two common numeric encodings: 0/1
 #' (0 = censored, 1 = event) and the [survival::Surv()] 1/2 convention
-#' (1 = censored, 2 = event). Anything else is an error.
+#' (1 = censored, 2 = event). Anything else is an error, a code that is not a
+#' whole number and a factor or character vector among them. Call it on the
+#' whole status vector, since the 1/2 codes of a group censored throughout are
+#' all 1 and so fit the 0/1 convention too.
 #' @noRd
 normalise_status <- function(status) {
   if (is.logical(status)) return(as.integer(status))
-  status <- as.integer(status)
+  # as.integer() would turn a factor into its level codes, which then pass as
+  # the 1/2 convention with whichever level sorts first taken as censored, and
+  # a character vector into NA. Neither says which value is the event.
+  if (is.factor(status) || is.character(status)) {
+    stop("`status` must be numeric (0/1 or 1/2) or logical; recode a factor ",
+         "or character indicator first.", call. = FALSE)
+  }
+  # Judge the codes as given. as.integer() truncates towards zero, so 0.5 would
+  # pass as a censoring and 1.5 as a 1 of the 1/2 convention.
   vals <- unique(status[!is.na(status)])
-  if (length(vals) == 0) return(status)
-  if (all(vals %in% c(0L, 1L))) {
-    status
-  } else if (all(vals %in% c(1L, 2L))) {
-    status - 1L
+  if (length(vals) == 0) return(as.integer(status))
+  if (all(vals %in% c(0, 1))) {
+    as.integer(status)
+  } else if (all(vals %in% c(1, 2))) {
+    as.integer(status) - 1L
   } else {
     stop("`status` must use the 0/1 (0 = censored) or 1/2 ",
          "(1 = censored) coding.", call. = FALSE)
@@ -526,6 +582,13 @@ risk_break_default <- function(time) {
   tmax <- max(time, na.rm = TRUE)
   if (!is.finite(tmax) || tmax <= 0) return(0)
   br <- pretty(c(0, tmax), n = 6)
+  # pretty() returns multiples of a binary floating-point step, so a 0.2 step
+  # gives 0.6000000000000001 for 0.6. A break a hair above its round value
+  # leaves out a subject followed up to exactly that time, and a last break a
+  # hair above a round tmax falls off the axis. Rounding to the step's own
+  # decimals restores the values the labels show.
+  step <- br[2L] - br[1L]
+  br <- round(br, max(0, 1 - floor(log10(step))))
   br[br >= 0 & br <= tmax]
 }
 
