@@ -3,9 +3,11 @@ CMD
 Color
 Colourblind
 Kullback
+LZW
 Leibler
 Okabe
 PACF
+PLOS
 Poisson
 ROC
 Raincloud
@@ -16,6 +18,7 @@ Zipf
 allFit
 bayesian
 brms
+cairo
 colorblind
 colourblind
 easystats
@@ -26,6 +29,7 @@ gridlines
 heatmaps
 lme4
 powercurvePlot
+ragg
 raincloud
 reproducibly
 simr

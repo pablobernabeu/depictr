@@ -16,7 +16,7 @@ save_plot(
 }
 \arguments{
 \item{filename}{Output file path. The extension sets the device (e.g. \code{.png},
-\code{.pdf}, \code{.tiff}).}
+\code{.pdf}, \code{.eps}, \code{.tiff}).}
 
 \item{plot}{The plot to save; defaults to the last plot drawn.}
 
@@ -24,9 +24,13 @@ save_plot(
 
 \item{units}{Units for \code{width} and \code{height}.}
 
-\item{dpi}{Resolution for raster devices.}
+\item{dpi}{Resolution for raster devices. An EPS rasterises its translucent
+layers, and whatever they overlap, at this resolution or at 600 dpi,
+whichever is higher.}
 
-\item{...}{Passed to \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}.}
+\item{...}{Passed to \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}, which passes what it does not use
+on to the device. A \code{device} or device argument given here overrides the
+defaults described under "Formats journals accept".}
 }
 \value{
 The \code{filename}, invisibly.
@@ -34,10 +38,74 @@ The \code{filename}, invisibly.
 \description{
 A convenience wrapper around \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}} with sensible defaults for
 figures in papers and reports: a moderate size, 300 dpi, and the output
-directory created if needed. The device is inferred from the file extension.
+directory created if needed. The device is inferred from the file extension,
+and PDF, EPS and TIFF files are written to pass the technical checks
+journals run on submitted figures.
 }
+\section{Formats journals accept}{
+
+When no \code{device} is given, three formats are written differently from
+ggplot2's defaults.
+
+A PDF is written with \code{\link[grDevices:cairo_pdf]{grDevices::cairo_pdf()}}, which embeds its fonts.
+ggplot2's default, \code{\link[grDevices:pdf]{grDevices::pdf()}}, names the fonts without embedding
+them.
+
+An EPS or PostScript file is written with \code{\link[grDevices:cairo_ps]{grDevices::cairo_ps()}}, with its
+fonts embedded too. PostScript has no transparency, and
+\code{\link[grDevices:postscript]{grDevices::postscript()}} leaves every translucent layer out of the file:
+the points and the confidence band of the plot in the examples below
+vanish. \code{cairo_ps()} rasterises those layers, together with whatever they
+overlap, at \code{fallback_resolution}, by default \code{max(dpi, 600)} here. A
+message says so when a layer of the plot, or of any panel of a patchwork, is
+translucent. A PDF keeps such layers as vector graphics.
+
+A TIFF is compressed with LZW, which is lossless. Uncompressed, a figure of
+7 by 4.5 inches at 300 dpi takes 8.1 MiB, and one at the largest size PLOS
+accepts takes more than the 10 MB PLOS allows. The TIFF is drawn on white
+unless \code{bg} is given, so a transparent background, as in
+\code{\link[ggplot2:theme_void]{ggplot2::theme_void()}}, leaves no alpha channel in the file.
+
+Without cairo, a PDF is written with \code{pdf()} and a message says how to embed
+its fonts with \code{\link[grDevices:embedFonts]{grDevices::embedFonts()}}, and an EPS is written with
+\code{postscript()} and a warning. A \code{device}, or a device argument such as
+\code{fallback_resolution}, \code{compression} or \code{bg}, passed in \code{...} is used as
+given, so \code{device = "pdf"}, \code{device = "eps"} or \code{device = "tiff"} restores
+ggplot2's own behaviour.
+
+Which formats three publishers accepted on 2 October 2026:\tabular{llll}{
+   Format \tab PLOS \tab Nature (final artwork) \tab Elsevier \cr
+   PDF \tab No \tab Yes, as vector art \tab Yes \cr
+   EPS \tab Yes, with fonts embedded \tab Yes, as vector art \tab Yes, with fonts embedded \cr
+   TIFF \tab Yes, LZW-compressed RGB or greyscale, no alpha channel, at most 10 MB \tab No \tab Yes \cr
+}
+
+
+Nature also asks for fonts embedded as TrueType 2 or 42, never Type 3, and
+for line art and text that are not rasterised. A figure with translucent
+layers therefore goes to Nature as a PDF. Elsevier asks for a graph sent as
+a TIFF at 1000 dpi, so pass \code{dpi = 1000} for one.
+
+The Python twin takes the plot first, as \code{save_plot(plot, filename)}.
+}
+
 \examples{
 p <- scatter_trend(crop_yield, fertiliser, yield)
 tmp <- file.path(tempdir(), "yield.png")
 save_plot(tmp, p)
+
+# A TIFF well within the 10 MB that PLOS allows.
+save_plot(file.path(tempdir(), "yield.tiff"), p)
+}
+\references{
+PLOS ONE. Figures. \url{https://journals.plos.org/plosone/s/figures}
+
+Nature. Guide to preparing final artwork.
+\url{https://www.nature.com/documents/nature-final-artwork.pdf}
+
+Nature research figure guide. Preparing figures: our specifications.
+\url{https://research-figure-guide.nature.com/figures/preparing-figures-our-specifications/}
+
+Elsevier. Artwork overview.
+\url{https://www.elsevier.com/about/policies-and-standards/author/artwork-and-media-instructions/artwork-overview}
 }

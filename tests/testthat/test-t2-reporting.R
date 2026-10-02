@@ -67,3 +67,177 @@ test_that("arrange_plots() builds without deprecation warnings", {
   withr::local_pdf(NULL)
   expect_no_warning(print(combined))
 })
+
+# save_plot(): files that pass journals' technical checks ---------------------
+
+# Whether a file's bytes contain a piece of text, read as bytes so that the
+# compressed streams around it do not matter.
+file_contains <- function(path, text) {
+  bytes <- readBin(path, "raw", file.size(path))
+  length(grepRaw(text, bytes, fixed = TRUE)) > 0
+}
+
+# One numeric tag of a TIFF's first image directory: 259 is the compression (5
+# for LZW) and 277 the samples per pixel (3 for RGB, 4 with an alpha channel).
+# The file is parsed from its bytes so that the test needs no image package.
+tiff_tag <- function(path, tag) {
+  bytes <- readBin(path, "raw", file.size(path))
+  endian <- if (identical(rawToChar(bytes[1:2]), "II")) "little" else "big"
+  int <- function(at, size) {
+    readBin(bytes[at + seq_len(size)], "integer", size = size,
+            signed = size == 4, endian = endian)
+  }
+  ifd <- int(4, 4)
+  for (i in seq_len(int(ifd, 2))) {
+    entry <- ifd + 2 + 12 * (i - 1)
+    if (int(entry, 2) == tag) {
+      # A value of type SHORT (3) takes the first two bytes of its field.
+      size <- if (int(entry + 2, 2) == 3) 2 else 4
+      return(int(entry + 8, size))
+    }
+  }
+  NA_integer_
+}
+
+test_that("save_plot() embeds the fonts in a PDF", {
+  skip_if_not(capabilities("cairo"))
+  f <- withr::local_tempfile(fileext = ".pdf")
+  save_plot(f, scatter_trend(crop_yield, fertiliser, yield))
+  # pdf() names Helvetica without embedding it. An embedded font is a font
+  # program stream, which the font descriptor points to as /FontFile2 (TrueType)
+  # or /FontFile3, and Type 3 fonts are the bitmap-like kind journals refuse.
+  expect_true(file_contains(f, "/FontFile"))
+  expect_false(file_contains(f, "/Type3"))
+})
+
+test_that("save_plot() keeps the translucent layers of an EPS and embeds fonts", {
+  skip_if_not(capabilities("cairo"))
+  f <- withr::local_tempfile(fileext = ".eps")
+  # postscript() drops every element drawn with alpha below 1, here all 200
+  # points and the confidence band, and says so only in a warning. cairo_ps()
+  # rasterises the area those layers cover, with the trend line drawn over it.
+  expect_no_warning(
+    expect_message(
+      save_plot(f, scatter_trend(crop_yield, fertiliser, yield)),
+      "layers, and whatever they overlap, were rasterised at 600 dpi"
+    )
+  )
+  expect_true(file_contains(f, "EPSF-3.0"))
+  expect_false(file_contains(f, "%%DocumentNeededResources: font"))
+})
+
+test_that("save_plot() says nothing about rasterising an opaque EPS", {
+  skip_if_not(capabilities("cairo"))
+  f <- withr::local_tempfile(fileext = ".eps")
+  # The smoothing layer carries an alpha but, without its band, draws nothing
+  # with it, so nothing in this figure is rasterised.
+  opaque <- scatter_trend(crop_yield, fertiliser, yield, se = FALSE,
+                          point_alpha = 1)
+  expect_no_message(expect_no_warning(save_plot(f, opaque)))
+})
+
+test_that("save_plot() notices a translucent panel anywhere in a composite", {
+  skip_if_not(capabilities("cairo"))
+  f <- withr::local_tempfile(fileext = ".eps")
+  opaque <- scatter_trend(crop_yield, fertiliser, yield, se = FALSE,
+                          point_alpha = 1)
+  # The translucent panel comes first, so patchwork keeps it among the patches
+  # and makes the opaque one the composite's own plot.
+  combined <- arrange_plots(scatter_trend(crop_yield, fertiliser, yield),
+                            opaque, ncol = 2)
+  expect_message(save_plot(f, combined), "rasterised")
+})
+
+test_that("save_plot() compresses a TIFF", {
+  skip_if_not(capabilities("cairo"))
+  f <- withr::local_tempfile(fileext = ".tiff")
+  save_plot(f, scatter_trend(crop_yield, fertiliser, yield))
+  # Uncompressed, 7 x 4.5 inches at 300 dpi is 8.1 MiB. PLOS caps a figure at
+  # 10 MB, which the uncompressed file exceeds at PLOS's largest figure size.
+  expect_lt(file.size(f), 1e6)
+  expect_identical(tiff_tag(f, 259), 5L)
+})
+
+test_that("save_plot() writes a TIFF without an alpha channel, as PLOS asks", {
+  skip_if_not(capabilities("cairo"))
+  f <- withr::local_tempfile(fileext = ".tiff")
+  # theme_void() leaves the background transparent, which ragg and the cairo
+  # TIFF device keep as a fourth channel. PLOS: "No alpha channels".
+  save_plot(f, scatter_trend(crop_yield, fertiliser, yield) +
+              ggplot2::theme_void())
+  expect_identical(tiff_tag(f, 277), 3L)
+})
+
+test_that("a background given to save_plot() reaches ggsave() as given", {
+  # Windows' own TIFF device never stores an alpha channel, so the file cannot
+  # show that a transparent background was passed on. ggsave() can.
+  seen <- list()
+  local_mocked_bindings(
+    ggsave = function(filename, ..., bg = NULL) seen[[length(seen) + 1]] <<- bg,
+    .package = "ggplot2"
+  )
+  p <- ggplot2::ggplot()
+  save_plot(withr::local_tempfile(fileext = ".tiff"), p)
+  save_plot(withr::local_tempfile(fileext = ".tiff"), p, bg = "transparent")
+  save_plot(withr::local_tempfile(fileext = ".png"), p)
+  expect_identical(seen, list("white", "transparent"))
+})
+
+test_that("an explicit device or device argument still wins in save_plot()", {
+  skip_if_not(capabilities("cairo"))
+  p <- scatter_trend(crop_yield, fertiliser, yield)
+
+  pdf_file <- withr::local_tempfile(fileext = ".pdf")
+  expect_no_message(save_plot(pdf_file, p, device = "pdf"))
+  expect_false(file_contains(pdf_file, "/FontFile"))
+
+  eps_file <- withr::local_tempfile(fileext = ".eps")
+  expect_message(save_plot(eps_file, p, fallback_resolution = 300),
+                 "rasterised at 300 dpi")
+})
+
+test_that("save_plot() falls back to pdf() and postscript() without cairo", {
+  local_mocked_bindings(.cairo_available = function() FALSE)
+  p <- scatter_trend(crop_yield, fertiliser, yield)
+
+  pdf_file <- withr::local_tempfile(fileext = ".pdf")
+  expect_message(save_plot(pdf_file, p), "embedFonts")
+  expect_true(file.exists(pdf_file))
+  expect_false(file_contains(pdf_file, "/FontFile"))
+
+  eps_file <- withr::local_tempfile(fileext = ".eps")
+  # postscript() raises its own semi-transparency warning, and save_plot() adds
+  # one that says what it means for the file.
+  expect_warning(
+    expect_warning(save_plot(eps_file, p), "leaves out translucent layers"),
+    "semi-transparency"
+  )
+  expect_true(file.exists(eps_file))
+})
+
+test_that("save_plot() falls back when the cairo device cannot open", {
+  local_mocked_bindings(
+    .cairo_available = function() TRUE,
+    .open_cairo = function(...) stop("unable to start device")
+  )
+  f <- withr::local_tempfile(fileext = ".pdf")
+  expect_message(save_plot(f, scatter_trend(crop_yield, fertiliser, yield)),
+                 "embedFonts")
+  expect_true(file.exists(f))
+})
+
+test_that("a TIFF asks for the cairo type only where quartz would ignore LZW", {
+  # ggsave() hands a TIFF to ragg when ragg is installed, and ragg compresses.
+  expect_null(.tiff_type(ragg = TRUE, bitmap_type = "quartz", cairo = TRUE))
+  expect_identical(
+    .tiff_type(ragg = FALSE, bitmap_type = "quartz", cairo = TRUE), "cairo"
+  )
+  expect_null(.tiff_type(ragg = FALSE, bitmap_type = "cairo", cairo = TRUE))
+  expect_null(.tiff_type(ragg = FALSE, bitmap_type = "quartz", cairo = FALSE))
+})
+
+test_that("save_plot() reads ggsave()'s named resolutions as numbers", {
+  expect_identical(.dpi_number("retina"), 320)
+  expect_identical(.dpi_number("print"), 300)
+  expect_identical(.dpi_number(150), 150)
+})

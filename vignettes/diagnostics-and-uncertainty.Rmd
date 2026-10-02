@@ -260,7 +260,9 @@ panel
 ```
 
 `save_plot()` writes it out at a print-ready 300 dpi by default, creating any
-missing directories along the way.
+missing directories along the way. A PDF or EPS embeds its fonts and a TIFF is
+LZW-compressed, as journals ask of submitted figures, and the help page,
+`?save_plot`, lists the formats PLOS, Nature and Elsevier accept.
 
 ```{r, eval = FALSE}
 save_plot("figures/diagnostics.png", panel, width = 7, height = 3.2, dpi = 300)

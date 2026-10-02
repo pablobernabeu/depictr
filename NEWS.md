@@ -108,6 +108,23 @@
   break equal to the longest follow-up was lost the same way. The breaks are
   now rounded to their step before the counts are taken.
 
+* `save_plot()` wrote files that fail the checks journals run on submitted
+  figures. An EPS left out every translucent element, including all the points
+  and the confidence band of the first `scatter_trend()` example, with only a
+  terse device warning to show for it, and it named its fonts without embedding
+  them. A PDF did not embed its fonts either. A TIFF was uncompressed: 8.1 MiB
+  at the default 7 by 4.5 inches, and more than the 10 MB PLOS allows at the
+  largest figure size it accepts. A transparent background, such as
+  `theme_void()` leaves, could also give the TIFF the alpha channel PLOS
+  refuses. PDF and EPS files now go through the cairo devices, which embed the
+  fonts. An EPS rasterises its translucent layers, and whatever they overlap,
+  at 600 dpi or more, with a message when it does. A TIFF is now LZW-compressed
+  and drawn on white unless `bg` is given. On a Mac without ragg, it is drawn
+  by the cairo TIFF device, because the default quartz one ignores compression.
+  A `device` or device argument passed to `save_plot()` still wins. Without
+  cairo, the old devices are used, with a message or a warning saying what the
+  file lacks.
+
 ## Degenerate input
 
 * `survival_plot()` truncated a non-integer status code, so `c(0, 0.5, 1)` was

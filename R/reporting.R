@@ -155,27 +155,264 @@ arrange_plots <- function(..., ncol = NULL, nrow = NULL,
 #'
 #' A convenience wrapper around [ggplot2::ggsave()] with sensible defaults for
 #' figures in papers and reports: a moderate size, 300 dpi, and the output
-#' directory created if needed. The device is inferred from the file extension.
+#' directory created if needed. The device is inferred from the file extension,
+#' and PDF, EPS and TIFF files are written to pass the technical checks
+#' journals run on submitted figures.
+#'
+#' @section Formats journals accept:
+#' When no `device` is given, three formats are written differently from
+#' ggplot2's defaults.
+#'
+#' A PDF is written with [grDevices::cairo_pdf()], which embeds its fonts.
+#' ggplot2's default, [grDevices::pdf()], names the fonts without embedding
+#' them.
+#'
+#' An EPS or PostScript file is written with [grDevices::cairo_ps()], with its
+#' fonts embedded too. PostScript has no transparency, and
+#' [grDevices::postscript()] leaves every translucent layer out of the file:
+#' the points and the confidence band of the plot in the examples below
+#' vanish. `cairo_ps()` rasterises those layers, together with whatever they
+#' overlap, at `fallback_resolution`, by default `max(dpi, 600)` here. A
+#' message says so when a layer of the plot, or of any panel of a patchwork, is
+#' translucent. A PDF keeps such layers as vector graphics.
+#'
+#' A TIFF is compressed with LZW, which is lossless. Uncompressed, a figure of
+#' 7 by 4.5 inches at 300 dpi takes 8.1 MiB, and one at the largest size PLOS
+#' accepts takes more than the 10 MB PLOS allows. The TIFF is drawn on white
+#' unless `bg` is given, so a transparent background, as in
+#' [ggplot2::theme_void()], leaves no alpha channel in the file.
+#'
+#' Without cairo, a PDF is written with `pdf()` and a message says how to embed
+#' its fonts with [grDevices::embedFonts()], and an EPS is written with
+#' `postscript()` and a warning. A `device`, or a device argument such as
+#' `fallback_resolution`, `compression` or `bg`, passed in `...` is used as
+#' given, so `device = "pdf"`, `device = "eps"` or `device = "tiff"` restores
+#' ggplot2's own behaviour.
+#'
+#' Which formats three publishers accepted on 2 October 2026:
+#'
+#' | Format | PLOS | Nature (final artwork) | Elsevier |
+#' |:---|:---|:---|:---|
+#' | PDF | No | Yes, as vector art | Yes |
+#' | EPS | Yes, with fonts embedded | Yes, as vector art | Yes, with fonts embedded |
+#' | TIFF | Yes, LZW-compressed RGB or greyscale, no alpha channel, at most 10 MB | No | Yes |
+#'
+#' Nature also asks for fonts embedded as TrueType 2 or 42, never Type 3, and
+#' for line art and text that are not rasterised. A figure with translucent
+#' layers therefore goes to Nature as a PDF. Elsevier asks for a graph sent as
+#' a TIFF at 1000 dpi, so pass `dpi = 1000` for one.
+#'
+#' The Python twin takes the plot first, as `save_plot(plot, filename)`.
 #'
 #' @param filename Output file path. The extension sets the device (e.g. `.png`,
-#'   `.pdf`, `.tiff`).
+#'   `.pdf`, `.eps`, `.tiff`).
 #' @param plot The plot to save; defaults to the last plot drawn.
 #' @param width,height Dimensions.
 #' @param units Units for `width` and `height`.
-#' @param dpi Resolution for raster devices.
-#' @param ... Passed to [ggplot2::ggsave()].
+#' @param dpi Resolution for raster devices. An EPS rasterises its translucent
+#'   layers, and whatever they overlap, at this resolution or at 600 dpi,
+#'   whichever is higher.
+#' @param ... Passed to [ggplot2::ggsave()], which passes what it does not use
+#'   on to the device. A `device` or device argument given here overrides the
+#'   defaults described under "Formats journals accept".
 #'
 #' @return The `filename`, invisibly.
+#' @references
+#' PLOS ONE. Figures. <https://journals.plos.org/plosone/s/figures>
+#'
+#' Nature. Guide to preparing final artwork.
+#' <https://www.nature.com/documents/nature-final-artwork.pdf>
+#'
+#' Nature research figure guide. Preparing figures: our specifications.
+#' <https://research-figure-guide.nature.com/figures/preparing-figures-our-specifications/>
+#'
+#' Elsevier. Artwork overview.
+#' <https://www.elsevier.com/about/policies-and-standards/author/artwork-and-media-instructions/artwork-overview>
 #' @export
 #' @examples
 #' p <- scatter_trend(crop_yield, fertiliser, yield)
 #' tmp <- file.path(tempdir(), "yield.png")
 #' save_plot(tmp, p)
+#'
+#' # A TIFF well within the 10 MB that PLOS allows.
+#' save_plot(file.path(tempdir(), "yield.tiff"), p)
 save_plot <- function(filename, plot = ggplot2::last_plot(),
                       width = 7, height = 4.5, units = "in", dpi = 300, ...) {
   dir <- dirname(filename)
   if (!dir.exists(dir)) dir.create(dir, recursive = TRUE)
-  ggplot2::ggsave(filename = filename, plot = plot, width = width,
-                  height = height, units = units, dpi = dpi, ...)
+  args <- list(...)
+  format <- .file_format(filename)
+  # The PDF and EPS devices record here whether cairo opened, so that the note
+  # after saving describes the file that was written.
+  opened <- new.env(parent = emptyenv())
+  if (is.null(args[["device"]])) {
+    if (identical(format, "pdf")) {
+      args$device <- .journal_device("pdf", opened)
+    } else if (format %in% c("eps", "ps")) {
+      args$fallback_resolution <- args[["fallback_resolution"]] %||%
+        max(.dpi_number(dpi), 600, na.rm = TRUE)
+      args$device <- .journal_device("ps", opened)
+    } else if (format %in% c("tif", "tiff")) {
+      args$compression <- args[["compression"]] %||% "lzw"
+      # ragg and the cairo TIFF device store an alpha channel whenever the
+      # device background is transparent, as ggsave() makes it for
+      # theme_void(), and PLOS refuses one. On white, the plot's own background
+      # still covers the page.
+      args$bg <- args[["bg"]] %||% "white"
+      if (is.null(args[["type"]])) args$type <- .tiff_type()
+    }
+  }
+  # Called through a closure so that the plot travels by name. do.call() would
+  # otherwise write the whole plot object into the call it reports on error.
+  save <- function(...) {
+    ggplot2::ggsave(filename = filename, plot = plot, width = width,
+                    height = height, units = units, dpi = dpi, ...)
+  }
+  do.call(save, args)
+  .report_device(format, opened$device, plot, args[["fallback_resolution"]])
   invisible(filename)
+}
+
+# The lower-case extension of a file name, or "" when it has none.
+.file_format <- function(filename) {
+  base <- basename(filename)
+  if (!grepl(".", base, fixed = TRUE)) return("")
+  tolower(sub("^.*\\.", "", base))
+}
+
+# ggsave() also accepts a resolution by name. Anything else it cannot read
+# becomes NA here, and ggsave() then reports the problem in its own words.
+.dpi_number <- function(dpi) {
+  if (is.numeric(dpi)) return(dpi)
+  if (!is.character(dpi) || length(dpi) != 1) return(NA_real_)
+  switch(dpi, retina = 320, print = 300, screen = 72, NA_real_)
+}
+
+# Kept apart so that the tests can take cairo away on a machine that has it.
+.cairo_available <- function() isTRUE(capabilities("cairo"))
+
+# A device function for ggsave() that opens cairo and, when cairo cannot open,
+# the device ggplot2 would have used. Only a failure to open the device falls
+# back, so an error in drawing the plot is still reported as the plot's own.
+.journal_device <- function(format, opened) {
+  force(format)
+  function(filename, ...) {
+    args <- list(...)
+    if (.cairo_available()) {
+      started <- tryCatch({
+        .open_cairo(format, filename, args)
+        TRUE
+      }, error = function(e) FALSE)
+      if (started) {
+        opened$device <- "cairo"
+        return(invisible(NULL))
+      }
+    }
+    opened$device <- "fallback"
+    .open_fallback(format, filename, args)
+  }
+}
+
+.open_cairo <- function(format, filename, args) {
+  if (identical(format, "pdf")) {
+    do.call(grDevices::cairo_pdf, c(list(filename = filename), args))
+  } else {
+    # One page in Encapsulated PostScript, as ggplot2 asks of postscript().
+    args$onefile <- args[["onefile"]] %||% FALSE
+    do.call(grDevices::cairo_ps, c(list(filename = filename), args))
+  }
+}
+
+# The devices ggplot2 uses for these extensions, opened as ggplot2 opens them.
+.open_fallback <- function(format, filename, args) {
+  cairo_only <- c("antialias", "fallback_resolution", "symbolfamily")
+  args <- args[setdiff(names(args), cairo_only)]
+  if (identical(format, "pdf")) {
+    do.call(grDevices::pdf, c(list(file = filename), args))
+  } else {
+    eps <- list(onefile = FALSE, horizontal = FALSE, paper = "special")
+    do.call(grDevices::postscript,
+            c(list(file = filename), utils::modifyList(eps, args)))
+  }
+}
+
+# A note on what the file holds, when that differs from what was asked for.
+.report_device <- function(format, device, plot, resolution) {
+  if (is.null(device)) return(invisible(NULL))
+  if (identical(format, "pdf")) {
+    if (identical(device, "fallback")) {
+      message("The PDF was written with pdf(), so its fonts are not ",
+              "embedded. Embed them before submission with ",
+              "grDevices::embedFonts(), which needs Ghostscript.")
+    }
+    return(invisible(NULL))
+  }
+  kind <- if (identical(format, "eps")) "EPS" else "PostScript"
+  if (identical(device, "fallback")) {
+    warning("cairo_ps() could not be used, so the ", kind, " file was ",
+            "written with postscript(), which leaves out translucent layers ",
+            "and does not embed fonts. Save as PDF or TIFF to keep them.",
+            call. = FALSE)
+  } else if (.has_translucency(plot)) {
+    # cairo rasterises the whole area a translucent layer covers, including
+    # the lines and text drawn over it there.
+    message(kind, " has no transparency, so the translucent layers, and ",
+            "whatever they overlap, were rasterised at ", resolution, " dpi. ",
+            "Journals that forbid rasterised line art, Nature among them, ",
+            "take PDF.")
+  }
+  invisible(NULL)
+}
+
+# Whether any layer of a plot, or of any panel of a composite, draws with alpha
+# below 1. A patchwork is itself its last panel, and keeps the others in
+# `patches$plots`. The build repeats work ggsave() has done, so its messages
+# and warnings, already shown once, are muffled.
+.has_translucency <- function(plot) {
+  if (inherits(plot, "patchwork") &&
+      any(vapply(plot$patches$plots, .has_translucency, logical(1)))) {
+    return(TRUE)
+  }
+  if (!inherits(plot, "ggplot")) return(FALSE)
+  built <- tryCatch(
+    suppressMessages(suppressWarnings(ggplot2::ggplot_build(plot))),
+    error = function(e) NULL
+  )
+  if (is.null(built)) return(FALSE)
+  any(vapply(seq_along(built$data), function(i) {
+    .layer_translucent(built$plot$layers[[i]], built$data[[i]])
+  }, logical(1)))
+}
+
+# A smoothing layer applies its alpha only to the confidence band, so without
+# the band, as under `se = FALSE`, its alpha column describes nothing drawn.
+.layer_translucent <- function(layer, data) {
+  alpha <- data[["alpha"]]
+  if (inherits(layer$geom, "GeomSmooth") && !.smooth_band(layer, data)) {
+    alpha <- NULL
+  }
+  if (any(alpha > 0 & alpha < 1, na.rm = TRUE)) return(TRUE)
+  for (aesthetic in c("colour", "fill")) {
+    if (is.null(data[[aesthetic]])) next
+    rgba <- tryCatch(grDevices::col2rgb(data[[aesthetic]], alpha = TRUE),
+                     error = function(e) NULL)
+    if (!is.null(rgba) && any(rgba[4, ] > 0 & rgba[4, ] < 255)) return(TRUE)
+  }
+  FALSE
+}
+
+.smooth_band <- function(layer, data) {
+  se <- layer$computed_geom_params$se %||% layer$geom_params$se
+  !isFALSE(se) && (all(c("ymin", "ymax") %in% names(data)) ||
+                     all(c("xmin", "xmax") %in% names(data)))
+}
+
+# grDevices::tiff() ignores compression, with a warning, for the quartz type
+# that macOS uses by default. ggsave() hands a TIFF to ragg when ragg is
+# installed, and ragg compresses, so the cairo type is asked for only when
+# grDevices::tiff() would otherwise draw with quartz.
+.tiff_type <- function(ragg = requireNamespace("ragg", quietly = TRUE),
+                       bitmap_type = getOption("bitmapType"),
+                       cairo = .cairo_available()) {
+  if (!ragg && identical(bitmap_type, "quartz") && cairo) "cairo" else NULL
 }
