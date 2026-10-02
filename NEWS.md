@@ -1,3 +1,15 @@
+# depictr (development version)
+
+## Figures that misreported the data
+
+* `estimation_plot()`, and `group_comparison_plot(differences = TRUE)` which
+  calls it, failed in a fresh R session with "Can't find method for generic
+  `/(e1, e2)`", or with "non-numeric argument to binary operator" under
+  ggplot2 3.5. The two panels were stacked with patchwork's `/` operator, which
+  exists only once patchwork has been loaded, and nothing in depictr loaded it.
+  The panels are now composed with `patchwork::wrap_plots()`, and depictr
+  imports patchwork, so `library(depictr)` loads it.
+
 # depictr 0.3.0
 
 ## Auditing a finished figure

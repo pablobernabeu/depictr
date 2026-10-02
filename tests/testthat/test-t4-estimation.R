@@ -171,3 +171,50 @@ test_that("group_colours() honours a supplied palette", {
   expect_equal(unname(cols), rep("#111111", 3))
   expect_named(cols, c("a", "b", "c"))
 })
+
+# ---- a fresh R session ------------------------------------------------------
+# The two panels are composed by patchwork, whose plot operators exist only once
+# its namespace is loaded, and depictr imports from patchwork so that
+# library(depictr) loads it. Within a test run, patchwork is always loaded
+# already: load_all() loads every package in Imports, and under R CMD check the
+# earlier test files use it. That is how the failure went unseen, so the second
+# test starts a separate R process.
+
+test_that("depictr imports from patchwork, so loading depictr loads it", {
+  expect_true("patchwork" %in% names(getNamespaceImports("depictr")))
+})
+
+test_that("estimation plots build in a fresh R session", {
+  skip_on_cran()
+  skip_if_not_installed("callr")
+  # The child process loads the installed depictr. Under devtools::test() that
+  # copy may predate the source under test, so this runs only under R CMD
+  # check, where the installed copy is the one being checked.
+  skip_if_not(testthat::is_checking())
+
+  # Each child prints its plot, as the documented example does at the console,
+  # so that both panels are built and drawn there.
+  fresh <- callr::r(function() {
+    grDevices::pdf(NULL)
+    library(depictr)
+    patchwork_loaded <- "patchwork" %in% loadedNamespaces()
+    p <- estimation_plot(lexical_decision, RT, condition, n_boot = 50)
+    print(p)
+    c(patchwork_loaded = patchwork_loaded,
+      is_patchwork = inherits(p, "patchwork"))
+  })
+  expect_true(fresh[["patchwork_loaded"]])
+  expect_true(fresh[["is_patchwork"]])
+
+  # group_comparison_plot(differences = TRUE) forwards to estimation_plot() and
+  # failed the same way. It gets a process of its own, so that it is the first
+  # call in that session.
+  expect_true(callr::r(function() {
+    grDevices::pdf(NULL)
+    library(depictr)
+    p <- group_comparison_plot(crop_yield, yield, treatment,
+                               differences = TRUE, n_boot = 50)
+    print(p)
+    inherits(p, "patchwork")
+  }))
+})

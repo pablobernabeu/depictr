@@ -54,6 +54,7 @@ Suggests:
     boot,
     cluster,
     colorspace,
+    callr,
     testthat (>= 3.0.0),
     withr
 VignetteBuilder: knitr

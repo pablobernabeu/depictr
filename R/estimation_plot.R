@@ -254,8 +254,10 @@ estimation_plot <- function(data, y, group, reference = NULL,
     }
   }
 
-  combined <- top / bottom +
-    patchwork::plot_layout(heights = heights)
+  # patchwork's `/` operator exists only once patchwork is loaded, so stacking
+  # with it failed in a fresh session. Calling wrap_plots() through `::` loads
+  # patchwork first.
+  combined <- patchwork::wrap_plots(top, bottom, ncol = 1, heights = heights)
   attr(combined, "differences") <- diffs
   combined
 }

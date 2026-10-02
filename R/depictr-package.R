@@ -113,7 +113,11 @@
 #' @keywords internal
 "_PACKAGE"
 
+# Importing from patchwork makes library(depictr) load it, and loading patchwork
+# registers its plot operators, such as `/` and `|`, for the composite plots
+# depictr returns.
 ## usethis namespace: start
+#' @importFrom patchwork wrap_plots
 #' @importFrom rlang .data
 #' @importFrom Rdpack reprompt
 ## usethis namespace: end
