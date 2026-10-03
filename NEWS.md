@@ -143,6 +143,16 @@
   afresh over the grid. Beside its raw variable, such a term used to shift the
   line without complaint.
 
+* `model_report()` judged every `glm` by normal-theory panels. A correctly
+  specified logistic model, simulated with 400 observations, put about a third
+  of its standardised deviance residuals outside the Q-Q band, the picture of
+  a broken model. A `glm` now
+  gets the binned-residual and quantile-residual panels that
+  `residual_diagnostics_plot()` already used, and `model_report()` gains the
+  same `glm_panels` and `seed` arguments. `glm_panels = FALSE` restores the
+  old panels. The help page of `qq_plot()` now says that the standardised
+  deviance residuals of a non-Gaussian `glm` are not expected to be normal.
+
 * `ts_forecast()`, and the forecast overlay of `timeseries_plot()`, drew
   prediction intervals far too narrow. In rolling-origin backtests on eight
   classic series, the nominal 95% band covered about 60% of one-step-ahead

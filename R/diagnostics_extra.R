@@ -74,6 +74,15 @@ influence_plot <- function(model, n_label = 3, colour = depictr_brand(),
 #' quantiles of the simulated order statistics, which needs no large-sample
 #' approximation.
 #'
+#' The band measures departures from a normal distribution, which the
+#' residuals of a linear model should follow. The standardised deviance
+#' residuals of a non-Gaussian `glm` are not expected to be normal, even when
+#' the model is correctly specified: those of a binary model take only two
+#' values at each fitted value. Points outside the band then say little about
+#' the fit. For a `glm`, [residual_diagnostics_plot()] and [model_report()]
+#' plot randomised quantile residuals (Dunn & Smyth, 1996), which are standard
+#' normal under a correct model.
+#'
 #' @param x A numeric vector, or a fitted `lm`/`glm` model (its standardised
 #'   residuals are used).
 #' @param colour Point colour. Defaults to the depictr brand blue.
@@ -88,6 +97,8 @@ influence_plot <- function(model, n_label = 3, colour = depictr_brand(),
 #'   reproducibility.
 #'
 #' @return A [ggplot2::ggplot] object.
+#' @references
+#' \insertRef{dunn1996}{depictr}
 #' @export
 #' @examples
 #' qq_plot(rnorm(100))

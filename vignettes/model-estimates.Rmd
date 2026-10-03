@@ -271,7 +271,8 @@ within each panel), so this fit is stable.
 `model_report()` composes several views (coefficients, the effect of a focal
 predictor, residuals against fitted values and a Q-Q plot, with a fit-statistics
 subtitle) into a single figure for a rapid review or a report appendix. It works
-on `lm`/`glm` models, and here we use the crop-yield model.
+on `lm`/`glm` models, and here we use the crop-yield model. A `glm` gets the
+binned-residual and quantile-residual panels of `residual_diagnostics_plot()`.
 
 ```{r report, fig.width = 9, fig.height = 7}
 full <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment,

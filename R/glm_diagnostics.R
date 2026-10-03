@@ -242,3 +242,28 @@ quantile_residuals <- function(model, seed = NULL) {
   attr(r, "quantile") <- TRUE
   r
 }
+
+#' The quantile residuals a Q-Q panel draws, with the axis label naming them
+#'
+#' Keeps the finite values of `quantile_residuals()`, so it drops the rows the
+#' fit left out or gave zero weight. The label is "Deviance residuals" where
+#' the family has no quantile residual and the deviance residuals stand in.
+#' Shared by [residual_diagnostics_plot()] and [model_report()], so the two
+#' panels of one model agree.
+#'
+#' @param model A fitted `glm`.
+#' @param seed Optional integer seed, passed to `quantile_residuals()`.
+#' @return A list of the numeric `sample` and its axis `label`.
+#' @noRd
+glm_qq_sample <- function(model, seed = NULL) {
+  qr <- quantile_residuals(model, seed = seed)
+  vals <- as.numeric(qr)
+  list(
+    sample = vals[is.finite(vals)],
+    label = if (isTRUE(attr(qr, "quantile"))) {
+      "Quantile residuals"
+    } else {
+      "Deviance residuals"
+    }
+  )
+}

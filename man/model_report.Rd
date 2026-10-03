@@ -9,7 +9,9 @@ model_report(
   predictor = NULL,
   standardise = TRUE,
   title = NULL,
-  subtitle = NULL
+  subtitle = NULL,
+  glm_panels = TRUE,
+  seed = NULL
 )
 }
 \arguments{
@@ -30,6 +32,14 @@ putting predictors on a common scale; set \code{FALSE} for raw estimates.}
 \item{subtitle}{Overall subtitle. If \code{NULL}, a line of fit statistics
 (number of observations, R-squared and AIC) is used. For a \code{glm}, the
 R-squared is the deviance R-squared described in \code{\link[=model_fit_table]{model_fit_table()}}.}
+
+\item{glm_panels}{For a \code{glm}, whether to draw the binned-residual and
+quantile-residual panels (the default) instead of the classic \code{lm}
+panels. Ignored for an \code{lm}.}
+
+\item{seed}{Optional integer seed for the randomisation of discrete
+quantile residuals, for a reproducible Q-Q panel of a binomial or Poisson
+\code{glm}. The caller's random number stream is left as it was.}
 }
 \value{
 A 'patchwork' object (printable like a \link[ggplot2:ggplot]{ggplot2::ggplot}).
@@ -37,17 +47,42 @@ A 'patchwork' object (printable like a \link[ggplot2:ggplot]{ggplot2::ggplot}).
 \description{
 Assembles a compact, consistent overview of a fitted model in a single
 figure: the coefficient estimates, the predicted effect of a focal predictor,
-a residuals-against-fitted plot and a normal Q-Q plot, with a subtitle of key
-fit statistics. It is a convenience wrapper that composes several depictr
+a residual panel and a normal Q-Q plot, with a subtitle of key fit
+statistics. It is a convenience wrapper that composes several depictr
 plots with \code{\link[=arrange_plots]{arrange_plots()}}, and serves well for a rapid model review or a
 report appendix.
+}
+\details{
+For an \code{lm}, the residual panel plots the residuals against the fitted
+values, and the Q-Q panel is \code{\link[=qq_plot]{qq_plot()}} of the standardised residuals. A
+\code{glm} gets the panels \code{\link[=residual_diagnostics_plot]{residual_diagnostics_plot()}} draws for it
+(\code{glm_panels = TRUE}). The residual panel is a \code{\link[=binned_residual_plot]{binned_residual_plot()}}
+(Gelman & Hill, 2007). The Q-Q panel plots randomised quantile residuals
+(Dunn & Smyth, 1996), which are standard normal under a correctly specified
+model whatever the response family, so the band of \code{\link[=qq_plot]{qq_plot()}} applies to
+them. The standardised deviance residuals of a binary or count model are
+not expected to be normal, so even a correctly specified model can put many
+of them outside that band (about a third, in a simulated logistic model with
+400 observations). The quantile residuals of a binomial or Poisson model are
+randomised, and even under a correct model a run of them occasionally
+leaves the pointwise band. A departure worth acting on persists when the
+panel is drawn again with another \code{seed}. For a family with no quantile
+residual here, such as a quasi-likelihood family, the Q-Q panel plots the
+deviance residuals and its axis says so.
 }
 \examples{
 fit <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment,
           data = crop_yield)
 model_report(fit, title = "Crop-yield model")
 
+# A logistic model gets binned and quantile-residual panels, and a seed
+# fixes the randomisation of its quantile residuals:
 gfit <- glm(accuracy ~ word_frequency + RT + condition,
             data = lexical_decision, family = binomial)
-model_report(gfit)
+model_report(gfit, seed = 1)
+}
+\references{
+\insertRef{gelman2007}{depictr}
+
+\insertRef{dunn1996}{depictr}
 }

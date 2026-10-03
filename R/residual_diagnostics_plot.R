@@ -83,18 +83,12 @@ residual_diagnostics_plot <- function(model,
   }
   if ("qq" %in% which) {
     panels$qq <- if (use_glm) {
-      qr <- quantile_residuals(model, seed = seed)
-      qlab <- if (isTRUE(attr(qr, "quantile"))) {
-        "Quantile residuals"
-      } else {
-        "Deviance residuals"
-      }
-      qvals <- as.numeric(qr)
-      qdf <- data.frame(sample = qvals[is.finite(qvals)])
+      qq <- glm_qq_sample(model, seed = seed)
+      qdf <- data.frame(sample = qq$sample)
       ggplot2::ggplot(qdf, ggplot2::aes(sample = .data$sample)) +
         ggplot2::stat_qq(alpha = point_alpha, colour = depictr_brand()) +
         ggplot2::stat_qq_line(colour = depictr_reference(), linetype = 2) +
-        ggplot2::labs(x = "Theoretical quantiles", y = qlab,
+        ggplot2::labs(x = "Theoretical quantiles", y = qq$label,
                       title = "Normal Q-Q") +
         theme_depictr()
     } else {

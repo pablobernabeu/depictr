@@ -294,6 +294,86 @@ test_that("residual_diagnostics_plot() is glm-aware but lm is unchanged", {
   expect_silent(ggplot2::ggplot_build(patchwork::wrap_plots(pl)))
 })
 
+test_that("model_report() draws the GLM panels for a glm", {
+  # It drew a residuals-against-fitted scatter and a Q-Q plot of standardised
+  # deviance residuals for every glm. Those residuals are not expected to look
+  # normal for a binary or count response, even under a correct model.
+  withr::local_seed(5)
+  withr::local_pdf(NULL)
+  n <- 300
+  d <- data.frame(x = stats::rnorm(n))
+  d$y_binary <- stats::rbinom(n, 1, stats::plogis(-0.2 + 0.9 * d$x))
+  d$y_count <- stats::rpois(n, exp(0.4 + 0.5 * d$x))
+  d$y_cont <- 1 + 0.5 * d$x + stats::rnorm(n)
+  fits <- list(
+    binomial = glm(y_binary ~ x, family = binomial, data = d),
+    poisson = glm(y_count ~ x, family = poisson, data = d),
+    gaussian = glm(y_cont ~ x, data = d)
+  )
+  for (nm in names(fits)) {
+    # The default arguments, so the old code runs this call and fails on the
+    # panels themselves.
+    r <- model_report(fits[[nm]])
+    titles <- vapply(seq_along(r), function(k) r[[k]]$labels$title,
+                     character(1))
+    expect_identical(titles[3:4], c("Binned residuals", "Normal Q-Q"),
+                     label = paste(nm, "panel titles"))
+    expect_identical(r[[4]]$labels$y, "Quantile residuals",
+                     label = paste(nm, "Q-Q axis"))
+    expect_no_warning(print(r))
+  }
+})
+
+test_that("a correct logistic model stays inside the model_report() Q-Q band", {
+  # About a third of the standardised deviance residuals of a correctly
+  # specified logistic model fell outside the band, the picture of a broken
+  # model. Quantile residuals are standard normal under the model.
+  withr::local_seed(2026)
+  n <- 400
+  d <- data.frame(x1 = stats::rnorm(n), x2 = stats::rnorm(n))
+  d$y <- stats::rbinom(n, 1, stats::plogis(-0.3 + 1.2 * d$x1 - 0.8 * d$x2))
+  fit <- glm(y ~ x1 + x2, family = binomial, data = d)
+  outside <- function(report) {
+    band <- ggplot2::layer_data(report[[4]], 1)
+    points <- ggplot2::layer_data(report[[4]], 2)
+    expect_equal(points$x, band$x)
+    mean(points$y < band$ymin | points$y > band$ymax)
+  }
+  r <- model_report(fit, seed = 1)
+  expect_lt(outside(r), 0.10)
+  # The seed makes the randomised residuals reproducible.
+  expect_identical(ggplot2::layer_data(r[[4]], 2)$y,
+                   ggplot2::layer_data(model_report(fit, seed = 1)[[4]], 2)$y)
+  # The classic panels, still available, flag the same correct model.
+  expect_gt(outside(model_report(fit, glm_panels = FALSE)), 0.20)
+})
+
+test_that("model_report() keeps the classic panels for an lm or on request", {
+  fit <- lm(yield ~ rainfall + fertiliser, data = crop_yield)
+  r <- model_report(fit)
+  expect_identical(r[[3]]$labels$title, "Residuals vs. fitted")
+  expect_identical(r[[4]]$labels$y, "Standardised residuals")
+
+  gfit <- glm(adverse_event ~ biomarker + age + arm, data = clinical_trial,
+              family = binomial)
+  rc <- model_report(gfit, glm_panels = FALSE)
+  expect_identical(rc[[3]]$labels$title, "Residuals vs. fitted")
+  expect_identical(rc[[4]]$labels$y, "Standardised residuals")
+})
+
+test_that("model_report() names deviance residuals for an unsupported family", {
+  # quantile_residuals() has no distribution for a quasi-likelihood family and
+  # falls back to the deviance residuals, which the axis must not call
+  # quantile residuals.
+  withr::local_seed(8)
+  d <- data.frame(x = stats::rnorm(200))
+  d$y <- stats::rnbinom(200, mu = exp(0.5 + 0.4 * d$x), size = 2)
+  fit <- glm(y ~ x, family = quasipoisson, data = d)
+  r <- model_report(fit)
+  expect_identical(r[[3]]$labels$title, "Binned residuals")
+  expect_identical(r[[4]]$labels$y, "Deviance residuals")
+})
+
 test_that("qq_plot() draws a band and keeps working without one", {
   set.seed(1)
   p1 <- qq_plot(rnorm(100))

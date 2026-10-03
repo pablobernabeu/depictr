@@ -58,10 +58,22 @@ the fitted reference line. \code{"simulate"} builds a Monte-Carlo envelope by
 repeatedly drawing normal samples of the same size and taking the empirical
 quantiles of the simulated order statistics, which needs no large-sample
 approximation.
+
+The band measures departures from a normal distribution, which the
+residuals of a linear model should follow. The standardised deviance
+residuals of a non-Gaussian \code{glm} are not expected to be normal, even when
+the model is correctly specified: those of a binary model take only two
+values at each fitted value. Points outside the band then say little about
+the fit. For a \code{glm}, \code{\link[=residual_diagnostics_plot]{residual_diagnostics_plot()}} and \code{\link[=model_report]{model_report()}}
+plot randomised quantile residuals (Dunn & Smyth, 1996), which are standard
+normal under a correct model.
 }
 \examples{
 qq_plot(rnorm(100))
 qq_plot(rt(100, df = 3), band_type = "simulate")
 fit <- lm(yield ~ rainfall + fertiliser, data = crop_yield)
 qq_plot(fit)
+}
+\references{
+\insertRef{dunn1996}{depictr}
 }
