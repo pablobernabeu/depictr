@@ -12,13 +12,21 @@ power_curve_plot(
   x_expand = NULL,
   ribbon = TRUE,
   title = NULL,
-  interaction = c("times", "asterisk", "colon", "space")
+  interaction = c("times", "asterisk", "colon", "space"),
+  n = NULL,
+  power = NULL,
+  group = NULL,
+  lower = NULL,
+  upper = NULL,
+  y_lab = NULL
 )
 }
 \arguments{
 \item{x}{A \code{powerCurve} object from 'simr', or a data frame with a sample
-size column (\code{nlevels}, \code{n} or \code{x}), a power column (\code{mean} or \code{power}),
-and optional \code{lower}/\code{upper} confidence limits.}
+size column (\code{n}, \code{nlevels}, \code{x}, \code{sample_size} or \code{n_subject}), a power
+column (\code{power}, \code{mean} or \code{p}), and optional confidence limits
+(\verb{<power>_lo}/\verb{<power>_hi}, \code{lower}/\code{upper}, \code{ci_low}/\code{ci_high} or
+\code{conf.low}/\code{conf.high}).}
 
 \item{target}{Target power, drawn as a horizontal reference line. Use \code{NA}
 to omit it.}
@@ -37,6 +45,24 @@ predictor name stored in the object is used.}
 
 \item{interaction}{Passed to \code{\link[=format_terms]{format_terms()}} when deriving the title from a
 'simr' object.}
+
+\item{n, power}{Columns holding the sample size and the power, as strings or
+unquoted names. By default, they are found among the names listed under
+\code{x}. \code{power} may name any proportion on the 0-1 scale, such as pilotr's
+\code{p_meaningful}.}
+
+\item{group}{Column that separates several curves, as a string or an
+unquoted name. Each level is drawn as its own line, in its own colour and
+line type. By default, an \code{effect}, \code{param} or \code{term} column with more than
+one level is used, with a message. Rows that share a sample size with no
+such column are an error, because joining them would draw a zig-zag.}
+
+\item{lower, upper}{Columns holding the lower and upper confidence limits.
+Name both or neither. By default, they are found among the names listed
+under \code{x}.}
+
+\item{y_lab}{Y-axis label. By default, "Power" when the power column is one
+of the names listed under \code{x}, and the column's name otherwise.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
@@ -48,6 +74,15 @@ power (80\% by default). The input is usually a power curve produced by
 the plot to be redrawn without repeating a power simulation that is often
 slow to run.
 }
+\details{
+A table may hold several curves, one per effect or design, stacked by row.
+Each is drawn as its own line, told apart by colour and line type. The
+tables pilotr returns are read as they are: \code{power_curve_mixed()} gives
+\code{n_subject}, \code{effect}, \code{power}, \code{power_lo} and \code{power_hi}, and
+\code{precision_curve()} gives \code{n_subject}, \code{param} and the decision
+probabilities \code{p_meaningful} and \code{p_equivalent} with their own \verb{_lo} and
+\verb{_hi} bounds, which \code{power} can name.
+}
 \examples{
 pc <- data.frame(
   nlevels = c(10, 20, 30, 40, 50, 60),
@@ -56,4 +91,15 @@ pc <- data.frame(
   upper = c(0.28, 0.44, 0.62, 0.75, 0.86, 0.93)
 )
 power_curve_plot(pc, title = "Power for the condition effect")
+
+# Two curves in one table, laid out as pilotr's power_curve_mixed() returns
+# them: one row per sample size and effect.
+curves <- data.frame(
+  n_subject = rep(c(20, 40, 60, 80), each = 2),
+  effect = rep(c("condition", "frequency"), times = 4),
+  power = c(0.31, 0.12, 0.58, 0.21, 0.78, 0.33, 0.90, 0.45),
+  power_lo = c(0.23, 0.07, 0.48, 0.14, 0.69, 0.25, 0.83, 0.36),
+  power_hi = c(0.41, 0.19, 0.67, 0.30, 0.85, 0.43, 0.94, 0.55)
+)
+power_curve_plot(curves, group = "effect", x_lab = "Participants")
 }

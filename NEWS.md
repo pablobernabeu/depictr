@@ -219,6 +219,19 @@
   terms per factor arrived in lme4 1.1-18, and 1.1-19 revised the data-frame
   method that reads them.
 
+* `power_curve_plot()` reads power tables with several curves, one per effect
+  or design, and draws one line each, told apart by colour and line type. It
+  joined them into a single zig-zag before. An `effect`, `param` or `term`
+  column with more than one level separates the curves, with a message naming
+  the columns used, and rows that share a sample size with no such column are
+  now an error. It recognises `n_subject` and `<power>_lo`/`<power>_hi` columns
+  such as pilotr's, so the output of pilotr's `power_curve_mixed()` plots as it
+  is, with its band. It gains `n`, `power`, `group`, `lower`, `upper` and
+  `y_lab`, appended after the existing arguments so that positional calls keep
+  working. The y-axis title is "Power" for the usual power columns and the
+  column's name otherwise, so a decision probability such as pilotr's
+  `p_meaningful` is not labelled as power.
+
 ## Degenerate input
 
 * `survival_plot()` truncated a non-integer status code, so `c(0, 0.5, 1)` was
