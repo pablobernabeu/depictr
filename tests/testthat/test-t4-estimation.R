@@ -166,6 +166,71 @@ test_that("group_comparison_plot(differences = TRUE) yields an estimation plot",
   expect_s3_class(p2, "patchwork")
 })
 
+# ---- where each difference is drawn ------------------------------------------
+# A reader matches a difference to its group by the column it sits in, so each
+# group must take the same place across the width of both panels. patchwork
+# gives the stacked panels the same width. A column's place is therefore read
+# from each built panel as a fraction of its x range, from 0 at the left to 1 at
+# the right.
+
+column_positions <- function(panel) {
+  x <- ggplot2::ggplot_build(panel)$layout$panel_params[[1]]$x
+  stats::setNames(x$break_positions(), x$get_limits())
+}
+
+drawn_positions <- function(panel) {
+  built <- ggplot2::ggplot_build(panel)
+  geoms <- vapply(panel$layers, function(l) class(l$geom)[1], character(1))
+  x <- as.numeric(built$data[[which(geoms == "GeomPointrange")]]$x)
+  x_range <- built$layout$panel_params[[1]]$x.range
+  (x - x_range[1]) / diff(x_range)
+}
+
+test_that("each difference is drawn beneath its own group", {
+  set.seed(2)
+  p <- estimation_plot(wellbeing_survey, life_satisfaction, region,
+                       reference = "North", n_boot = 200)
+  top <- column_positions(p[[1]])
+  expect_named(top, c("North", "East", "South", "West"))
+  # Every group keeps its column in the lower panel, the reference included.
+  expect_equal(column_positions(p[[2]])[names(top)], top)
+  diffs <- attr(p, "differences")
+  expect_equal(drawn_positions(p[[2]]), unname(top[as.character(diffs$group)]))
+  # The reference's column below is left empty, with no label.
+  labels <- ggplot2::ggplot_build(p[[2]])$layout$panel_params[[1]]$x$get_labels()
+  expect_equal(labels, c("", "East", "South", "West"))
+})
+
+test_that("with two groups the difference sits beneath the second group", {
+  set.seed(1)
+  p <- estimation_plot(lexical_decision, RT, condition, n_boot = 200)
+  top <- column_positions(p[[1]])
+  expect_equal(column_positions(p[[2]])[names(top)], top)
+  expect_equal(drawn_positions(p[[2]]), unname(top["unrelated"]))
+})
+
+test_that("group_comparison_plot(differences = TRUE) keeps the columns too", {
+  set.seed(1)
+  p <- group_comparison_plot(crop_yield, yield, treatment, differences = TRUE,
+                             n_boot = 200)
+  top <- column_positions(p[[1]])
+  expect_equal(column_positions(p[[2]])[names(top)], top)
+  expect_equal(drawn_positions(p[[2]]), unname(top["enhanced"]))
+})
+
+test_that("the caption names the bootstrap behind the intervals", {
+  # The Python twin pins the same text (tests/test_estimation_tables.py).
+  set.seed(1)
+  p <- estimation_plot(crop_yield, yield, treatment)
+  expect_equal(p[[2]]$labels$caption, "Bootstrap 95% CI (5,000 resamples)")
+  # A round number of resamples is written out in full, as in Python. format()
+  # alone would give 1e+05. A group of one skips the bootstrap, which keeps the
+  # test quick, and its warnings are tested above.
+  tiny <- data.frame(y = c(1, 2, 3), g = c("a", "a", "b"))
+  p <- suppressWarnings(estimation_plot(tiny, y, g, n_boot = 1e5))
+  expect_equal(p[[2]]$labels$caption, "Bootstrap 95% CI (100,000 resamples)")
+})
+
 test_that("group_colours() honours a supplied palette", {
   cols <- depictr:::group_colours(c("a", "b", "c"), palette = c("#111111"))
   expect_equal(unname(cols), rep("#111111", 3))

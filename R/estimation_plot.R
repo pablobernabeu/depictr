@@ -1,22 +1,22 @@
 # Estimation / effect-size plots ---------------------------------------------
 
-#' Gardner-Altman / Cumming estimation plot
+#' Cumming estimation plot
 #'
 #' An estimation plot puts the *effect size* and its uncertainty at the centre
 #' of the comparison, rather than a p-value. The upper panel shows each group's
-#' raw data (jittered) with its mean and confidence interval; the lower panel
-#' shows the pairwise mean difference(s) against a reference group, each with
-#' a bootstrap confidence interval. The two panels share an aligned outcome axis
-#' and are stacked with 'patchwork', so a difference of zero in the lower panel
-#' lines up with the reference group's mean above it.
+#' raw data (jittered) with its mean and confidence interval. The lower panel
+#' shows the difference between each other group's mean and a reference group's
+#' mean, with a bootstrap confidence interval. Each difference is drawn in its
+#' group's column, beneath that group's data. The two panels are stacked with
+#' 'patchwork', and each has its own outcome axis.
 #'
-#' With exactly two groups this is the classic *Gardner-Altman* two-group plot
-#' (Gardner & Altman, 1986; Ho et al., 2019): a single mean difference is shown
-#' with its bootstrap interval, annotated with a standardised effect size
-#' (Cohen's *d* or, by default, the small-sample corrected Hedges' *g*; Hedges,
-#' 1981). With more than two groups it becomes a *Cumming* estimation plot
-#' (Cumming, 2012): every other group is compared with the reference group, each
-#' difference carrying its own bootstrap interval.
+#' This stacked layout is the *Cumming* estimation plot (Cumming, 2012; Ho et
+#' al., 2019), with two groups as with more. Each difference is annotated with a
+#' standardised effect size: Cohen's *d* or, by default, the small-sample
+#' corrected Hedges' *g* (Hedges, 1981). The Gardner-Altman plot (Gardner &
+#' Altman, 1986) is a different layout, which sets a single difference beside
+#' the two groups on a floating axis whose zero is level with the reference
+#' group's mean.
 #'
 #' The lower-panel interval is a non-parametric *bootstrap* of the mean
 #' difference: the two groups are resampled with replacement `n_boot` times and
@@ -35,7 +35,8 @@
 #' @param group The grouping variable (string or unquoted name).
 #' @param reference The reference (control) group that the others are compared
 #'   with; defaults to the first level of `group`. The reference is drawn first
-#'   in the upper panel and sits at a difference of zero in the lower panel.
+#'   in the upper panel and has an empty column in the lower panel, where the
+#'   dashed line marks a difference of zero.
 #' @param conf_level Confidence level for both the group intervals (t-based) and
 #'   the bootstrap difference intervals.
 #' @param n_boot Number of bootstrap resamples for the difference intervals.
@@ -102,8 +103,7 @@ estimation_plot <- function(data, y, group, reference = NULL,
     stop("`group` must have at least two non-empty levels.", call. = FALSE)
   }
 
-  # Order the levels so the reference comes first (its mean aligns with the
-  # zero-difference line below).
+  # Order the levels so the reference comes first, in both panels.
   ref <- reference %||% groups[1]
   if (!ref %in% groups) {
     stop("`reference` (\"", ref, "\") is not a level of `group`.",
@@ -209,17 +209,22 @@ estimation_plot <- function(data, y, group, reference = NULL,
     ggplot2::labs(
       x = NULL,
       y = sprintf("Mean difference\n(vs. %s)", ref),
+      # format() alone writes 1e5 as 1e+05, the shorter form. scientific =
+      # FALSE writes it as 100,000, as the Python twin does.
       caption = sprintf("Bootstrap %g%% CI (%s resamples)",
-                        100 * conf_level, format(n_boot, big.mark = ","))
+                        100 * conf_level,
+                        format(n_boot, big.mark = ",", scientific = FALSE))
     ) +
     theme_depictr(grid = "y") +
     ggplot2::theme(legend.position = "none")
 
-  # Match the lower-panel x ordering and labels to the upper panel: pad with
-  # an (invisible) slot for the reference so the columns line up.
+  # Give the lower panel a column for every group, in the upper panel's order,
+  # so each difference sits beneath its own group, and leave the reference's
+  # column empty and unlabelled. The limits name every group because
+  # expand_limits() cannot add a slot to explicit discrete limits.
   bottom <- bottom +
-    ggplot2::scale_x_discrete(limits = others, drop = FALSE) +
-    ggplot2::expand_limits(x = groups)
+    ggplot2::scale_x_discrete(limits = groups,
+                              labels = function(b) ifelse(b == ref, "", b))
 
   # Surface the standardised effect size for EVERY contrast, not only the
   # two-group case. Showing Hedges' g / Cohen's d beside each bootstrap interval

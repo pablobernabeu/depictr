@@ -10,6 +10,19 @@
   The panels are now composed with `patchwork::wrap_plots()`, and depictr
   imports patchwork, so `library(depictr)` loads it.
 
+* `estimation_plot()` drew the differences out of line with the groups they
+  belong to. The lower panel had one column fewer than the upper and spread its
+  columns across the full width, so with reference North, the East difference
+  sat beneath North, and with two groups, the single difference sat midway
+  between them. Every group now keeps its column in both panels, and the
+  reference's column in the lower panel is left empty.
+  `group_comparison_plot(differences = TRUE)` is fixed with it. The function is
+  also described for what it draws, a Cumming estimation plot with the
+  differences stacked beneath the data. The claim that zero lines up with the
+  reference group's mean has been removed, since the stacked panels have
+  independent axes. The caption now writes a round number of resamples in full,
+  as 100,000 where it printed 1e+05.
+
 * `coefficient_plot()` attached an unnamed `labels` vector to the wrong
   coefficients. The labels were assigned after the terms had been reversed or
   sorted for display, so in `lm(yield ~ rainfall + fertiliser + soil_ph)` soil pH
