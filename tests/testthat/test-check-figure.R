@@ -48,6 +48,45 @@ wcag <- function(a, b) {
   (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
 }
 
+# A colour as it shows over a background at a given alpha, recomputed by hand:
+# each channel in [0, 1] is alpha * colour + (1 - alpha) * background, then
+# floor(255 * x + 0.5) gives the 8-bit value.
+mix <- function(colour, background, alpha) {
+  fg <- as.numeric(grDevices::col2rgb(colour)) / 255
+  bg <- as.numeric(grDevices::col2rgb(background)) / 255
+  channels <- floor(255 * (alpha * fg + (1 - alpha) * bg) + 0.5)
+  tolower(grDevices::rgb(channels[1], channels[2], channels[3],
+                         maxColorValue = 255))
+}
+
+# Translucent versions of the good figure's colours, built the same way in both
+# twins. `alpha = NULL` leaves the layer's alpha unset.
+bars_figure <- function(alpha, values = c("#005b96", "#d55e00")) {
+  two <- data.frame(g = c("a", "b"), y = c(1, 2))
+  bars <- if (is.null(alpha)) geom_col() else geom_col(alpha = alpha)
+  ggplot(two, aes(g, y, fill = g)) + bars +
+    scale_fill_manual(values = values) +
+    theme_depictr()
+}
+
+points_figure <- function(alpha) {
+  ggplot(crop_yield, aes(rainfall, yield, colour = treatment,
+                         shape = treatment)) +
+    geom_point(alpha = alpha) +
+    scale_colour_manual(values = c("#005b96", "#d55e00")) +
+    theme_depictr()
+}
+
+# Densities whose fill is translucent and whose outline, mapped to the same
+# groups, is drawn opaque.
+density_figure <- function(alpha = 0.2) {
+  ggplot(crop_yield, aes(yield, colour = treatment, fill = treatment)) +
+    geom_density(alpha = alpha) +
+    scale_colour_manual(values = c("#005b96", "#d55e00")) +
+    scale_fill_manual(values = c("#005b96", "#d55e00")) +
+    theme_depictr()
+}
+
 # --- shape of the result -----------------------------------------------------
 
 test_that("check_figure() returns the standard table shape", {
@@ -131,6 +170,30 @@ test_that("the audit reports the numbers its Python twin reports", {
                c(111.87, 89.87, 107.07, 98.5, 16.92, 8.8, 1.49, 1.77, 1))
   expect_identical(dark$detail[dark$check == "geometry_contrast"],
                    "Lowest-contrast colour #005b96 on #333333.")
+
+  # Translucent bars, measured as drawn: #005b96 and #d55e00 at alpha 0.3 show
+  # as #b3cee0 and #f2cfb3. Read at full opacity, the figure passed geometry at
+  # 3.87 and greyscale at 16.92.
+  bars <- check_figure(bars_figure(alpha = 0.3))
+  expect_equal(bars$measured,
+               c(33.44, 27.98, 33.13, 35.37, 4.03, 8.8, 8.45, 1.46, 0))
+  expect_identical(bars$detail, c(
+    rep("Closest pair #b3cee0 and #f2cfb3 of 2 encoding fill colours.", 4),
+    "Closest pair #b3cee0 and #f2cfb3 in CIE lightness.",
+    "Smallest text 8.80 pt, drawn at 17.78 cm and printed at 17.78 cm.",
+    "Lowest-contrast text #4d4d4d on #ffffff at 8.80 pt.",
+    paste("Lowest-contrast colour #d55e00 at alpha 0.30, drawn as #f2cfb3,",
+          "on #ffffff."),
+    "Colour alone distinguishes the groups."))
+
+  # The good figure's points at alpha 0.7, which the Get started vignette used
+  # to show as mended. Its vermillion is drawn as #e28e4d, at 2.56:1.
+  points <- check_figure(points_figure(alpha = 0.7))
+  expect_equal(points$measured,
+               c(83.25, 69.5, 80.89, 85.03, 10.77, 8.8, 8.45, 2.56, 1))
+  expect_identical(detail_for(points, "geometry_contrast"), paste(
+    "Lowest-contrast colour #d55e00 at alpha 0.70, drawn as #e28e4d,",
+    "on #ffffff."))
 })
 
 # --- the measurements themselves ---------------------------------------------
@@ -340,6 +403,186 @@ test_that("relative luminance follows the current WCAG 2.2 definition", {
   expect_equal(.relative_luminance(hex), .srgb_to_linear(channels))
 })
 
+# --- translucent marks and text, measured as drawn ---------------------------
+
+test_that("translucent fills are measured as the colours they show", {
+  bars <- check_figure(bars_figure(alpha = 0.3))
+  expect_identical(mix("#005b96", "#ffffff", 0.3), "#b3cee0")
+  expect_identical(mix("#d55e00", "#ffffff", 0.3), "#f2cfb3")
+  expect_equal(measured_for(bars, "geometry_contrast"),
+               round(wcag("#f2cfb3", "#ffffff"), 2))
+  expect_identical(verdict_for(bars, "geometry_contrast"), "fail")
+  expect_identical(verdict_for(bars, "greyscale_separability"), "fail")
+  # The colour rows are palette_safety() on the drawn colours.
+  reference <- palette_safety(c("#b3cee0", "#f2cfb3"))
+  expect_equal(measured_for(bars, "colour_separability"),
+               reference$by_condition[["normal"]])
+  for (tp in c("protan", "deutan", "tritan")) {
+    expect_equal(measured_for(bars, paste0("colour_separability_", tp)),
+                 reference$by_condition[[tp]])
+  }
+  # A fill is mixed with the panel it is drawn on, here a dark one.
+  dark <- check_figure(bars_figure(alpha = 0.3) +
+    theme(panel.background = ggplot2::element_rect(fill = "#333333")))
+  blue <- mix("#005b96", "#333333", 0.3)
+  expect_equal(measured_for(dark, "geometry_contrast"),
+               round(wcag(blue, "#333333"), 2))
+  expect_identical(detail_for(dark, "geometry_contrast"), sprintf(
+    "Lowest-contrast colour #005b96 at alpha 0.30, drawn as %s, on #333333.",
+    blue))
+  # Opaque bars keep the detail they always had.
+  expect_identical(detail_for(check_figure(bars_figure(alpha = 1)),
+                              "geometry_contrast"),
+                   "Lowest-contrast colour #d55e00 on #ffffff.")
+})
+
+test_that("translucent points are measured as drawn", {
+  points <- check_figure(points_figure(alpha = 0.7))
+  expect_identical(mix("#d55e00", "#ffffff", 0.7), "#e28e4d")
+  expect_equal(measured_for(points, "geometry_contrast"),
+               round(wcag("#e28e4d", "#ffffff"), 2))
+  expect_identical(verdict_for(points, "geometry_contrast"), "fail")
+})
+
+test_that("translucent text is measured as drawn", {
+  # alpha("black", 0.25) is #00000040, black at 64/255 over white.
+  veiled <- check_figure(good_figure() +
+    theme(axis.text = ggplot2::element_text(colour = alpha("black", 0.25))))
+  grey <- mix("#000000", "#ffffff", 64 / 255)
+  expect_identical(grey, "#bfbfbf")
+  expect_equal(measured_for(veiled, "text_contrast"), 1.84)
+  expect_equal(measured_for(veiled, "text_contrast"),
+               round(wcag(grey, "#ffffff"), 2))
+  expect_identical(verdict_for(veiled, "text_contrast"), "fail")
+  expect_identical(detail_for(veiled, "text_contrast"), paste(
+    "Lowest-contrast text #000000 at alpha 0.25, drawn as #bfbfbf,",
+    "on #ffffff at 8.80 pt."))
+})
+
+test_that("a gpar alpha is multiplied into text down the grob tree", {
+  # grid multiplies a grob's alpha into its colour's own and carries a parent's
+  # alpha down to its children. Black at 128/255, in a text grob at alpha 0.5
+  # inside a tree at alpha 0.5, is drawn at 0.125, which is #dfdfdf on white.
+  label <- grid::textGrob("label", gp = grid::gpar(col = "#00000080",
+                                                   alpha = 0.5, fontsize = 10))
+  tree <- grid::gTree(children = grid::gList(label),
+                      gp = grid::gpar(alpha = 0.5))
+  text <- .figure_text(tree, .completed_theme(theme_depictr()), "#ffffff")
+  expect_equal(text$alpha, 128 / 255 * 0.25)
+  expect_identical(text$colour, mix("#000000", "#ffffff", 128 / 255 * 0.25))
+  expect_identical(text$colour, "#dfdfdf")
+})
+
+test_that("an opaque outline mapped to the same groups carries the contrast", {
+  # WCAG lets a border carry a graphical object's contrast. The fills at alpha
+  # 0.2 are pale, and the outlines, drawn opaque, are what is measured.
+  outlined <- check_figure(density_figure())
+  expect_equal(measured_for(outlined, "geometry_contrast"),
+               round(wcag("#d55e00", "#ffffff"), 2))
+  expect_identical(detail_for(outlined, "geometry_contrast"),
+                   "Lowest-contrast colour #d55e00 on #ffffff.")
+  # A constant black outline says nothing about which group a shape belongs
+  # to, so it carries no credit and the pale fill is measured.
+  plain <- check_figure(
+    ggplot(crop_yield, aes(yield, fill = treatment)) +
+      geom_density(alpha = 0.2, colour = "black") +
+      scale_fill_manual(values = c("#005b96", "#d55e00")) +
+      theme_depictr())
+  pale <- mix("#d55e00", "#ffffff", 0.2)
+  expect_equal(measured_for(plain, "geometry_contrast"),
+               round(wcag(pale, "#ffffff"), 2))
+  expect_identical(detail_for(plain, "geometry_contrast"), sprintf(
+    "Lowest-contrast colour #d55e00 at alpha 0.20, drawn as %s, on #ffffff.",
+    pale))
+})
+
+test_that("each aesthetic's colours are compared among themselves", {
+  white <- "#ffffff"
+  # The outlines and the pale fills of the densities form two sets, and the
+  # row reports the closer of their two pairs, the fills.
+  outlined <- check_figure(density_figure())
+  fills <- c(mix("#005b96", white, 0.2), mix("#d55e00", white, 0.2))
+  expect_equal(measured_for(outlined, "colour_separability"),
+               palette_safety(fills)$by_condition[["normal"]])
+  expect_identical(detail_for(outlined, "colour_separability"), sprintf(
+    "Closest pair %s and %s of 2 encoding fill colours.", fills[[1]],
+    fills[[2]]))
+  # A fill at alpha 0.9 is a hair from its own opaque outline. Pooled, that
+  # pair failed the figure. It is one group, so it is never compared.
+  near <- check_figure(density_figure(alpha = 0.9))
+  fills <- c(mix("#005b96", white, 0.9), mix("#d55e00", white, 0.9))
+  expect_equal(measured_for(near, "colour_separability"),
+               palette_safety(fills)$by_condition[["normal"]])
+  expect_identical(verdict_for(near, "colour_separability"), "pass")
+  # Nor across layers: translucent points beside opaque lines in the same two
+  # colours are compared group against group, never a group with itself.
+  layered <- check_figure(
+    ggplot(crop_yield, aes(rainfall, yield, colour = treatment)) +
+      geom_point(alpha = 0.95) + geom_line() +
+      scale_colour_manual(values = c("#005b96", "#d55e00")) +
+      theme_depictr())
+  blue <- c("#005b96", mix("#005b96", white, 0.95))
+  vermillion <- c("#d55e00", mix("#d55e00", white, 0.95))
+  across <- min(outer(seq_along(blue), seq_along(vermillion), Vectorize(
+    function(i, j) {
+      palette_safety(c(blue[[i]], vermillion[[j]]))$by_condition[["normal"]]
+    })))
+  expect_equal(measured_for(layered, "colour_separability"), across)
+  expect_identical(verdict_for(layered, "colour_separability"), "pass")
+})
+
+test_that("verdicts on translucent fills can move in either direction", {
+  # Red and green fills at alpha 0.6 are lighter by different amounts, so a
+  # deuteranope tells them apart by lightness. Read at full opacity, they
+  # failed at 0.37.
+  red_green <- c("#d62728", "#309208")
+  opaque <- check_figure(bars_figure(alpha = 1, values = red_green))
+  translucent <- check_figure(bars_figure(alpha = 0.6, values = red_green))
+  expect_equal(measured_for(opaque, "colour_separability_deutan"), 0.37)
+  expect_identical(verdict_for(opaque, "colour_separability_deutan"), "fail")
+  expect_equal(measured_for(translucent, "colour_separability_deutan"), 11.58)
+  expect_identical(verdict_for(translucent, "colour_separability_deutan"),
+                   "pass")
+  # The good figure's colours, which pass at full opacity, fall below 3:1 as
+  # fills at alpha 0.3.
+  expect_identical(verdict_for(check_figure(bars_figure(alpha = 1)),
+                               "geometry_contrast"), "pass")
+  expect_identical(verdict_for(check_figure(bars_figure(alpha = 0.3)),
+                               "geometry_contrast"), "fail")
+})
+
+test_that("a colour's own alpha gives way to the layer's, as ggplot2 draws it", {
+  # scales::alpha(), which every geom calls, keeps a colour's own alpha only
+  # when the layer sets none. The Python twin follows plotnine, which keeps the
+  # colour's own alpha either way, so only the first case is shared.
+  own <- c("#005b964d", "#d55e004d")
+  unset <- check_figure(bars_figure(alpha = NULL, values = own))
+  expect_identical(detail_for(unset, "geometry_contrast"), sprintf(
+    "Lowest-contrast colour #d55e00 at alpha 0.30, drawn as %s, on #ffffff.",
+    mix("#d55e00", "#ffffff", 77 / 255)))
+  set <- check_figure(bars_figure(alpha = 0.6, values = own))
+  expect_identical(detail_for(set, "geometry_contrast"), sprintf(
+    "Lowest-contrast colour #d55e00 at alpha 0.60, drawn as %s, on #ffffff.",
+    mix("#d55e00", "#ffffff", 0.6)))
+})
+
+test_that("the layer alpha reaches the parts each geom applies it to", {
+  # As ggplot2 draws them: area geoms take it on the fill and leave the outline
+  # opaque, lines take it on the colour, and points on both. A geom not listed
+  # takes it on both, the cautious assumption.
+  fill_only <- list(GeomCol, GeomBar, GeomTile, GeomRect, GeomArea,
+                    GeomRibbon, GeomDensity, GeomPolygon, GeomViolin,
+                    GeomBoxplot, GeomCrossbar, GeomSmooth)
+  colour_only <- list(GeomPath, GeomLine, GeomStep, GeomSegment, GeomErrorbar,
+                      GeomLinerange, GeomHline, GeomVline, GeomAbline)
+  both <- list(GeomPoint, GeomPointrange, GeomDotplot)
+  for (geom in fill_only) expect_identical(.alpha_targets(geom), "fill")
+  for (geom in colour_only) expect_identical(.alpha_targets(geom), "colour")
+  for (geom in both) {
+    expect_identical(.alpha_targets(geom), c("colour", "fill"))
+  }
+})
+
 test_that("redundant encoding counts the channels that vary alongside colour", {
   colour_only <- ggplot(crop_yield, aes(rainfall, yield, colour = treatment)) +
     geom_point() + scale_colour_depictr() + theme_depictr()
@@ -476,16 +719,16 @@ test_that("check_figure() refuses non-positive and non-scalar settings", {
 
 test_that("check_figure() reads the extended plot, not the one depictr returned", {
   # The whole point of introspecting the build: a user's replacement scale is
-  # what the figure ships with, so it is what gets audited.
-  base <- explore_distribution(lexical_decision, RT, group = condition)
-  expect_identical(verdict_for(check_figure(base), "colour_separability"),
-                   "pass")
+  # what the figure ships with, so it is what gets audited. The dumbbell's
+  # points are opaque, so the verdicts turn on the scale alone.
+  base <- dumbbell_plot(lexical_decision, participant, RT, condition)
+  expect_identical(
+    verdict_for(check_figure(base), "colour_separability_deutan"), "pass")
   # Replacing a scale that is already there is the ordinary way a user overrides
   # depictr's colours, and ggplot2 says so every time; the message is not the
   # subject of this test.
   broken <- suppressMessages(
-    base + scale_fill_manual(values = c("#d62728", "#309208")) +
-      scale_colour_manual(values = c("#d62728", "#309208")))
+    base + scale_colour_manual(values = c("#d62728", "#309208")))
   expect_identical(
     verdict_for(check_figure(broken), "colour_separability_deutan"), "fail")
 })

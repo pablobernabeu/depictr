@@ -188,17 +188,18 @@ grouped <- ggplot(crop_yield, aes(fertiliser, yield, colour = treatment)) +
 check_figure(grouped)
 ```
 
-Two rows are worth dwelling on. `geometry_contrast` measures each encoding colour
-against the panel background, and the palette's orange sits at 2.25 against white,
-below the 3:1 that WCAG asks of a graphical object [@wcag22]. `redundant_encoding`
-is zero because nothing but colour tells the two treatments apart. Mapping shape
-as well, and letting the darker vermillion do the second colour's work, clears
-both:
+Two rows are worth dwelling on. `geometry_contrast` measures each encoding colour,
+as it is drawn, against the panel background. The palette's orange falls below the
+3:1 that WCAG asks of a graphical object [@wcag22] even when opaque, at 2.25:1,
+and further when drawn translucent, as these points are. `redundant_encoding` is
+zero because nothing but colour tells the two treatments apart. Mapping shape as
+well, letting the darker vermillion do the second colour's work and drawing the
+points opaque clears both:
 
 ```{r}
 mended <- ggplot(crop_yield, aes(fertiliser, yield, colour = treatment,
                                  shape = treatment)) +
-  geom_point(alpha = 0.7) +
+  geom_point() +
   scale_colour_manual(values = c("#005b96", "#d55e00")) +
   theme_depictr()
 

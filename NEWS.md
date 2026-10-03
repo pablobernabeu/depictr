@@ -229,6 +229,17 @@
   dropped, so `geometry_contrast` moves for such a figure. The
   relative-luminance code now cites the current WCAG 2.2 definition and its
   0.04045 breakpoint, which changes no ratio.
+* `check_figure()` measured translucent marks and text as if they were opaque,
+  so a figure could pass contrast, colour-vision and greyscale checks that its
+  drawn colours fail. The 'mended' example in the Get started vignette was one:
+  its points, drawn at alpha 0.7, passed the geometry check at 3.87:1, and the
+  vermillion a reader sees reaches 2.56:1. Colours are now composited over
+  their background with the alpha each geom applies, outlines drawn opaque are
+  credited, and the colours of each aesthetic are compared among themselves. A
+  translucent colour or text is named in the detail with its alpha and the
+  colour it is drawn as, and the separability rows say whether their closest
+  pair are colours or fill colours. Verdicts on translucent figures can change
+  in either direction. The vignette's example now draws its points opaque.
 
 # depictr 0.3.0
 

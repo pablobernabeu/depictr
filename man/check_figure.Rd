@@ -58,13 +58,29 @@ of a free pass.
 }
 \section{What each check measures}{
 
+Colours and text are measured as drawn. A translucent colour is composited
+over the background it is drawn on with the alpha it is drawn with, so it is
+measured as the paler colour the reader sees. As ggplot2 draws them, bars,
+tiles, areas, densities, ribbons, polygons, violins, boxplots, crossbars and
+smooths apply a layer's alpha to their fill and leave the outline opaque.
+Lines, paths, segments, error bars and reference lines apply it to their
+colour, and points apply it to both. Any other geom is taken to apply it to
+both, the cautious assumption. A colour that carries its own alpha keeps it
+when the layer sets none, as ggplot2 draws it. A colour drawn at several
+alphas within one layer is measured at the smallest. Where marks overlap
+one another, the colour that shows depends on what lies beneath it, and
+that is not measured.
+
 \code{colour_separability} is the smallest CIE76 colour difference (Delta-E)
-between any two of the figure's encoding colours, and the three
+between two of the figure's encoding colours, and the three
 \verb{colour_separability_*} rows repeat that measurement after simulating each
 dichromacy at full severity with \code{\link[=simulate_cvd]{simulate_cvd()}}. Encoding colours are the
 distinct colour and fill values a layer uses to tell groups apart; a
 continuous colour or fill scale is a smooth ramp rather than a set of codes,
-so it is excluded.
+so it is excluded. The outline colours, across every layer, are compared
+among themselves, and so are the fill colours, and the row reports the
+closest pair from either set. An outline is therefore never compared with
+its own fill, nor a group with itself as another layer draws it.
 
 \code{greyscale_separability} is the smallest difference in CIE lightness between
 those same colours, which is what survives printing in black and white.
@@ -83,14 +99,19 @@ furthest short of its own threshold. Each text is measured against the
 background it is drawn on: a facet strip's fill for strip text, the legend
 box's fill for legend text, and the plot background for the rest. A
 translucent fill is measured as the colour it shows over what lies beneath
-it. Text that is large at its printed size, 18 pt or 14 pt in bold, is held
-to 3:1, and other text to 4.5:1, as success criterion 1.4.3 asks. The row's
-\code{threshold} is the one that applies to the text it reports, and its \code{detail}
-names that text's colour, background, printed size and weight.
+it, and so is text drawn with an alpha. Text that is large at its printed
+size, 18 pt or 14 pt in bold, is held to 3:1, and other text to 4.5:1, as
+success criterion 1.4.3 asks. The row's \code{threshold} is the one that applies
+to the text it reports, and its \code{detail} names that text's colour,
+background, printed size and weight.
 
-\code{geometry_contrast} is the smallest WCAG 2.2 contrast ratio of any encoding
-colour against the panel background, or against the plot background where
-the panel paints none.
+\code{geometry_contrast} is the smallest WCAG 2.2 contrast ratio of any encoded
+group's drawn colour against the panel background, or against the plot
+background where the panel paints none. Where a layer maps its outline
+colour to the same groups as its fill, each group counts the better of the
+two, since WCAG lets a border carry a graphical object's contrast. For a
+translucent colour, the \code{detail} names the colour, its alpha and the colour
+it is drawn as.
 
 \code{redundant_encoding} counts how many of shape and line type also vary in a
 layer whose colour varies. Zero means the distinction between groups is

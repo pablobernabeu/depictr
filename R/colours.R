@@ -158,16 +158,21 @@ simulate_cvd <- function(colours, deficiency, severity = 1) {
 #' is walked in the same order as the Python twin so that a tie between two
 #' equally close pairs resolves to the same pair in both engines.
 #'
+#' @param groups Optional labels, one per colour. A pair whose labels are equal
+#'   is skipped: [check_figure()] labels each drawn colour with the colour it
+#'   was declared as, so that one group drawn in two ways is not set against
+#'   itself.
 #' @return A list with `distance` and `pair`, the one-based indices of the two
 #'   closest colours.
 #' @noRd
-.min_pairwise_delta_e <- function(cols) {
+.min_pairwise_delta_e <- function(cols, groups = NULL) {
   lab <- .srgb_to_lab(cols)
   n <- nrow(lab)
   best <- Inf
   pair <- c(1L, 1L)
   for (i in seq_len(n - 1)) {
     for (j in seq(i + 1, n)) {
+      if (!is.null(groups) && groups[[i]] == groups[[j]]) next
       d <- sqrt(sum((lab[i, ] - lab[j, ])^2))
       if (d < best) {
         best <- d

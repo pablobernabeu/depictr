@@ -39,13 +39,29 @@
 #' of a free pass.
 #'
 #' @section What each check measures:
+#' Colours and text are measured as drawn. A translucent colour is composited
+#' over the background it is drawn on with the alpha it is drawn with, so it is
+#' measured as the paler colour the reader sees. As ggplot2 draws them, bars,
+#' tiles, areas, densities, ribbons, polygons, violins, boxplots, crossbars and
+#' smooths apply a layer's alpha to their fill and leave the outline opaque.
+#' Lines, paths, segments, error bars and reference lines apply it to their
+#' colour, and points apply it to both. Any other geom is taken to apply it to
+#' both, the cautious assumption. A colour that carries its own alpha keeps it
+#' when the layer sets none, as ggplot2 draws it. A colour drawn at several
+#' alphas within one layer is measured at the smallest. Where marks overlap
+#' one another, the colour that shows depends on what lies beneath it, and
+#' that is not measured.
+#'
 #' `colour_separability` is the smallest CIE76 colour difference (Delta-E)
-#' between any two of the figure's encoding colours, and the three
+#' between two of the figure's encoding colours, and the three
 #' `colour_separability_*` rows repeat that measurement after simulating each
 #' dichromacy at full severity with [simulate_cvd()]. Encoding colours are the
 #' distinct colour and fill values a layer uses to tell groups apart; a
 #' continuous colour or fill scale is a smooth ramp rather than a set of codes,
-#' so it is excluded.
+#' so it is excluded. The outline colours, across every layer, are compared
+#' among themselves, and so are the fill colours, and the row reports the
+#' closest pair from either set. An outline is therefore never compared with
+#' its own fill, nor a group with itself as another layer draws it.
 #'
 #' `greyscale_separability` is the smallest difference in CIE lightness between
 #' those same colours, which is what survives printing in black and white.
@@ -64,14 +80,19 @@
 #' background it is drawn on: a facet strip's fill for strip text, the legend
 #' box's fill for legend text, and the plot background for the rest. A
 #' translucent fill is measured as the colour it shows over what lies beneath
-#' it. Text that is large at its printed size, 18 pt or 14 pt in bold, is held
-#' to 3:1, and other text to 4.5:1, as success criterion 1.4.3 asks. The row's
-#' `threshold` is the one that applies to the text it reports, and its `detail`
-#' names that text's colour, background, printed size and weight.
+#' it, and so is text drawn with an alpha. Text that is large at its printed
+#' size, 18 pt or 14 pt in bold, is held to 3:1, and other text to 4.5:1, as
+#' success criterion 1.4.3 asks. The row's `threshold` is the one that applies
+#' to the text it reports, and its `detail` names that text's colour,
+#' background, printed size and weight.
 #'
-#' `geometry_contrast` is the smallest WCAG 2.2 contrast ratio of any encoding
-#' colour against the panel background, or against the plot background where
-#' the panel paints none.
+#' `geometry_contrast` is the smallest WCAG 2.2 contrast ratio of any encoded
+#' group's drawn colour against the panel background, or against the plot
+#' background where the panel paints none. Where a layer maps its outline
+#' colour to the same groups as its fill, each group counts the better of the
+#' two, since WCAG lets a border carry a graphical object's contrast. For a
+#' translucent colour, the `detail` names the colour, its alpha and the colour
+#' it is drawn as.
 #'
 #' `redundant_encoding` counts how many of shape and line type also vary in a
 #' layer whose colour varies. Zero means the distinction between groups is
@@ -158,14 +179,15 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
   panel_bg <- .element_background(
     ggplot2::calc_element("panel.background", resolved), plot_bg) %||% plot_bg
 
-  encoding <- .figure_colour_encoding(built)
+  # Marks are drawn on the panel, so a translucent one shows the panel through.
+  encoding <- .figure_colour_encoding(built, panel_bg)
   text <- .figure_text(ggplot2::ggplot_gtable(built), resolved, plot_bg)
 
   rows <- c(
-    .separability_rows(encoding$colours, min_delta_e),
+    .separability_rows(encoding$sets, min_delta_e),
     list(.text_size_row(text, width_cm, render_width_cm, min_text_pt)),
     list(.text_contrast_row(text, width_cm, render_width_cm)),
-    list(.geometry_contrast_row(encoding$colours, panel_bg)),
+    list(.geometry_contrast_row(encoding$marks, panel_bg)),
     list(.redundant_encoding_row(encoding))
   )
   out <- do.call(rbind, rows)
@@ -252,25 +274,32 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 
 # --- colour bookkeeping -----------------------------------------------------
 
-#' Normalise colours to lower-case six-digit hex, dropping what cannot be seen
+#' Parse colours into canonical hex and their own alpha
 #'
-#' Anything missing, unparseable or fully transparent is removed rather than
-#' carried through as a colour, since it encodes nothing. The result is the same
-#' canonical form the Python twin produces, so the two can be compared directly.
+#' Anything missing or unparseable is dropped, since it draws nothing. The hex
+#' is lower-case and six-digit, the canonical form the Python twin produces, so
+#' the two can be compared directly. The colour's own alpha is kept beside it,
+#' in `[0, 1]`, for the caller to decide how it is drawn.
+#' @return A data frame of `value` (the colour as given), `hex` and `alpha`,
+#'   one row per colour that parsed, or `NULL` when none did.
 #' @noRd
-.as_hex <- function(cols) {
+.parse_colours <- function(cols) {
   cols <- as.character(cols)
   cols <- cols[!is.na(cols) & nzchar(cols) & cols != "NA"]
-  if (!length(cols)) return(character(0))
+  if (!length(cols)) return(NULL)
   parsed <- lapply(cols, function(x) {
     tryCatch(grDevices::col2rgb(x, alpha = TRUE), error = function(e) NULL)
   })
-  parsed <- parsed[!vapply(parsed, is.null, logical(1))]
-  if (!length(parsed)) return(character(0))
-  rgba <- do.call(cbind, parsed)
-  rgba <- rgba[, rgba[4, ] > 0, drop = FALSE]
-  if (!ncol(rgba)) return(character(0))
-  tolower(grDevices::rgb(rgba[1, ], rgba[2, ], rgba[3, ], maxColorValue = 255))
+  ok <- !vapply(parsed, is.null, logical(1))
+  if (!any(ok)) return(NULL)
+  rgba <- do.call(cbind, parsed[ok])
+  data.frame(
+    value = cols[ok],
+    hex = tolower(grDevices::rgb(rgba[1, ], rgba[2, ], rgba[3, ],
+                                 maxColorValue = 255)),
+    alpha = rgba[4, ] / 255,
+    stringsAsFactors = FALSE
+  )
 }
 
 #' A colour as drawn over a background, given its alpha
@@ -328,6 +357,117 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
   (pmax(la, lb) + 0.05) / (pmin(la, lb) + 0.05)
 }
 
+#' Which of a layer's colour and fill take its alpha, as ggplot2 draws the geom
+#'
+#' Read from the geoms' drawing code. Rectangles (bars, columns, tiles),
+#' ribbons (areas, densities), polygons, violins, boxplots, crossbars and
+#' smooths pass the layer's alpha to the fill alone and draw the outline, the
+#' whiskers and the median or fitted line opaque. Paths (lines, steps),
+#' segments, error bars, line ranges and the reference lines pass it to the
+#' colour. Points and point ranges pass it to both, and so does any geom not
+#' named here, the cautious assumption for a geom whose drawing has not been
+#' read. The Python twin keeps the same table for plotnine's geoms.
+#' @return `"fill"`, `"colour"` or both.
+#' @noRd
+.alpha_targets <- function(geom) {
+  if (inherits(geom, c("GeomRect", "GeomRibbon", "GeomPolygon", "GeomViolin",
+                       "GeomBoxplot", "GeomCrossbar", "GeomSmooth"))) {
+    return("fill")
+  }
+  if (inherits(geom, c("GeomPath", "GeomSegment", "GeomErrorbar",
+                       "GeomLinerange", "GeomHline", "GeomVline",
+                       "GeomAbline"))) {
+    return("colour")
+  }
+  c("colour", "fill")
+}
+
+#' The colour one aesthetic of a layer draws on each row, and its alpha
+#'
+#' ggplot2 draws a colour through `scales::alpha()`, which replaces the
+#' colour's own alpha with the layer's when the layer sets one and keeps it
+#' otherwise. Where the geom does not pass its alpha to this aesthetic, the
+#' colour's own alpha is all there is. A row drawn fully transparent is
+#' dropped, since it shows nothing.
+#' @param applies Whether the layer's alpha reaches this aesthetic.
+#' @return A data frame of `row` (the row of the layer data), `declared`
+#'   (canonical hex) and `alpha`, or `NULL` when nothing is drawn.
+#' @noRd
+.layer_ink <- function(layer_data, aesthetic, applies) {
+  values <- as.character(layer_data[[aesthetic]])
+  parsed <- .parse_colours(unique(values))
+  if (is.null(parsed)) return(NULL)
+  at <- match(values, parsed$value)
+  rows <- which(!is.na(at))
+  own <- parsed$alpha[at[rows]]
+  layer_alpha <- rep_len(as.numeric(layer_data[["alpha"]] %||% NA_real_),
+                         length(values))[rows]
+  alpha <- if (applies) ifelse(is.na(layer_alpha), own, layer_alpha) else own
+  keep <- alpha > 0
+  if (!any(keep)) return(NULL)
+  data.frame(row = rows[keep], declared = parsed$hex[at[rows]][keep],
+             alpha = alpha[keep], stringsAsFactors = FALSE)
+}
+
+#' Each declared colour of a layer as drawn, at the smallest alpha it takes
+#' @return A data frame of `declared`, `alpha` and `drawn`, one row per
+#'   declared colour.
+#' @noRd
+.drawn_by_value <- function(ink, background) {
+  alpha <- tapply(ink$alpha, ink$declared, min)
+  declared <- names(alpha)
+  alpha <- as.numeric(alpha)
+  data.frame(declared = declared, alpha = alpha,
+             drawn = .composite(declared, background, alpha),
+             stringsAsFactors = FALSE)
+}
+
+#' The groups a layer's colour and fill share, when they mark the same ones
+#'
+#' The two mark the same groups when each colour goes with exactly one fill on
+#' the rows that draw both, and the other way round, and every colour and fill
+#' the layer draws is among those pairs.
+#' @return A data frame of `colour` and `fill` (declared hex), one row per
+#'   group, or `NULL` when the two mark different groups.
+#' @noRd
+.shared_groups <- function(colour, fill) {
+  rows <- intersect(colour$row, fill$row)
+  pairs <- unique(data.frame(
+    colour = colour$declared[match(rows, colour$row)],
+    fill = fill$declared[match(rows, fill$row)],
+    stringsAsFactors = FALSE
+  ))
+  one_to_one <- !anyDuplicated(pairs$colour) && !anyDuplicated(pairs$fill)
+  covers <- setequal(pairs$colour, colour$declared) &&
+    setequal(pairs$fill, fill$declared)
+  if (nrow(pairs) && one_to_one && covers) pairs else NULL
+}
+
+#' One drawn colour per group of a layer, for the geometry check
+#'
+#' A group whose outline colour and fill are both mapped to it counts the one
+#' of the two that contrasts better with the background. WCAG's Understanding
+#' document for success criterion 1.4.11 lets a border supply a graphical
+#' object's contrast, and an area geom draws its outline opaque however pale
+#' its fill. Otherwise, each encoding colour stands for its own group.
+#' @noRd
+.layer_marks <- function(ink, drawn, background) {
+  if (all(c("colour", "fill") %in% names(ink))) {
+    groups <- .shared_groups(ink$colour, ink$fill)
+    if (!is.null(groups)) {
+      fill <- drawn$fill[match(groups$fill, drawn$fill$declared), ,
+                         drop = FALSE]
+      outline <- drawn$colour[match(groups$colour, drawn$colour$declared), ,
+                              drop = FALSE]
+      better <- .contrast_ratio(outline$drawn, background) >
+        .contrast_ratio(fill$drawn, background)
+      fill[better, ] <- outline[better, ]
+      return(fill)
+    }
+  }
+  do.call(rbind, unname(drawn))
+}
+
 #' The colours a figure uses to tell groups apart, and what else varies with them
 #'
 #' A colour or fill counts as encoding when a single layer draws more than one
@@ -335,11 +475,17 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' ramp, where neighbouring colours are meant to be close, so measuring the
 #' distance between them would only ever say that a gradient is a gradient.
 #'
-#' @return A list with `colours` (canonical hex, sorted so that a tie between
-#'   two equally close pairs resolves the same way in both engines) and
-#'   `redundant`, the names of the non-colour channels that vary alongside them.
+#' Every colour is taken as drawn over `background`, the panel, at the alpha
+#' its geom applies to it.
+#'
+#' @return A list with `sets`, the drawn colours of the colour and of the fill
+#'   aesthetic across all layers (each a data frame of `drawn` and `declared`,
+#'   sorted so that a tie between two equally close pairs resolves the same way
+#'   in both engines, and absent when nothing encodes by it), `marks`, one
+#'   drawn colour per encoded group for the geometry check, and `redundant`,
+#'   the names of the non-colour channels that vary alongside them.
 #' @noRd
-.figure_colour_encoding <- function(built) {
+.figure_colour_encoding <- function(built, background) {
   continuous <- character(0)
   for (scale in built$plot$scales$scales) {
     if (!isTRUE(scale$is_discrete())) {
@@ -352,25 +498,33 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
     length(unique(values[!is.na(values)])) >= 2
   }
 
-  colours <- character(0)
+  sets <- list(colour = NULL, fill = NULL)
+  marks <- list()
   redundant <- character(0)
   for (index in seq_along(built$data)) {
     layer_data <- built$data[[index]]
+    layer <- built$plot$layers[[index]]
     # A text layer's colour is chosen for legibility against whatever it sits
     # on, not to code a group, so counting it would report the distance between
     # black and white labels as though it were the distance between categories.
-    if (.is_text_layer(built$plot$layers[[index]])) next
-    encodes <- FALSE
+    if (.is_text_layer(layer)) next
+    targets <- .alpha_targets(layer$geom)
+    ink <- list()
     for (aesthetic in c("colour", "fill")) {
       if (aesthetic %in% continuous || !varies(layer_data, aesthetic)) next
+      rows <- .layer_ink(layer_data, aesthetic, aesthetic %in% targets)
       # Distinct after normalisation: two spellings of one colour are one
       # colour, and a layer that draws only that encodes nothing.
-      hex <- unique(.as_hex(unique(layer_data[[aesthetic]])))
-      if (length(hex) < 2) next
-      colours <- union(colours, hex)
-      encodes <- TRUE
+      if (is.null(rows) || length(unique(rows$declared)) < 2) next
+      ink[[aesthetic]] <- rows
     }
-    if (!encodes) next
+    if (!length(ink)) next
+    drawn <- lapply(ink, .drawn_by_value, background = background)
+    for (aesthetic in names(drawn)) {
+      sets[[aesthetic]] <- rbind(sets[[aesthetic]],
+                                 drawn[[aesthetic]][, c("drawn", "declared")])
+    }
+    marks[[length(marks) + 1L]] <- .layer_marks(ink, drawn, background)
     also <- c("shape", "linetype")[
       vapply(c("shape", "linetype"), function(a) varies(layer_data, a),
              logical(1))
@@ -379,7 +533,14 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
   }
   # Radix order is byte order, which is what Python's sorted() gives, so the two
   # engines pick the same pair when two are equally close.
-  list(colours = sort(unique(colours), method = "radix"), redundant = redundant)
+  sets <- lapply(sets, function(set) {
+    if (is.null(set)) return(NULL)
+    set <- unique(set)
+    set[order(set$drawn, set$declared, method = "radix"), , drop = FALSE]
+  })
+  list(sets = Filter(Negate(is.null), sets),
+       marks = if (length(marks)) do.call(rbind, marks),
+       redundant = redundant)
 }
 
 # --- text bookkeeping -------------------------------------------------------
@@ -409,29 +570,35 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' beneath them, and the plot background holds elsewhere. Legend keys are never
 #' taken for a background, since text is not drawn on them.
 #'
+#' A text drawn with an alpha is composited over its background, as a mark is
+#' over the panel. grid multiplies a gpar alpha into the colour's own and
+#' carries it down the tree, so the walk carries it too.
+#'
 #' @param background The plot background, which the outermost gtable's own
 #'   "background" cell paints and which therefore is not read a second time.
-#' @return A data frame of `size` (points), `colour` (hex), `bold` (logical)
-#'   and `background` (hex), or `NULL` when the figure draws no text.
+#' @return A data frame of `size` (points), `colour` (the hex drawn),
+#'   `declared` (the hex before compositing), `alpha`, `bold` (logical) and
+#'   `background` (hex), or `NULL` when the figure draws no text.
 #' @noRd
 .figure_text <- function(gt, resolved, background) {
   base <- ggplot2::calc_element("text", resolved)
   found <- list()
-  walk <- function(grob, bg, face = NULL, root = FALSE) {
+  walk <- function(grob, bg, face = NULL, alpha = 1, root = FALSE) {
     if (is.null(grob)) return(invisible(NULL))
     # grid stores a gpar fontface as `font`, and a titleGrob can hold it for the
     # text inside, so the face is inherited down the tree like the background.
     face <- grob$gp$font %||% grob$gp$fontface %||% face
+    alpha <- alpha * as.numeric(grob$gp$alpha %||% 1)[[1]]
     if (inherits(grob, "gtable")) {
       cells <- grob$layout$name %||% rep_len("", length(grob$grobs))
       if (!root) bg <- .cell_background(grob, cells, bg)
       for (index in seq_along(grob$grobs)) {
         if (startsWith(cells[[index]], "panel")) next
-        walk(grob$grobs[[index]], bg, face)
+        walk(grob$grobs[[index]], bg, face, alpha)
       }
     } else if (inherits(grob, "gTree")) {
       bg <- .strip_background(grob$children, bg)
-      for (child in grob$children) walk(child, bg, face)
+      for (child in grob$children) walk(child, bg, face, alpha)
     }
     if (!inherits(grob, "text")) return(invisible(NULL))
     labels <- as.character(grob$label)
@@ -443,13 +610,19 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
     # element and quietly losing the smallest or the palest.
     sizes <- as.numeric(grob$gp$fontsize %||% base$size) *
       as.numeric(grob$gp$cex %||% 1)
-    colours <- .as_hex(grob$gp$col %||% base$colour %||% "black")
+    ink <- .parse_colours(grob$gp$col %||% base$colour %||% "black")
+    if (!is.null(ink)) {
+      ink$alpha <- ink$alpha * alpha
+      ink <- ink[ink$alpha > 0, , drop = FALSE]
+    }
     sizes <- sizes[is.finite(sizes)]
-    if (!length(sizes) || !length(colours)) return(invisible(NULL))
+    if (!length(sizes) || is.null(ink) || !nrow(ink)) return(invisible(NULL))
     bold <- (face %||% 1) %in% c(2, 4, "bold", "bold.italic")
-    n <- max(length(sizes), length(colours), length(bold))
+    n <- max(length(sizes), nrow(ink), length(bold))
     found[[length(found) + 1L]] <<- data.frame(
-      size = rep_len(sizes, n), colour = rep_len(colours, n),
+      size = rep_len(sizes, n),
+      colour = rep_len(.composite(ink$hex, bg, ink$alpha), n),
+      declared = rep_len(ink$hex, n), alpha = rep_len(ink$alpha, n),
       bold = rep_len(bold, n), background = bg,
       stringsAsFactors = FALSE
     )
@@ -517,13 +690,20 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' @noRd
 .fmt <- function(x) formatC(x, format = "f", digits = 2)
 
+# How a detail names the colours of each aesthetic's set.
+.set_nouns <- c(colour = "colours", fill = "fill colours")
+
 #' The four colour rows plus the greyscale row
+#'
+#' Each set holds the drawn colours of one aesthetic, and only colours declared
+#' differently are paired, so a group is never compared with itself. The rows
+#' report the closest pair over the sets, the first set winning a tie.
 #' @noRd
-.separability_rows <- function(colours, min_delta_e) {
+.separability_rows <- function(sets, min_delta_e) {
   check_names <- c("colour_separability", "colour_separability_protan",
                    "colour_separability_deutan", "colour_separability_tritan")
   conditions <- c("normal", names(.cvd_matrices))
-  if (length(colours) < 2) {
+  if (!length(sets)) {
     rows <- lapply(check_names, function(nm) {
       .check_row(nm, NA_real_, min_delta_e, .no_colour_detail)
     })
@@ -531,36 +711,55 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
       "greyscale_separability", NA_real_, min_delta_e, .no_colour_detail)
     return(rows)
   }
-  rows <- Map(function(nm, condition) {
-    seen <- if (condition == "normal") colours else {
-      simulate_cvd(colours, condition)
+  closest_over_sets <- function(measure) {
+    best <- NULL
+    for (aesthetic in names(sets)) {
+      set <- sets[[aesthetic]]
+      found <- measure(set)
+      if (is.null(best) || found$distance < best$distance) {
+        best <- found
+        best$colours <- set$drawn[found$pair]
+        best$size <- nrow(set)
+        best$noun <- .set_nouns[[aesthetic]]
+      }
     }
-    closest <- .min_pairwise_delta_e(seen)
-    pair <- colours[closest$pair]
+    best
+  }
+  rows <- Map(function(nm, condition) {
+    closest <- closest_over_sets(function(set) {
+      seen <- if (condition == "normal") set$drawn else {
+        simulate_cvd(set$drawn, condition)
+      }
+      .min_pairwise_delta_e(seen, set$declared)
+    })
     .check_row(nm, closest$distance, min_delta_e, sprintf(
-      "Closest pair %s and %s of %d encoding colours.",
-      pair[[1]], pair[[2]], length(colours)))
+      "Closest pair %s and %s of %d encoding %s.", closest$colours[[1]],
+      closest$colours[[2]], closest$size, closest$noun))
   }, check_names, conditions)
   # Lightness is what a black-and-white printer keeps, and CIE L* is a function
   # of luminance alone, so the greyscale difference between two colours is the
   # CIE76 distance between their lightnesses.
-  lightness <- .srgb_to_lab(colours)[, "L"]
-  grey <- .min_pairwise_delta_e_1d(lightness)
-  pair <- colours[grey$pair]
+  grey <- closest_over_sets(function(set) {
+    .min_pairwise_delta_e_1d(.srgb_to_lab(set$drawn)[, "L"], set$declared)
+  })
   rows[[length(rows) + 1L]] <- .check_row(
     "greyscale_separability", grey$distance, min_delta_e, sprintf(
-      "Closest pair %s and %s in CIE lightness.", pair[[1]], pair[[2]]))
+      "Closest pair %s and %s in CIE lightness.", grey$colours[[1]],
+      grey$colours[[2]]))
   unname(rows)
 }
 
 #' Smallest pairwise gap in a single dimension, walked in the twin's order
+#'
+#' A pair whose `groups` are equal is skipped, as in `.min_pairwise_delta_e()`.
 #' @noRd
-.min_pairwise_delta_e_1d <- function(values) {
+.min_pairwise_delta_e_1d <- function(values, groups = NULL) {
   n <- length(values)
   best <- Inf
   pair <- c(1L, 1L)
   for (i in seq_len(n - 1)) {
     for (j in seq(i + 1, n)) {
+      if (!is.null(groups) && groups[[i]] == groups[[j]]) next
       d <- abs(values[[i]] - values[[j]])
       if (d < best) {
         best <- d
@@ -605,27 +804,42 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
                  method = "radix")[[1]]
   .check_row("text_contrast", ratios[[worst]], threshold[[worst]],
              sprintf("Lowest-contrast text %s on %s at %s pt%s.",
-                     text$colour[[worst]], text$background[[worst]],
-                     .fmt(printed[[worst]]),
+                     .ink_as_drawn(text$declared[[worst]], text$alpha[[worst]],
+                                   text$colour[[worst]]),
+                     text$background[[worst]], .fmt(printed[[worst]]),
                      if (text$bold[[worst]]) " bold" else ""))
 }
 
+#' How a detail names a colour: as declared when it is opaque, and with its
+#' alpha and the colour it is drawn as when it is not
 #' @noRd
-.geometry_contrast_row <- function(colours, background) {
-  if (!length(colours)) {
+.ink_as_drawn <- function(declared, alpha, drawn) {
+  if (alpha >= 1) return(drawn)
+  sprintf("%s at alpha %s, drawn as %s,", declared, .fmt(alpha), drawn)
+}
+
+#' The encoded group whose drawn colour contrasts least with the background
+#'
+#' Ties go to the drawn colour, then the declared one, in byte order, which is
+#' the order the Python twin breaks them in.
+#' @noRd
+.geometry_contrast_row <- function(marks, background) {
+  if (is.null(marks) || !nrow(marks)) {
     return(.check_row("geometry_contrast", NA_real_, .wcag_object_contrast,
                       .no_colour_detail))
   }
-  ratios <- .contrast_ratio(colours, background)
-  worst <- which.min(ratios)
+  ratios <- .contrast_ratio(marks$drawn, background)
+  worst <- order(ratios, marks$drawn, marks$declared, method = "radix")[[1]]
   .check_row("geometry_contrast", ratios[[worst]], .wcag_object_contrast,
              sprintf("Lowest-contrast colour %s on %s.",
-                     colours[[worst]], background))
+                     .ink_as_drawn(marks$declared[[worst]],
+                                   marks$alpha[[worst]], marks$drawn[[worst]]),
+                     background))
 }
 
 #' @noRd
 .redundant_encoding_row <- function(encoding) {
-  if (length(encoding$colours) < 2) {
+  if (!length(encoding$sets)) {
     return(.check_row("redundant_encoding", NA_real_, 1, .no_colour_detail))
   }
   channels <- encoding$redundant
