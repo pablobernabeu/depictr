@@ -27,7 +27,8 @@
 #'
 #' @return A [ggplot2::ggplot] object. The per-observation silhouette table is
 #'   attached as the attribute `"silhouette"` and the average width as
-#'   `"avg_width"`.
+#'   `"avg_width"`. The table's `cluster` and `neighbor` columns carry the
+#'   assignments passed in `clusters`, as does each band label.
 #' @references
 #' Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the interpretation
 #' and validation of cluster analysis. *Journal of Computational and Applied
@@ -55,7 +56,8 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
   # Order: by cluster, then by descending width within cluster, and assign a
   # plotting index so bars stack neatly within each cluster block.
   sil <- sil[order(sil$cluster, -sil$sil_width), , drop = FALSE]
-  sil$cluster <- factor(sil$cluster)
+  sil$cluster <- factor(prep$levels[sil$cluster], levels = prep$levels)
+  sil$neighbor <- factor(prep$levels[sil$neighbor], levels = prep$levels)
   sil$index <- seq_len(nrow(sil))
 
   avg_by_cluster <- tapply(sil$sil_width, sil$cluster, mean)
@@ -133,12 +135,21 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
 #' (the smallest `k` whose gap is within one standard error of the next, using
 #' the Tibshirani et al. heuristic).
 #'
+#' Only the gap statistic can conclude that the data hold no clusters, by
+#' suggesting `k = 1`, and only when the search starts at 1, as it does by
+#' default. The elbow is the candidate farthest from the straight line joining
+#' the first and last points of the curve, so it is never the first or last
+#' candidate. A range therefore has to extend one step beyond any `k` the elbow
+#' should be able to choose.
+#'
 #' @param data A data frame or numeric matrix.
-#' @param k_range Integer vector of candidate cluster counts to evaluate.
-#'   Candidates the chosen criterion cannot evaluate are skipped with a message
-#'   naming them: `k = 1` under `"silhouette"` (a lone cluster has no
-#'   neighbouring cluster to compare against, so the width is undefined), and
-#'   any `k` at or above the number of observations under every criterion.
+#' @param k_range Integer vector of candidate cluster counts to evaluate. The
+#'   default, `NULL`, searches `1:8` for `"gap"` and `"wss"` and `2:8` for
+#'   `"silhouette"`. Candidates the chosen criterion cannot evaluate are skipped
+#'   with a message naming them: `k = 1` under `"silhouette"` (a lone cluster
+#'   has no neighbouring cluster to compare against, so the width is
+#'   undefined), and any `k` at or above the number of observations under
+#'   every criterion.
 #' @param method Diagnostic: `"silhouette"`, `"wss"` (within sum of squares
 #'   elbow) or `"gap"`.
 #' @param cols When `data` is a data frame, the numeric columns to use.
@@ -168,7 +179,7 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
 #' p <- k_diagnostic(crop_yield, k_range = 2:6,
 #'                   cols = c("rainfall", "fertiliser", "soil_ph", "yield"))
 #' attr(p, "suggested")
-k_diagnostic <- function(data, k_range = 2:8,
+k_diagnostic <- function(data, k_range = NULL,
                          method = c("silhouette", "wss", "gap"),
                          cols = NULL, scale = TRUE, nstart = 10, B = 50,
                          title = NULL) {
@@ -228,17 +239,20 @@ k_diagnostic <- function(data, k_range = 2:8,
 #' @return A list with elements `table` (a data frame with one row per `k`),
 #'   `suggested` (the chosen `k`) and `method`.
 #' @noRd
-k_diagnostic_data <- function(data, k_range = 2:8,
+k_diagnostic_data <- function(data, k_range = NULL,
                               method = c("silhouette", "wss", "gap"),
                               cols = NULL, scale = TRUE, nstart = 10, B = 50) {
   method <- match.arg(method)
   X <- numeric_matrix(data, cols, scale)
-  requested <- sort(unique(as.integer(k_range)))
   # The silhouette width compares each point with its nearest *other* cluster,
   # so it is undefined at k = 1; wss and gap both define a k = 1 baseline. A k
   # at or above the number of observations leaves no clustering to evaluate.
   # Say which candidates went, rather than quietly narrowing the search.
   k_min <- if (method == "silhouette") 2L else 1L
+  # The default search starts where the criterion is defined. A gap search
+  # that starts at 2 cannot return k = 1, and so finds clusters in noise.
+  if (is.null(k_range)) k_range <- k_min:8L
+  requested <- sort(unique(as.integer(k_range)))
   k_range <- requested[requested >= k_min & requested < nrow(X)]
   dropped <- setdiff(requested, k_range)
   if (length(dropped)) {
@@ -319,7 +333,8 @@ sil_prepare <- function(data, clusters, cols, scale, distance) {
       stop("`clusters` must have one entry per object in the `dist`.",
            call. = FALSE)
     }
-    return(list(clusters = as.integer(as.factor(clusters)), dist = data))
+    f <- droplevels(as.factor(clusters))
+    return(list(clusters = as.integer(f), levels = levels(f), dist = data))
   }
   if (is.data.frame(data)) {
     if (is.null(cols)) {
@@ -348,7 +363,10 @@ sil_prepare <- function(data, clusters, cols, scale, distance) {
          call. = FALSE)
   }
   if (scale) mat <- scale(mat)
-  list(clusters = as.integer(as.factor(cl)),
+  f <- droplevels(as.factor(cl))
+  # The widths are computed on integer codes, but the bands and the attached
+  # table must carry the caller's own labels, so keep the levels here.
+  list(clusters = as.integer(f), levels = levels(f),
        dist = stats::dist(mat, method = distance))
 }
 
@@ -427,7 +445,8 @@ base_silhouette <- function(clusters, dist) {
 #'
 #' Connects the first and last (k, wss) points with a straight line and returns
 #' the k whose point is farthest below that chord, a common, parameter-free
-#' "elbow" heuristic (the Kneedle idea).
+#' "elbow" heuristic (the Kneedle idea). Both endpoints lie on the chord, so
+#' with three or more candidates neither can be returned.
 #' @noRd
 elbow_k <- function(k, wss) {
   if (length(k) < 3) return(k[which.max(-diff(c(wss, wss[length(wss)])))])

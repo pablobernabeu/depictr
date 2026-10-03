@@ -27,6 +27,9 @@
 #'   (`"silhouette"`, `"wss"` or `"gap"`; see [k_diagnostic()]), or `NULL`
 #'   (the default) to leave `k` unchanged. Ignored when `clusters` is supplied.
 #' @param k_range Candidate values of `k` searched when `suggest_k` is set.
+#'   The default, `NULL`, searches `1:8` for `"gap"` and `"wss"` and `2:8` for
+#'   `"silhouette"`, as [k_diagnostic()] does, so the gap statistic can
+#'   suggest a single cluster.
 #' @param hulls Whether to draw a shaded convex hull around each cluster.
 #' @param label_centers Whether to label the cluster centroids.
 #' @param point_alpha Point transparency.
@@ -50,7 +53,7 @@
 #'                                   "yield"), suggest_k = TRUE, k_range = 2:6,
 #'              seed = 1)
 cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
-                         scale = TRUE, suggest_k = NULL, k_range = 2:8,
+                         scale = TRUE, suggest_k = NULL, k_range = NULL,
                          hulls = TRUE, label_centers = TRUE,
                          point_alpha = 0.8, palette = NULL, title = NULL,
                          seed = NULL, nstart = 10, iter.max = 10) {

@@ -202,6 +202,11 @@
   unquoted column name, as elsewhere in the package. A `prcomp` object fitted
   with `retx = FALSE` has no scores to draw, and it is now refused with a
   message that says so.
+* `silhouette_plot()` recoded the cluster labels it was given to 1, 2, 3 and
+  so on, so a clustering labelled `"low"`, `"mid"` and `"high"`, or coded 2, 5
+  and 9, came back with other names in the band labels and in the attached
+  `"silhouette"` table. The labels passed in are now kept, and the table's
+  `neighbor` column is a factor of them.
 
 * `random_effects_plot()` failed for any model with more than one
   random-effect term per grouping factor fitted without a correlation,
@@ -267,6 +272,16 @@
   ggplot2 3.5.x. The floors job in continuous integration now also tests the
   floor against the newest patchwork, and runs every example with warnings
   treated as errors.
+
+## Changed defaults
+
+* The gap statistic's default search in `k_diagnostic()` and
+  `cluster_plot(suggest_k = "gap")` could not return `k = 1`, so it reported
+  clusters in pure noise (`k = 2` for 20 of 20 seeded Gaussian data sets).
+  `k_range` now defaults to `NULL`, which searches `1:8` for the gap and elbow
+  criteria and `2:8` for the silhouette, as before. A suggestion made with the
+  old default can change, so pass `k_range = 2:8` to reproduce it. The help
+  pages now say that the elbow never chooses the first or last candidate.
 
 # depictr 0.3.0
 

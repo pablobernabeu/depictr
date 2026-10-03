@@ -6,7 +6,7 @@
 \usage{
 k_diagnostic(
   data,
-  k_range = 2:8,
+  k_range = NULL,
   method = c("silhouette", "wss", "gap"),
   cols = NULL,
   scale = TRUE,
@@ -18,11 +18,13 @@ k_diagnostic(
 \arguments{
 \item{data}{A data frame or numeric matrix.}
 
-\item{k_range}{Integer vector of candidate cluster counts to evaluate.
-Candidates the chosen criterion cannot evaluate are skipped with a message
-naming them: \code{k = 1} under \code{"silhouette"} (a lone cluster has no
-neighbouring cluster to compare against, so the width is undefined), and
-any \code{k} at or above the number of observations under every criterion.}
+\item{k_range}{Integer vector of candidate cluster counts to evaluate. The
+default, \code{NULL}, searches \code{1:8} for \code{"gap"} and \code{"wss"} and \code{2:8} for
+\code{"silhouette"}. Candidates the chosen criterion cannot evaluate are skipped
+with a message naming them: \code{k = 1} under \code{"silhouette"} (a lone cluster
+has no neighbouring cluster to compare against, so the width is
+undefined), and any \code{k} at or above the number of observations under
+every criterion.}
 
 \item{method}{Diagnostic: \code{"silhouette"}, \code{"wss"} (within sum of squares
 elbow) or \code{"gap"}.}
@@ -53,6 +55,14 @@ available: the average silhouette width (maximised), the total within-cluster
 sum of squares "elbow" (the point of maximum curvature), and the gap statistic
 (the smallest \code{k} whose gap is within one standard error of the next, using
 the Tibshirani et al. heuristic).
+}
+\details{
+Only the gap statistic can conclude that the data hold no clusters, by
+suggesting \code{k = 1}, and only when the search starts at 1, as it does by
+default. The elbow is the candidate farthest from the straight line joining
+the first and last points of the curve, so it is never the first or last
+candidate. A range therefore has to extend one step beyond any \code{k} the elbow
+should be able to choose.
 }
 \examples{
 p <- k_diagnostic(crop_yield, k_range = 2:6,

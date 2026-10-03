@@ -41,6 +41,28 @@ test_that("a clusters vector sized to the complete rows is refused up front", {
   expect_s3_class(silhouette_plot(d, cl10), "ggplot")
 })
 
+test_that("silhouette_plot() keeps the cluster labels it was given", {
+  # Regression: the assignments were recoded to 1..k, so the bands and the
+  # attached table could not be matched back to the caller's clustering.
+  set.seed(1)
+  cl <- kmeans(scale(crop_yield[cols]), 3)$cluster
+  labelled <- c("low", "mid", "high")[cl]
+  p <- silhouette_plot(crop_yield, labelled, cols = cols)
+
+  tab <- attr(p, "silhouette")
+  expect_equal(sort(unique(as.character(tab$cluster))),
+               sort(unique(labelled)))
+  expect_equal(sort(unique(as.character(tab$neighbor))),
+               sort(unique(labelled)))
+  band_labels <- ggplot2::ggplot_build(p)$data[[3]]$label
+  expect_true(all(grepl("^(low|mid|high)  \\(n=", band_labels)))
+
+  # Codes with gaps keep their own values and do not become 1, 2, 3.
+  gapped <- silhouette_plot(crop_yield, c(2, 5, 9)[cl], cols = cols)
+  expect_equal(sort(unique(as.character(attr(gapped, "silhouette")$cluster))),
+               c("2", "5", "9"))
+})
+
 test_that("base_silhouette() matches cluster::silhouette to numerical tolerance", {
   skip_if_not_installed("cluster")
   set.seed(42)
@@ -267,4 +289,59 @@ test_that("a seeded cluster_plot() leaves a fresh session unseeded", {
   before <- get(".Random.seed", envir = .GlobalEnv)
   cluster_plot(crop_yield, cols = cols, k = 2, seed = 42)
   expect_identical(get(".Random.seed", envir = .GlobalEnv), before)
+})
+
+test_that("the default search lets the gap statistic find no clusters in noise", {
+  # Regression: k_range defaulted to 2:8 for every criterion, so the gap
+  # statistic could never return k = 1 and reported clusters in pure Gaussian
+  # noise (k = 2 in 20 of 20 seeded data sets). From 1:8 it returns k = 1.
+  set.seed(20)
+  noise <- data.frame(a = rnorm(150), b = rnorm(150), c = rnorm(150))
+  kd <- k_diagnostic(noise, method = "gap", B = 20)
+  expect_equal(attr(kd, "k_table")$k, 1:8)
+  expect_equal(attr(kd, "suggested"), 1L)
+
+  # cluster_plot() resolves the same default and draws the single cluster.
+  p <- cluster_plot(noise, suggest_k = "gap", seed = 20)
+  expect_equal(attr(p, "k_diagnostic")$table$k, 1:8)
+  expect_equal(attr(p, "k_diagnostic")$suggested, 1L)
+  expect_identical(p$labels$subtitle, "k = 1 suggested by gap diagnostic")
+  expect_silent(ggplot2::ggplot_build(p))
+})
+
+test_that("the default elbow search can choose k = 2", {
+  # The elbow is the candidate farthest from the chord between the first and
+  # last points, so it is never an endpoint. From the old default of 2:8 it
+  # could not choose two clusters even for two well-separated blobs, and
+  # suggested 4 or 5 for them.
+  set.seed(3)
+  blobs <- data.frame(x = c(rnorm(60, -5), rnorm(60, 5)),
+                      y = c(rnorm(60, -5), rnorm(60, 5)))
+  kd <- k_diagnostic(blobs, method = "wss")
+  expect_equal(attr(kd, "k_table")$k, 1:8)
+  expect_equal(attr(kd, "suggested"), 2L)
+  p <- cluster_plot(blobs, suggest_k = "wss", seed = 3)
+  expect_equal(attr(p, "k_diagnostic")$suggested, 2L)
+})
+
+test_that("the default silhouette search starts at k = 2 without a message", {
+  skip_if_not_installed("cluster")
+  # The silhouette width is undefined for one cluster, so its default range
+  # starts at 2 and nothing has to be skipped.
+  set.seed(5)
+  expect_no_message(
+    kd <- k_diagnostic(crop_yield, cols = cols, method = "silhouette")
+  )
+  expect_equal(attr(kd, "k_table")$k, 2:8)
+  expect_no_message(
+    p <- cluster_plot(crop_yield, cols = cols, suggest_k = TRUE, seed = 5)
+  )
+  expect_equal(attr(p, "k_diagnostic")$table$k, 2:8)
+})
+
+test_that("elbow_k() never returns the first or last candidate", {
+  # Both endpoints lie on the chord, at distance zero. The documentation says
+  # so, and the range has to extend one step past any k worth considering.
+  expect_equal(depictr:::elbow_k(1:5, c(100, 10, 9, 8, 7)), 2)
+  expect_equal(depictr:::elbow_k(1:5, c(100, 99, 98, 97, 1)), 4)
 })

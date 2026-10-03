@@ -11,7 +11,7 @@ cluster_plot(
   clusters = NULL,
   scale = TRUE,
   suggest_k = NULL,
-  k_range = 2:8,
+  k_range = NULL,
   hulls = TRUE,
   label_centers = TRUE,
   point_alpha = 0.8,
@@ -47,7 +47,10 @@ average-silhouette criterion), a string naming the criterion
 (\code{"silhouette"}, \code{"wss"} or \code{"gap"}; see \code{\link[=k_diagnostic]{k_diagnostic()}}), or \code{NULL}
 (the default) to leave \code{k} unchanged. Ignored when \code{clusters} is supplied.}
 
-\item{k_range}{Candidate values of \code{k} searched when \code{suggest_k} is set.}
+\item{k_range}{Candidate values of \code{k} searched when \code{suggest_k} is set.
+The default, \code{NULL}, searches \code{1:8} for \code{"gap"} and \code{"wss"} and \code{2:8} for
+\code{"silhouette"}, as \code{\link[=k_diagnostic]{k_diagnostic()}} does, so the gap statistic can
+suggest a single cluster.}
 
 \item{hulls}{Whether to draw a shaded convex hull around each cluster.}
 
