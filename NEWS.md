@@ -203,6 +203,17 @@
   with `retx = FALSE` has no scores to draw, and it is now refused with a
   message that says so.
 
+* `random_effects_plot()` failed for any model with more than one
+  random-effect term per grouping factor fitted without a correlation,
+  `(1 + x || g)` for instance. The same error, "incorrect number of
+  dimensions", stopped split terms such as `(1 | g) + (0 + x | g)` and their
+  `glmer()` equivalents. It now reads lme4's conditional standard deviations
+  for every model shape. For a correlated model, they equal the square roots of
+  the diagonal it used before, so those intervals are unchanged. lme4 is now
+  suggested at version 1.1-19 or later. Conditional variances for several
+  terms per factor arrived in lme4 1.1-18, and 1.1-19 revised the data-frame
+  method that reads them.
+
 ## Degenerate input
 
 * `survival_plot()` truncated a non-integer status code, so `c(0, 0.5, 1)` was

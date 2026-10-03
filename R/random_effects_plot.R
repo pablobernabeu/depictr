@@ -9,7 +9,14 @@
 #' @param x Either a mixed model fitted with 'lme4' (`merMod`), or a data frame
 #'   with one row per group level and columns such as `level`/`group`,
 #'   `estimate`, and either `conf.low`/`conf.high` or `std.error`. An optional
-#'   `term` column facets the plot.
+#'   `term` column facets the plot. A model may have several grouping factors
+#'   and several terms per factor, correlated or not. The forms
+#'   `(1 + x | g)`, `(1 + x || g)` and `(1 | g) + (0 + x | g)` are all drawn.
+#'   The intervals are the conditional modes plus or minus the normal quantile
+#'   times the conditional standard deviations that
+#'   `lme4::ranef(condVar = TRUE)` reports. A model with one term in all is
+#'   drawn in a single panel labelled "Random effect", and otherwise each term
+#'   has a panel labelled "factor: term".
 #' @param conf_level Confidence level when intervals are derived from standard
 #'   errors.
 #' @param sort Whether to order the levels by their estimate.
@@ -118,26 +125,20 @@ ranef_from_df <- function(x, conf_level) {
 #' @noRd
 ranef_from_model <- function(model, conf_level) {
   ensure_installed("lme4", "to extract random effects from a mixed model")
-  re <- lme4::ranef(model, condVar = TRUE)
+  # The postVar attribute is a 3-d array only when all of a factor's terms form
+  # one correlated block. For (1 + x || g) or split terms, it is a list of
+  # arrays. lme4's data-frame method reads either form and returns each
+  # conditional standard deviation (condsd) as the square root of the
+  # postVar diagonal.
+  re <- as.data.frame(lme4::ranef(model, condVar = TRUE))
   z <- stats::qnorm(1 - (1 - conf_level) / 2)
-  parts <- lapply(names(re), function(g) {
-    df <- re[[g]]
-    pv <- attr(df, "postVar")
-    terms <- colnames(df)
-    levs <- rownames(df)
-    do.call(rbind, lapply(seq_along(terms), function(ti) {
-      se <- sqrt(pv[ti, ti, ])
-      est <- df[[ti]]
-      data.frame(
-        level = levs,
-        estimate = est,
-        conf.low = est - z * se,
-        conf.high = est + z * se,
-        facet = if (length(re) > 1 || length(terms) > 1)
-          paste0(g, ": ", terms[ti]) else "Random effect",
-        stringsAsFactors = FALSE
-      )
-    }))
-  })
-  do.call(rbind, parts)
+  facet <- paste0(as.character(re$grpvar), ": ", as.character(re$term))
+  data.frame(
+    level = as.character(re$grp),
+    estimate = re$condval,
+    conf.low = re$condval - z * re$condsd,
+    conf.high = re$condval + z * re$condsd,
+    facet = if (length(unique(facet)) > 1) facet else "Random effect",
+    stringsAsFactors = FALSE
+  )
 }

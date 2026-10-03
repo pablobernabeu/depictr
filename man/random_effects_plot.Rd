@@ -17,7 +17,14 @@ random_effects_plot(
 \item{x}{Either a mixed model fitted with 'lme4' (\code{merMod}), or a data frame
 with one row per group level and columns such as \code{level}/\code{group},
 \code{estimate}, and either \code{conf.low}/\code{conf.high} or \code{std.error}. An optional
-\code{term} column facets the plot.}
+\code{term} column facets the plot. A model may have several grouping factors
+and several terms per factor, correlated or not. The forms
+\code{(1 + x | g)}, \code{(1 + x || g)} and \code{(1 | g) + (0 + x | g)} are all drawn.
+The intervals are the conditional modes plus or minus the normal quantile
+times the conditional standard deviations that
+\code{lme4::ranef(condVar = TRUE)} reports. A model with one term in all is
+drawn in a single panel labelled "Random effect", and otherwise each term
+has a panel labelled "factor: term".}
 
 \item{conf_level}{Confidence level when intervals are derived from standard
 errors.}
