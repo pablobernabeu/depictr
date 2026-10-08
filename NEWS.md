@@ -252,6 +252,22 @@
   pair are colours or fill colours. Verdicts on translucent figures can change
   in either direction. The vignette's example now draws its points opaque.
 
+## Metadata and documentation
+
+* The declared ggplot2 floor rises from 3.5.0 to 3.5.2. The current patchwork
+  cannot load against ggplot2 3.5.0 or 3.5.1, so every function that composes
+  panels failed on the floor the package declared: `arrange_plots()`,
+  `model_report()`, `residual_diagnostics_plot()`, `estimation_plot()`,
+  `explore_pairs()`, `decompose_plot()` and `survival_plot(risk_table = TRUE)`.
+  On ggplot2 3.5.x, `pca_plot()` and `silhouette_plot()` also warned about an
+  unknown `linewidth` and drew borders round their labels. They now name the
+  border argument each ggplot2 version understands and draw no border on either.
+  The reference lines of `coefficient_plot()`, `frequentist_bayesian_plot()`
+  and `posterior_plot()` no longer warn about an unknown `inherit.aes` on
+  ggplot2 3.5.x. The floors job in continuous integration now also tests the
+  floor against the newest patchwork, and runs every example with warnings
+  treated as errors.
+
 # depictr 0.3.0
 
 ## Auditing a finished figure

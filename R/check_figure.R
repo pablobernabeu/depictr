@@ -223,7 +223,7 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' [ggplot2::calc_element()] walks an element up its inheritance chain, so it
 #' needs a theme that names every element rather than only the ones the plot
 #' happens to set. ggplot2 4.0.0 exports `complete_theme()` for exactly that.
-#' The declared floor is ggplot2 3.5.0, so below 4.0.0 the same completion is
+#' The declared floor is ggplot2 3.5.2, so below 4.0.0 the same completion is
 #' assembled from the exported API by `.completed_theme_compat()`.
 #' @noRd
 .completed_theme <- function(theme) {

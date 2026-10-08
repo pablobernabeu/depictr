@@ -117,13 +117,14 @@ pca_plot <- function(x, cols = NULL, group = NULL, components = c(1, 2),
         arrow = ggplot2::arrow(length = ggplot2::unit(0.18, "cm")),
         colour = "grey20", linewidth = 0.5, inherit.aes = FALSE
       ) +
-      ggplot2::geom_label(
+      rlang::exec(
+        ggplot2::geom_label,
         data = rot,
         ggplot2::aes(x = .data$labx, y = .data$laby, label = .data$varname),
         colour = "grey20", fontface = "bold", size = 3.6,
         fill = grDevices::adjustcolor("white", alpha.f = 0.7),
-        linewidth = 0, label.padding = ggplot2::unit(0.12, "lines"),
-        inherit.aes = FALSE
+        label.padding = ggplot2::unit(0.12, "lines"),
+        inherit.aes = FALSE, !!!label_border_none()
       )
   }
 

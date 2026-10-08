@@ -335,9 +335,11 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
           label = factor(labs_all[keep], levels = levels(draws$label)),
           xref = ref, stringsAsFactors = FALSE
         )
+        # geom_vline() never inherits the plot's aesthetics. Passing
+        # inherit.aes = FALSE as well warns on ggplot2 3.5.x.
         p <- p + ggplot2::geom_vline(
           data = refdf, ggplot2::aes(xintercept = .data$xref),
-          linetype = 2, colour = depictr_reference(), inherit.aes = FALSE
+          linetype = 2, colour = depictr_reference()
         )
       }
     }

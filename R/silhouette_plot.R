@@ -90,20 +90,22 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
     ggplot2::geom_col(width = 1) +
     ggplot2::geom_hline(yintercept = avg_width, linetype = 2,
                         colour = "grey30") +
-    ggplot2::geom_label(
+    rlang::exec(
+      ggplot2::geom_label,
       data = ann,
       ggplot2::aes(x = .data$index, y = y_pos, label = .data$label),
       inherit.aes = FALSE, hjust = 0, size = 3, colour = "grey15",
       fill = grDevices::adjustcolor("white", alpha.f = 0.75),
-      linewidth = 0, label.padding = ggplot2::unit(0.12, "lines")
+      label.padding = ggplot2::unit(0.12, "lines"), !!!label_border_none()
     ) +
-    ggplot2::geom_label(
+    rlang::exec(
+      ggplot2::geom_label,
       data = overall_ann,
       ggplot2::aes(x = .data$index, y = .data$sil_width, label = .data$label),
       inherit.aes = FALSE, hjust = 0.5, vjust = -0.2, size = 3,
       colour = "grey30",
       fill = grDevices::adjustcolor("white", alpha.f = 0.75),
-      linewidth = 0, label.padding = ggplot2::unit(0.12, "lines")
+      label.padding = ggplot2::unit(0.12, "lines"), !!!label_border_none()
     ) +
     # The per-band labels already name each cluster (with its n and mean width),
     # so a separate colour legend would be redundant.

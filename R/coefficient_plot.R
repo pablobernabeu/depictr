@@ -293,10 +293,12 @@ add_term_facets <- function(p, reference_line = NA,
   if (!is.na(reference_line)) {
     ref <- reference_line_panels(p$data, reference_line)
     if (nrow(ref)) {
+      # geom_vline() never inherits the plot's aesthetics. Passing
+      # inherit.aes = FALSE as well warns on ggplot2 3.5.x.
       out <- out + ggplot2::geom_vline(
         data = ref,
         ggplot2::aes(xintercept = .data$xintercept),
-        linetype = 2, colour = reference_colour, inherit.aes = FALSE
+        linetype = 2, colour = reference_colour
       )
     }
   }

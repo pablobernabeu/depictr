@@ -24,6 +24,25 @@ ensure_installed <- function(pkg, what = NULL) {
   invisible(TRUE)
 }
 
+#' Arguments that draw a geom_label() without a border
+#'
+#' ggplot2 4.0.0 replaced geom_label()'s `label.size` with `linewidth`. Before
+#' 4.0.0, `linewidth` is an unknown parameter that warns and leaves the default
+#' 0.25 mm border drawn. From 4.0.0, `label.size` is soft-deprecated. Splice the
+#' result into the call with `rlang::exec(ggplot2::geom_label, ...,
+#' !!!label_border_none())`.
+#' @param version The ggplot2 version to answer for, the installed one by
+#'   default.
+#' @return A one-element named list.
+#' @noRd
+label_border_none <- function(version = utils::packageVersion("ggplot2")) {
+  if (package_version(version) < "4.0.0") {
+    list(label.size = 0)
+  } else {
+    list(linewidth = 0)
+  }
+}
+
 #' Validate that `data` is a data frame containing `cols`
 #' @noRd
 check_columns <- function(data, cols, arg = "data") {
