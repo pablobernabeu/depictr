@@ -296,6 +296,26 @@
   old default can change, so pass `k_range = 2:8` to reproduce it. The help
   pages now say that the elbow never chooses the first or last candidate.
 
+* `standardise = TRUE` in `coefficient_plot()`, and so the default
+  `model_report()`, multiplied every model-matrix column by its standard
+  deviation. That made a factor contrast depend on how the groups happened to
+  be balanced: one true effect of 1 came out as 0.52, 0.43 or 0.23 with 50%,
+  20% or 5% of observations in the group. It also scaled an interaction by the
+  spread of a product column, 265 for `rainfall:treatment` in the crop-yield
+  model. Continuous inputs are now scaled by their standard deviation, and
+  factor, logical and two-valued inputs such as 0/1 are left as they are
+  (Gelman, 2008). An
+  interaction is scaled through its continuous inputs, so
+  `rainfall:treatment` becomes the change in the rainfall slope per SD of
+  rainfall. The new `sd_multiple = 2` gives Gelman's two-SD convention.
+  `poly()`, `ns()` and other matrix-valued terms are left unscaled with a
+  message. An interaction of continuous inputs draws a warning unless they are
+  all centred, because each main effect is a slope at zero on the other input.
+  The axis label adds "(contrasts unscaled)" when a contrast is drawn, and the
+  `model_report()` panel is titled "Coefficients (per SD of continuous
+  predictors)". The help page and the model-estimates vignette no longer claim
+  that the standardised magnitudes are comparable.
+
 # depictr 0.3.0
 
 ## Auditing a finished figure

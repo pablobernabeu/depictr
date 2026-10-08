@@ -22,10 +22,12 @@ model_report(
 failing that, the first variable) is used, so a model with
 \code{log(rainfall)} shows the effect of \code{rainfall}.}
 
-\item{standardise}{Whether the coefficient panel shows standardised
-coefficients (each scaled by its predictor's standard deviation). Defaults
-to \code{TRUE}, which keeps the panel readable in this compact overview by
-putting predictors on a common scale; set \code{FALSE} for raw estimates.}
+\item{standardise}{Whether the coefficient panel scales each continuous
+predictor's coefficient by that predictor's standard deviation, leaving
+factor and binary contrasts in the outcome's units, as described for
+\code{standardise} in \code{\link[=coefficient_plot]{coefficient_plot()}}. Defaults to \code{TRUE}, which keeps the
+panel readable in this compact overview when the slopes are on very
+different scales. Set \code{FALSE} for raw estimates.}
 
 \item{title}{Overall title.}
 

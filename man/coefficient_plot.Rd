@@ -19,6 +19,7 @@ coefficient_plot(
   facet = FALSE,
   scales = c("fixed", "free"),
   standardise = FALSE,
+  sd_multiple = 1,
   title = NULL,
   subtitle = NULL,
   x_lab = NULL
@@ -68,18 +69,35 @@ convenience alias for \code{scales = "free"}.}
 \code{"free"} (one free-scaled panel per term). When \code{facet = TRUE} this is
 forced to \code{"free"}.}
 
-\item{standardise}{Whether to standardise the coefficients by multiplying
-each by the standard deviation of its predictor column, putting them on a
-common scale so their magnitudes are comparable (and removing the empty
-band that otherwise appears when predictors are on very different scales).
-Requires a fitted model (ignored, with a warning, for a tidy data frame).
-Defaults to \code{FALSE}.}
+\item{standardise}{Whether to scale each coefficient by the spread of its
+inputs, following Gelman (2008). A continuous input (numeric, with more
+than two distinct values) is scaled by \code{sd_multiple} times its standard
+deviation in the rows the model used, so its slope becomes the change in
+the outcome per SD. Factor, character, logical and two-valued numeric
+inputs (0/1, say) are left unscaled, since a contrast already compares
+two groups and its per-SD value would depend on how balanced the groups
+happen to be. An interaction is scaled
+through its inputs: \code{rainfall:treatment} by the SD of \code{rainfall}, and a
+product of two continuous inputs by both their SDs. Matrix-valued terms
+such as \code{poly()} and \code{ns()} are left unscaled, with a message. An
+interaction of continuous inputs draws a warning unless they are all
+centred. Otherwise, each input's main effect is its slope where the
+others are zero, and Gelman's remedy is to centre the inputs and refit. A continuous slope and
+a contrast are comparable only roughly, most nearly with
+\code{sd_multiple = 2}. Requires a fitted model (ignored, with a warning, for a
+tidy data frame). Defaults to \code{FALSE}.}
+
+\item{sd_multiple}{How many standard deviations of a continuous input one
+unit of the standardised scale spans when \code{standardise = TRUE}. Defaults
+to 1. Use 2 for Gelman's (2008) convention, under which the coefficient
+of a continuous input is comparable to that of a balanced binary one.}
 
 \item{title, subtitle, x_lab}{Plot title, subtitle and x-axis label. \code{x_lab}
-defaults to "Estimate", or "Estimate per SD of predictor" when
-\code{standardise}. The label names the convention on the figure itself,
-because only the predictors are rescaled here: a fully standardised beta
-would rescale the outcome too.}
+defaults to "Estimate", or, when \code{standardise}, "Estimate per SD of
+predictor" ("per 2 SD" with \code{sd_multiple = 2}), followed by "(contrasts
+unscaled)" when a factor or binary term is drawn. The label names the
+convention on the figure itself, because only the predictors are rescaled
+here: a fully standardised beta would rescale the outcome too.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
@@ -101,6 +119,10 @@ coefficient_plot(fit, order = "descending", title = "Drivers of crop yield")
 # free-scaled panel:
 coefficient_plot(fit, intercept = TRUE, facet = TRUE)
 
-# Or put the coefficients on a common, comparable scale:
+# Or scale the continuous slopes per SD of their predictors, leaving the
+# treatment contrast in the outcome's units:
 coefficient_plot(fit, standardise = TRUE)
+}
+\references{
+\insertRef{gelman2008}{depictr}
 }

@@ -31,10 +31,12 @@
 #'   [effects_plot()]. If `NULL`, the first numeric variable in the formula (or,
 #'   failing that, the first variable) is used, so a model with
 #'   `log(rainfall)` shows the effect of `rainfall`.
-#' @param standardise Whether the coefficient panel shows standardised
-#'   coefficients (each scaled by its predictor's standard deviation). Defaults
-#'   to `TRUE`, which keeps the panel readable in this compact overview by
-#'   putting predictors on a common scale; set `FALSE` for raw estimates.
+#' @param standardise Whether the coefficient panel scales each continuous
+#'   predictor's coefficient by that predictor's standard deviation, leaving
+#'   factor and binary contrasts in the outcome's units, as described for
+#'   `standardise` in [coefficient_plot()]. Defaults to `TRUE`, which keeps the
+#'   panel readable in this compact overview when the slopes are on very
+#'   different scales. Set `FALSE` for raw estimates.
 #' @param title Overall title.
 #' @param subtitle Overall subtitle. If `NULL`, a line of fit statistics
 #'   (number of observations, R-squared and AIC) is used. For a `glm`, the
@@ -81,7 +83,11 @@ model_report <- function(model, predictor = NULL, standardise = TRUE,
 
   p_coef <- coefficient_plot(
     model, standardise = standardise,
-    title = if (standardise) "Coefficients (per predictor SD)" else "Coefficients"
+    title = if (standardise) {
+      "Coefficients (per SD of continuous predictors)"
+    } else {
+      "Coefficients"
+    }
   )
   p_eff <- effects_plot(model, predictor,
                         title = paste("Effect of", predictor))

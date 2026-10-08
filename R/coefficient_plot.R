@@ -38,17 +38,36 @@
 #' @param scales Either `"fixed"` (the default, a single shared x-axis) or
 #'   `"free"` (one free-scaled panel per term). When `facet = TRUE` this is
 #'   forced to `"free"`.
-#' @param standardise Whether to standardise the coefficients by multiplying
-#'   each by the standard deviation of its predictor column, putting them on a
-#'   common scale so their magnitudes are comparable (and removing the empty
-#'   band that otherwise appears when predictors are on very different scales).
-#'   Requires a fitted model (ignored, with a warning, for a tidy data frame).
-#'   Defaults to `FALSE`.
+#' @param standardise Whether to scale each coefficient by the spread of its
+#'   inputs, following Gelman (2008). A continuous input (numeric, with more
+#'   than two distinct values) is scaled by `sd_multiple` times its standard
+#'   deviation in the rows the model used, so its slope becomes the change in
+#'   the outcome per SD. Factor, character, logical and two-valued numeric
+#'   inputs (0/1, say) are left unscaled, since a contrast already compares
+#'   two groups and its per-SD value would depend on how balanced the groups
+#'   happen to be. An interaction is scaled
+#'   through its inputs: `rainfall:treatment` by the SD of `rainfall`, and a
+#'   product of two continuous inputs by both their SDs. Matrix-valued terms
+#'   such as `poly()` and `ns()` are left unscaled, with a message. An
+#'   interaction of continuous inputs draws a warning unless they are all
+#'   centred. Otherwise, each input's main effect is its slope where the
+#'   others are zero, and Gelman's remedy is to centre the inputs and refit. A continuous slope and
+#'   a contrast are comparable only roughly, most nearly with
+#'   `sd_multiple = 2`. Requires a fitted model (ignored, with a warning, for a
+#'   tidy data frame). Defaults to `FALSE`.
+#' @param sd_multiple How many standard deviations of a continuous input one
+#'   unit of the standardised scale spans when `standardise = TRUE`. Defaults
+#'   to 1. Use 2 for Gelman's (2008) convention, under which the coefficient
+#'   of a continuous input is comparable to that of a balanced binary one.
 #' @param title,subtitle,x_lab Plot title, subtitle and x-axis label. `x_lab`
-#'   defaults to "Estimate", or "Estimate per SD of predictor" when
-#'   `standardise`. The label names the convention on the figure itself,
-#'   because only the predictors are rescaled here: a fully standardised beta
-#'   would rescale the outcome too.
+#'   defaults to "Estimate", or, when `standardise`, "Estimate per SD of
+#'   predictor" ("per 2 SD" with `sd_multiple = 2`), followed by "(contrasts
+#'   unscaled)" when a factor or binary term is drawn. The label names the
+#'   convention on the figure itself, because only the predictors are rescaled
+#'   here: a fully standardised beta would rescale the outcome too.
+#'
+#' @references
+#' \insertRef{gelman2008}{depictr}
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export
@@ -64,7 +83,8 @@
 #' # free-scaled panel:
 #' coefficient_plot(fit, intercept = TRUE, facet = TRUE)
 #'
-#' # Or put the coefficients on a common, comparable scale:
+#' # Or scale the continuous slopes per SD of their predictors, leaving the
+#' # treatment contrast in the outcome's units:
 #' coefficient_plot(fit, standardise = TRUE)
 coefficient_plot <- function(x,
                       conf_level = 0.95,
@@ -80,6 +100,7 @@ coefficient_plot <- function(x,
                       facet = FALSE,
                       scales = c("fixed", "free"),
                       standardise = FALSE,
+                      sd_multiple = 1,
                       title = NULL,
                       subtitle = NULL,
                       x_lab = NULL) {
@@ -88,20 +109,27 @@ coefficient_plot <- function(x,
   scales <- match.arg(scales)
   if (facet) scales <- "free"
 
+  if (!is.numeric(sd_multiple) || length(sd_multiple) != 1 ||
+      !is.finite(sd_multiple) || sd_multiple <= 0) {
+    stop("`sd_multiple` must be a single positive number.", call. = FALSE)
+  }
+
   est <- tidy_estimates(x, conf_level = conf_level)
 
-  # Optionally put every coefficient on a common, comparable scale by
-  # multiplying it (and its interval) by the standard deviation of its
-  # predictor column. This removes the dead band that appears when, say, a
-  # per-mm rainfall slope sits next to a per-category treatment effect.
+  # Optionally scale each slope by the spread of its continuous inputs, which
+  # removes the dead band that appears when, say, a per-mm rainfall slope sits
+  # next to a treatment contrast. Contrasts keep their units (Gelman, 2008).
+  contrasts_unscaled <- FALSE
   if (standardise) {
-    est <- standardise_estimates(est, x)
+    est <- standardise_estimates(est, x, sd_multiple)
+    contrasts_unscaled <- isTRUE(attr(est, "contrasts_unscaled"))
   }
-  # Name the convention on the axis: only the predictors are rescaled, so
-  # "standardised estimate" would promise the fully standardised beta that the
-  # reader of a travelling figure would reasonably assume it meant.
   x_lab <- x_lab %||%
-    if (standardise) "Estimate per SD of predictor" else "Estimate"
+    if (standardise) {
+      standardised_axis_label(sd_multiple, contrasts_unscaled)
+    } else {
+      "Estimate"
+    }
 
   # Prettify coefficient names to the effect (variable) name by default
   # (e.g. "conditionunrelated" -> "condition"); user `labels` take precedence.
@@ -226,35 +254,154 @@ merge_pretty_labels <- function(user, auto) {
   c(user, auto[setdiff(names(auto), names(user))])
 }
 
-#' Standardise estimates by the SD of each predictor column
+#' Standardise estimates by the SD of each continuous input
 #'
-#' Multiplies each estimate and its interval by the standard deviation of the
-#' matching model-matrix column, giving x-standardised coefficients on a common
-#' scale. Terms with no matching column (or the intercept, whose column has SD
-#' 0) are left unscaled. Needs a fitted model; warns and returns `est` unchanged
-#' for a data-frame input.
+#' Multiplies each estimate, its interval and its standard error by the
+#' spread of the inputs that make up its model-matrix column, following
+#' Gelman (2008). A continuous input (numeric, more than two distinct values)
+#' contributes `sd_multiple` times its standard deviation in the model frame.
+#' A factor, logical or two-valued numeric input contributes 1, so a contrast
+#' keeps its own units and does not change with how balanced the groups are.
+#' An interaction column takes the product of its inputs' multipliers, which
+#' makes it the change in a per-SD slope. Scaling the product column by its
+#' own SD would give a number with no interpretation. Matrix-valued inputs
+#' such as `poly()` or `ns()` bases are left unscaled with a message.
+#'
+#' Needs a fitted model. For a data-frame input, or a model whose columns
+#' cannot be traced back to its inputs, it warns and returns `est` unchanged.
+#' The result carries a `contrasts_unscaled` attribute, `TRUE` when a column
+#' involves a factor or binary input, for the axis label.
 #' @noRd
-standardise_estimates <- function(est, x) {
+standardise_estimates <- function(est, x, sd_multiple = 1) {
   if (inherits(x, "data.frame")) {
     warning("`standardise` needs a fitted model, not a data frame; ignoring it.",
             call. = FALSE)
     return(est)
   }
-  mm <- tryCatch(stats::model.matrix(x), error = function(e) NULL)
-  if (is.null(mm)) {
-    warning("Could not obtain the model matrix; `standardise` ignored.",
-            call. = FALSE)
+  sc <- input_scales(x, sd_multiple)
+  if (is.null(sc)) {
+    warning("Could not trace the model's coefficients to its inputs, so ",
+            "`standardise` is ignored.", call. = FALSE)
     return(est)
   }
-  sds <- apply(mm, 2, stats::sd)
-  sc <- sds[match(est$term, colnames(mm))]
-  sc[is.na(sc)] <- 1
-  sc[est$term %in% c("(Intercept)", "Intercept", "b_Intercept")] <- 1
+  hit <- match(est$term, names(sc$multiplier))
+  mult <- unname(sc$multiplier[hit])
+  mult[is.na(mult)] <- 1
+
+  if (length(sc$matrix_inputs)) {
+    message("`standardise` leaves matrix-valued terms unscaled: ",
+            paste(sc$matrix_inputs, collapse = ", "), ". Their columns are ",
+            "basis functions, not slopes per unit of one input.")
+  }
+  if (length(sc$uncentred_interactions)) {
+    several <- length(sc$uncentred_interactions) > 1
+    warning("`standardise`: ", paste(sc$uncentred_interactions, collapse = ", "),
+            if (several) " are interactions" else " is an interaction",
+            " of uncentred continuous inputs, so the main ",
+            "effect of each is its slope where the others are zero. Centre the ",
+            "inputs and refit for main effects at their means (Gelman, 2008).",
+            call. = FALSE)
+  }
+
   for (col in intersect(c("estimate", "conf.low", "conf.high", "std.error"),
                         names(est))) {
-    est[[col]] <- est[[col]] * sc
+    est[[col]] <- est[[col]] * mult
   }
+  attr(est, "contrasts_unscaled") <-
+    any(est$term %in% sc$contrast_columns)
   est
+}
+
+#' Trace each model-matrix column to its inputs and their scaling multipliers
+#'
+#' Uses the `assign` attribute of the model matrix and the factors matrix of
+#' the model's terms to find the inputs behind each column. Each input is then
+#' classified in the model frame (the rows the fit used) as continuous,
+#' contrast (factor, character, logical or at most two distinct values) or
+#' matrix-valued. Returns `NULL` when any of the pieces is missing, so the
+#' caller can refuse to guess.
+#' @return A list with `multiplier` (named by column), `contrast_columns`,
+#'   `matrix_inputs` and `uncentred_interactions`.
+#' @noRd
+input_scales <- function(x, sd_multiple) {
+  mm <- tryCatch(stats::model.matrix(x), error = function(e) NULL)
+  tt <- tryCatch(stats::terms(x), error = function(e) NULL)
+  mf <- tryCatch(stats::model.frame(x), error = function(e) NULL)
+  if (is.null(mm) || is.null(tt) || is.null(mf)) return(NULL)
+  assign <- attr(mm, "assign")
+  fac <- attr(tt, "factors")
+  if (is.null(assign) || length(assign) != ncol(mm)) return(NULL)
+  if (any(assign > 0) && (length(fac) == 0 || max(assign) > ncol(fac))) {
+    return(NULL)
+  }
+  inputs_of <- function(a) rownames(fac)[fac[, a] > 0]
+  used <- unique(unlist(lapply(unique(assign[assign > 0]), inputs_of)))
+  if (!all(used %in% names(mf))) return(NULL)
+
+  kind <- vapply(used, function(v) input_kind(mf[[v]]), character(1))
+  scale <- vapply(used, function(v) {
+    if (kind[[v]] == "continuous") {
+      sd_multiple * stats::sd(as.numeric(mf[[v]]), na.rm = TRUE)
+    } else {
+      1
+    }
+  }, numeric(1))
+
+  cols <- colnames(mm)
+  multiplier <- stats::setNames(rep(1, length(cols)), cols)
+  contrast <- logical(length(cols))
+  for (i in seq_along(cols)) {
+    if (assign[i] < 1) next
+    vars <- inputs_of(assign[i])
+    multiplier[i] <- prod(scale[vars])
+    contrast[i] <- any(kind[vars] == "contrast")
+  }
+
+  # An interaction of two or more continuous inputs leaves each main effect
+  # conditional on the others at zero. Centred inputs make that zero the mean,
+  # which is Gelman's remedy, so only uncentred ones are reported.
+  terms_used <- unique(assign[assign > 0])
+  uncentred <- character(0)
+  for (a in terms_used) {
+    vars <- inputs_of(a)
+    cont <- vars[kind[vars] == "continuous"]
+    if (length(cont) < 2) next
+    off_centre <- vapply(cont, function(v) {
+      val <- as.numeric(mf[[v]])
+      abs(mean(val, na.rm = TRUE)) >
+        sqrt(.Machine$double.eps) * stats::sd(val, na.rm = TRUE)
+    }, logical(1))
+    if (any(off_centre)) uncentred <- c(uncentred, colnames(fac)[a])
+  }
+
+  list(multiplier = multiplier,
+       contrast_columns = cols[contrast],
+       matrix_inputs = used[kind == "matrix"],
+       uncentred_interactions = uncentred)
+}
+
+#' Classify one model-frame input for standardise_estimates()
+#' @noRd
+input_kind <- function(v) {
+  if (is.matrix(v)) {
+    if (ncol(v) > 1) return("matrix")
+    v <- v[, 1]
+  }
+  if (is.factor(v) || is.character(v) || is.logical(v)) return("contrast")
+  values <- unique(as.numeric(v[!is.na(v)]))
+  if (length(values) > 2) "continuous" else "contrast"
+}
+
+#' Axis label for standardised estimates
+#'
+#' Only the predictors are rescaled, so the label says per SD of predictor and
+#' never "standardised estimate", which conventionally means a fully
+#' standardised beta. It says so when contrasts were left in their own units.
+#' @noRd
+standardised_axis_label <- function(sd_multiple, contrasts_unscaled) {
+  per <- if (sd_multiple == 1) "SD" else paste(format(sd_multiple), "SD")
+  paste0("Estimate per ", per, " of predictor",
+         if (isTRUE(contrasts_unscaled)) " (contrasts unscaled)")
 }
 
 #' Lay a forest plot out one term per row, each panel free-scaled

@@ -275,3 +275,153 @@ test_that("the standardise label names the x-only convention", {
   expect_equal(coefficient_plot(fit, standardise = TRUE, x_lab = "beta")$labels$x,
                "beta")
 })
+
+# Standardised estimates, keyed by raw term name.
+std_by_term <- function(p, col = "estimate") {
+  stats::setNames(p$data[[col]], p$data$term)
+}
+
+test_that("standardise scales continuous inputs and leaves contrasts alone", {
+  # Regression: every model-matrix column was multiplied by its own SD, so the
+  # treatment dummy was scaled by 0.500 (the SD of a 0/1 column with 46.5%
+  # treated) and rainfall:treatmentenhanced by 264.98, the SD of a product
+  # column. Gelman (2008, p. 2867) leaves binary inputs unscaled and scales an
+  # interaction through its inputs, so the interaction is the change in the
+  # rainfall slope per SD of rainfall.
+  fit <- lm(yield ~ rainfall * treatment + fertiliser, data = crop_yield)
+  b <- stats::coef(fit)
+  ci <- stats::confint(fit)
+  sd_rain <- stats::sd(crop_yield$rainfall)
+  sd_fert <- stats::sd(crop_yield$fertiliser)
+  p <- coefficient_plot(fit, standardise = TRUE)
+  got <- std_by_term(p)
+  expect_equal(got[["treatmentenhanced"]], b[["treatmentenhanced"]])
+  expect_equal(got[["rainfall"]], b[["rainfall"]] * sd_rain)
+  expect_equal(got[["fertiliser"]], b[["fertiliser"]] * sd_fert)
+  expect_equal(got[["rainfall:treatmentenhanced"]],
+               b[["rainfall:treatmentenhanced"]] * sd_rain)
+  expect_equal(std_by_term(p, "conf.low")[["rainfall:treatmentenhanced"]],
+               ci["rainfall:treatmentenhanced", 1] * sd_rain)
+  expect_equal(std_by_term(p, "conf.high")[["treatmentenhanced"]],
+               ci["treatmentenhanced", 2])
+  expect_equal(p$labels$x, "Estimate per SD of predictor (contrasts unscaled)")
+
+  # Gelman's two-SD convention doubles the continuous multipliers only.
+  p2 <- coefficient_plot(fit, standardise = TRUE, sd_multiple = 2)
+  got2 <- std_by_term(p2)
+  expect_equal(got2[["rainfall"]], b[["rainfall"]] * 2 * sd_rain)
+  expect_equal(got2[["rainfall:treatmentenhanced"]],
+               b[["rainfall:treatmentenhanced"]] * 2 * sd_rain)
+  expect_equal(got2[["treatmentenhanced"]], b[["treatmentenhanced"]])
+  expect_equal(p2$labels$x,
+               "Estimate per 2 SD of predictor (contrasts unscaled)")
+})
+
+test_that("a binary input's standardised estimate does not track group balance", {
+  # Simulation from the audit: y = d + x + e. The per-column SD gave d about
+  # 0.52, 0.43 and 0.23 at P(d = 1) = 0.5, 0.2 and 0.05 for one true effect.
+  # A 0/1 or 1/2 numeric, a logical and a factor input are all left unscaled.
+  for (p1 in c(0.5, 0.2, 0.05)) {
+    withr::local_seed(11)
+    n <- 2000
+    sim <- data.frame(d = stats::rbinom(n, 1, p1), x = stats::rnorm(n))
+    sim$y <- sim$d + sim$x + stats::rnorm(n)
+    sim$d_lgl <- sim$d == 1
+    sim$d_fac <- factor(sim$d, labels = c("no", "yes"))
+    sim$d_12 <- sim$d + 1
+    for (form in list(y ~ d + x, y ~ d_lgl + x, y ~ d_fac + x, y ~ d_12 + x)) {
+      fit <- lm(form, data = sim)
+      raw <- stats::coef(fit)[2]
+      got <- std_by_term(coefficient_plot(fit, standardise = TRUE))
+      expect_equal(got[[names(raw)]], unname(raw), info = paste(p1, names(raw)))
+      expect_equal(got[["x"]], stats::coef(fit)[["x"]] * stats::sd(sim$x))
+    }
+  }
+})
+
+test_that("standardise scales a transformed input by the SD of what was fitted", {
+  fit <- lm(yield ~ log(rainfall) + treatment, data = crop_yield)
+  got <- std_by_term(coefficient_plot(fit, standardise = TRUE))
+  expect_equal(got[["log(rainfall)"]],
+               stats::coef(fit)[["log(rainfall)"]] *
+                 stats::sd(log(crop_yield$rainfall)))
+})
+
+test_that("matrix-valued terms are left unscaled with a message", {
+  fit <- lm(yield ~ poly(rainfall, 2) + fertiliser, data = crop_yield)
+  expect_message(p <- coefficient_plot(fit, standardise = TRUE),
+                 "poly(rainfall, 2)", fixed = TRUE)
+  got <- std_by_term(p)
+  b <- stats::coef(fit)
+  expect_equal(got[["poly(rainfall, 2)1"]], b[["poly(rainfall, 2)1"]])
+  expect_equal(got[["poly(rainfall, 2)2"]], b[["poly(rainfall, 2)2"]])
+  expect_equal(got[["fertiliser"]],
+               b[["fertiliser"]] * stats::sd(crop_yield$fertiliser))
+  # No contrast is drawn, so the label does not mention one.
+  expect_equal(p$labels$x, "Estimate per SD of predictor")
+})
+
+test_that("a continuous-by-continuous interaction warns unless centred", {
+  fit <- lm(yield ~ rainfall * fertiliser, data = crop_yield)
+  expect_warning(p <- coefficient_plot(fit, standardise = TRUE),
+                 "rainfall:fertiliser")
+  b <- stats::coef(fit)
+  expect_equal(std_by_term(p)[["rainfall:fertiliser"]],
+               b[["rainfall:fertiliser"]] * stats::sd(crop_yield$rainfall) *
+                 stats::sd(crop_yield$fertiliser))
+  # Gelman's remedy: centred inputs make each main effect the slope at the
+  # other's mean, so there is nothing to warn about.
+  centred <- transform(crop_yield, rain_c = rainfall - mean(rainfall),
+                       fert_c = fertiliser - mean(fertiliser))
+  fit_c <- lm(yield ~ rain_c * fert_c, data = centred)
+  expect_no_warning(coefficient_plot(fit_c, standardise = TRUE))
+  # Centring one input is not enough: its main effect is still the slope
+  # where the other, uncentred input is zero.
+  expect_warning(
+    coefficient_plot(lm(yield ~ rain_c * fertiliser, data = centred),
+                     standardise = TRUE),
+    "rain_c:fertiliser is an interaction", fixed = TRUE
+  )
+  # Without standardise the figure is in raw units and says nothing.
+  expect_no_warning(coefficient_plot(fit))
+})
+
+test_that("standardise maps inputs for glm and lmer fits", {
+  gfit <- glm(accuracy ~ word_frequency + condition, data = lexical_decision,
+              family = binomial)
+  got <- std_by_term(coefficient_plot(gfit, standardise = TRUE))
+  b <- stats::coef(gfit)
+  expect_equal(got[["conditionunrelated"]], b[["conditionunrelated"]])
+  expect_equal(got[["word_frequency"]],
+               b[["word_frequency"]] * stats::sd(lexical_decision$word_frequency))
+
+  skip_if_not_installed("lme4")
+  mfit <- lme4::lmer(RT ~ condition + modality + word_frequency +
+                       (1 | participant) + (1 | item), data = lexical_decision)
+  got <- std_by_term(coefficient_plot(mfit, standardise = TRUE))
+  fe <- lme4::fixef(mfit)
+  expect_equal(got[["conditionunrelated"]], fe[["conditionunrelated"]])
+  expect_equal(got[["modalityauditory"]], fe[["modalityauditory"]])
+  expect_equal(got[["word_frequency"]],
+               fe[["word_frequency"]] * stats::sd(lexical_decision$word_frequency))
+})
+
+test_that("sd_multiple must be a single positive number", {
+  fit <- lm(yield ~ rainfall, data = crop_yield)
+  for (bad in list(0, -1, c(1, 2), NA_real_, "2")) {
+    expect_error(coefficient_plot(fit, standardise = TRUE, sd_multiple = bad),
+                 "`sd_multiple` must be a single positive number", fixed = TRUE)
+  }
+})
+
+test_that("model_report() leaves the treatment contrast unscaled by default", {
+  fit <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment,
+            data = crop_yield)
+  coef_panel <- model_report(fit)[[1]]
+  got <- std_by_term(coef_panel)
+  expect_equal(got[["treatmentenhanced"]], stats::coef(fit)[["treatmentenhanced"]])
+  expect_equal(got[["soil_ph"]],
+               stats::coef(fit)[["soil_ph"]] * stats::sd(crop_yield$soil_ph))
+  expect_equal(coef_panel$labels$title,
+               "Coefficients (per SD of continuous predictors)")
+})

@@ -90,14 +90,20 @@ coefficient_plot(
 
 Coefficient names are tidied to the effect (variable) name automatically
 (`conditionunrelated` becomes `condition`, `word_frequency` becomes `word
-frequency`). Pass `labels` to override any of them. The slopes also sit on quite
-different scales, so `standardise = TRUE` rescales each
-coefficient by its predictor's standard deviation, putting them on one
-comparable axis:
+frequency`). Pass `labels` to override any of them. A slope per Zipf unit and a
+contrast between two conditions are in different units. `standardise = TRUE`
+multiplies the slope of each continuous predictor by that predictor's standard
+deviation, so the word-frequency slope reads as the change in RT per SD. The two
+factor contrasts stay as differences in milliseconds between conditions. A
+contrast already compares two groups, and its per-SD value would depend on how
+evenly the trials happen to be split between them [@gelman2008]. An interaction
+is scaled through its inputs in the same way, and the axis label names the
+convention. Gelman recommends two SDs, which makes a continuous slope roughly
+comparable with a binary contrast. `sd_multiple = 2` follows that convention:
 
 ```{r coef-std, eval = has_lmer}
-coefficient_plot(fit, standardise = TRUE, order = "ascending",
-                 title = "Standardised predictors of RT")
+coefficient_plot(fit, standardise = TRUE, sd_multiple = 2, order = "ascending",
+                 title = "Predictors of RT, word frequency per 2 SD")
 ```
 
 To keep the raw units instead, including a large intercept that would
