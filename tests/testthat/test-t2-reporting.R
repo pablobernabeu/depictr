@@ -99,8 +99,25 @@ tiff_tag <- function(path, tag) {
   NA_integer_
 }
 
+# The tests of what cairo writes need cairo to load. On Linux and macOS,
+# capabilities("cairo") says only that R was built with cairo, and R for macOS
+# from CRAN loads it only where XQuartz is installed, which GitHub's macOS
+# runners lack. What save_plot() writes there instead is tested on every
+# platform further down, by taking cairo away.
+skip_without_cairo <- function() {
+  skip_if_not(.cairo_available(), "cairo cannot be loaded here")
+}
+
+# ggsave() compresses a TIFF with ragg wherever ragg is installed, and otherwise
+# with the cairo TIFF device on Linux and macOS. Windows compresses with its own
+# device, and since R for Windows ships cairo, the check passes there too.
+skip_without_tiff_compression <- function() {
+  skip_if_not(requireNamespace("ragg", quietly = TRUE) || .cairo_available(),
+              "neither ragg nor cairo can compress a TIFF here")
+}
+
 test_that("save_plot() embeds the fonts in a PDF", {
-  skip_if_not(capabilities("cairo"))
+  skip_without_cairo()
   f <- withr::local_tempfile(fileext = ".pdf")
   save_plot(f, scatter_trend(crop_yield, fertiliser, yield))
   # pdf() names Helvetica without embedding it. An embedded font is a font
@@ -111,7 +128,7 @@ test_that("save_plot() embeds the fonts in a PDF", {
 })
 
 test_that("save_plot() keeps the translucent layers of an EPS and embeds fonts", {
-  skip_if_not(capabilities("cairo"))
+  skip_without_cairo()
   f <- withr::local_tempfile(fileext = ".eps")
   # postscript() drops every element drawn with alpha below 1, here all 200
   # points and the confidence band, and says so only in a warning. cairo_ps()
@@ -127,7 +144,7 @@ test_that("save_plot() keeps the translucent layers of an EPS and embeds fonts",
 })
 
 test_that("save_plot() says nothing about rasterising an opaque EPS", {
-  skip_if_not(capabilities("cairo"))
+  skip_without_cairo()
   f <- withr::local_tempfile(fileext = ".eps")
   # The smoothing layer carries an alpha but, without its band, draws nothing
   # with it, so nothing in this figure is rasterised.
@@ -137,7 +154,7 @@ test_that("save_plot() says nothing about rasterising an opaque EPS", {
 })
 
 test_that("save_plot() notices a translucent panel anywhere in a composite", {
-  skip_if_not(capabilities("cairo"))
+  skip_without_cairo()
   f <- withr::local_tempfile(fileext = ".eps")
   opaque <- scatter_trend(crop_yield, fertiliser, yield, se = FALSE,
                           point_alpha = 1)
@@ -149,7 +166,7 @@ test_that("save_plot() notices a translucent panel anywhere in a composite", {
 })
 
 test_that("save_plot() compresses a TIFF", {
-  skip_if_not(capabilities("cairo"))
+  skip_without_tiff_compression()
   f <- withr::local_tempfile(fileext = ".tiff")
   save_plot(f, scatter_trend(crop_yield, fertiliser, yield))
   # Uncompressed, 7 x 4.5 inches at 300 dpi is 8.1 MiB. PLOS caps a figure at
@@ -159,7 +176,7 @@ test_that("save_plot() compresses a TIFF", {
 })
 
 test_that("save_plot() writes a TIFF without an alpha channel, as PLOS asks", {
-  skip_if_not(capabilities("cairo"))
+  skip_without_tiff_compression()
   f <- withr::local_tempfile(fileext = ".tiff")
   # theme_void() leaves the background transparent, which ragg and the cairo
   # TIFF device keep as a fourth channel. PLOS: "No alpha channels".
@@ -184,7 +201,7 @@ test_that("a background given to save_plot() reaches ggsave() as given", {
 })
 
 test_that("an explicit device or device argument still wins in save_plot()", {
-  skip_if_not(capabilities("cairo"))
+  skip_without_cairo()
   p <- scatter_trend(crop_yield, fertiliser, yield)
 
   pdf_file <- withr::local_tempfile(fileext = ".pdf")
@@ -224,6 +241,53 @@ test_that("save_plot() falls back when the cairo device cannot open", {
   expect_message(save_plot(f, scatter_trend(crop_yield, fertiliser, yield)),
                  "embedFonts")
   expect_true(file.exists(f))
+})
+
+test_that("save_plot() falls back when cairo warns and opens no device", {
+  # A cairo device whose library will not load fails this way on Linux and
+  # macOS. ggsave() would then draw the figure on the caller's device, close
+  # that device and write no file.
+  local_mocked_bindings(
+    .cairo_available = function() TRUE,
+    .open_cairo = function(...) warning("failed to load cairo DLL")
+  )
+  grDevices::postscript(withr::local_tempfile(fileext = ".ps"))
+  callers <- grDevices::dev.cur()
+  withr::defer(grDevices::dev.off(callers))
+  f <- withr::local_tempfile(fileext = ".pdf")
+  expect_message(
+    expect_warning(save_plot(f, scatter_trend(crop_yield, fertiliser, yield)),
+                   "failed to load cairo DLL"),
+    "embedFonts"
+  )
+  expect_true(file.exists(f))
+  expect_identical(grDevices::dev.cur(), callers)
+})
+
+test_that(".cairo_available() agrees with whether a cairo device opens", {
+  # On Linux and macOS, capabilities("cairo") says only that R was built with
+  # cairo, and a cairo device whose library will not load warns and opens
+  # nothing. Whether one opens is what .cairo_available() has to predict.
+  before <- grDevices::dev.cur()
+  f <- withr::local_tempfile(fileext = ".pdf")
+  suppressWarnings(tryCatch(grDevices::cairo_pdf(f), error = function(e) NULL))
+  opens <- !identical(grDevices::dev.cur(), before)
+  if (opens) grDevices::dev.off()
+  expect_identical(.cairo_available(), opens)
+})
+
+test_that("save_plot() writes the PDF and EPS asked for, with cairo or without", {
+  # Without cairo, as on a Mac without XQuartz, the files come from pdf() and
+  # postscript(), and the tests above check what save_plot() says about them.
+  p <- scatter_trend(crop_yield, fertiliser, yield)
+  pdf_file <- withr::local_tempfile(fileext = ".pdf")
+  eps_file <- withr::local_tempfile(fileext = ".eps")
+  suppressWarnings(suppressMessages({
+    save_plot(pdf_file, p)
+    save_plot(eps_file, p)
+  }))
+  expect_true(file.exists(pdf_file))
+  expect_true(file.exists(eps_file))
 })
 
 test_that("a TIFF asks for the cairo type only where quartz would ignore LZW", {

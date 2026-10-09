@@ -185,7 +185,10 @@ arrange_plots <- function(..., ncol = NULL, nrow = NULL,
 #'
 #' Without cairo, a PDF is written with `pdf()` and a message says how to embed
 #' its fonts with [grDevices::embedFonts()], and an EPS is written with
-#' `postscript()` and a warning. A `device`, or a device argument such as
+#' `postscript()` and a warning. R for macOS from CRAN loads cairo only where
+#' XQuartz (<https://www.xquartz.org>) is installed, and a Mac with neither
+#' XQuartz nor ragg writes the TIFF uncompressed, with a warning from
+#' [grDevices::tiff()]. A `device`, or a device argument such as
 #' `fallback_resolution`, `compression` or `bg`, passed in `...` is used as
 #' given, so `device = "pdf"`, `device = "eps"` or `device = "tiff"` restores
 #' ggplot2's own behaviour.
@@ -289,20 +292,35 @@ save_plot <- function(filename, plot = ggplot2::last_plot(),
   switch(dpi, retina = 320, print = 300, screen = 72, NA_real_)
 }
 
-# Kept apart so that the tests can take cairo away on a machine that has it.
-.cairo_available <- function() isTRUE(capabilities("cairo"))
+# Whether cairo can be loaded. On Linux and macOS, capabilities("cairo") says
+# only that R was built with it. R for macOS from CRAN links cairo to XQuartz's
+# libraries, so without XQuartz, capabilities() reports TRUE while every cairo
+# device fails. grSoftVersion() loads cairo to read its version and gives ""
+# when it cannot.
+# The warnings from a failed load are muffled, because the fallback then says
+# what the file lacks. Kept apart so that the tests can take cairo away on a
+# machine that has it.
+.cairo_available <- function() {
+  isTRUE(capabilities("cairo")) &&
+    nzchar(suppressWarnings(grDevices::grSoftVersion()[["cairo"]]))
+}
 
 # A device function for ggsave() that opens cairo and, when cairo cannot open,
 # the device ggplot2 would have used. Only a failure to open the device falls
 # back, so an error in drawing the plot is still reported as the plot's own.
+# On Linux and macOS, a cairo device whose library will not load warns, opens
+# nothing and returns. ggsave() would then draw on whatever device was current
+# and close it, so cairo counts as open only once the current device has
+# changed.
 .journal_device <- function(format, opened) {
   force(format)
   function(filename, ...) {
     args <- list(...)
     if (.cairo_available()) {
+      before <- grDevices::dev.cur()
       started <- tryCatch({
         .open_cairo(format, filename, args)
-        TRUE
+        !identical(grDevices::dev.cur(), before)
       }, error = function(e) FALSE)
       if (started) {
         opened$device <- "cairo"

@@ -68,7 +68,10 @@ unless \code{bg} is given, so a transparent background, as in
 
 Without cairo, a PDF is written with \code{pdf()} and a message says how to embed
 its fonts with \code{\link[grDevices:embedFonts]{grDevices::embedFonts()}}, and an EPS is written with
-\code{postscript()} and a warning. A \code{device}, or a device argument such as
+\code{postscript()} and a warning. R for macOS from CRAN loads cairo only where
+XQuartz (\url{https://www.xquartz.org}) is installed, and a Mac with neither
+XQuartz nor ragg writes the TIFF uncompressed, with a warning from
+\code{\link[grDevices:tiff]{grDevices::tiff()}}. A \code{device}, or a device argument such as
 \code{fallback_resolution}, \code{compression} or \code{bg}, passed in \code{...} is used as
 given, so \code{device = "pdf"}, \code{device = "eps"} or \code{device = "tiff"} restores
 ggplot2's own behaviour.

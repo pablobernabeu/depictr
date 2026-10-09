@@ -136,7 +136,9 @@
   by the cairo TIFF device, because the default quartz one ignores compression.
   A `device` or device argument passed to `save_plot()` still wins. Without
   cairo, the old devices are used, with a message or a warning saying what the
-  file lacks.
+  file lacks. R for macOS from CRAN loads cairo only where XQuartz is
+  installed, so on a Mac without it a PDF or EPS is written this way, and a
+  TIFF is left uncompressed unless ragg is installed.
 
 * `effects_plot()`, `interaction_plot()` and `model_report()` failed on any
   model with a transformed term (`log()`, `poly()`, `ns()`, `scale()`,
