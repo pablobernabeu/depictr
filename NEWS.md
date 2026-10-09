@@ -286,6 +286,10 @@
   floor against the newest patchwork, and runs every example with warnings
   treated as errors.
 
+* ragg is listed in Suggests. `save_plot()` asks whether it is installed when
+  it chooses a device for a TIFF, and `R CMD check` warns about a package
+  looked up that way unless the package declares it.
+
 ## Changed defaults
 
 * The gap statistic's default search in `k_diagnostic()` and
