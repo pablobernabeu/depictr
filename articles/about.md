@@ -6,7 +6,7 @@ If you use depictr in published work, please cite it.
 
 > Bernabeu, P. (2026). depictr: A unified toolkit for visualising
 > statistical models and data. R package version 0.3.0.
-> <https://doi.org/10.5281/zenodo.21266308>
+> <https://doi.org/10.32614/CRAN.package.depictr>
 
 ```
 @Manual{depictr,
@@ -14,13 +14,13 @@ If you use depictr in published work, please cite it.
   author = {Pablo Bernabeu},
   year   = {2026},
   note   = {R package version 0.3.0},
-  doi    = {10.5281/zenodo.21266308},
-  url    = {https://doi.org/10.5281/zenodo.21266308},
+  doi    = {10.32614/CRAN.package.depictr},
+  url    = {https://CRAN.R-project.org/package=depictr},
 }
 ```
 
 Copy BibTeX [Download
-.bib](data:application/x-bibtex;charset=utf-8,%40Manual%7Bdepictr%2C%0A%20%20title%20%20%3D%20%7B%7Bdepictr%7D%3A%20A%20unified%20toolkit%20for%20visualising%20statistical%20models%20and%20data%7D%2C%0A%20%20author%20%3D%20%7BPablo%20Bernabeu%7D%2C%0A%20%20year%20%20%20%3D%20%7B2026%7D%2C%0A%20%20note%20%20%20%3D%20%7BR%20package%20version%200.3.0%7D%2C%0A%20%20doi%20%20%20%20%3D%20%7B10.5281%2Fzenodo.21266308%7D%2C%0A%20%20url%20%20%20%20%3D%20%7Bhttps%3A%2F%2Fdoi.org%2F10.5281%2Fzenodo.21266308%7D%2C%0A%7D)
+.bib](data:application/x-bibtex;charset=utf-8,%40Manual%7Bdepictr%2C%0A%20%20title%20%20%3D%20%7B%7Bdepictr%7D%3A%20A%20unified%20toolkit%20for%20visualising%20statistical%20models%20and%20data%7D%2C%0A%20%20author%20%3D%20%7BPablo%20Bernabeu%7D%2C%0A%20%20year%20%20%20%3D%20%7B2026%7D%2C%0A%20%20note%20%20%20%3D%20%7BR%20package%20version%200.3.0%7D%2C%0A%20%20doi%20%20%20%20%3D%20%7B10.32614%2FCRAN.package.depictr%7D%2C%0A%20%20url%20%20%20%20%3D%20%7Bhttps%3A%2F%2FCRAN.R-project.org%2Fpackage%3Ddepictr%7D%2C%0A%7D)
 
 R users can also retrieve this citation directly with
 `citation("depictr")`.
@@ -54,13 +54,15 @@ retained. The full text is on the site’s licence page.
 
 ## Versioning and archival
 
-Releases are tagged on
-[GitHub](https://github.com/pablobernabeu/depictr/releases) and archived
-on Zenodo. The concept DOI
+CRAN assigned the package the DOI
+[10.32614/CRAN.package.depictr](https://doi.org/10.32614/CRAN.package.depictr)
+on publication. It names the package across all its versions, so the
+version in the citation identifies the release used. Releases are also
+tagged on [GitHub](https://github.com/pablobernabeu/depictr/releases)
+and archived on Zenodo, where the concept DOI
 [10.5281/zenodo.21266308](https://doi.org/10.5281/zenodo.21266308)
-always resolves to the latest archived version, so a citation using it
-stays current as the package evolves. What changed in each release is
-recorded in the
+resolves to the latest archived release and each release has a DOI of
+its own. What changed in each release is recorded in the
 [changelog](https://pablobernabeu.github.io/depictr/news/index.md).
 
 ## Contributing and support

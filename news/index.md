@@ -400,6 +400,16 @@
   `R CMD check` warns about a package looked up that way unless the
   package declares it.
 
+- `citation("depictr")`, the website and `CITATION.cff` give the DOI
+  that CRAN assigned to the package, 10.32614/CRAN.package.depictr, in
+  place of the Zenodo concept DOI. It names the R package across all its
+  versions, and it is the DOI that the CRAN page and the citation R
+  generates for a CRAN package already gave, so the package no longer
+  circulates under two. Zenodo still archives every GitHub release, and
+  `CITATION.cff` lists both identifiers. Its release date is now the day
+  CRAN published 0.3.0, 2026-09-01, where it gave a date that matched
+  neither CRAN nor the GitHub release.
+
 ### Changed defaults
 
 - The gap statistic’s default search in

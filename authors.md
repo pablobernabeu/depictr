@@ -12,13 +12,13 @@ Source:
 
 Bernabeu, P. (2026). depictr: A unified toolkit for visualising
 statistical models and data. R package version 0.3.0.
-https://doi.org/10.5281/zenodo.21266308
+https://doi.org/10.32614/CRAN.package.depictr
 
     @Manual{,
       title = {{depictr}: A unified toolkit for visualising statistical models and data},
       author = {Pablo Bernabeu},
       year = {2026},
       note = {R package version 0.3.0},
-      doi = {10.5281/zenodo.21266308},
-      url = {https://doi.org/10.5281/zenodo.21266308},
+      doi = {10.32614/CRAN.package.depictr},
+      url = {https://CRAN.R-project.org/package=depictr},
     }
