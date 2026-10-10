@@ -233,39 +233,41 @@ check_figure(grouped)
 ```
 
                            check measured threshold verdict
-    1        colour_separability   119.21       5.0    pass
-    2 colour_separability_protan   108.92       5.0    pass
-    3 colour_separability_deutan   121.29       5.0    pass
-    4 colour_separability_tritan    77.90       5.0    pass
-    5     greyscale_separability    33.34       5.0    pass
+    1        colour_separability    93.16       5.0    pass
+    2 colour_separability_protan    90.12       5.0    pass
+    3 colour_separability_deutan    94.81       5.0    pass
+    4 colour_separability_tritan    70.34       5.0    pass
+    5     greyscale_separability    23.06       5.0    pass
     6                  text_size     8.80       6.0    pass
     7              text_contrast     8.45       4.5    pass
-    8          geometry_contrast     2.25       3.0    fail
+    8          geometry_contrast     1.76       3.0    fail
     9         redundant_encoding     0.00       1.0    fail
-                                                                 detail
-    1           Closest pair #005b96 and #e69f00 of 2 encoding colours.
-    2           Closest pair #005b96 and #e69f00 of 2 encoding colours.
-    3           Closest pair #005b96 and #e69f00 of 2 encoding colours.
-    4           Closest pair #005b96 and #e69f00 of 2 encoding colours.
-    5                Closest pair #005b96 and #e69f00 in CIE lightness.
-    6 Smallest text 8.80 pt, drawn at 17.78 cm and printed at 17.78 cm.
-    7                          Lowest-contrast text #4d4d4d on #ffffff.
-    8                        Lowest-contrast colour #e69f00 on #ffffff.
-    9                            Colour alone distinguishes the groups.
+                                                                           detail
+    1                     Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
+    2                     Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
+    3                     Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
+    4                     Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
+    5                          Closest pair #4d8cb6 and #eebc4d in CIE lightness.
+    6           Smallest text 8.80 pt, drawn at 17.78 cm and printed at 17.78 cm.
+    7                         Lowest-contrast text #4d4d4d on #ffffff at 8.80 pt.
+    8 Lowest-contrast colour #e69f00 at alpha 0.70, drawn as #eebc4d, on #ffffff.
+    9                                      Colour alone distinguishes the groups.
 
 Two rows are worth dwelling on. `geometry_contrast` measures each
-encoding colour against the panel background, and the palette’s orange
-sits at 2.25 against white, below the 3:1 that WCAG asks of a graphical
-object ([World Wide Web Consortium, 2023](#ref-wcag22)).
-`redundant_encoding` is zero because nothing but colour tells the two
-treatments apart. Mapping shape as well, and letting the darker
-vermillion do the second colour’s work, clears both:
+encoding colour, as it is drawn, against the panel background. The
+palette’s orange falls below the 3:1 that WCAG asks of a graphical
+object ([World Wide Web Consortium, 2023](#ref-wcag22)) even when
+opaque, at 2.25:1, and further when drawn translucent, as these points
+are. `redundant_encoding` is zero because nothing but colour tells the
+two treatments apart. Mapping shape as well, letting the darker
+vermillion do the second colour’s work and drawing the points opaque
+clears both:
 
 ``` r
 
 mended <- ggplot(crop_yield, aes(fertiliser, yield, colour = treatment,
                                  shape = treatment)) +
-  geom_point(alpha = 0.7) +
+  geom_point() +
   scale_colour_manual(values = c("#005b96", "#d55e00")) +
   theme_depictr()
 

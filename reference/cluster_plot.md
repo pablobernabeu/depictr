@@ -16,7 +16,7 @@ cluster_plot(
   clusters = NULL,
   scale = TRUE,
   suggest_k = NULL,
-  k_range = 2:8,
+  k_range = NULL,
   hulls = TRUE,
   label_centers = TRUE,
   point_alpha = 0.8,
@@ -75,7 +75,11 @@ cluster_plot(
 
 - k_range:
 
-  Candidate values of `k` searched when `suggest_k` is set.
+  Candidate values of `k` searched when `suggest_k` is set. The default,
+  `NULL`, searches `1:8` for `"gap"` and `"wss"` and `2:8` for
+  `"silhouette"`, as
+  [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
+  does, so the gap statistic can suggest a single cluster.
 
 - hulls:
 

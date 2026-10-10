@@ -287,7 +287,10 @@ first design the simulation clears comfortably.</p>
 <span><span class="va">panel</span></span></code></pre></div>
 <p><img src="diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" alt="" width="672"></p>
 <p><code><a href="../reference/save_plot.html">save_plot()</a></code> writes it out at a print-ready 300 dpi by
-default, creating any missing directories along the way.</p>
+default, creating any missing directories along the way. A PDF or EPS
+embeds its fonts and a TIFF is LZW-compressed, as journals ask of
+submitted figures, and the help page, <code><a href="../reference/save_plot.html">?save_plot</a></code>, lists the
+formats PLOS, Nature and Elsevier accept.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/save_plot.html">save_plot</a></span><span class="op">(</span><span class="st">"figures/diagnostics.png"</span>, <span class="va">panel</span>, width <span class="op">=</span> <span class="fl">7</span>, height <span class="op">=</span> <span class="fl">3.2</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span></code></pre></div>
 </div>

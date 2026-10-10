@@ -12,7 +12,7 @@ error of the next, using the Tibshirani et al. heuristic).
 ``` r
 k_diagnostic(
   data,
-  k_range = 2:8,
+  k_range = NULL,
   method = c("silhouette", "wss", "gap"),
   cols = NULL,
   scale = TRUE,
@@ -30,11 +30,13 @@ k_diagnostic(
 
 - k_range:
 
-  Integer vector of candidate cluster counts to evaluate. Candidates the
-  chosen criterion cannot evaluate are skipped with a message naming
-  them: `k = 1` under `"silhouette"` (a lone cluster has no neighbouring
-  cluster to compare against, so the width is undefined), and any `k` at
-  or above the number of observations under every criterion.
+  Integer vector of candidate cluster counts to evaluate. The default,
+  `NULL`, searches `1:8` for `"gap"` and `"wss"` and `2:8` for
+  `"silhouette"`. Candidates the chosen criterion cannot evaluate are
+  skipped with a message naming them: `k = 1` under `"silhouette"` (a
+  lone cluster has no neighbouring cluster to compare against, so the
+  width is undefined), and any `k` at or above the number of
+  observations under every criterion.
 
 - method:
 
@@ -72,6 +74,15 @@ object showing the diagnostic value against `k`, with the suggested `k`
 marked and named in the subtitle. The underlying computation is attached
 as attributes: `attr(p, "k_table")` (a data frame with one row per `k`),
 `attr(p, "suggested")` (the chosen `k`) and `attr(p, "method")`.
+
+## Details
+
+Only the gap statistic can conclude that the data hold no clusters, by
+suggesting `k = 1`, and only when the search starts at 1, as it does by
+default. The elbow is the candidate farthest from the straight line
+joining the first and last points of the curve, so it is never the first
+or last candidate. A range therefore has to extend one step beyond any
+`k` the elbow should be able to choose.
 
 ## References
 

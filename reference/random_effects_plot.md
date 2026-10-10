@@ -25,7 +25,14 @@ random_effects_plot(
   Either a mixed model fitted with 'lme4' (`merMod`), or a data frame
   with one row per group level and columns such as `level`/`group`,
   `estimate`, and either `conf.low`/`conf.high` or `std.error`. An
-  optional `term` column facets the plot.
+  optional `term` column facets the plot. A model may have several
+  grouping factors and several terms per factor, correlated or not. The
+  forms `(1 + x | g)`, `(1 + x || g)` and `(1 | g) + (0 + x | g)` are
+  all drawn. The intervals are the conditional modes plus or minus the
+  normal quantile times the conditional standard deviations that
+  `lme4::ranef(condVar = TRUE)` reports. A model with one term in all is
+  drawn in a single panel labelled "Random effect", and otherwise each
+  term has a panel labelled "factor: term".
 
 - conf_level:
 

@@ -89,7 +89,8 @@ colourblind-safe <code><a href="depictr_palette.html">depictr_palette()</a></cod
 
 <dt id="arg-bayesian">bayesian<a class="anchor" aria-label="anchor" href="#arg-bayesian"></a></dt>
 <dd><p>A Bayesian model, a <code>posterior</code> draws object, a draws
-matrix/data frame, or a tidy data frame of posterior summaries.</p></dd>
+matrix/data frame, a tidy data frame of posterior summaries or a summary
+matrix such as <code>brms::fixef()</code> returns.</p></dd>
 
 
 <dt id="arg-conf-level">conf_level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
@@ -97,8 +98,10 @@ matrix/data frame, or a tidy data frame of posterior summaries.</p></dd>
 
 
 <dt id="arg-labels-interaction-intercept">labels, interaction, intercept<a class="anchor" aria-label="anchor" href="#arg-labels-interaction-intercept"></a></dt>
-<dd><p>See <code><a href="compare_models.html">compare_models()</a></code>.
-<code>intercept</code> defaults to <code>TRUE</code> here, matching the original behaviour.</p></dd>
+<dd><p>See <code><a href="compare_models.html">compare_models()</a></code>. On both paths,
+an unnamed <code>labels</code> vector takes the frequentist terms first, then any
+that only the Bayesian input holds. <code>intercept</code> defaults to <code>TRUE</code> here,
+matching the original behaviour.</p></dd>
 
 
 <dt id="arg-facet-scales">facet, scales<a class="anchor" aria-label="anchor" href="#arg-facet-scales"></a></dt>
@@ -143,12 +146,18 @@ here: when <code>bayesian</code> carries posterior <em>draws</em> (a <code>brms<
 <code>posterior</code> draws object, a draws matrix, or a long/wide draws data frame),
 the full posterior <em>distribution</em> is drawn per term (a 'ggdist' half-eye)
 and the frequentist point and confidence interval is overlaid at the same
-position. When <code>bayesian</code> is only a tidy table of posterior <em>summaries</em>
-(columns such as <code>term</code>, <code>estimate</code>, <code>conf.low</code>/<code>conf.high</code>, or the
-<code>Estimate</code>, <code>l-95% CI</code>, <code>u-95% CI</code> of <code>brms::fixef()</code>), the function shows the
-familiar two-source forest plot via <code><a href="compare_models.html">compare_models()</a></code>.</p>
+position. When <code>bayesian</code> is only a table of posterior <em>summaries</em>, the
+function shows the familiar two-source forest plot via <code><a href="compare_models.html">compare_models()</a></code>.
+It reads tidy columns (<code>term</code>, <code>estimate</code>, <code>conf.low</code>, <code>conf.high</code>), the
+<code>Estimate</code>, <code>Q2.5</code> and <code>Q97.5</code> of the matrix <code>brms::fixef()</code> returns, and the
+<code>l-95% CI</code> and <code>u-95% CI</code> of <code>summary(fit)$fixed</code>.</p>
 <p>Terms are aligned by their canonical display label, so the <code>brms</code>-style <code>b_</code>
-prefix is reconciled automatically against the frequentist term names.</p>
+prefix is reconciled automatically against the frequentist term names. Draws
+are read as in <code><a href="posterior_plot.html">posterior_plot()</a></code>, so a draws object holding <code>b_</code> parameters
+keeps only those, and two terms that would share a label are an error. With
+draws, only the terms both sides share are drawn, and a message names any
+dropped, such as a <code>sigma</code> in the posterior. The forest plot of summaries
+draws every term of either input.</p>
     </div>
 
     <div class="section level2">

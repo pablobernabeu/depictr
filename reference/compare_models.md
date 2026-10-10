@@ -57,13 +57,23 @@ compare_models(
 
 - order:
 
-  Order terms by their average estimate across sources: `"none"`,
-  `"ascending"` or `"descending"`.
+  Order of the terms, by their average estimate across sources.
+  `"ascending"` puts the smallest estimate at the bottom and the largest
+  at the top, so estimates increase up the axis. `"descending"` does the
+  reverse, and `"none"` keeps the terms in the order they first appear,
+  from top to bottom. The faceted layout (`facet = TRUE`) stacks its
+  panels the other way up.
 
 - labels:
 
-  Optional display labels (see
-  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)).
+  Optional display labels. An unnamed vector gives one label per term,
+  whatever `order` is. The terms are taken in the order they first
+  appear across the sources, each source in the order
+  [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md)
+  returns, after the intercept is dropped unless `intercept = TRUE`.
+  Terms drawn on one row, such as `stress` and brms's `b_stress`, take
+  one label. A named vector mapping raw term names to labels, such as
+  `c(soil_ph = "Soil pH")`, is safer.
 
 - interaction:
 

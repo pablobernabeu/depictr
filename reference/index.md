@@ -28,7 +28,7 @@ summaries.
 - [`group_comparison_plot()`](https://pablobernabeu.github.io/depictr/reference/group_comparison_plot.md)
   : Compare group means with confidence intervals
 - [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md)
-  : Gardner-Altman / Cumming estimation plot
+  : Cumming estimation plot
 - [`dumbbell_plot()`](https://pablobernabeu.github.io/depictr/reference/dumbbell_plot.md)
   : Dumbbell plot
 - [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md)
@@ -70,7 +70,7 @@ forecasting.
 - [`seasonal_plot()`](https://pablobernabeu.github.io/depictr/reference/seasonal_plot.md)
   : Seasonal-subseries (cycle) plot
 - [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)
-  : Forecast a seasonal series with STL plus seasonal-naive drift
+  : Forecast a seasonal series with STL and a random walk with drift
 
 ## Model estimates and inference
 

@@ -63,7 +63,9 @@ silhouette_plot(
 
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
 object. The per-observation silhouette table is attached as the
-attribute `"silhouette"` and the average width as `"avg_width"`.
+attribute `"silhouette"` and the average width as `"avg_width"`. The
+table's `cluster` and `neighbor` columns carry the assignments passed in
+`clusters`, as does each band label.
 
 ## Details
 

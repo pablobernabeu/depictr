@@ -85,7 +85,10 @@ confidence intervals (factor predictor) convey uncertainty.</p>
 
 
 <dt id="arg-predictor">predictor<a class="anchor" aria-label="anchor" href="#arg-predictor"></a></dt>
-<dd><p>Name of the focal predictor (string).</p></dd>
+<dd><p>Name of the focal predictor (string): a variable in the
+model's formula, or a model-frame name such as <code>"log(rainfall)"</code>, which
+stands for the one variable it transforms. A term built from several
+variables, such as <code>"I(rainfall * fertiliser)"</code>, is refused.</p></dd>
 
 
 <dt id="arg-conf-level">conf_level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
@@ -115,13 +118,33 @@ brand blue.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Predictions and standard errors come from <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">stats::predict()</a></code>; <code>glm</code>
+    <p>The prediction grid holds the variables the formula names, on their own
+scale, and <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">stats::predict()</a></code> re-applies each transformation to it. A model
+with terms such as <code>log(rainfall)</code>, <code>poly(fertiliser, 2)</code>, <code><a href="https://rdrr.io/r/splines/ns.html" class="external-link">splines::ns()</a></code>,
+<code><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale()</a></code>, <code><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor()</a></code> or <code><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I()</a></code> is therefore predicted as fitted, and the
+x-axis shows the raw variable. Typical values and the range of the focal
+predictor are taken over the rows the model was fitted to. A numeric
+variable that enters only through <code><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor()</a></code> is held at its most frequent
+value. A variable that enters only through a transformation is recovered
+from the data named in the model's call, so such a model fitted to
+workspace vectors without <code>data =</code> is refused. A term computed from
+statistics of its rows, such as <code>I(x - mean(x))</code>, is refused too, since
+<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> would compute it afresh over the grid. Centre such a variable in
+the data, or use <code><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale()</a></code>, which <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> re-applies as fitted.</p>
+<p>An offset, whether an <code><a href="https://rdrr.io/r/stats/offset.html" class="external-link">offset()</a></code> term or the <code>offset</code> argument, is held at
+its mean over the rows the model was fitted to, on the link scale. For a
+Poisson rate model with <code>offset(log(exposure))</code>, the line is the expected
+count at the geometric-mean exposure. The offset stays at its mean when the
+focal predictor enters it too, as in <code>log(exposure) + offset(log(exposure))</code>,
+so the line then shows the predictor's effect beyond the offset. The y-axis
+label ends in "at the mean offset".</p>
+<p>Predictions and standard errors come from <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">stats::predict()</a></code>; <code>glm</code>
 predictions are formed on the link scale and back-transformed, so a binomial
 model shows predicted probabilities. Mixed models fitted with
 <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lme4::lmer()</a></code>/<code><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">lme4::glmer()</a></code> are supported too: predictions use only the
-fixed effects (<code>re.form = NA</code>) and standard errors come from the fixed-effect
-design matrix and <code><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov()</a></code>. Works with <code>lm</code>, <code>glm</code> and <code>merMod</code>; other model
-classes are attempted on a best-effort basis.</p>
+fixed effects (as <code>re.form = NA</code> does) and standard errors come from the
+fixed-effect design matrix and <code><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov()</a></code>. Works with <code>lm</code>, <code>glm</code> and
+<code>merMod</code>; other model classes are attempted on a best-effort basis.</p>
     </div>
 
     <div class="section level2">

@@ -1,5 +1,443 @@
 # Changelog
 
+## depictr (development version)
+
+### Figures that misreported the data
+
+- [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md),
+  and `group_comparison_plot(differences = TRUE)` which calls it, failed
+  in a fresh R session with “Can’t find method for generic `/(e1, e2)`”,
+  or with “non-numeric argument to binary operator” under ggplot2 3.5.
+  The two panels were stacked with patchwork’s `/` operator, which
+  exists only once patchwork has been loaded, and nothing in depictr
+  loaded it. The panels are now composed with
+  [`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html),
+  and depictr imports patchwork, so
+  [`library(depictr)`](https://pablobernabeu.github.io/depictr/) loads
+  it.
+
+- [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md)
+  drew the differences out of line with the groups they belong to. The
+  lower panel had one column fewer than the upper and spread its columns
+  across the full width, so with reference North, the East difference
+  sat beneath North, and with two groups, the single difference sat
+  midway between them. Every group now keeps its column in both panels,
+  and the reference’s column in the lower panel is left empty.
+  `group_comparison_plot(differences = TRUE)` is fixed with it. The
+  function is also described for what it draws, a Cumming estimation
+  plot with the differences stacked beneath the data. The claim that
+  zero lines up with the reference group’s mean has been removed, since
+  the stacked panels have independent axes. The caption now writes a
+  round number of resamples in full, as 100,000 where it printed 1e+05.
+
+- [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)
+  attached an unnamed `labels` vector to the wrong coefficients. The
+  labels were assigned after the terms had been reversed or sorted for
+  display, so in `lm(yield ~ rainfall + fertiliser + soil_ph)` soil pH
+  was labelled ‘Rainfall’. An unnamed vector is now bound to the terms
+  in model order before any reordering.
+  [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md)
+  and
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  counted one row per term and source, or one per posterior draw, and so
+  refused a vector with one label per term. Both now accept one, read
+  with the terms in the order they first appear. Named labels are
+  unchanged and remain the safer form. The documentation of `order` now
+  says which end the largest estimate lands at.
+
+- [`model_fit_table()`](https://pablobernabeu.github.io/depictr/reference/model_fit_table.md)
+  and the
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
+  subtitle misreported R² for `glm` models. McFadden’s ratio was applied
+  to every family, so a Gaussian `glm` could report a negative value and
+  a quasi-likelihood family reported `NA`. The null model was refitted
+  with [`update()`](https://rdrr.io/r/stats/update.html). That used more
+  rows than the model when a predictor had missing values, dropped an
+  offset written in the formula, put an intercept in the null of a model
+  fitted without one and gave `NA` for a model fitted inside a function.
+  Every `glm`, including quasi-likelihood and negative binomial fits,
+  now reports the deviance R², 1 - D/D0, computed from the deviances the
+  fit already holds. It equals the ordinary R² for a Gaussian model with
+  the identity link and McFadden’s R² for binary logistic regression, so
+  a binary logistic value changes only where the old refit went wrong.
+  Values for Poisson, grouped binomial, Gamma and other models change by
+  definition. The
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
+  subtitle now calls it the deviance R², where it said pseudo-R².
+
+- For mixed models fitted by REML with
+  [`lme4::lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html),
+  [`model_fit_table()`](https://pablobernabeu.github.io/depictr/reference/model_fit_table.md)
+  now takes AIC, BIC and the log-likelihood from a maximum-likelihood
+  refit and says so in a message. REML criteria cannot be compared
+  between models with different fixed effects, which is the comparison
+  the model-estimates vignette makes. If a refit fails, a warning says
+  so and that model’s criteria are `NA`. The `R2` column stays `NA` for
+  mixed models, as the help page now documents.
+
+- A `glm` fitted with `na.action = na.exclude` broke the classification
+  and diagnostic plots. Its fitted values are padded with `NA` to the
+  length of the data while its response is not, and the plots paired the
+  two. The ROC, precision-recall, threshold, gain and lift plots and the
+  confusion matrix failed, and
+  [`calibration_plot()`](https://pablobernabeu.github.io/depictr/reference/calibration_plot.md)
+  silently dropped bins and drew the rest with other rows’ outcomes. In
+  the Q-Q panel of
+  [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md),
+  the quantile residuals set each response against another row’s fitted
+  value, and for a Gaussian model they were all `NA`, so the panel was
+  empty. All of them now use the model’s own unpadded components.
+  [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
+  and
+  [`influence_plot()`](https://pablobernabeu.github.io/depictr/reference/influence_plot.md)
+  also leave the excluded rows out of their frames, for an `lm` as for a
+  `glm`. They no longer warn about removing those rows, and the 2p/n
+  leverage line of
+  [`influence_plot()`](https://pablobernabeu.github.io/depictr/reference/influence_plot.md)
+  no longer counts them.
+
+- The quantile residuals in the Q-Q panel of
+  [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
+  ignored prior weights in Gaussian and Gamma models. Every observation
+  was given the same scale, so a correctly specified weighted model
+  showed spurious departures from the line. The weights now scale each
+  observation’s variance, as they do in the fit.
+
+- A brms posterior passed as a `posterior` draws object was read as a
+  plain table.
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  silently pooled `b_Intercept` with `Intercept`, the intercept brms
+  reports for centred predictors, into one slab. It also drew the
+  sampler’s log density and every random effect as parameters.
+  [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
+  stopped with an error about duplicated factor levels. Draws objects
+  now keep their population-level (`b_`) parameters, named without the
+  prefix as for a brms fit, with a message naming what was dropped. A
+  `labels` key for one of them is written without the prefix too. In
+  both functions, two parameters whose draws would share a label are now
+  an error, and `lp__` and `lprior` are never drawn as parameters,
+  whatever form the draws take. For a `stanreg` fit, the group-level
+  `b[...]` and `Sigma[...]` draws are no longer read as fixed effects
+  either.
+
+- When `bayesian` holds draws,
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  now draws only the terms both inputs share, and a message names any it
+  dropped. A `sigma` in the posterior, or a frequentist term with no
+  posterior, no longer takes a row of its own. Inputs that share no
+  terms are an error.
+
+- A `brms::fixef()` matrix was read as draws, so it came out as four
+  ‘parameters’ named after its columns.
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  now takes the summary path for it, and
+  [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md),
+  which needs draws, refuses it. The summary path also no longer warns
+  about label keys you never supplied.
+
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  read the `status` coding separately in each group. Under the
+  [`survival::Surv()`](https://rdrr.io/pkg/survival/man/Surv.html) 1/2
+  convention, a group whose subjects were all censored (all `1`) fits
+  the 0/1 convention as well, so it was read as a group in which every
+  subject had the event, and its curve fell to zero. Codings that mixed
+  the two conventions across groups were accepted silently. The coding
+  is now read once, over all observations.
+
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  silently misread a factor `status`. The factor was coerced to its
+  level codes and read under the 1/2 convention, so whichever level
+  sorted first was taken as censored, whatever it meant. A character
+  `status` became `NA` throughout, with only a coercion warning, and
+  drew a flat curve at one. Both are now refused with an error that says
+  to recode the indicator first.
+
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  ignored its `group` and `status` arguments when `time` was a data
+  frame. It read both from conventionally named columns only (`group`,
+  `strata` or `arm`, and `status` or `event`), so
+  `survival_plot(df, group = "treatment")` drew a single pooled curve
+  with no legend, log-rank test or risk-table rows. A column name or a
+  vector with one entry per row is now honoured for both, and takes
+  precedence over the conventionally named column. A name that matches
+  no column is an error.
+
+- The number-at-risk table of
+  [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  could miscount at its default breaks.
+  [`pretty()`](https://rdrr.io/r/base/pretty.html) returns multiples of
+  a binary floating-point step, so with follow-up up to 1.2 the break
+  labelled 0.6 was 0.6000000000000001, and a subject followed up to
+  exactly 0.6 was left out of the count there. A last break equal to the
+  longest follow-up was lost the same way. The breaks are now rounded to
+  their step before the counts are taken.
+
+- [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
+  wrote files that fail the checks journals run on submitted figures. An
+  EPS left out every translucent element, including all the points and
+  the confidence band of the first
+  [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md)
+  example, with only a terse device warning to show for it, and it named
+  its fonts without embedding them. A PDF did not embed its fonts
+  either. A TIFF was uncompressed: 8.1 MiB at the default 7 by 4.5
+  inches, and more than the 10 MB PLOS allows at the largest figure size
+  it accepts. A transparent background, such as
+  [`theme_void()`](https://ggplot2.tidyverse.org/reference/ggtheme.html)
+  leaves, could also give the TIFF the alpha channel PLOS refuses. PDF
+  and EPS files now go through the cairo devices, which embed the fonts.
+  An EPS rasterises its translucent layers, and whatever they overlap,
+  at 600 dpi or more, with a message when it does. A TIFF is now
+  LZW-compressed and drawn on white unless `bg` is given. On a Mac
+  without ragg, it is drawn by the cairo TIFF device, because the
+  default quartz one ignores compression. A `device` or device argument
+  passed to
+  [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
+  still wins. Without cairo, the old devices are used, with a message or
+  a warning saying what the file lacks. R for macOS from CRAN loads
+  cairo only where XQuartz is installed, so on a Mac without it a PDF or
+  EPS is written this way, and a TIFF is left uncompressed unless ragg
+  is installed.
+
+- [`effects_plot()`](https://pablobernabeu.github.io/depictr/reference/effects_plot.md),
+  [`interaction_plot()`](https://pablobernabeu.github.io/depictr/reference/interaction_plot.md)
+  and
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
+  failed on any model with a transformed term
+  ([`log()`](https://rdrr.io/r/base/Log.html),
+  [`poly()`](https://rdrr.io/r/stats/poly.html), `ns()`,
+  [`scale()`](https://rdrr.io/r/base/scale.html),
+  [`factor()`](https://rdrr.io/r/base/factor.html),
+  [`I()`](https://rdrr.io/r/base/AsIs.html)) or an offset. Where a
+  transformed term sat beside its raw variable, they drew a flat effect
+  line or coincident interaction lines without complaint. The prediction
+  grid is now built from the raw variables, so
+  [`predict()`](https://rdrr.io/r/stats/predict.html) re-applies every
+  transformation, and offsets are held at their sample mean on the link
+  scale, as the y-axis label now says. A model-frame name such as
+  `"log(rainfall)"` stands for the variable it transforms, and the
+  x-axis shows that variable.
+
+- The raw values behind a transformed term come from the data named in
+  the model’s call. A model fitted to workspace vectors without `data =`
+  is therefore refused, where it could silently plot its fitted values
+  against the grid, and so is a data frame that has changed since the
+  fit or a formula that reads one with `$`. A term computed from
+  statistics of its rows, such as `I(x - mean(x))`, is refused as well,
+  since [`predict()`](https://rdrr.io/r/stats/predict.html) would
+  compute it afresh over the grid. Beside its raw variable, such a term
+  used to shift the line without complaint.
+
+- [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
+  judged every `glm` by normal-theory panels. A correctly specified
+  logistic model, simulated with 400 observations, put about a third of
+  its standardised deviance residuals outside the Q-Q band, the picture
+  of a broken model. A `glm` now gets the binned-residual and
+  quantile-residual panels that
+  [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
+  already used, and
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
+  gains the same `glm_panels` and `seed` arguments. `glm_panels = FALSE`
+  restores the old panels. The help page of
+  [`qq_plot()`](https://pablobernabeu.github.io/depictr/reference/qq_plot.md)
+  now says that the standardised deviance residuals of a non-Gaussian
+  `glm` are not expected to be normal.
+
+- [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md),
+  and the forecast overlay of
+  [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md),
+  drew prediction intervals far too narrow. In rolling-origin backtests
+  on eight classic series, the nominal 95% band covered about 60% of
+  one-step-ahead outcomes. The documentation credited its square-root
+  widening to seasonal naive forecasting, whose variance does not grow
+  that way. Forecasts now come from a random walk with drift on the
+  STL-seasonally-adjusted series, with the last seasonal cycle added
+  back, which reproduces
+  `forecast::stlf(method = "rwdrift", s.window = "periodic")`. A new
+  `lambda` argument in both functions applies a Box-Cox (or log)
+  transformation for a seasonal swing that grows with the level, and a
+  caption on the overlay names the interval and the method. A series of
+  exactly two cycles now gets the package’s own message, and
+  [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md)
+  gains `s_window`. The vignette’s claim that STL lets the seasonal
+  component evolve held only for a window this release exposes for the
+  first time.
+
+- [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
+  drew the forecast of a numeric `x` in the wrong place. The forecaster
+  counted time in cycles from 1, while the history sits at the
+  observation index or at the supplied `time`. The overlay therefore
+  jumped back towards the start of the axis, and on a `Date` axis it
+  landed in the year 4. The forecast now continues the history’s own
+  axis, one typical step at a time. An unsorted `time` is also put in
+  order before forecasting, as it already was for the moving average.
+
+- [`pca_plot()`](https://pablobernabeu.github.io/depictr/reference/pca_plot.md)
+  now fixes the aspect ratio, so the angles drawn between the loading
+  arrows are their angles in loading space whatever the size of the
+  device. The panel’s height and width follow the ranges of its axes, so
+  a figure of another shape gains blank space around the panel. The
+  arrows and their labels are drawn in a neutral dark grey (`grey20`) in
+  place of the accent, which is also the palette’s fourth colour and so
+  tied the variables to the fourth group. A misspelt `group` column, a
+  column name passed with a `prcomp` object and a `group` vector of the
+  wrong length are now errors. The first put one point in a level named
+  after the misspelling and the rest in `NA`. The second put every point
+  in one level named after the column, and the third was padded with
+  `NA` or recycled in silence. `group` also takes an unquoted column
+  name, as elsewhere in the package. A `prcomp` object fitted with
+  `retx = FALSE` has no scores to draw, and it is now refused with a
+  message that says so.
+
+- [`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md)
+  recoded the cluster labels it was given to 1, 2, 3 and so on, so a
+  clustering labelled `"low"`, `"mid"` and `"high"`, or coded 2, 5 and
+  9, came back with other names in the band labels and in the attached
+  `"silhouette"` table. The labels passed in are now kept, and the
+  table’s `neighbor` column is a factor of them.
+
+- [`random_effects_plot()`](https://pablobernabeu.github.io/depictr/reference/random_effects_plot.md)
+  failed for any model with more than one random-effect term per
+  grouping factor fitted without a correlation, `(1 + x || g)` for
+  instance. The same error, “incorrect number of dimensions”, stopped
+  split terms such as `(1 | g) + (0 + x | g)` and their `glmer()`
+  equivalents. It now reads lme4’s conditional standard deviations for
+  every model shape. For a correlated model, they equal the square roots
+  of the diagonal it used before, so those intervals are unchanged. lme4
+  is now suggested at version 1.1-19 or later. Conditional variances for
+  several terms per factor arrived in lme4 1.1-18, and 1.1-19 revised
+  the data-frame method that reads them.
+
+- [`power_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/power_curve_plot.md)
+  reads power tables with several curves, one per effect or design, and
+  draws one line each, told apart by colour and line type. It joined
+  them into a single zig-zag before. An `effect`, `param` or `term`
+  column with more than one level separates the curves, with a message
+  naming the columns used, and rows that share a sample size with no
+  such column are now an error. It recognises `n_subject` and
+  `<power>_lo`/`<power>_hi` columns such as pilotr’s, so the output of
+  pilotr’s `power_curve_mixed()` plots as it is, with its band. It gains
+  `n`, `power`, `group`, `lower`, `upper` and `y_lab`, appended after
+  the existing arguments so that positional calls keep working. The
+  y-axis title is “Power” for the usual power columns and the column’s
+  name otherwise, so a decision probability such as pilotr’s
+  `p_meaningful` is not labelled as power.
+
+### Degenerate input
+
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  truncated a non-integer status code, so `c(0, 0.5, 1)` was read as two
+  censored observations and an event. Non-integer codes are now refused
+  with the existing coding message.
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  kept an arm whose every `status` was missing when `group` was a
+  factor. The arm stayed in the legend with no curve and a row of zeros
+  in the risk table, and `logrank = TRUE` failed with an error that did
+  not say why. The arm is now dropped with the missing statuses, as it
+  already was for a character `group`.
+
+### Auditing a finished figure
+
+- [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  measured all text against the plot background, so text on a coloured
+  facet strip or legend box was judged against a background it is not
+  drawn on: white strip text on a dark strip failed and unreadable grey
+  strip text passed. Each text is now measured against its own
+  background, with a translucent fill taken as the colour it shows over
+  what lies beneath it. Large text (18 pt, or 14 pt bold, as printed) is
+  held to the 3:1 that WCAG asks of it, where it used to be held to
+  4.5:1. The `text_contrast` row reports the text that falls furthest
+  short of its own threshold and gives that threshold, and its detail
+  names the text’s printed size and weight. A translucent plot or panel
+  background is also measured as the colour it shows. Its alpha used to
+  be dropped, so `geometry_contrast` moves for such a figure. The
+  relative-luminance code now cites the current WCAG 2.2 definition and
+  its 0.04045 breakpoint, which changes no ratio.
+- [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  measured translucent marks and text as if they were opaque, so a
+  figure could pass contrast, colour-vision and greyscale checks that
+  its drawn colours fail. The ‘mended’ example in the Get started
+  vignette was one: its points, drawn at alpha 0.7, passed the geometry
+  check at 3.87:1, and the vermillion a reader sees reaches 2.56:1.
+  Colours are now composited over their background with the alpha each
+  geom applies, outlines drawn opaque are credited, and the colours of
+  each aesthetic are compared among themselves. A translucent colour or
+  text is named in the detail with its alpha and the colour it is drawn
+  as, and the separability rows say whether their closest pair are
+  colours or fill colours. Verdicts on translucent figures can change in
+  either direction. The vignette’s example now draws its points opaque.
+
+### Metadata and documentation
+
+- The declared ggplot2 floor rises from 3.5.0 to 3.5.2. The current
+  patchwork cannot load against ggplot2 3.5.0 or 3.5.1, so every
+  function that composes panels failed on the floor the package
+  declared:
+  [`arrange_plots()`](https://pablobernabeu.github.io/depictr/reference/arrange_plots.md),
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md),
+  [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md),
+  [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md),
+  [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md),
+  [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md)
+  and `survival_plot(risk_table = TRUE)`. On ggplot2 3.5.x,
+  [`pca_plot()`](https://pablobernabeu.github.io/depictr/reference/pca_plot.md)
+  and
+  [`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md)
+  also warned about an unknown `linewidth` and drew borders round their
+  labels. They now name the border argument each ggplot2 version
+  understands and draw no border on either. The reference lines of
+  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  and
+  [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
+  no longer warn about an unknown `inherit.aes` on ggplot2 3.5.x. The
+  floors job in continuous integration now also tests the floor against
+  the newest patchwork, and runs every example with warnings treated as
+  errors.
+
+- ragg is listed in Suggests.
+  [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
+  asks whether it is installed when it chooses a device for a TIFF, and
+  `R CMD check` warns about a package looked up that way unless the
+  package declares it.
+
+### Changed defaults
+
+- The gap statistic’s default search in
+  [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
+  and `cluster_plot(suggest_k = "gap")` could not return `k = 1`, so it
+  reported clusters in pure noise (`k = 2` for 20 of 20 seeded Gaussian
+  data sets). `k_range` now defaults to `NULL`, which searches `1:8` for
+  the gap and elbow criteria and `2:8` for the silhouette, as before. A
+  suggestion made with the old default can change, so pass
+  `k_range = 2:8` to reproduce it. The help pages now say that the elbow
+  never chooses the first or last candidate.
+
+- `standardise = TRUE` in
+  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
+  and so the default
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md),
+  multiplied every model-matrix column by its standard deviation. That
+  made a factor contrast depend on how the groups happened to be
+  balanced: one true effect of 1 came out as 0.52, 0.43 or 0.23 with
+  50%, 20% or 5% of observations in the group. It also scaled an
+  interaction by the spread of a product column, 265 for
+  `rainfall:treatment` in the crop-yield model. Continuous inputs are
+  now scaled by their standard deviation, and factor, logical and
+  two-valued inputs such as 0/1 are left as they are (Gelman, 2008). An
+  interaction is scaled through its continuous inputs, so
+  `rainfall:treatment` becomes the change in the rainfall slope per SD
+  of rainfall. The new `sd_multiple = 2` gives Gelman’s two-SD
+  convention. [`poly()`](https://rdrr.io/r/stats/poly.html), `ns()` and
+  other matrix-valued terms are left unscaled with a message. An
+  interaction of continuous inputs draws a warning unless they are all
+  centred, because each main effect is a slope at zero on the other
+  input. The axis label adds “(contrasts unscaled)” when a contrast is
+  drawn, and the
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
+  panel is titled “Coefficients (per SD of continuous predictors)”. The
+  help page and the model-estimates vignette no longer claim that the
+  standardised magnitudes are comparable.
+
 ## depictr 0.3.0
 
 CRAN release: 2026-09-01

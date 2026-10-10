@@ -113,12 +113,22 @@ names of <code>...</code>.</p></dd>
 
 
 <dt id="arg-order">order<a class="anchor" aria-label="anchor" href="#arg-order"></a></dt>
-<dd><p>Order terms by their average estimate across sources:
-<code>"none"</code>, <code>"ascending"</code> or <code>"descending"</code>.</p></dd>
+<dd><p>Order of the terms, by their average estimate across sources.
+<code>"ascending"</code> puts the smallest estimate at the bottom and the largest at
+the top, so estimates increase up the axis. <code>"descending"</code> does the
+reverse, and <code>"none"</code> keeps the terms in the order they first appear, from
+top to bottom. The faceted layout (<code>facet = TRUE</code>) stacks its panels the
+other way up.</p></dd>
 
 
 <dt id="arg-labels">labels<a class="anchor" aria-label="anchor" href="#arg-labels"></a></dt>
-<dd><p>Optional display labels (see <code><a href="coefficient_plot.html">coefficient_plot()</a></code>).</p></dd>
+<dd><p>Optional display labels. An unnamed vector gives one label per
+term, whatever <code>order</code> is. The terms are taken in the order they first
+appear across the sources, each source in the order <code><a href="tidy_estimates.html">tidy_estimates()</a></code>
+returns, after the intercept is dropped unless <code>intercept = TRUE</code>. Terms
+drawn on one row, such as <code>stress</code> and brms's <code>b_stress</code>, take one label.
+A named vector mapping raw term names to labels, such as
+<code>c(soil_ph = "Soil pH")</code>, is safer.</p></dd>
 
 
 <dt id="arg-interaction">interaction<a class="anchor" aria-label="anchor" href="#arg-interaction"></a></dt>

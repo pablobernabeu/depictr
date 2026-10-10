@@ -17,6 +17,7 @@ timeseries_plot(
   forecast = NULL,
   frequency = NULL,
   level = 0.95,
+  lambda = NULL,
   palette = NULL,
   point = FALSE,
   title = NULL,
@@ -55,14 +56,17 @@ timeseries_plot(
 
   Optional forecast overlay for a single (non-grouped) series. Either an
   integer horizon (number of future steps) to forecast with the built-in
-  STL + seasonal-naive-with-drift method (see
+  STL plus random walk with drift (see
   [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)),
   or a pre-computed forecast supplied as a data frame with columns
   `time`, `fit` and (optionally) `lwr`/`upr`, for instance from a fitted
   [`forecast::forecast()`](https://generics.r-lib.org/reference/forecast.html)
   object. The point forecast continues the line and a shaded
-  prediction-interval ribbon, which widens with the horizon, is drawn
-  behind it.
+  prediction-interval ribbon is drawn behind it. The built-in forecast
+  is captioned with its coverage and method, and its band widens with
+  the horizon on the scale it is made on (see `lambda`). For a numeric
+  `x`, it is made from the values in time order and continues the
+  history's own time axis, one typical step at a time.
 
 - frequency:
 
@@ -73,6 +77,13 @@ timeseries_plot(
 
   Prediction-interval coverage for the built-in forecast (a single
   number strictly between 0 and 1, e.g. `0.95`).
+
+- lambda:
+
+  Optional Box-Cox transformation for the built-in forecast, passed to
+  [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md).
+  `0` forecasts on the log scale, which suits a series whose seasonal
+  swing grows with its level.
 
 - palette:
 
@@ -104,6 +115,7 @@ object.
 timeseries_plot(AirPassengers, rolling = 12,
                 title = "Air passengers", y_lab = "Passengers")
 
-# 24-month forecast with a 90% prediction interval
-timeseries_plot(AirPassengers, forecast = 24, level = 0.9)
+# 24-month forecast with a 90% prediction interval, made on the log scale
+# because the seasonal swing grows with the number of passengers
+timeseries_plot(AirPassengers, forecast = 24, level = 0.9, lambda = 0)
 ```

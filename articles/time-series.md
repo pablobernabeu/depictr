@@ -50,8 +50,9 @@ decompose_plot(indoor_ts, confidence = TRUE, title = "Indoor sales, decomposed")
 
 ![](time-series_files/figure-html/unnamed-chunk-3-1.png)
 
-Classical decomposition instead holds the seasonal component fixed
-across the whole series, where STL lets it evolve from year to year.
+Classical decomposition holds the seasonal component fixed across the
+whole series, and so does STL ([Cleveland et al.,
+1990](#ref-cleveland1990)) with its default `s_window = "periodic"`.
 
 ``` r
 
@@ -60,6 +61,21 @@ decompose_plot(indoor_ts, method = "classical",
 ```
 
 ![](time-series_files/figure-html/unnamed-chunk-4-1.png)
+
+A numeric `s_window` lets the STL seasonal component change from year to
+year. It is the number of consecutive years used to estimate each
+seasonal value, an odd number of at least 7, so a smaller window lets
+the pattern change faster. The bundled series has a fixed seasonal
+pattern by construction, so the effect shows better on `AirPassengers`,
+whose seasonal swing grows with the number of passengers.
+
+``` r
+
+decompose_plot(AirPassengers, s_window = 13,
+               title = "Air passengers, with a 13-year seasonal window")
+```
+
+![](time-series_files/figure-html/unnamed-chunk-5-1.png)
 
 ## Autocorrelation
 
@@ -73,14 +89,14 @@ spikes at multiples of twelve are the annual seasonality.
 acf_plot(indoor_ts)
 ```
 
-![](time-series_files/figure-html/unnamed-chunk-5-1.png)
+![](time-series_files/figure-html/unnamed-chunk-6-1.png)
 
 ``` r
 
 acf_plot(indoor_ts, type = "partial")
 ```
 
-![](time-series_files/figure-html/unnamed-chunk-6-1.png)
+![](time-series_files/figure-html/unnamed-chunk-7-1.png)
 
 ## The seasonal pattern up close
 
@@ -97,7 +113,7 @@ do.
 seasonal_plot(indoor_ts, title = "Indoor sales: monthly subseries")
 ```
 
-![](time-series_files/figure-html/unnamed-chunk-7-1.png)
+![](time-series_files/figure-html/unnamed-chunk-8-1.png)
 
 With `style = "season"` every year becomes its own line over the months
 on a shared axis, which is handy for spotting an unusual year.
@@ -108,15 +124,17 @@ seasonal_plot(indoor_ts, style = "season",
               title = "Indoor sales: one line per year")
 ```
 
-![](time-series_files/figure-html/unnamed-chunk-8-1.png)
+![](time-series_files/figure-html/unnamed-chunk-9-1.png)
 
 ## Forecasting
 
 [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)
-is a lightweight, dependency-free forecaster: it decomposes the series
-with STL, extrapolates the recent trend, carries the seasonal pattern
-forward and returns point forecasts with prediction intervals that widen
-with the horizon.
+forecasts by decomposition ([Hyndman & Athanasopoulos, 2021, Section
+5.7](#ref-hyndman2021)). It removes the seasonal component that STL
+estimates, forecasts what remains with a random walk with drift and adds
+the last year’s seasonal pattern back. Its prediction intervals are
+those of the random walk with drift, which widen with the horizon
+([Hyndman & Athanasopoulos, 2021, Section 5.5](#ref-hyndman2021)).
 
 ``` r
 
@@ -125,17 +143,18 @@ head(fc)
 ```
 
           time      fit      lwr      upr
-    1 2024.000 325.4647 308.9359 341.9935
-    2 2024.083 344.0097 320.6345 367.3850
-    3 2024.167 355.7215 327.0927 384.3502
-    4 2024.250 368.7429 335.6853 401.8005
-    5 2024.333 361.4311 324.4716 398.3906
-    6 2024.417 355.8928 315.4057 396.3799
+    1 2024.000 316.3669 291.6190 341.1148
+    2 2024.083 334.7537 299.5126 369.9948
+    3 2024.167 346.3072 302.8512 389.7631
+    4 2024.250 359.1704 308.6539 409.6869
+    5 2024.333 351.7003 294.8458 408.5547
+    6 2024.417 346.0037 283.3144 408.6930
 
 Passing an integer horizon straight to
 [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
 overlays that forecast on the history: the point forecast continues the
-line and the shaded ribbon shows the (growing) 90% prediction interval.
+line and the shaded ribbon shows the (growing) 90% prediction interval,
+named in the caption.
 
 ``` r
 
@@ -144,10 +163,41 @@ timeseries_plot(indoor_ts, forecast = 18, level = 0.9,
                 y_lab = "Units")
 ```
 
-![](time-series_files/figure-html/unnamed-chunk-10-1.png)
+![](time-series_files/figure-html/unnamed-chunk-11-1.png)
 
-For a fully specified statistical model, fit it yourself (for example
-with
+The model assumes a seasonal pattern that adds to the level and stays
+the same from year to year. Its band treats that pattern as known, which
+leaves out the uncertainty in estimating it. In a rolling-origin
+backtest on five classic series whose seasonal swing does not grow with
+their level, the nominal 95% band covered 92% of one-step-ahead
+outcomes. From three to 12 steps ahead, it covered 99%. The band
+therefore runs somewhat narrow at the shortest horizons and wide further
+out, where the uncertainty of a random walk keeps growing while these
+series stay close to their trend. When the swing does grow with the
+level, as it does for `AirPassengers`, set `lambda = 0` to forecast the
+logarithm. The forecast comes back on the original scale, where the
+point forecast is the median of the forecast distribution ([Hyndman &
+Athanasopoulos, 2021, Section 5.6](#ref-hyndman2021)).
+
+``` r
+
+timeseries_plot(AirPassengers, forecast = 24, level = 0.9, lambda = 0,
+                title = "Air passengers with a 24-month forecast",
+                y_lab = "Passengers")
+```
+
+![](time-series_files/figure-html/unnamed-chunk-12-1.png)
+
+For a different model, fit it yourself (for example with
 [`forecast::forecast()`](https://generics.r-lib.org/reference/forecast.html))
 and pass the resulting `time`/`fit`/`lwr`/`upr` columns to
 `timeseries_plot(forecast = )` as a data frame.
+
+## References
+
+Cleveland, R. B., Cleveland, W. S., McRae, J. E., & Terpenning, I.
+(1990). STL: A seasonal-trend decomposition procedure based on loess.
+*Journal of Official Statistics*, *6*(1), 3–73.
+
+Hyndman, R. J., & Athanasopoulos, G. (2021). *Forecasting: Principles
+and practice* (3rd ed.). OTexts. <https://otexts.com/fpp3/>

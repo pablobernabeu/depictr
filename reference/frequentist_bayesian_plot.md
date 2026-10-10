@@ -38,7 +38,8 @@ frequentist_bayesian_plot(
 - bayesian:
 
   A Bayesian model, a `posterior` draws object, a draws matrix/data
-  frame, or a tidy data frame of posterior summaries.
+  frame, a tidy data frame of posterior summaries or a summary matrix
+  such as `brms::fixef()` returns.
 
 - conf_level:
 
@@ -48,7 +49,9 @@ frequentist_bayesian_plot(
 
   See
   [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md).
-  `intercept` defaults to `TRUE` here, matching the original behaviour.
+  On both paths, an unnamed `labels` vector takes the frequentist terms
+  first, then any that only the Bayesian input holds. `intercept`
+  defaults to `TRUE` here, matching the original behaviour.
 
 - facet, scales:
 
@@ -93,15 +96,22 @@ carries posterior *draws* (a `brms`/`rstanarm` fit, a `posterior` draws
 object, a draws matrix, or a long/wide draws data frame), the full
 posterior *distribution* is drawn per term (a 'ggdist' half-eye) and the
 frequentist point and confidence interval is overlaid at the same
-position. When `bayesian` is only a tidy table of posterior *summaries*
-(columns such as `term`, `estimate`, `conf.low`/`conf.high`, or the
-`Estimate`, `l-95% CI`, `u-95% CI` of `brms::fixef()`), the function
-shows the familiar two-source forest plot via
+position. When `bayesian` is only a table of posterior *summaries*, the
+function shows the familiar two-source forest plot via
 [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md).
+It reads tidy columns (`term`, `estimate`, `conf.low`, `conf.high`), the
+`Estimate`, `Q2.5` and `Q97.5` of the matrix `brms::fixef()` returns,
+and the `l-95% CI` and `u-95% CI` of `summary(fit)$fixed`.
 
 Terms are aligned by their canonical display label, so the `brms`-style
 `b_` prefix is reconciled automatically against the frequentist term
-names.
+names. Draws are read as in
+[`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md),
+so a draws object holding `b_` parameters keeps only those, and two
+terms that would share a label are an error. With draws, only the terms
+both sides share are drawn, and a message names any dropped, such as a
+`sigma` in the posterior. The forest plot of summaries draws every term
+of either input.
 
 ## Examples
 

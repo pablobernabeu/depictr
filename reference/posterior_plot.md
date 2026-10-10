@@ -68,6 +68,8 @@ posterior_plot(
   `c(conditionunrelated = "condition")`. Unmatched parameters fall back
   to
   [`format_terms()`](https://pablobernabeu.github.io/depictr/reference/format_terms.md).
+  For a `brms` fit, or a draws object holding `b_` parameters, the names
+  are given without the `b_` prefix.
 
 - reference_line:
 
@@ -132,7 +134,18 @@ Draws may be supplied in many shapes: a fitted Bayesian model (`brms` or
 with one column of draws per parameter, or a long data frame (a
 parameter column and a value column). For fitted models only the
 fixed-effect (population) parameters are kept, with the `brms` `b_`
-prefix stripped.
+prefix stripped. A draws object that holds `b_` parameters, as
+[`posterior::as_draws_df()`](https://mc-stan.org/posterior/reference/draws_df.html)
+returns for a `brms` fit, is read the same way, with a message naming
+the variables it dropped. Pass it through
+[`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) to keep
+the other variables, as a model of your own whose names happen to start
+with `b_` may need. The log densities `lp__` and `lprior` are never
+drawn as parameters. Two parameters that would share a display label,
+such as the `b_Intercept` and centred `Intercept` of a plain table of
+`brms` draws, are an error until one is renamed with `labels`. A matrix
+of posterior summaries, such as `brms::fixef()` returns, holds no draws
+and is refused.
 
 The slab styles use the 'ggdist' package. When 'ggdist' is not installed
 the function falls back to the point-and-nested-interval display

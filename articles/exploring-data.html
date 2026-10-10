@@ -189,12 +189,12 @@ density per group:</p>
 <h2 id="estimation-plots-effect-size-rather-than-a-p-value">Estimation plots: effect size rather than a p-value<a class="anchor" aria-label="anchor" href="#estimation-plots-effect-size-rather-than-a-p-value"></a>
 </h2>
 <p>An <em>estimation plot</em> puts the effect size and its uncertainty
-at the centre of the comparison. <code><a href="../reference/estimation_plot.html">estimation_plot()</a></code> draws
-the classic Gardner-Altman two-group plot: the raw data with group means
-on top, and the mean difference with a bootstrap confidence interval
-beneath, aligned so a difference of zero sits under the reference
-group’s mean. With two groups it also annotates a standardised effect
-size (Hedges’ <em>g</em> by default).</p>
+at the centre of the comparison. <code><a href="../reference/estimation_plot.html">estimation_plot()</a></code> draws a
+Cumming estimation plot, with the raw data and group means on top.
+Beneath them, each group’s difference from the reference group is drawn
+with a bootstrap confidence interval, in that group’s column. Each
+difference is annotated with a standardised effect size (Hedges’
+<em>g</em> by default).</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/estimation_plot.html">estimation_plot</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">RT</span>, <span class="va">condition</span>,</span>
@@ -203,8 +203,7 @@ size (Hedges’ <em>g</em> by default).</p>
 <p><code>group_comparison_plot(differences = TRUE)</code> is the same
 idea reached from the group-means plot: it appends the difference panel,
 turning a means comparison into a full estimation plot. With more than
-two groups every other group is compared against a chosen reference (a
-Cumming plot).</p>
+two groups every other group is compared against a chosen reference.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/group_comparison_plot.html">group_comparison_plot</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="va">yield</span>, <span class="va">treatment</span>, differences <span class="op">=</span> <span class="cn">TRUE</span>,</span>

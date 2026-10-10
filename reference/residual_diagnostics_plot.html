@@ -126,7 +126,9 @@ residuals, for reproducible <code>glm</code> Q-Q panels.</p></dd>
 (Gelman &amp; Hill, 2007; see <code><a href="binned_residual_plot.html">binned_residual_plot()</a></code>), which is readable even
 for binary or count models, and the Q-Q panel uses <em>randomised quantile</em>
 residuals (Dunn &amp; Smyth, 1996), which are standard normal under a correctly
-specified model regardless of the response family. The scale-location and
+specified model regardless of the response family. In a Gaussian or Gamma
+model, prior weights enter these residuals as they enter the fit, through
+each observation's variance. The scale-location and
 leverage panels are unchanged. For an <code>lm</code> the behaviour is identical to
 before. Set <code>glm_panels = FALSE</code> to force the classic <code>lm</code>-style panels for a
 <code>glm</code> as well.</p>

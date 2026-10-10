@@ -94,7 +94,7 @@ one colourblind-aware palette and one set of label conventions.
   seasonal subseries across cycles.
 
 - [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md):
-  a simple forecast with prediction intervals.
+  STL plus random walk with drift, with prediction intervals.
 
 ## Model estimates and inference
 

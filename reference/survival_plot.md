@@ -39,19 +39,23 @@ survival_plot(
 
 - status:
 
-  Event indicator when `time` is a vector. Either the 0/1 convention
-  (`0` = censored, `1` = event) or the
+  Event indicator: a vector, or a column name when `time` is a data
+  frame (by default its `status` or `event` column). Either the 0/1
+  convention (`0` = censored, `1` = event) or the
   [`survival::Surv()`](https://rdrr.io/pkg/survival/man/Surv.html) 1/2
-  convention (`1` = censored, `2` = event) is accepted; logical values
-  are also allowed. Other codings raise an error. Observations whose
-  status is missing are dropped with a message, since they record
-  neither an event nor a censoring.
+  convention (`1` = censored, `2` = event) is accepted, read over all
+  groups together; logical values are also allowed. Other codings raise
+  an error, among them a code that is not a whole number and a factor or
+  character indicator, whose values do not say which one is the event.
+  Observations whose status is missing are dropped with a message, since
+  they record neither an event nor a censoring.
 
 - group:
 
-  Optional grouping variable (a vector, or a column name when `time` is
-  a data frame). Observations whose group is missing are dropped with a
-  message, since they belong to no arm.
+  Optional grouping variable: a vector, or a column name when `time` is
+  a data frame (by default its `group`, `strata` or `arm` column, if
+  any). Observations whose group is missing are dropped with a message,
+  since they belong to no arm.
 
 - conf_level:
 

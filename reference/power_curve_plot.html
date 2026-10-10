@@ -74,7 +74,13 @@ slow to run.</p>
 <span>  x_expand <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ribbon <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  interaction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"times"</span>, <span class="st">"asterisk"</span>, <span class="st">"colon"</span>, <span class="st">"space"</span><span class="op">)</span></span>
+<span>  interaction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"times"</span>, <span class="st">"asterisk"</span>, <span class="st">"colon"</span>, <span class="st">"space"</span><span class="op">)</span>,</span>
+<span>  n <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  power <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  group <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lower <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  upper <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  y_lab <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -84,8 +90,10 @@ slow to run.</p>
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
 <dd><p>A <code>powerCurve</code> object from 'simr', or a data frame with a sample
-size column (<code>nlevels</code>, <code>n</code> or <code>x</code>), a power column (<code>mean</code> or <code>power</code>),
-and optional <code>lower</code>/<code>upper</code> confidence limits.</p></dd>
+size column (<code>n</code>, <code>nlevels</code>, <code>x</code>, <code>sample_size</code> or <code>n_subject</code>), a power
+column (<code>power</code>, <code>mean</code> or <code>p</code>), and optional confidence limits
+(<code>&lt;power&gt;_lo</code>/<code>&lt;power&gt;_hi</code>, <code>lower</code>/<code>upper</code>, <code>ci_low</code>/<code>ci_high</code> or
+<code>conf.low</code>/<code>conf.high</code>).</p></dd>
 
 
 <dt id="arg-target">target<a class="anchor" aria-label="anchor" href="#arg-target"></a></dt>
@@ -119,10 +127,46 @@ predictor name stored in the object is used.</p></dd>
 <dd><p>Passed to <code><a href="format_terms.html">format_terms()</a></code> when deriving the title from a
 'simr' object.</p></dd>
 
+
+<dt id="arg-n-power">n, power<a class="anchor" aria-label="anchor" href="#arg-n-power"></a></dt>
+<dd><p>Columns holding the sample size and the power, as strings or
+unquoted names. By default, they are found among the names listed under
+<code>x</code>. <code>power</code> may name any proportion on the 0-1 scale, such as pilotr's
+<code>p_meaningful</code>.</p></dd>
+
+
+<dt id="arg-group">group<a class="anchor" aria-label="anchor" href="#arg-group"></a></dt>
+<dd><p>Column that separates several curves, as a string or an
+unquoted name. Each level is drawn as its own line, in its own colour and
+line type. By default, an <code>effect</code>, <code>param</code> or <code>term</code> column with more than
+one level is used, with a message. Rows that share a sample size with no
+such column are an error, because joining them would draw a zig-zag.</p></dd>
+
+
+<dt id="arg-lower-upper">lower, upper<a class="anchor" aria-label="anchor" href="#arg-lower-upper"></a></dt>
+<dd><p>Columns holding the lower and upper confidence limits.
+Name both or neither. By default, they are found among the names listed
+under <code>x</code>.</p></dd>
+
+
+<dt id="arg-y-lab">y_lab<a class="anchor" aria-label="anchor" href="#arg-y-lab"></a></dt>
+<dd><p>Y-axis label. By default, "Power" when the power column is one
+of the names listed under <code>x</code>, and the column's name otherwise.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot</a> object.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>A table may hold several curves, one per effect or design, stacked by row.
+Each is drawn as its own line, told apart by colour and line type. The
+tables pilotr returns are read as they are: <code>power_curve_mixed()</code> gives
+<code>n_subject</code>, <code>effect</code>, <code>power</code>, <code>power_lo</code> and <code>power_hi</code>, and
+<code>precision_curve()</code> gives <code>n_subject</code>, <code>param</code> and the decision
+probabilities <code>p_meaningful</code> and <code>p_equivalent</code> with their own <code>_lo</code> and
+<code>_hi</code> bounds, which <code>power</code> can name.</p>
     </div>
 
     <div class="section level2">
@@ -135,6 +179,18 @@ predictor name stored in the object is used.</p></dd>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">power_curve_plot</span><span class="op">(</span><span class="va">pc</span>, title <span class="op">=</span> <span class="st">"Power for the condition effect"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="power_curve_plot-1.png" alt="" width="672" height="432"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Two curves in one table, laid out as pilotr's power_curve_mixed() returns</span></span></span>
+<span class="r-in"><span><span class="co"># them: one row per sample size and effect.</span></span></span>
+<span class="r-in"><span><span class="va">curves</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  n_subject <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">40</span>, <span class="fl">60</span>, <span class="fl">80</span><span class="op">)</span>, each <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  effect <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"condition"</span>, <span class="st">"frequency"</span><span class="op">)</span>, times <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  power <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.31</span>, <span class="fl">0.12</span>, <span class="fl">0.58</span>, <span class="fl">0.21</span>, <span class="fl">0.78</span>, <span class="fl">0.33</span>, <span class="fl">0.90</span>, <span class="fl">0.45</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  power_lo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.23</span>, <span class="fl">0.07</span>, <span class="fl">0.48</span>, <span class="fl">0.14</span>, <span class="fl">0.69</span>, <span class="fl">0.25</span>, <span class="fl">0.83</span>, <span class="fl">0.36</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  power_hi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.41</span>, <span class="fl">0.19</span>, <span class="fl">0.67</span>, <span class="fl">0.30</span>, <span class="fl">0.85</span>, <span class="fl">0.43</span>, <span class="fl">0.94</span>, <span class="fl">0.55</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">power_curve_plot</span><span class="op">(</span><span class="va">curves</span>, group <span class="op">=</span> <span class="st">"effect"</span>, x_lab <span class="op">=</span> <span class="st">"Participants"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="power_curve_plot-2.png" alt="" width="672" height="432"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

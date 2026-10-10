@@ -72,10 +72,11 @@ For a `glm`, the default panels are made GLM-aware
 which is readable even for binary or count models, and the Q-Q panel
 uses *randomised quantile* residuals (Dunn & Smyth, 1996), which are
 standard normal under a correctly specified model regardless of the
-response family. The scale-location and leverage panels are unchanged.
-For an `lm` the behaviour is identical to before. Set
-`glm_panels = FALSE` to force the classic `lm`-style panels for a `glm`
-as well.
+response family. In a Gaussian or Gamma model, prior weights enter these
+residuals as they enter the fit, through each observation's variance.
+The scale-location and leverage panels are unchanged. For an `lm` the
+behaviour is identical to before. Set `glm_panels = FALSE` to force the
+classic `lm`-style panels for a `glm` as well.
 
 ## References
 

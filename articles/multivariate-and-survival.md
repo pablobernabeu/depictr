@@ -113,15 +113,18 @@ knitr::kable(attr(kd, "k_table"), digits = 3)
 |   6 |          0.213 |
 
 The gap statistic compares the within-cluster dispersion against a null
-reference, so unlike the other two criteria it can also support `k = 1`.
-Giving it a range that starts there shows what it makes of these data.
-The reference samples are drawn at random, so the chunk is seeded for a
-reproducible build.
+reference, so unlike the other two criteria it can also support `k = 1`,
+and its default search starts there. The elbow’s default search starts
+at 1 as well. The elbow is the candidate farthest from the line joining
+the first and last points of the curve, though, so it never picks either
+end of the range. The silhouette width is undefined for a single
+cluster, and its search starts at 2. The reference samples are drawn at
+random, so the chunk is seeded for a reproducible build.
 
 ``` r
 
 set.seed(1)
-k_diagnostic(crop_yield, k_range = 1:6, cols = num, method = "gap")
+k_diagnostic(crop_yield, cols = num, method = "gap")
 ```
 
 ![](multivariate-and-survival_files/figure-html/unnamed-chunk-8-1.png)

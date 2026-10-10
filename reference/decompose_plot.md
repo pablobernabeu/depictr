@@ -11,6 +11,7 @@ decompose_plot(
   frequency = NULL,
   method = c("stl", "classical"),
   robust = FALSE,
+  s_window = "periodic",
   confidence = FALSE,
   level = 0.95,
   title = NULL
@@ -30,8 +31,10 @@ decompose_plot(
 
 - method:
 
-  `"stl"` (loess-based) or `"classical"`
-  ([`stats::decompose()`](https://rdrr.io/r/stats/decompose.html)).
+  `"stl"` (loess-based, Cleveland et al., 1990) or `"classical"`
+  ([`stats::decompose()`](https://rdrr.io/r/stats/decompose.html)). STL
+  needs more than two full cycles of data, and classical decomposition
+  at least two.
 
 - robust:
 
@@ -40,6 +43,17 @@ decompose_plot(
   `robust = TRUE`), which down-weights outliers in the loess fits so
   that an unusual point bleeds less into the trend and seasonal
   components. Ignored for the classical method.
+
+- s_window:
+
+  For `method = "stl"`, the seasonal window, passed to
+  [`stats::stl()`](https://rdrr.io/r/stats/stl.html) as `s.window`. The
+  default, `"periodic"`, estimates one seasonal value per position in
+  the cycle and repeats it in every cycle, as classical decomposition
+  does. An odd whole number of at least 7 lets the seasonal component
+  change from cycle to cycle. It is the number of consecutive cycles
+  that go into each seasonal value, so a smaller window lets the pattern
+  change faster. Ignored for the classical method.
 
 - confidence:
 
@@ -71,6 +85,12 @@ remainder values. It conveys the scale of the unexplained variation
 around the smoothed trend rather than a formal sampling-distribution
 interval.
 
+## References
+
+Cleveland RB, Cleveland WS, McRae JE, Terpenning I (1990). “STL: A
+seasonal-trend decomposition procedure based on loess.” *Journal of
+Official Statistics*, **6**(1), 3–73.
+
 ## See also
 
 [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md),
@@ -86,6 +106,9 @@ decompose_plot(AirPassengers, method = "classical")
 
 # Robust STL with a confidence ribbon on the trend
 decompose_plot(AirPassengers, robust = TRUE, confidence = TRUE)
+
+# A seasonal component free to grow with the level of the series
+decompose_plot(AirPassengers, s_window = 13)
 
 # }
 ```

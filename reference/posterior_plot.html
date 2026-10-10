@@ -124,7 +124,8 @@ outer width is used for the caption and the displayed interval mass.</p></dd>
 <dt id="arg-labels">labels<a class="anchor" aria-label="anchor" href="#arg-labels"></a></dt>
 <dd><p>Optional named character vector renaming parameters, e.g.
 <code>c(conditionunrelated = "condition")</code>. Unmatched parameters fall back to
-<code><a href="format_terms.html">format_terms()</a></code>.</p></dd>
+<code><a href="format_terms.html">format_terms()</a></code>. For a <code>brms</code> fit, or a draws object holding <code>b_</code>
+parameters, the names are given without the <code>b_</code> prefix.</p></dd>
 
 
 <dt id="arg-reference-line">reference_line<a class="anchor" aria-label="anchor" href="#arg-reference-line"></a></dt>
@@ -188,7 +189,16 @@ mass; pass <code>NA</code> to omit a caption.</p></dd>
 <code>rstanarm</code>), a <code>posterior</code> <em>draws</em> object, a wide data frame or matrix with
 one column of draws per parameter, or a long data frame (a parameter column
 and a value column). For fitted models only the fixed-effect (population)
-parameters are kept, with the <code>brms</code> <code>b_</code> prefix stripped.</p>
+parameters are kept, with the <code>brms</code> <code>b_</code> prefix stripped. A draws object
+that holds <code>b_</code> parameters, as <code><a href="https://mc-stan.org/posterior/reference/draws_df.html" class="external-link">posterior::as_draws_df()</a></code> returns for a
+<code>brms</code> fit, is read the same way, with a message naming the variables it
+dropped. Pass it through <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> to keep the other variables, as a
+model of your own whose names happen to start with <code>b_</code> may need. The log
+densities <code>lp__</code> and <code>lprior</code> are never drawn as parameters. Two parameters
+that would share a display label, such as the <code>b_Intercept</code> and centred
+<code>Intercept</code> of a plain table of <code>brms</code> draws, are an error until one is
+renamed with <code>labels</code>. A matrix of posterior summaries, such as
+<code>brms::fixef()</code> returns, holds no draws and is refused.</p>
 <p>The slab styles use the 'ggdist' package. When 'ggdist' is not installed the
 function falls back to the point-and-nested-interval display (equivalent to
 <code>style = "interval"</code>) and emits an informative message.</p>

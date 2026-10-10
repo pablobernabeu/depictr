@@ -291,7 +291,10 @@ panel
 
 [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
 writes it out at a print-ready 300 dpi by default, creating any missing
-directories along the way.
+directories along the way. A PDF or EPS embeds its fonts and a TIFF is
+LZW-compressed, as journals ask of submitted figures, and the help page,
+[`?save_plot`](https://pablobernabeu.github.io/depictr/reference/save_plot.md),
+lists the formats PLOS, Nature and Elsevier accept.
 
 ``` r
 

@@ -78,7 +78,14 @@ inspect by-group departures from the average, and to identify unusual groups.</p
 <dd><p>Either a mixed model fitted with 'lme4' (<code>merMod</code>), or a data frame
 with one row per group level and columns such as <code>level</code>/<code>group</code>,
 <code>estimate</code>, and either <code>conf.low</code>/<code>conf.high</code> or <code>std.error</code>. An optional
-<code>term</code> column facets the plot.</p></dd>
+<code>term</code> column facets the plot. A model may have several grouping factors
+and several terms per factor, correlated or not. The forms
+<code>(1 + x | g)</code>, <code>(1 + x || g)</code> and <code>(1 | g) + (0 + x | g)</code> are all drawn.
+The intervals are the conditional modes plus or minus the normal quantile
+times the conditional standard deviations that
+<code>lme4::ranef(condVar = TRUE)</code> reports. A model with one term in all is
+drawn in a single panel labelled "Random effect", and otherwise each term
+has a panel labelled "factor: term".</p></dd>
 
 
 <dt id="arg-conf-level">conf_level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>

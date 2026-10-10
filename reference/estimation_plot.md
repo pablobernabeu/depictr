@@ -1,13 +1,13 @@
-# Gardner-Altman / Cumming estimation plot
+# Cumming estimation plot
 
 An estimation plot puts the *effect size* and its uncertainty at the
 centre of the comparison, rather than a p-value. The upper panel shows
-each group's raw data (jittered) with its mean and confidence interval;
-the lower panel shows the pairwise mean difference(s) against a
-reference group, each with a bootstrap confidence interval. The two
-panels share an aligned outcome axis and are stacked with 'patchwork',
-so a difference of zero in the lower panel lines up with the reference
-group's mean above it.
+each group's raw data (jittered) with its mean and confidence interval.
+The lower panel shows the difference between each other group's mean and
+a reference group's mean, with a bootstrap confidence interval. Each
+difference is drawn in its group's column, beneath that group's data.
+The two panels are stacked with 'patchwork', and each has its own
+outcome axis.
 
 ## Usage
 
@@ -47,8 +47,8 @@ estimation_plot(
 
   The reference (control) group that the others are compared with;
   defaults to the first level of `group`. The reference is drawn first
-  in the upper panel and sits at a difference of zero in the lower
-  panel.
+  in the upper panel and has an empty column in the lower panel, where
+  the dashed line marks a difference of zero.
 
 - conf_level:
 
@@ -99,14 +99,13 @@ the `"differences"` attribute (a data frame).
 
 ## Details
 
-With exactly two groups this is the classic *Gardner-Altman* two-group
-plot (Gardner & Altman, 1986; Ho et al., 2019): a single mean difference
-is shown with its bootstrap interval, annotated with a standardised
-effect size (Cohen's *d* or, by default, the small-sample corrected
-Hedges' *g*; Hedges, 1981). With more than two groups it becomes a
-*Cumming* estimation plot (Cumming, 2012): every other group is compared
-with the reference group, each difference carrying its own bootstrap
-interval.
+This stacked layout is the *Cumming* estimation plot (Cumming, 2012; Ho
+et al., 2019), with two groups as with more. Each difference is
+annotated with a standardised effect size: Cohen's *d* or, by default,
+the small-sample corrected Hedges' *g* (Hedges, 1981). The
+Gardner-Altman plot (Gardner & Altman, 1986) is a different layout,
+which sets a single difference beside the two groups on a floating axis
+whose zero is level with the reference group's mean.
 
 The lower-panel interval is a non-parametric *bootstrap* of the mean
 difference: the two groups are resampled with replacement `n_boot` times

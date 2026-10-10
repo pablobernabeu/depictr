@@ -31,16 +31,20 @@ interaction_plot(
 
 - predictor:
 
-  Name of the focal predictor on the x-axis (string).
+  Name of the focal predictor on the x-axis (string), given as in
+  [`effects_plot()`](https://pablobernabeu.github.io/depictr/reference/effects_plot.md):
+  `"log(rainfall)"` means `rainfall`.
 
 - moderator:
 
-  Name of the moderating predictor, mapped to colour (string).
+  Name of the moderating predictor, mapped to colour (string), given in
+  the same way as `predictor`. It must be a different variable.
 
 - moderator_values:
 
-  For a numeric moderator, the values to show. Defaults to the 10th,
-  50th and 90th percentiles.
+  For a numeric moderator, the values to show, on the variable's own
+  scale. Defaults to the 10th, 50th and 90th percentiles in the
+  estimation sample.
 
 - conf_level:
 
@@ -67,6 +71,14 @@ interaction_plot(
 
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
 object.
+
+## Details
+
+The grid is built as in
+[`effects_plot()`](https://pablobernabeu.github.io/depictr/reference/effects_plot.md).
+It holds the raw variables, so transformed terms are predicted as
+fitted. Typical values come from the estimation sample, and an offset is
+held at its mean on the link scale.
 
 ## Examples
 

@@ -69,6 +69,7 @@ column, a value column and an optional grouping column.</p>
 <span>  forecast <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  frequency <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  lambda <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  palette <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -108,12 +109,15 @@ is computed, so unsorted input is handled correctly.</p></dd>
 <dt id="arg-forecast">forecast<a class="anchor" aria-label="anchor" href="#arg-forecast"></a></dt>
 <dd><p>Optional forecast overlay for a single (non-grouped) series.
 Either an integer horizon (number of future steps) to forecast with the
-built-in STL + seasonal-naive-with-drift method (see <code><a href="ts_forecast.html">ts_forecast()</a></code>), or a
+built-in STL plus random walk with drift (see <code><a href="ts_forecast.html">ts_forecast()</a></code>), or a
 pre-computed forecast supplied as a data frame with columns <code>time</code>, <code>fit</code>
 and (optionally) <code>lwr</code>/<code>upr</code>, for instance from a fitted
 <code><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast::forecast()</a></code> object. The point forecast continues the line and a
-shaded prediction-interval ribbon, which widens with the horizon, is drawn
-behind it.</p></dd>
+shaded prediction-interval ribbon is drawn behind it. The built-in
+forecast is captioned with its coverage and method, and its band widens
+with the horizon on the scale it is made on (see <code>lambda</code>). For a numeric
+<code>x</code>, it is made from the values in time order and continues the history's
+own time axis, one typical step at a time.</p></dd>
 
 
 <dt id="arg-frequency">frequency<a class="anchor" aria-label="anchor" href="#arg-frequency"></a></dt>
@@ -124,6 +128,12 @@ numeric <code>x</code> to a <code>ts</code> when an integer <code>forecast</code
 <dt id="arg-level">level<a class="anchor" aria-label="anchor" href="#arg-level"></a></dt>
 <dd><p>Prediction-interval coverage for the built-in forecast (a single
 number strictly between 0 and 1, e.g. <code>0.95</code>).</p></dd>
+
+
+<dt id="arg-lambda">lambda<a class="anchor" aria-label="anchor" href="#arg-lambda"></a></dt>
+<dd><p>Optional Box-Cox transformation for the built-in forecast,
+passed to <code><a href="ts_forecast.html">ts_forecast()</a></code>. <code>0</code> forecasts on the log scale, which suits a
+series whose seasonal swing grows with its level.</p></dd>
 
 
 <dt id="arg-palette">palette<a class="anchor" aria-label="anchor" href="#arg-palette"></a></dt>
@@ -152,8 +162,9 @@ number strictly between 0 and 1, e.g. <code>0.95</code>).</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">timeseries_plot</span><span class="op">(</span><span class="va">AirPassengers</span>, rolling <span class="op">=</span> <span class="fl">12</span>,</span></span>
 <span class="r-in"><span>                title <span class="op">=</span> <span class="st">"Air passengers"</span>, y_lab <span class="op">=</span> <span class="st">"Passengers"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="timeseries_plot-1.png" alt="" width="672" height="432"></span>
-<span class="r-in"><span><span class="co"># 24-month forecast with a 90% prediction interval</span></span></span>
-<span class="r-in"><span><span class="fu">timeseries_plot</span><span class="op">(</span><span class="va">AirPassengers</span>, forecast <span class="op">=</span> <span class="fl">24</span>, level <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># 24-month forecast with a 90% prediction interval, made on the log scale</span></span></span>
+<span class="r-in"><span><span class="co"># because the seasonal swing grows with the number of passengers</span></span></span>
+<span class="r-in"><span><span class="fu">timeseries_plot</span><span class="op">(</span><span class="va">AirPassengers</span>, forecast <span class="op">=</span> <span class="fl">24</span>, level <span class="op">=</span> <span class="fl">0.9</span>, lambda <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="timeseries_plot-2.png" alt="" width="672" height="432"></span>
 </code></pre></div>
     </div>

@@ -50,15 +50,23 @@ coefficient_plot(
 
 Coefficient names are tidied to the effect (variable) name automatically
 (`conditionunrelated` becomes `condition`, `word_frequency` becomes
-`word frequency`). Pass `labels` to override any of them. The slopes
-also sit on quite different scales, so `standardise = TRUE` rescales
-each coefficient by its predictor’s standard deviation, putting them on
-one comparable axis:
+`word frequency`). Pass `labels` to override any of them. A slope per
+Zipf unit and a contrast between two conditions are in different units.
+`standardise = TRUE` multiplies the slope of each continuous predictor
+by that predictor’s standard deviation, so the word-frequency slope
+reads as the change in RT per SD. The two factor contrasts stay as
+differences in milliseconds between conditions. A contrast already
+compares two groups, and its per-SD value would depend on how evenly the
+trials happen to be split between them ([Gelman,
+2008](#ref-gelman2008)). An interaction is scaled through its inputs in
+the same way, and the axis label names the convention. Gelman recommends
+two SDs, which makes a continuous slope roughly comparable with a binary
+contrast. `sd_multiple = 2` follows that convention:
 
 ``` r
 
-coefficient_plot(fit, standardise = TRUE, order = "ascending",
-                 title = "Standardised predictors of RT")
+coefficient_plot(fit, standardise = TRUE, sd_multiple = 2, order = "ascending",
+                 title = "Predictors of RT, word frequency per 2 SD")
 ```
 
 ![](model-estimates_files/figure-html/coef-std-1.png)
@@ -93,14 +101,29 @@ compare_models(Reduced = reduced, Full = fit, order = "descending")
 knitr::kable(model_fit_table(Reduced = reduced, Full = fit))
 ```
 
+    model_fit_table(): REML fits were refitted by maximum likelihood for AIC, BIC and logLik, so models that differ in their fixed effects can be compared.
+
 | model   |   n |  df |      AIC |      BIC |    logLik |  R2 |    RMSE |
 |:--------|----:|----:|---------:|---------:|----------:|----:|--------:|
-| Reduced | 902 |   6 | 11338.03 | 11366.85 | -5663.014 |  NA | 118.790 |
-| Full    | 902 |   7 | 11324.31 | 11357.94 | -5655.153 |  NA | 118.129 |
+| Reduced | 902 |   6 | 11357.00 | 11385.83 | -5672.502 |  NA | 118.790 |
+| Full    | 902 |   7 | 11349.29 | 11382.92 | -5667.643 |  NA | 118.129 |
 
-For `glm` models the `R2` column reports McFadden’s pseudo-R-squared
-([McFadden, 1974](#ref-mcfadden1974)) in place of the ordinary
-coefficient of determination.
+Both the reduced and the full model were fitted by restricted maximum
+likelihood (REML), the default of `lmer()`. A REML likelihood is the
+likelihood of the residuals left once the fixed effects are removed. It
+changes with the fixed effects, so REML criteria cannot compare models
+that differ in them, as these two do.
+[`model_fit_table()`](https://pablobernabeu.github.io/depictr/reference/model_fit_table.md)
+therefore takes AIC, BIC and the log-likelihood from a
+maximum-likelihood refit, as
+[`anova()`](https://rdrr.io/r/stats/anova.html) does for lme4 fits, and
+says so in a message. The `R2` column reads `NA` for mixed models, since
+no single R-squared is standard for them. For a `glm`, it reports the
+deviance R-squared ([Cameron & Windmeijer, 1997](#ref-cameron1997)), the
+share of the null deviance that the predictors explain. That equals the
+ordinary R-squared for a Gaussian model with the identity link and
+McFadden’s pseudo-R-squared ([McFadden, 1974](#ref-mcfadden1974)) for
+binary logistic regression.
 
 ## Predicted values and interactions
 
@@ -271,7 +294,9 @@ coincide within each panel), so this fit is stable.
 composes several views (coefficients, the effect of a focal predictor,
 residuals against fitted values and a Q-Q plot, with a fit-statistics
 subtitle) into a single figure for a rapid review or a report appendix.
-It works on `lm`/`glm` models, and here we use the crop-yield model.
+It works on `lm`/`glm` models, and here we use the crop-yield model. A
+`glm` gets the binned-residual and quantile-residual panels of
+[`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md).
 
 ``` r
 
@@ -283,6 +308,15 @@ model_report(full, title = "Crop-yield model")
 ![](model-estimates_files/figure-html/report-1.png)
 
 ## References
+
+Cameron, A. C., & Windmeijer, F. A. G. (1997). An R-squared measure of
+goodness of fit for some common nonlinear regression models. *Journal of
+Econometrics*, *77*(2), 329–342.
+<https://doi.org/10.1016/S0304-4076(96)01818-0>
+
+Gelman, A. (2008). Scaling regression inputs by dividing by two standard
+deviations. *Statistics in Medicine*, *27*(15), 2865–2873.
+<https://doi.org/10.1002/sim.3107>
 
 McFadden, D. (1974). Conditional logit analysis of qualitative choice
 behavior. In P. Zarembka (Ed.), *Frontiers in econometrics* (pp.

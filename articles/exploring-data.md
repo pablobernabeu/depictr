@@ -157,11 +157,11 @@ ridgeline_plot(wellbeing_survey, life_satisfaction, region)
 An *estimation plot* puts the effect size and its uncertainty at the
 centre of the comparison.
 [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md)
-draws the classic Gardner-Altman two-group plot: the raw data with group
-means on top, and the mean difference with a bootstrap confidence
-interval beneath, aligned so a difference of zero sits under the
-reference group’s mean. With two groups it also annotates a standardised
-effect size (Hedges’ *g* by default).
+draws a Cumming estimation plot, with the raw data and group means on
+top. Beneath them, each group’s difference from the reference group is
+drawn with a bootstrap confidence interval, in that group’s column. Each
+difference is annotated with a standardised effect size (Hedges’ *g* by
+default).
 
 ``` r
 
@@ -175,8 +175,7 @@ estimation_plot(lexical_decision, RT, condition,
 `group_comparison_plot(differences = TRUE)` is the same idea reached
 from the group-means plot: it appends the difference panel, turning a
 means comparison into a full estimation plot. With more than two groups
-every other group is compared against a chosen reference (a Cumming
-plot).
+every other group is compared against a chosen reference.
 
 ``` r
 

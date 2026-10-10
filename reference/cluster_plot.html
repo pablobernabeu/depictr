@@ -73,7 +73,7 @@ for any number of variables.</p>
 <span>  clusters <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scale <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  suggest_k <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  k_range <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">8</span>,</span>
+<span>  k_range <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  hulls <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  label_centers <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  point_alpha <span class="op">=</span> <span class="fl">0.8</span>,</span>
@@ -126,7 +126,10 @@ average-silhouette criterion), a string naming the criterion
 
 
 <dt id="arg-k-range">k_range<a class="anchor" aria-label="anchor" href="#arg-k-range"></a></dt>
-<dd><p>Candidate values of <code>k</code> searched when <code>suggest_k</code> is set.</p></dd>
+<dd><p>Candidate values of <code>k</code> searched when <code>suggest_k</code> is set.
+The default, <code>NULL</code>, searches <code>1:8</code> for <code>"gap"</code> and <code>"wss"</code> and <code>2:8</code> for
+<code>"silhouette"</code>, as <code><a href="k_diagnostic.html">k_diagnostic()</a></code> does, so the gap statistic can
+suggest a single cluster.</p></dd>
 
 
 <dt id="arg-hulls">hulls<a class="anchor" aria-label="anchor" href="#arg-hulls"></a></dt>

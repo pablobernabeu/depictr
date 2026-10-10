@@ -23,6 +23,7 @@ coefficient_plot(
   facet = FALSE,
   scales = c("fixed", "free"),
   standardise = FALSE,
+  sd_multiple = 1,
   title = NULL,
   subtitle = NULL,
   x_lab = NULL
@@ -49,15 +50,21 @@ coefficient_plot(
 
 - order:
 
-  Order the terms by estimate: `"none"` (keep input order),
-  `"ascending"` or `"descending"`.
+  Order of the terms. `"ascending"` puts the smallest estimate at the
+  bottom and the largest at the top, so estimates increase up the axis.
+  `"descending"` does the reverse, and `"none"` keeps model order from
+  top to bottom. The faceted layout (`facet = TRUE`) stacks its panels
+  the other way up.
 
 - labels:
 
-  Optional display labels for the terms. Either a character vector the
-  same length as the number of terms (in plotting order) or a named
-  vector mapping raw term names to labels. If `NULL`, names are tidied
-  with
+  Optional display labels for the terms. An unnamed vector gives one
+  label per term in model order (the order
+  [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md)
+  returns, after the intercept is dropped unless `intercept = TRUE`),
+  whatever `order` is. A named vector mapping raw term names to labels,
+  such as `c(soil_ph = "Soil pH")`, is safer. If `NULL`, names are
+  tidied with
   [`format_terms()`](https://pablobernabeu.github.io/depictr/reference/format_terms.md).
 
 - interaction:
@@ -96,25 +103,51 @@ coefficient_plot(
 
 - standardise:
 
-  Whether to standardise the coefficients by multiplying each by the
-  standard deviation of its predictor column, putting them on a common
-  scale so their magnitudes are comparable (and removing the empty band
-  that otherwise appears when predictors are on very different scales).
-  Requires a fitted model (ignored, with a warning, for a tidy data
-  frame). Defaults to `FALSE`.
+  Whether to scale each coefficient by the spread of its inputs,
+  following Gelman (2008). A continuous input (numeric, with more than
+  two distinct values) is scaled by `sd_multiple` times its standard
+  deviation in the rows the model used, so its slope becomes the change
+  in the outcome per SD. Factor, character, logical and two-valued
+  numeric inputs (0/1, say) are left unscaled, since a contrast already
+  compares two groups and its per-SD value would depend on how balanced
+  the groups happen to be. An interaction is scaled through its inputs:
+  `rainfall:treatment` by the SD of `rainfall`, and a product of two
+  continuous inputs by both their SDs. Matrix-valued terms such as
+  [`poly()`](https://rdrr.io/r/stats/poly.html) and `ns()` are left
+  unscaled, with a message. An interaction of continuous inputs draws a
+  warning unless they are all centred. Otherwise, each input's main
+  effect is its slope where the others are zero, and Gelman's remedy is
+  to centre the inputs and refit. A continuous slope and a contrast are
+  comparable only roughly, most nearly with `sd_multiple = 2`. Requires
+  a fitted model (ignored, with a warning, for a tidy data frame).
+  Defaults to `FALSE`.
+
+- sd_multiple:
+
+  How many standard deviations of a continuous input one unit of the
+  standardised scale spans when `standardise = TRUE`. Defaults to 1. Use
+  2 for Gelman's (2008) convention, under which the coefficient of a
+  continuous input is comparable to that of a balanced binary one.
 
 - title, subtitle, x_lab:
 
   Plot title, subtitle and x-axis label. `x_lab` defaults to "Estimate",
-  or "Estimate per SD of predictor" when `standardise`. The label names
-  the convention on the figure itself, because only the predictors are
-  rescaled here: a fully standardised beta would rescale the outcome
-  too.
+  or, when `standardise`, "Estimate per SD of predictor" ("per 2 SD"
+  with `sd_multiple = 2`), followed by "(contrasts unscaled)" when a
+  factor or binary term is drawn. The label names the convention on the
+  figure itself, because only the predictors are rescaled here: a fully
+  standardised beta would rescale the outcome too.
 
 ## Value
 
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
 object.
+
+## References
+
+Gelman A (2008). “Scaling regression inputs by dividing by two standard
+deviations.” *Statistics in Medicine*, **27**(15), 2865–2873.
+[doi:10.1002/sim.3107](https://doi.org/10.1002/sim.3107) .
 
 ## Examples
 
@@ -133,6 +166,7 @@ coefficient_plot(fit, order = "descending", title = "Drivers of crop yield")
 coefficient_plot(fit, intercept = TRUE, facet = TRUE)
 
 
-# Or put the coefficients on a common, comparable scale:
+# Or scale the continuous slopes per SD of their predictors, leaving the
+# treatment contrast in the outcome's units:
 coefficient_plot(fit, standardise = TRUE)
 ```

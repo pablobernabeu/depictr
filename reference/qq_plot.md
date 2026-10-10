@@ -79,6 +79,25 @@ envelope by repeatedly drawing normal samples of the same size and
 taking the empirical quantiles of the simulated order statistics, which
 needs no large-sample approximation.
 
+The band measures departures from a normal distribution, which the
+residuals of a linear model should follow. The standardised deviance
+residuals of a non-Gaussian `glm` are not expected to be normal, even
+when the model is correctly specified: those of a binary model take only
+two values at each fitted value. Points outside the band then say little
+about the fit. For a `glm`,
+[`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
+and
+[`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
+plot randomised quantile residuals (Dunn & Smyth, 1996), which are
+standard normal under a correct model.
+
+## References
+
+Dunn PK, Smyth GK (1996). “Randomized quantile residuals.” *Journal of
+Computational and Graphical Statistics*, **5**(3), 236–244.
+[doi:10.1080/10618600.1996.10474708](https://doi.org/10.1080/10618600.1996.10474708)
+.
+
 ## Examples
 
 ``` r

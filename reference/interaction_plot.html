@@ -84,16 +84,20 @@ moderating predictor. Other predictors are held at typical values.</p>
 
 
 <dt id="arg-predictor">predictor<a class="anchor" aria-label="anchor" href="#arg-predictor"></a></dt>
-<dd><p>Name of the focal predictor on the x-axis (string).</p></dd>
+<dd><p>Name of the focal predictor on the x-axis (string), given
+as in <code><a href="effects_plot.html">effects_plot()</a></code>: <code>"log(rainfall)"</code> means <code>rainfall</code>.</p></dd>
 
 
 <dt id="arg-moderator">moderator<a class="anchor" aria-label="anchor" href="#arg-moderator"></a></dt>
-<dd><p>Name of the moderating predictor, mapped to colour (string).</p></dd>
+<dd><p>Name of the moderating predictor, mapped to colour
+(string), given in the same way as <code>predictor</code>. It must be a different
+variable.</p></dd>
 
 
 <dt id="arg-moderator-values">moderator_values<a class="anchor" aria-label="anchor" href="#arg-moderator-values"></a></dt>
-<dd><p>For a numeric moderator, the values to show. Defaults
-to the 10th, 50th and 90th percentiles.</p></dd>
+<dd><p>For a numeric moderator, the values to show, on the
+variable's own scale. Defaults to the 10th, 50th and 90th percentiles in
+the estimation sample.</p></dd>
 
 
 <dt id="arg-conf-level">conf_level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
@@ -119,6 +123,12 @@ to the 10th, 50th and 90th percentiles.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot</a> object.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The grid is built as in <code><a href="effects_plot.html">effects_plot()</a></code>. It holds the raw variables, so
+transformed terms are predicted as fitted. Typical values come from the
+estimation sample, and an offset is held at its mean on the link scale.</p>
     </div>
 
     <div class="section level2">
