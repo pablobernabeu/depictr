@@ -1,7 +1,7 @@
 # depictr <small>(R)</small> <img src="man/figures/logo.png" align="right" height="120" alt="" />
 
 <!-- badges: start -->
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21266308.svg)](https://doi.org/10.5281/zenodo.21266308)
+[![DOI](https://img.shields.io/badge/DOI-10.32614%2FCRAN.package.depictr-blue.svg)](https://doi.org/10.32614/CRAN.package.depictr)
 [![CRAN status](https://www.r-pkg.org/badges/version/depictr)](https://CRAN.R-project.org/package=depictr)
 [![R-CMD-check](https://github.com/pablobernabeu/depictr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/pablobernabeu/depictr/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)

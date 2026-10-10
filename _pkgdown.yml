@@ -49,12 +49,16 @@ home:
         title: Community
         text: >
           [Contributing guide](CONTRIBUTING.html)
+      # The DOI is the one CRAN assigned, which names the package across its
+      # versions. It is set as text, as lexsync's site sets it, so that it can
+      # wrap in the narrow sidebar: the <wbr> allows a break after the slash. The
+      # README's DOI badge still appears under Dev status.
       citation:
         title: Citation
         text: |
           [How to cite depictr](articles/about.html)
 
-          [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21266308.svg)](https://doi.org/10.5281/zenodo.21266308)
+          DOI [10.32614/<wbr>CRAN.package.depictr](https://doi.org/10.32614/CRAN.package.depictr)
 
 navbar:
   structure:

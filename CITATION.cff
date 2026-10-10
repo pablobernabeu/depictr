@@ -9,10 +9,25 @@ authors:
     orcid: "https://orcid.org/0000-0003-1083-2460"
     email: pcbernabeu@gmail.com
 version: "0.3.0"
-date-released: "2026-08-21"
-doi: "10.5281/zenodo.21266308"
+# The date CRAN published 0.3.0.
+date-released: "2026-09-01"
+# The DOI CRAN assigned to the package on publication. It identifies the package
+# across all its versions, so the version above pins the release.
+doi: "10.32614/CRAN.package.depictr"
+# Both DOIs, since doi holds one. Zenodo's concept DOI resolves to the latest
+# archived GitHub release.
+identifiers:
+  - type: doi
+    value: "10.32614/CRAN.package.depictr"
+    description: "The R package on CRAN, across all its versions."
+  - type: doi
+    value: "10.5281/zenodo.21266308"
+    description: "Every GitHub release of the repository, archived on Zenodo."
 license: MIT
 repository-code: "https://github.com/pablobernabeu/depictr"
+# CRAN distributes the built package, which is what CFF's repository-artifact
+# field is for. The sources are on GitHub, in repository-code above.
+repository-artifact: "https://CRAN.R-project.org/package=depictr"
 url: "https://pablobernabeu.github.io/depictr/"
 keywords:
   - data visualisation
