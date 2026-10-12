@@ -1,0 +1,24 @@
+# Holds this repository's own DOIs to the family's display standard: each is
+# shown as a full https://doi.org/ link, the README badge rows end with one DOI
+# badge, and no site page shows a DOI badge. The rules are in the docstring of
+# .github/check_doi_display.py, which is identical in all seven repositories.
+# It reads only tracked text files and needs nothing installed, so it runs on
+# every push to main and every pull request, without a path filter.
+name: doi-display
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  doi-display:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check how the DOIs are displayed
+        run: python3 .github/check_doi_display.py

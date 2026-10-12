@@ -1,11 +1,11 @@
 # depictr <small>(R)</small> <img src="man/figures/logo.png" align="right" height="120" alt="" />
 
 <!-- badges: start -->
-[![DOI](https://img.shields.io/badge/DOI-10.32614%2FCRAN.package.depictr-blue.svg)](https://doi.org/10.32614/CRAN.package.depictr)
 [![CRAN status](https://www.r-pkg.org/badges/version/depictr)](https://CRAN.R-project.org/package=depictr)
 [![R-CMD-check](https://github.com/pablobernabeu/depictr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/pablobernabeu/depictr/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/license/MIT)
+[![DOI 10.32614/CRAN.package.depictr](https://img.shields.io/badge/DOI-10.32614%2FCRAN.package.depictr-blue.svg)](https://doi.org/10.32614/CRAN.package.depictr)
 <!-- badges: end -->
 
 depictr is a single, consistent toolkit of publication-ready plots that span
@@ -154,7 +154,9 @@ of those, `R CMD check` runs on every push across Linux, macOS and Windows.
 
 ## Citation
 
-`citation("depictr")` gives the preferred reference. The [About
+`citation("depictr")` gives the preferred reference. The DOI that CRAN
+assigned to the package is <https://doi.org/10.32614/CRAN.package.depictr>, and
+it covers every version. The [About
 page](https://pablobernabeu.github.io/depictr/articles/about.html) carries the
 same citation with a BibTeX entry and a short note on the developer, and the
 repository ships

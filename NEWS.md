@@ -293,13 +293,16 @@
   looked up that way unless the package declares it.
 
 * `citation("depictr")`, the website and `CITATION.cff` give the DOI that CRAN
-  assigned to the package, 10.32614/CRAN.package.depictr, in place of the
-  Zenodo concept DOI. It names the R package across all its versions, and it is
-  the DOI that the CRAN page and the citation R generates for a CRAN package
-  already gave, so the package no longer circulates under two. Zenodo still
-  archives every GitHub release, and `CITATION.cff` lists both identifiers. Its
-  release date is now the day CRAN published 0.3.0, 2026-09-01, where it gave a
-  date that matched neither CRAN nor the GitHub release.
+  assigned to the package, <https://doi.org/10.32614/CRAN.package.depictr>, in
+  place of the Zenodo concept DOI. It names the R package across all its
+  versions, and it is the DOI that the CRAN page and the citation R generates
+  for a CRAN package already gave, so the package no longer circulates under
+  two. Zenodo still archives every GitHub release, and `CITATION.cff` lists both
+  identifiers. Its release date is now the day CRAN published 0.3.0, 2026-09-01,
+  where it gave a date that matched neither CRAN nor the GitHub release. The
+  CRAN DOI and the Zenodo DOI are shown as full links on the website and in the
+  README, and the sidebar of the home page shows the CRAN DOI once: the DOI
+  badge in the README no longer appears there a second time.
 
 ## Changed defaults
 

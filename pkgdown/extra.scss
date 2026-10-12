@@ -339,6 +339,30 @@ aside h2 {
   margin-top: 1.4rem;
 }
 
+// Citation component. The CRAN DOI is shown as its full https://doi.org/ URL,
+// which the sidebar cannot break by itself, so the <wbr> hints in _pkgdown.yml
+// are its only break points: before the two slashes that follow doi.org and
+// before the last full stop, so no line ends in a full stop. At the size of the
+// Developers roles line, balanced, the link takes one or two lines from 216px
+// up and at most three in the 156px column between the md and lg breakpoints.
+// overflow-wrap guards against enlarged text, which could otherwise push one
+// piece of the URL past the column, where body's overflow-x: hidden clips it.
+aside .citation p:has(> a[href^="https://doi.org/"]) {
+  font-size: .875em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+// The README's DOI badge serves GitHub and CRAN. pkgdown copies every badge
+// between the README's badge markers into Dev status, with no way to leave one
+// out, and the Citation component already gives the DOI as a link, so the badge
+// is hidden here and the sidebar shows the DOI once. The site workflow runs
+// .github/check_doi_display.py --site, which fails if pkgdown's markup stops
+// matching this selector.
+aside .dev-status li:has(> a[href^="https://doi.org/"]) {
+  display: none;
+}
+
 // ---------------------------------------------------------------------------
 // Reference index — treat each function group as a card
 // ---------------------------------------------------------------------------

@@ -50,15 +50,18 @@ home:
         text: >
           [Contributing guide](CONTRIBUTING.html)
       # The DOI is the one CRAN assigned, which names the package across its
-      # versions. It is set as text, as lexsync's site sets it, so that it can
-      # wrap in the narrow sidebar: the <wbr> allows a break after the slash. The
-      # README's DOI badge still appears under Dev status.
+      # versions. It is shown as the full https://doi.org/ link that Crossref's
+      # display guidelines ask for, with no "DOI" label. The sidebar cannot break
+      # the URL by itself, so each <wbr> marks a break before a slash or before
+      # the last full stop, and no line ends in a full stop. pkgdown/extra.scss
+      # sizes the link and balances its lines, and it hides the README's DOI badge,
+      # which pkgdown copies into Dev status, so the sidebar shows the DOI once.
       citation:
         title: Citation
         text: |
           [How to cite depictr](articles/about.html)
 
-          DOI [10.32614/<wbr>CRAN.package.depictr](https://doi.org/10.32614/CRAN.package.depictr)
+          [https://doi.org<wbr>/10.32614<wbr>/CRAN.package<wbr>.depictr](https://doi.org/10.32614/CRAN.package.depictr)
 
 navbar:
   structure:

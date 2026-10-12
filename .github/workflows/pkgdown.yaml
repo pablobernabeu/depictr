@@ -73,3 +73,12 @@ jobs:
           clean: true
           branch: gh-pages
           folder: docs
+
+      - name: Check that the sidebar shows the DOI once, as a link
+        # pkgdown copies the README's DOI badge into Dev status, where
+        # pkgdown/extra.scss hides it, and the Citation component gives the DOI
+        # as a link. This fails if pkgdown's markup or the compiled stylesheet
+        # stops matching those rules, which would bring the duplicate back. It
+        # runs after the deployment, so that a failure marks the run red without
+        # holding the site back.
+        run: python3 .github/check_doi_display.py --site docs
