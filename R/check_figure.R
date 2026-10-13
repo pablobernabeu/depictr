@@ -159,10 +159,31 @@
 #' with panel labels at 8 pt. Pass the floor of the journal the figure is for
 #' as `min_text_pt`. The four pages are listed under References.
 #'
+#' @section Composites:
+#' A composite, such as [arrange_plots()], [residual_diagnostics_plot()] and
+#' [model_report()] return, is audited panel by panel. Each panel has its own
+#' scales, theme and text, so each is audited as it would be on its own. The
+#' reports are stacked under a leading integer column, `panel`, which only the
+#' report of a composite has. The widths are those of the whole composite. A
+#' panel's text keeps its point size whatever share of the width the panel
+#' takes, so the text of every panel scales by the same ratio.
+#'
+#' Panels are numbered depth-first through any composite nested inside, in the
+#' order the composite holds them. That is the order patchwork tags them in,
+#' and the reading order of a grid filled row by row. A spacer or a guide area
+#' draws no figure of its own and takes no number. A wrapped element, such as
+#' a grob or a table, cannot be read, so it keeps its number and is left out
+#' of the report with a warning.
+#'
+#' A panel's legend is measured with the panel, as the panel would draw it on
+#' its own, even when `guides = "collect"` gathers it into one legend for the
+#' composite. What the composite draws around its panels is not measured: the
+#' title, subtitle and caption of [patchwork::plot_annotation()] and the panel
+#' tags.
+#'
 #' @param plot A plot, as returned by any depictr plotting function, including
-#'   one extended afterwards with `+`. A multi-panel composite is refused: its
-#'   panels have their own scales, themes and text, and one table of numbers
-#'   cannot describe them all. Check each panel on its own.
+#'   one extended afterwards with `+`, or a multi-panel composite (see
+#'   "Composites").
 #' @param width_cm The width, in centimetres, that the figure will occupy in the
 #'   finished document. Defaults to 17.78 cm, the seven inches [save_plot()]
 #'   draws at, which means no scaling.
@@ -179,7 +200,9 @@
 #'
 #' @return A data frame with one row per check and columns `check`, `measured`,
 #'   `threshold`, `verdict` (`"pass"`, `"fail"` or `"not applicable"`) and
-#'   `detail`, a short note naming what produced the measurement.
+#'   `detail`, a short note naming what produced the measurement. For a
+#'   composite, the rows of each panel in turn, after a leading integer column
+#'   `panel`.
 #' @references
 #' APA Style. Figures.
 #' <https://apastyle.apa.org/style-grammar-guidelines/tables-figures/figures>
@@ -220,16 +243,18 @@
 #' # Saved at 8.9 cm in the first place, with save_plot(width = 8.9,
 #' # units = "cm"), it is drawn at the size it prints, so both widths are 8.9.
 #' check_figure(good, width_cm = 8.9, render_width_cm = 8.9)
+#'
+#' # Each panel of a composite is audited, and a column says which panel each
+#' # row describes. At base size 5, the second panel's text is too small.
+#' small <- good + theme_depictr(base_size = 5)
+#' both <- check_figure(arrange_plots(good, small))
+#' both[both$verdict == "fail", c("panel", "check", "measured")]
 check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
                          min_delta_e = 5, min_text_pt = 6) {
-  # A composite has several panels, each with its own scales, theme and text.
-  # One table of numbers cannot describe them all, and the class inherits from
-  # ggplot, so it would otherwise reach the build and fail obscurely.
-  if (inherits(plot, "patchwork")) {
-    stop("`plot` is a multi-panel composite. Check each panel on its own.",
-         call. = FALSE)
-  }
-  if (!inherits(plot, "ggplot")) {
+  # A patchwork inherits from ggplot, since it is its last panel with the
+  # others attached, so it is told apart before the build sees it.
+  composite <- inherits(plot, "patchwork")
+  if (!composite && !inherits(plot, "ggplot")) {
     stop("`plot` must be a plot object, as returned by any depictr plotting ",
          "function.", call. = FALSE)
   }
@@ -238,6 +263,81 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
   .positive_scalar(min_delta_e, "min_delta_e")
   .positive_scalar(min_text_pt, "min_text_pt")
 
+  if (composite) {
+    return(.audit_composite(plot, width_cm, render_width_cm, min_delta_e,
+                            min_text_pt))
+  }
+  .audit_plot(plot, width_cm, render_width_cm, min_delta_e, min_text_pt)
+}
+
+# --- composites -------------------------------------------------------------
+
+#' The panels of a composite, depth-first in the order it holds them
+#'
+#' Reached through patchwork's exported `length()` and `[[` methods alone, so
+#' the walk does not depend on how a patchwork stores its plots. `[[` hands
+#' back a nested composite whole, and the walk descends into it where it
+#' stands, which is the order patchwork tags the panels in. A spacer and a
+#' guide area draw no figure of their own, and patchwork tags neither, so
+#' neither is a panel.
+#' @return A list of the panels.
+#' @noRd
+.composite_panels <- function(plot) {
+  panels <- list()
+  for (index in seq_len(length(plot))) {
+    panel <- plot[[index]]
+    if (inherits(panel, "patchwork")) {
+      panels <- c(panels, .composite_panels(panel))
+    } else if (!inherits(panel, c("spacer", "guide_area"))) {
+      panels[[length(panels) + 1L]] <- panel
+    }
+  }
+  panels
+}
+
+#' Each panel of a composite audited on its own, under a panel column
+#'
+#' The composite's title, subtitle and tags belong to no panel, so they are
+#' not measured. The Python twin numbers the panels of a plotnine composition
+#' by the same rule.
+#' @noRd
+.audit_composite <- function(plot, width_cm, render_width_cm, min_delta_e,
+                             min_text_pt) {
+  panels <- .composite_panels(plot)
+  reports <- list()
+  for (number in seq_along(panels)) {
+    panel <- panels[[number]]
+    # A wrapped grob, table or base R plot is carried by an empty plot of
+    # patchwork's own, a "patch", and drawn from grobs that the build of that
+    # plot never sees. Audited as the plot, it would read as a panel with no
+    # text and no colours.
+    if (inherits(panel, "patch")) {
+      warning("Panel ", number, " is a wrapped element, such as a grob or a ",
+              "table, which check_figure() cannot read, so the report leaves ",
+              "it out.", call. = FALSE)
+      next
+    }
+    report <- .audit_plot(panel, width_cm, render_width_cm, min_delta_e,
+                          min_text_pt)
+    reports[[length(reports) + 1L]] <- cbind(panel = number, report)
+  }
+  if (!length(reports)) {
+    return(data.frame(panel = integer(0), check = character(0),
+                      measured = numeric(0), threshold = numeric(0),
+                      verdict = character(0), detail = character(0),
+                      stringsAsFactors = FALSE))
+  }
+  out <- do.call(rbind, reports)
+  rownames(out) <- NULL
+  out
+}
+
+# --- one plot ---------------------------------------------------------------
+
+#' The audit of a single plot, its settings already validated
+#' @noRd
+.audit_plot <- function(plot, width_cm, render_width_cm, min_delta_e,
+                        min_text_pt) {
   built <- ggplot2::ggplot_build(plot)
   resolved <- .completed_theme(built$plot$theme)
   # White stands in for the paper under a plot background that paints nothing.

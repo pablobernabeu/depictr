@@ -969,6 +969,87 @@ test_that("a measurement exactly on the threshold passes", {
     "fail")
 })
 
+# --- composites --------------------------------------------------------------
+
+test_that("a composite is audited panel by panel, in reading order", {
+  # Pinned so the two engines cannot drift apart unnoticed: the Python suite
+  # audits the same two panels and pins the same vector. Each panel reports
+  # what its figure reports alone, under a leading panel column.
+  report <- check_figure(arrange_plots(good_figure(), bad_figure(),
+                                       tag_levels = NULL))
+  expect_identical(names(report), c("panel", "check", "measured", "threshold",
+                                    "verdict", "detail"))
+  expect_identical(nrow(report), 20L)
+  expect_identical(report$panel, rep(1:2, each = 10))
+  expect_identical(report$check, rep(check_figure(good_figure())$check, 2))
+  expect_equal(report$measured, c(
+    111.87, 89.87, 107.07, 98.5, 16.92, 8.8, 8.45, 3.87, 1, NA,
+    116.25, 35.04, 0.37, 119.38, 6.32, 4, 8.45, 4.01, 0, NA))
+  expect_identical(rownames(report), as.character(seq_len(20)))
+  second <- report[report$panel == 2, -1]
+  rownames(second) <- NULL
+  expect_identical(second, check_figure(bad_figure()))
+})
+
+test_that("composite-level titles and tags are not measured", {
+  # patchwork draws them around the panels, and no panel holds them. A 2 pt
+  # title and 2 pt tags would fail the text floor, yet the panels' rows are
+  # those of the same panels without them.
+  plain <- check_figure(arrange_plots(good_figure(), bad_figure(),
+                                      tag_levels = NULL))
+  annotated <- patchwork::wrap_plots(good_figure(), bad_figure()) +
+    patchwork::plot_annotation(
+      title = "Two panels", tag_levels = "A",
+      theme = theme(plot.title = element_text(size = 2))) &
+    theme(plot.tag = element_text(size = 2))
+  expect_identical(check_figure(annotated), plain)
+})
+
+test_that("nested composites are walked depth-first, and spacers are not panels", {
+  nested <- check_figure(arrange_plots(
+    arrange_plots(good_figure(), bad_figure(), tag_levels = NULL),
+    good_figure(), tag_levels = NULL))
+  expect_identical(unique(nested$panel), 1:3)
+  expect_equal(nested$measured[nested$check == "text_size"], c(8.8, 4, 8.8))
+
+  # A spacer and a guide area draw no figure of their own, and patchwork tags
+  # neither, so the panels around them are numbered 1 and 2.
+  spaced <- check_figure(patchwork::wrap_plots(
+    good_figure(), patchwork::plot_spacer(), bad_figure(),
+    patchwork::guide_area(), guides = "collect"))
+  expect_identical(unique(spaced$panel), 1:2)
+  expect_equal(spaced$measured[spaced$check == "text_size"], c(8.8, 4))
+
+  # With nothing but spacers, there is no panel to audit.
+  empty <- check_figure(patchwork::wrap_plots(patchwork::plot_spacer(),
+                                              patchwork::plot_spacer()))
+  expect_identical(names(empty), names(spaced))
+  expect_identical(nrow(empty), 0L)
+})
+
+test_that("a wrapped element keeps its number and is left out with a warning", {
+  # The audit cannot read a grob, so it says so instead of reporting that the
+  # panel draws no text.
+  composite <- patchwork::wrap_plots(
+    good_figure(), patchwork::wrap_elements(grid::textGrob("note")),
+    bad_figure())
+  expect_warning(report <- check_figure(composite),
+                 "^Panel 2 is a wrapped element")
+  expect_identical(unique(report$panel), c(1L, 3L))
+})
+
+test_that("the package's own composites are audited panel by panel", {
+  fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
+  diagnostics <- check_figure(residual_diagnostics_plot(fit))
+  expect_identical(unique(diagnostics$panel), 1:4)
+  expect_identical(nrow(diagnostics), 40L)
+  # model_report() frees each panel's axis title with patchwork::free(), which
+  # changes the class of the panels it returns.
+  report <- check_figure(model_report(fit))
+  expect_identical(unique(report$panel), 1:4)
+  expect_true(all(report$verdict[report$check == "text_size"] == "pass"))
+})
+
 # --- refusals ----------------------------------------------------------------
 
 test_that("check_figure() refuses what it cannot audit", {
@@ -978,13 +1059,6 @@ test_that("check_figure() refuses what it cannot audit", {
   expect_error(check_figure("a plot"),
                paste0("^`plot` must be a plot object, as returned by any ",
                       "depictr plotting function\\.$"))
-  # A composite inherits from ggplot, so it would otherwise reach the build and
-  # fail obscurely; each panel has its own scales, theme and text anyway.
-  composite <- arrange_plots(ggplot() + theme_depictr(),
-                             ggplot() + theme_depictr())
-  expect_error(check_figure(composite),
-               paste0("^`plot` is a multi-panel composite\\. Check each panel ",
-                      "on its own\\.$"))
 })
 
 test_that("check_figure() refuses non-positive and non-scalar settings", {

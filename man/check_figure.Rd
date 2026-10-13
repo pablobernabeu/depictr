@@ -14,9 +14,8 @@ check_figure(
 }
 \arguments{
 \item{plot}{A plot, as returned by any depictr plotting function, including
-one extended afterwards with \code{+}. A multi-panel composite is refused: its
-panels have their own scales, themes and text, and one table of numbers
-cannot describe them all. Check each panel on its own.}
+one extended afterwards with \code{+}, or a multi-panel composite (see
+"Composites").}
 
 \item{width_cm}{The width, in centimetres, that the figure will occupy in the
 finished document. Defaults to 17.78 cm, the seven inches \code{\link[=save_plot]{save_plot()}}
@@ -38,7 +37,9 @@ size").}
 \value{
 A data frame with one row per check and columns \code{check}, \code{measured},
 \code{threshold}, \code{verdict} (\code{"pass"}, \code{"fail"} or \code{"not applicable"}) and
-\code{detail}, a short note naming what produced the measurement.
+\code{detail}, a short note naming what produced the measurement. For a
+composite, the rows of each panel in turn, after a leading integer column
+\code{panel}.
 }
 \description{
 Checks a figure as it will be submitted, rather than the palette it was built
@@ -185,6 +186,30 @@ with panel labels at 8 pt. Pass the floor of the journal the figure is for
 as \code{min_text_pt}. The four pages are listed under References.
 }
 
+\section{Composites}{
+
+A composite, such as \code{\link[=arrange_plots]{arrange_plots()}}, \code{\link[=residual_diagnostics_plot]{residual_diagnostics_plot()}} and
+\code{\link[=model_report]{model_report()}} return, is audited panel by panel. Each panel has its own
+scales, theme and text, so each is audited as it would be on its own. The
+reports are stacked under a leading integer column, \code{panel}, which only the
+report of a composite has. The widths are those of the whole composite. A
+panel's text keeps its point size whatever share of the width the panel
+takes, so the text of every panel scales by the same ratio.
+
+Panels are numbered depth-first through any composite nested inside, in the
+order the composite holds them. That is the order patchwork tags them in,
+and the reading order of a grid filled row by row. A spacer or a guide area
+draws no figure of its own and takes no number. A wrapped element, such as
+a grob or a table, cannot be read, so it keeps its number and is left out
+of the report with a warning.
+
+A panel's legend is measured with the panel, as the panel would draw it on
+its own, even when \code{guides = "collect"} gathers it into one legend for the
+composite. What the composite draws around its panels is not measured: the
+title, subtitle and caption of \code{\link[patchwork:plot_annotation]{patchwork::plot_annotation()}} and the panel
+tags.
+}
+
 \examples{
 library(ggplot2)
 
@@ -205,6 +230,12 @@ check_figure(good, width_cm = 8.9)
 # Saved at 8.9 cm in the first place, with save_plot(width = 8.9,
 # units = "cm"), it is drawn at the size it prints, so both widths are 8.9.
 check_figure(good, width_cm = 8.9, render_width_cm = 8.9)
+
+# Each panel of a composite is audited, and a column says which panel each
+# row describes. At base size 5, the second panel's text is too small.
+small <- good + theme_depictr(base_size = 5)
+both <- check_figure(arrange_plots(good, small))
+both[both$verdict == "fail", c("panel", "check", "measured")]
 }
 \references{
 APA Style. Figures.

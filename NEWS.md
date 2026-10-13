@@ -408,6 +408,15 @@
   audit a figure saved at its final width, with that width given as both
   widths or neither, and the help page gives four publishers' text floors,
   dated and linked, where it called 6 pt a common publisher floor.
+* `check_figure()` accepts a multi-panel composite and audits each panel on
+  its own, in the order patchwork tags them, with a leading `panel` column. It
+  used to refuse one, which left the package's own composites without an
+  audit. Among them are the figures of `arrange_plots()`,
+  `residual_diagnostics_plot()`, `model_report()`, `estimation_plot()` and
+  `survival_plot(risk_table = TRUE)`. Each panel's legend is measured with the
+  panel. A spacer or a guide area takes no panel number, and a wrapped element,
+  such as a grob or a table, is left out with a warning. Composite-level titles
+  and tags are not measured.
 
 ## Metadata and documentation
 
