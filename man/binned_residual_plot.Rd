@@ -10,7 +10,8 @@ binned_residual_plot(
   type = c("response", "pearson"),
   point_colour = depictr_brand(),
   band_colour = depictr_accent(),
-  title = NULL
+  title = NULL,
+  band = c("model", "empirical")
 )
 }
 \arguments{
@@ -28,28 +29,62 @@ minus fitted on the response scale, the Gelman-Hill default) or
 \eqn{\pm 2} SE band. Default to the depictr brand and accent colours.}
 
 \item{title}{Plot title.}
+
+\item{band}{Where the standard errors come from. The default, \code{"model"},
+takes them from the variance the fitted model implies for each residual.
+\code{"empirical"} takes them from the spread of the residuals in each bin, as
+in depictr 0.3.0 and \code{arm::binnedplot()}.}
 }
 \value{
-A \link[ggplot2:ggplot]{ggplot2::ggplot} object. The per-bin summary (mean fitted, mean
-residual, SE bound and an \code{outside} flag) is attached as
-\code{attr(plot, "bins")}.
+A \link[ggplot2:ggplot]{ggplot2::ggplot} object. The per-bin summary (mean fitted value,
+mean residual, number of observations \code{n}, the band's half-width \code{se2}
+and an \code{outside} flag) is attached as \code{attr(plot, "bins")}.
 }
 \description{
 For a fitted \code{glm} (especially binary or count models), a plot of raw
 residuals against fitted values is hard to read because the residuals take
 only a few values. Following Gelman and Hill (2007), this plot instead splits
 the data into equal-count bins of fitted values and plots, for each bin, the
-mean residual against the mean fitted value. Under a well-specified model the
+mean residual against the mean fitted value, inside a grey band of
+\eqn{\pm 2} standard errors of that mean. Under a well-specified model, the
 binned residuals scatter around zero, and about 95\% of them should fall
-within the grey \eqn{\pm 2} standard-error band, computed per bin as
-\eqn{2\,\hat{\sigma}_{\text{bin}}/\sqrt{n_{\text{bin}}}} from the residuals in
-that bin. Systematic departures (a trend, or many points outside the band)
-indicate a misspecified mean structure.
+within the band. Systematic departures (a trend, or many points outside the
+band) indicate a misspecified mean structure.
+}
+\details{
+By default (\code{band = "model"}), the standard error is the one the fitted
+model implies. The model gives the response \eqn{y_i} the variance
+\eqn{\phi V(\hat\mu_i) / w_i}, where \eqn{V} is the family's variance
+function, \eqn{w_i} the prior weight and \eqn{\phi} the dispersion. The
+dispersion is 1 for the binomial and Poisson families,
+\code{summary(model)$dispersion} for the others and \eqn{\hat\sigma^2} for an
+\code{lm}. Taking this as the variance of the response residual
+\eqn{y_i - \hat\mu_i}, the band gives the mean of the \eqn{n_b} residuals in
+bin \eqn{b} the standard error
+\eqn{\sqrt{\sum_{i \in b} \phi V(\hat\mu_i) / w_i} / n_b}. A Pearson
+residual, \eqn{(y_i - \hat\mu_i) \sqrt{w_i / V(\hat\mu_i)}}, then has
+variance \eqn{\phi}, so its bin mean has standard error
+\eqn{\sqrt{\phi / n_b}}. The fit absorbs a little of each observation's
+variance, so a residual varies slightly less than this and the band errs on
+the wide side. Observations with zero prior weight take no part in the fit
+and are left out of the bins.
+
+\code{band = "empirical"} draws the band of depictr 0.3.0 and earlier, the one
+\code{arm::binnedplot()} draws: twice the standard deviation of the residuals in
+the bin, divided by \eqn{\sqrt{n_b}}. It collapses wherever the outcomes in
+a bin are all alike. The residuals in a logistic model's bin without events
+all lie just below zero, so its band nearly vanishes and the bin is flagged.
+Where events are rare, such bins are what the model expects. The example
+below, a correctly specified model, has five of its seventeen bins flagged
+by that band and none by the model's.
 }
 \examples{
 gfit <- glm(adverse_event ~ biomarker + age + arm,
             data = clinical_trial, family = binomial)
 binned_residual_plot(gfit)
+
+# The band of depictr 0.3.0, which flags the bins that hold no events:
+binned_residual_plot(gfit, band = "empirical")
 }
 \references{
 \insertRef{gelman2007}{depictr}

@@ -14,13 +14,82 @@ test_that("binned_residual_plot() returns a ggplot and per-bin summary", {
 
   expect_error(binned_residual_plot("nope"), "lm")
   expect_error(binned_residual_plot(gfit, bins = 1), "bins")
+  expect_error(binned_residual_plot(gfit, band = "nope"), "should be one of")
 })
 
-test_that("binned bounds equal 2*sd/sqrt(n) per bin (independent recompute)", {
+test_that("the binned-residual band is the standard error the model implies", {
+  # The band was twice the residuals' own standard deviation in each bin over
+  # the square root of its count, and it collapses where a bin's outcomes are
+  # all alike. It is now twice the standard error of the bin's mean residual
+  # under the fitted model. There a response residual has variance
+  # phi * V(mu_i) / w_i and a Pearson residual variance phi. The expected
+  # values come from the accessor functions, apart from the model components
+  # the plot reads.
+  withr::local_seed(31)
+  n <- 240
+  d <- data.frame(x = stats::rnorm(n), w = rep(c(1, 4), n / 2),
+                  trials = sample(3:12, n, replace = TRUE))
+  d$succ <- stats::rbinom(n, d$trials, stats::plogis(-0.5 + 0.8 * d$x))
+  d$count <- stats::rnbinom(n, mu = exp(0.3 + 0.5 * d$x), size = 2)
+  d$cont <- 1 + 0.5 * d$x + stats::rnorm(n, sd = 1 / sqrt(d$w))
+  fits <- list(
+    binomial = glm(adverse_event ~ biomarker + age + arm,
+                   data = clinical_trial, family = binomial),
+    `grouped binomial` = glm(cbind(succ, trials - succ) ~ x, data = d,
+                             family = binomial),
+    quasipoisson = glm(count ~ x, data = d, family = quasipoisson),
+    `weighted gaussian` = glm(cont ~ x, data = d, weights = w),
+    `weighted lm` = lm(cont ~ x, data = d, weights = w)
+  )
+  bins <- 12
+  for (nm in names(fits)) {
+    fit <- fits[[nm]]
+    mu <- stats::fitted(fit)
+    w <- stats::weights(fit)
+    if (is.null(w)) w <- rep(1, length(mu))
+    is_glm <- inherits(fit, "glm")
+    v <- if (is_glm) stats::family(fit)$variance(mu) else rep(1, length(mu))
+    phi <- if (is_glm) summary(fit)$dispersion else stats::sigma(fit)^2
+    grp <- pmin(ceiling(rank(mu, ties.method = "first") / (length(mu) / bins)),
+                bins)
+    for (type in c("response", "pearson")) {
+      r <- stats::residuals(fit, type = type)
+      var_r <- if (type == "response") phi * v / w else rep(phi, length(mu))
+      nb <- as.numeric(tapply(r, grp, length))
+      bd <- attr(binned_residual_plot(fit, bins = bins, type = type), "bins")
+      label <- paste(nm, type)
+      expect_equal(bd$fitted, as.numeric(tapply(mu, grp, mean)),
+                   tolerance = 1e-10, label = label)
+      expect_equal(bd$resid, as.numeric(tapply(r, grp, mean)),
+                   tolerance = 1e-10, label = label)
+      expect_equal(bd$n, as.integer(nb), label = label)
+      expect_equal(bd$se2, 2 * sqrt(as.numeric(tapply(var_r, grp, sum))) / nb,
+                   tolerance = 1e-10, label = label)
+      expect_identical(bd$outside, abs(bd$resid) > bd$se2, label = label)
+    }
+  }
+})
+
+test_that("the documented example, a correct model, stays inside the band", {
+  # data-raw/generate_datasets.R simulates the adverse events from this very
+  # model. The empirical band flagged 5 of its 17 bins, each of them a bin
+  # without events, though at the lowest fitted values the model gives such a
+  # bin a probability of 0.78.
+  gfit <- glm(adverse_event ~ biomarker + age + arm,
+              data = clinical_trial, family = binomial)
+  bd <- attr(binned_residual_plot(gfit), "bins")
+  expect_equal(nrow(bd), 17L)
+  expect_lte(sum(bd$outside), 1)
+})
+
+test_that("band = 'empirical' reproduces the band of depictr 0.3.0", {
+  # Twice the standard deviation of the residuals in each bin over the square
+  # root of its count, the band arm::binnedplot() draws.
   gfit <- glm(adverse_event ~ biomarker + age + arm,
               data = clinical_trial, family = binomial)
   bins <- 12
-  bd <- attr(binned_residual_plot(gfit, bins = bins), "bins")
+  bd <- attr(binned_residual_plot(gfit, bins = bins, band = "empirical"),
+             "bins")
 
   fitted <- as.numeric(stats::fitted(gfit))
   resid  <- as.numeric(stats::residuals(gfit, type = "response"))
@@ -38,6 +107,89 @@ test_that("binned bounds equal 2*sd/sqrt(n) per bin (independent recompute)", {
   expect_equal(bd$se2,   agg$se2,   tolerance = 1e-10)
   # The outside flag is exactly |mean resid| > 2 sd / sqrt(n)
   expect_equal(bd$outside, abs(bd$resid) > bd$se2)
+
+  # At the default 17 bins, 0.3.0 drew these bounds and flagged five bins.
+  bd <- attr(binned_residual_plot(gfit, band = "empirical"), "bins")
+  expect_equal(bd$se2[1:3], c(0.001765791, 0.001317092, 0.001185107),
+               tolerance = 1e-6)
+  expect_identical(which(bd$outside), c(1L, 2L, 3L, 5L, 14L))
+})
+
+test_that("the model band flags about one bin in twenty under a correct model", {
+  skip_on_cran()
+  # Outcomes redrawn from the fitted model, which the refitted model then
+  # specifies correctly. The empirical band flags most of the bins that hold
+  # few events.
+  withr::local_seed(2026)
+  gfit <- glm(adverse_event ~ biomarker + age + arm,
+              data = clinical_trial, family = binomial)
+  ct <- clinical_trial
+  p <- stats::fitted(gfit)
+  flagged <- vapply(seq_len(200), function(i) {
+    ct$adverse_event <- stats::rbinom(nrow(ct), 1, p)
+    refit <- glm(adverse_event ~ biomarker + age + arm, data = ct,
+                 family = binomial)
+    c(model = mean(depictr:::binned_residual_data(refit)$outside),
+      empirical = mean(depictr:::binned_residual_data(
+        refit, band = "empirical")$outside))
+  }, numeric(2))
+  share <- rowMeans(flagged)
+  expect_lt(share[["model"]], 0.06)
+  expect_gt(share[["empirical"]], 0.2)
+})
+
+test_that("observations with zero prior weight are left out of the bins", {
+  # They take no part in the fit, and a variance divided by a zero weight
+  # would make the band of their bin infinite. A Gaussian fit's dispersion
+  # leaves them out as well, so its band is that of the fit without them.
+  withr::local_seed(12)
+  n <- 200
+  d <- data.frame(x = stats::rnorm(n), w = 1)
+  d$y <- stats::rbinom(n, 1, stats::plogis(0.3 + d$x))
+  d$z <- 1 + d$x + stats::rnorm(n)
+  d$w[c(5, 60, 140)] <- 0
+  fits <- list(
+    binomial = list(glm(y ~ x, data = d, family = binomial, weights = w),
+                    glm(y ~ x, data = d[d$w > 0, ], family = binomial)),
+    gaussian = list(glm(z ~ x, data = d, weights = w),
+                    glm(z ~ x, data = d[d$w > 0, ]))
+  )
+  for (nm in names(fits)) {
+    for (band in c("model", "empirical")) {
+      if (nm == "gaussian" && band == "model") {
+        # summary.glm() warns that its dispersion leaves them out.
+        expect_warning(p <- binned_residual_plot(fits[[nm]][[1]], band = band),
+                       "zero weight")
+      } else {
+        p <- binned_residual_plot(fits[[nm]][[1]], band = band)
+      }
+      expect_equal(attr(p, "bins"),
+                   attr(binned_residual_plot(fits[[nm]][[2]], band = band),
+                        "bins"),
+                   tolerance = 1e-8, label = paste(nm, band))
+    }
+  }
+})
+
+test_that("binned residuals of an na.exclude fit are those of its na.omit twin", {
+  # The band reads the prior weights, which hold one value per row of the fit,
+  # so the fitted values and residuals must too.
+  d <- lexical_decision
+  d$RT_na <- d$RT
+  d$RT_na[seq(1, nrow(d), length.out = 50)] <- NA
+  fe <- glm(accuracy ~ word_frequency + RT_na, data = d, family = binomial,
+            na.action = na.exclude)
+  fo <- glm(accuracy ~ word_frequency + RT_na, data = d, family = binomial,
+            na.action = na.omit)
+  for (band in c("model", "empirical")) {
+    for (type in c("response", "pearson")) {
+      expect_identical(
+        attr(binned_residual_plot(fe, type = type, band = band), "bins"),
+        attr(binned_residual_plot(fo, type = type, band = band), "bins"),
+        label = paste(band, type)
+      )
+    }
+  }
 })
 
 test_that("quantile residuals are ~uniform for a well-specified GLM", {

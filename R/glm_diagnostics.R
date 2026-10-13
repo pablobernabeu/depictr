@@ -6,12 +6,37 @@
 #' residuals against fitted values is hard to read because the residuals take
 #' only a few values. Following Gelman and Hill (2007), this plot instead splits
 #' the data into equal-count bins of fitted values and plots, for each bin, the
-#' mean residual against the mean fitted value. Under a well-specified model the
+#' mean residual against the mean fitted value, inside a grey band of
+#' \eqn{\pm 2} standard errors of that mean. Under a well-specified model, the
 #' binned residuals scatter around zero, and about 95% of them should fall
-#' within the grey \eqn{\pm 2} standard-error band, computed per bin as
-#' \eqn{2\,\hat{\sigma}_{\text{bin}}/\sqrt{n_{\text{bin}}}} from the residuals in
-#' that bin. Systematic departures (a trend, or many points outside the band)
-#' indicate a misspecified mean structure.
+#' within the band. Systematic departures (a trend, or many points outside the
+#' band) indicate a misspecified mean structure.
+#'
+#' By default (`band = "model"`), the standard error is the one the fitted
+#' model implies. The model gives the response \eqn{y_i} the variance
+#' \eqn{\phi V(\hat\mu_i) / w_i}, where \eqn{V} is the family's variance
+#' function, \eqn{w_i} the prior weight and \eqn{\phi} the dispersion. The
+#' dispersion is 1 for the binomial and Poisson families,
+#' `summary(model)$dispersion` for the others and \eqn{\hat\sigma^2} for an
+#' `lm`. Taking this as the variance of the response residual
+#' \eqn{y_i - \hat\mu_i}, the band gives the mean of the \eqn{n_b} residuals in
+#' bin \eqn{b} the standard error
+#' \eqn{\sqrt{\sum_{i \in b} \phi V(\hat\mu_i) / w_i} / n_b}. A Pearson
+#' residual, \eqn{(y_i - \hat\mu_i) \sqrt{w_i / V(\hat\mu_i)}}, then has
+#' variance \eqn{\phi}, so its bin mean has standard error
+#' \eqn{\sqrt{\phi / n_b}}. The fit absorbs a little of each observation's
+#' variance, so a residual varies slightly less than this and the band errs on
+#' the wide side. Observations with zero prior weight take no part in the fit
+#' and are left out of the bins.
+#'
+#' `band = "empirical"` draws the band of depictr 0.3.0 and earlier, the one
+#' `arm::binnedplot()` draws: twice the standard deviation of the residuals in
+#' the bin, divided by \eqn{\sqrt{n_b}}. It collapses wherever the outcomes in
+#' a bin are all alike. The residuals in a logistic model's bin without events
+#' all lie just below zero, so its band nearly vanishes and the bin is flagged.
+#' Where events are rare, such bins are what the model expects. The example
+#' below, a correctly specified model, has five of its seventeen bins flagged
+#' by that band and none by the model's.
 #'
 #' @param model A fitted `glm` object (an `lm` is also accepted and treated as a
 #'   Gaussian GLM).
@@ -23,10 +48,14 @@
 #' @param point_colour,band_colour Colours for the bin points and the
 #'   \eqn{\pm 2} SE band. Default to the depictr brand and accent colours.
 #' @param title Plot title.
+#' @param band Where the standard errors come from. The default, `"model"`,
+#'   takes them from the variance the fitted model implies for each residual.
+#'   `"empirical"` takes them from the spread of the residuals in each bin, as
+#'   in depictr 0.3.0 and `arm::binnedplot()`.
 #'
-#' @return A [ggplot2::ggplot] object. The per-bin summary (mean fitted, mean
-#'   residual, SE bound and an `outside` flag) is attached as
-#'   `attr(plot, "bins")`.
+#' @return A [ggplot2::ggplot] object. The per-bin summary (mean fitted value,
+#'   mean residual, number of observations `n`, the band's half-width `se2`
+#'   and an `outside` flag) is attached as `attr(plot, "bins")`.
 #' @references
 #' \insertRef{gelman2007}{depictr}
 #' @export
@@ -34,16 +63,21 @@
 #' gfit <- glm(adverse_event ~ biomarker + age + arm,
 #'             data = clinical_trial, family = binomial)
 #' binned_residual_plot(gfit)
+#'
+#' # The band of depictr 0.3.0, which flags the bins that hold no events:
+#' binned_residual_plot(gfit, band = "empirical")
 binned_residual_plot <- function(model, bins = NULL,
                                  type = c("response", "pearson"),
                                  point_colour = depictr_brand(),
                                  band_colour = depictr_accent(),
-                                 title = NULL) {
+                                 title = NULL,
+                                 band = c("model", "empirical")) {
   if (!inherits(model, "lm")) {
     stop("`model` must be an 'lm' or 'glm' object.", call. = FALSE)
   }
   type <- match.arg(type)
-  bd <- binned_residual_data(model, bins = bins, type = type)
+  band <- match.arg(band)
+  bd <- binned_residual_data(model, bins = bins, type = type, band = band)
 
   p <- ggplot2::ggplot(bd, ggplot2::aes(x = .data$fitted, y = .data$resid)) +
     ggplot2::geom_hline(yintercept = 0, linetype = 2,
@@ -77,24 +111,61 @@ binned_residual_plot <- function(model, bins = NULL,
 #' Per-bin binned-residual summary
 #'
 #' Splits the observations into `bins` equal-count groups of fitted values and
-#' returns, per bin, the mean fitted value, the mean residual and the
-#' \eqn{2\,\mathrm{sd}/\sqrt{n}} bound (Gelman & Hill, 2007). Used by
-#' [binned_residual_plot()] and re-used by [residual_diagnostics_plot()].
+#' returns, per bin, the mean fitted value, the mean residual, the number of
+#' observations and twice the standard error of the mean residual (Gelman &
+#' Hill, 2007). The standard error comes from the fitted model or from the
+#' residuals in the bin, as `band` says. Used by [binned_residual_plot()] and
+#' re-used by [residual_diagnostics_plot()].
 #' @param model A fitted `lm`/`glm`.
 #' @param bins Number of bins, or `NULL` for the \eqn{\sqrt{n}} default.
 #' @param type Residual type, `"response"` or `"pearson"`.
+#' @param band `"model"` for the standard error the model implies, or
+#'   `"empirical"` for the standard deviation of the bin's residuals over the
+#'   square root of its count.
 #' @noRd
 binned_residual_data <- function(model, bins = NULL,
-                                 type = c("response", "pearson")) {
+                                 type = c("response", "pearson"),
+                                 band = c("model", "empirical")) {
   type <- match.arg(type)
-  fitted <- as.numeric(stats::fitted(model))
-  resid <- as.numeric(stats::residuals(model, type = type))
-  ok <- is.finite(fitted) & is.finite(resid)
-  fitted <- fitted[ok]
-  resid <- resid[ok]
+  band <- match.arg(band)
+  # The model's own components hold one value per row of the fit, as the prior
+  # weights do, whereas fitted() and residuals() pad with NA the rows that
+  # na.exclude left out.
+  mu <- as.numeric(model$fitted.values)
+  if (inherits(model, "glm")) {
+    # A glm fitted with y = FALSE keeps no response, so it is recovered from
+    # the working residuals, as residuals.glm() recovers it.
+    y <- model$y %||%
+      (mu + model$residuals * model$family$mu.eta(model$linear.predictors))
+    w <- model$prior.weights
+    v <- model$family$variance(mu)
+  } else {
+    y <- mu + model$residuals
+    w <- model$weights %||% rep(1, length(mu))
+    v <- rep(1, length(mu))
+  }
+  # An observation with zero prior weight takes no part in the fit, and the
+  # model gives its residual no finite variance.
+  ok <- is.finite(mu) & is.finite(as.numeric(y)) & w > 0
+  fitted <- mu[ok]
+  w <- w[ok]
+  v <- v[ok]
+  resid <- as.numeric(y)[ok] - fitted
+  if (type == "pearson") resid <- resid * sqrt(w / v)
   n <- length(fitted)
   if (n < 4) {
     stop("Too few observations for a binned-residual plot.", call. = FALSE)
+  }
+  if (band == "model") {
+    # The variance of each residual under the model: phi V(mu_i) / w_i on the
+    # response scale, and phi for a Pearson residual. phi is 1 for the
+    # binomial and Poisson families.
+    phi <- if (inherits(model, "glm")) {
+      summary(model)$dispersion
+    } else {
+      stats::sigma(model)^2
+    }
+    resid_var <- if (type == "pearson") rep(phi, n) else phi * v / w
   }
 
   if (is.null(bins)) {
@@ -116,7 +187,15 @@ binned_residual_data <- function(model, bins = NULL,
   rows <- lapply(split_idx, function(ix) {
     nb <- length(ix)
     rb <- resid[ix]
-    se <- if (nb > 1L) stats::sd(rb) / sqrt(nb) else NA_real_
+    se <- if (band == "model") {
+      # The mean of independent residuals: the root of their summed
+      # variances over their count.
+      sqrt(sum(resid_var[ix])) / nb
+    } else if (nb > 1L) {
+      stats::sd(rb) / sqrt(nb)
+    } else {
+      NA_real_
+    }
     data.frame(
       fitted = mean(fitted[ix]),
       resid  = mean(rb),

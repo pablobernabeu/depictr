@@ -358,6 +358,19 @@
   predictors)". The help page and the model-estimates vignette no longer claim
   that the standardised magnitudes are comparable.
 
+* `binned_residual_plot()` draws its band from the model, as twice the
+  standard error of a bin's mean residual that the fitted model implies. The
+  old band, twice the standard deviation of the bin's residuals over the square
+  root of its count, collapsed wherever a bin held no events. On the package's
+  own example, a correctly specified model, it flagged five of seventeen bins.
+  When the adverse events were redrawn 200 times from the fitted model, so that
+  each refit was correct by construction, the old band flagged 31% of the bins
+  and the new one 3%. The binned-residual panel that
+  `residual_diagnostics_plot()` and `model_report()` draw for a `glm` changes
+  with it. `band = "empirical"` reproduces the earlier figure, whose band is
+  the one `arm::binnedplot()` draws. Observations with zero prior weight, which
+  take no part in the fit, are now left out of the bins.
+
 # depictr 0.3.0
 
 ## Auditing a finished figure
