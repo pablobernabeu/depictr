@@ -33,9 +33,9 @@ because they are collinear with the others. Values are computed from base R
 For single-degree-of-freedom terms this is the ordinary VIF, \eqn{1/(1-R^2)}.
 For terms that span several design-matrix columns (multi-level factors, or
 spline/polynomial bases) the function reports the generalised VIF of Fox and
-Monette (1992): with \eqn{R} the correlation matrix of the (centred)
-predictor columns, \eqn{R_{11}} the block for the term and \eqn{R_{22}} the
-block for the remaining columns,
+Monette (1992): with \eqn{R} the correlation matrix of the coefficient
+estimates other than the intercept, \eqn{R_{11}} the block for the term and
+\eqn{R_{22}} the block for the remaining coefficients,
 \deqn{\mathrm{GVIF} = \frac{\det(R_{11})\,\det(R_{22})}{\det(R)}.}
 When every term has a single degree of freedom the bars are the ordinary
 VIFs, on a plain "Variance inflation factor" axis with the reference line at
@@ -45,6 +45,15 @@ term equals \eqn{\sqrt{\mathrm{VIF}}}) and the reference line moves to
 \eqn{\sqrt{\mathrm{threshold}}} accordingly. The x-axis is kept tight to the
 data: when every bar is comfortably below the threshold the line is reported
 in the caption rather than drawn into a wide empty band.
+
+The correlations come from the fit's unscaled coefficient covariance, so a
+\code{glm} or a weighted \code{lm} is measured with the weights of its fit, and the
+values agree with those of \code{car::vif()}. For an unweighted \code{lm} with an
+intercept, they are the values the formula gives with \eqn{R} the
+correlation matrix of the predictor columns, as Fox and Monette state it. A
+model with aliased coefficients has no VIF and is refused, with the terms
+they belong to named. A model without an intercept warns, as \code{car::vif()}
+does, because its VIFs then come from columns that are not centred.
 }
 \examples{
 # Two deliberately collinear predictors: soil moisture is largely driven by

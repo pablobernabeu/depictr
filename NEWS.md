@@ -263,6 +263,18 @@
   colours are read as the fill scale draws them, interpolated in the Lab colour
   space, where the confusion matrix used an RGB approximation.
 
+* `vif_plot()` computed the VIFs of a weighted `lm` or a `glm` from the
+  correlations of the design matrix, which leave out the weights of the fit.
+  The generalised VIF of Fox and Monette (1992) compares the confidence region
+  of a term's coefficients with the one they would have without collinearity,
+  so it depends on those weights. The VIFs now come from the covariance of the
+  coefficients, as `car::vif()` computes them, and agree with it. For
+  `glm(adverse_event ~ biomarker + age + arm, family = binomial)` fitted to
+  `clinical_trial`, the VIF of age moves from 1.0073 to 1.0046. An unweighted
+  `lm` with an intercept gives the values it gave before. A model fitted
+  without an intercept now gives VIFs computed from columns that are not
+  centred, with a warning, as `car::vif()` does.
+
 ## Degenerate input
 
 * `survival_plot()` truncated a non-integer status code, so `c(0, 0.5, 1)` was
@@ -273,6 +285,10 @@
   in the risk table, and `logrank = TRUE` failed with an error that did not say
   why. The arm is now dropped with the missing statuses, as it already was for
   a character `group`.
+
+* `vif_plot()` refuses a model with aliased coefficients, for which no VIF
+  exists, and names the terms they belong to. It failed with an unrelated
+  base-R error, "missing value where TRUE/FALSE needed".
 
 ## Auditing a finished figure
 

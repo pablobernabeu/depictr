@@ -11,9 +11,9 @@
 #' For single-degree-of-freedom terms this is the ordinary VIF, \eqn{1/(1-R^2)}.
 #' For terms that span several design-matrix columns (multi-level factors, or
 #' spline/polynomial bases) the function reports the generalised VIF of Fox and
-#' Monette (1992): with \eqn{R} the correlation matrix of the (centred)
-#' predictor columns, \eqn{R_{11}} the block for the term and \eqn{R_{22}} the
-#' block for the remaining columns,
+#' Monette (1992): with \eqn{R} the correlation matrix of the coefficient
+#' estimates other than the intercept, \eqn{R_{11}} the block for the term and
+#' \eqn{R_{22}} the block for the remaining coefficients,
 #' \deqn{\mathrm{GVIF} = \frac{\det(R_{11})\,\det(R_{22})}{\det(R)}.}
 #' When every term has a single degree of freedom the bars are the ordinary
 #' VIFs, on a plain "Variance inflation factor" axis with the reference line at
@@ -23,6 +23,15 @@
 #' \eqn{\sqrt{\mathrm{threshold}}} accordingly. The x-axis is kept tight to the
 #' data: when every bar is comfortably below the threshold the line is reported
 #' in the caption rather than drawn into a wide empty band.
+#'
+#' The correlations come from the fit's unscaled coefficient covariance, so a
+#' `glm` or a weighted `lm` is measured with the weights of its fit, and the
+#' values agree with those of `car::vif()`. For an unweighted `lm` with an
+#' intercept, they are the values the formula gives with \eqn{R} the
+#' correlation matrix of the predictor columns, as Fox and Monette state it. A
+#' model with aliased coefficients has no VIF and is refused, with the terms
+#' they belong to named. A model without an intercept warns, as `car::vif()`
+#' does, because its VIFs then come from columns that are not centred.
 #'
 #' @param model A fitted `lm` or `glm` model with at least two predictors.
 #' @param threshold Reference value for the ordinary VIF, drawn as a line. For
@@ -130,26 +139,54 @@ vif_plot <- function(model, threshold = 5,
 
 #' Generalised variance inflation factors, one per model term
 #'
-#' Groups the design-matrix columns belonging to each model term and returns the
+#' Groups the coefficients belonging to each model term and returns the
 #' Fox-Monette generalised VIF together with the adjusted value
 #' `GVIF^(1/(2*df))` that puts every term on a common scale. Single-df terms
-#' reduce to the ordinary VIF.
+#' reduce to the ordinary VIF. The Python twin's `_gvif_terms()` is a port.
 #' @return A data frame with columns `term`, `df`, `gvif` and `gvif_adj`.
 #' @noRd
 gvif_terms <- function(model) {
-  X <- stats::model.matrix(model)
-  assign <- attr(X, "assign")
+  assign <- attr(stats::model.matrix(model), "assign")
   term_labels <- attr(stats::terms(model), "term.labels")
 
-  # Drop the intercept column (assign == 0); it is not a predictor.
-  keep <- assign != 0
-  X <- X[, keep, drop = FALSE]
-  assign <- assign[keep]
-  if (ncol(X) < 2) {
-    stop("VIF needs at least two predictor columns.", call. = FALSE)
+  # lm() and glm() leave an aliased coefficient NA. It has no variance of its
+  # own, so its term has no VIF, and car::vif() refuses such a model too.
+  aliased <- is.na(stats::coef(model))
+  if (is.matrix(aliased)) aliased <- rowSums(aliased) > 0
+  if (any(aliased)) {
+    vif_aliased_error(c("(Intercept)", term_labels)[unique(assign[aliased]) + 1])
   }
 
-  R <- stats::cor(X)
+  # Drop the intercept (assign == 0); it is not a predictor.
+  keep <- assign != 0
+  assign <- assign[keep]
+  if (length(assign) < 2) {
+    stop("VIF needs at least two predictor columns.", call. = FALSE)
+  }
+  # Without an intercept, the coefficients' covariance is built from
+  # uncentred columns, which makes predictors far from zero look collinear
+  # with each other. car::vif() gives a warning for the same reason.
+  if (all(keep)) {
+    warning("`model` has no intercept, so the VIFs come from uncentred ",
+            "columns and can be inflated by the predictors' means.",
+            call. = FALSE)
+  }
+
+  # The GVIF compares the confidence region of a term's coefficients with the
+  # one they would have if their columns were uncorrelated with the rest. R is
+  # therefore the correlation matrix of the coefficient estimates, as in
+  # car::vif(). For an unweighted lm with an intercept, this gives the same
+  # values as the correlations of the predictor columns. Only the estimates'
+  # covariance, however, reflects the weights of a weighted lm or of a glm's
+  # fit. The unscaled covariance, (X'WX)^-1, is read from the fit's QR
+  # decomposition, as summary.lm() and summary.glm() read it. vcov() scales it
+  # by the dispersion, which cancels in the correlations, and warns when a
+  # model fits its data exactly. Without aliasing, the QR is unpivoted, in
+  # coef() order.
+  qr_fit <- qr(model)
+  rank <- seq_len(qr_fit$rank)
+  V <- chol2inv(qr_fit$qr[rank, rank, drop = FALSE])
+  R <- stats::cov2cor(V[keep, keep, drop = FALSE])
   detR <- det(R)
   terms_present <- sort(unique(assign))
 
@@ -169,5 +206,22 @@ gvif_terms <- function(model) {
       stringsAsFactors = FALSE
     )
   })
-  do.call(rbind, rows)
+  res <- do.call(rbind, rows)
+
+  # A GVIF is at least 1 whenever the coefficients' covariance has full rank.
+  # A value that is not finite or not positive means rounding has left it
+  # singular, which is aliasing by another route.
+  bad <- !is.finite(res$gvif) | res$gvif <= 0
+  if (any(bad)) vif_aliased_error(res$term[bad])
+  res
+}
+
+#' Refuse a VIF for aliased coefficients, naming the terms they belong to
+#'
+#' The Python twin raises the same sentence.
+#' @noRd
+vif_aliased_error <- function(terms) {
+  stop("VIF is undefined when coefficients are aliased: ",
+       paste(terms, collapse = ", "),
+       ". Drop the redundant term(s) and refit.", call. = FALSE)
 }
