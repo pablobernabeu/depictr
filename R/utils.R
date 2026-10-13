@@ -103,6 +103,77 @@ drop_constant_matrix_columns <- function(mat, what) {
   mat
 }
 
+#' Prepare the grouping variable of a grouped plot
+#'
+#' Every grouped plot treats its group the same way, so that the same data give
+#' the same groups and colours in every function and in the Python twin. The
+#' group becomes a factor, so a numeric code is a group like any other. A
+#' numeric column with more than 20 distinct values is refused, though, since
+#' one group per value of a continuous variable is never what was meant. The
+#' threshold and the wording are those explore_categorical() applies to its
+#' `x`. Rows whose group is missing belong to no group, and they are dropped
+#' with survival_plot()'s message. Levels left without rows are dropped, so
+#' they take no place in the legend, on an axis or in the palette. Last, the
+#' palette is named by level, unless the user named it already, so that a level
+#' takes the same colour in every layer and panel, even one that lacks some
+#' levels.
+#'
+#' Call it after the rows missing a plotted value have been set aside, so that
+#' the levels are those of the rows drawn.
+#' @param data A data frame.
+#' @param group Name of the grouping column, or `NULL`.
+#' @param palette The user's palette, or `NULL` for [depictr_palette()].
+#' @return A list with elements `data`, `levels` and `palette`. `data` holds
+#'   the rows with a group, whose group column is now a factor of the levels in
+#'   use, and `palette` gives a colour for each level, named by level. Without
+#'   a group, `data` and `palette` come back as given and `levels` is `NULL`.
+#' @noRd
+prepare_group <- function(data, group, palette = NULL) {
+  if (is.null(group)) {
+    return(list(data = data, levels = NULL, palette = palette))
+  }
+  g <- data[[group]]
+  if (is.numeric(g)) {
+    n_distinct <- length(unique(g[!is.na(g)]))
+    if (n_distinct > 20) {
+      stop("`group` (", group, ") is numeric with ", n_distinct,
+           " distinct values; it looks continuous, not categorical. Bin it, ",
+           "or convert it to a factor first.", call. = FALSE)
+    }
+  }
+  no_group <- is.na(g)
+  if (length(g) && all(no_group)) {
+    stop("`group` is missing for every observation.", call. = FALSE)
+  }
+  if (any(no_group)) {
+    message(sum(no_group), " observation(s) with a missing group were dropped.")
+    data <- data[!no_group, , drop = FALSE]
+  }
+  data[[group]] <- droplevels(as.factor(data[[group]]))
+  lv <- levels(data[[group]])
+  list(data = data, levels = lv, palette = group_palette(lv, palette))
+}
+
+#' Name a palette by the levels it colours
+#'
+#' A named palette is the user's way to pin a colour to a level across figures,
+#' so it is kept as given. An unnamed one is taken in level order, as ggplot2's
+#' manual scale takes it, over the levels in use. One with fewer colours than
+#' there are levels is left for the manual scale to report, as before.
+#' @param levels The levels of the group.
+#' @param palette The user's palette, or `NULL` for [depictr_palette()].
+#' @noRd
+group_palette <- function(levels, palette = NULL) {
+  if (!length(levels)) return(palette)
+  if (is.null(palette)) {
+    return(stats::setNames(depictr_palette(length(levels)), levels))
+  }
+  if (!is.null(names(palette)) || length(palette) < length(levels)) {
+    return(palette)
+  }
+  stats::setNames(palette[seq_along(levels)], levels)
+}
+
 #' Resolve a column argument that may be a string or an unquoted name
 #'
 #' Accepts either `"col"` or `col` and returns the column name as a string,

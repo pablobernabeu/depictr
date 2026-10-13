@@ -26,7 +26,10 @@ explore_distribution(
 column name.}
 
 \item{group}{Optional grouping variable (string or unquoted name) mapped to
-colour/fill.}
+colour/fill. A numeric code counts as a group, but a numeric column with
+more than 20 distinct values is refused as continuous. Rows with a missing
+group are dropped with a message, and levels without rows are left out of
+the plot and its palette.}
 
 \item{type}{One of \code{"histogram"}, \code{"density"} or \code{"both"}.}
 

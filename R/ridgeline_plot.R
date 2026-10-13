@@ -17,7 +17,10 @@
 #' @param x The numeric variable whose distribution is shown (string or unquoted
 #'   name).
 #' @param group The grouping variable (string or unquoted name); one ridge per
-#'   level.
+#'   level. A numeric code counts as a group, but a numeric column with more
+#'   than 20 distinct values is refused as continuous. Rows with a missing group
+#'   are dropped with a message, and levels without rows are left out of the
+#'   plot and its palette.
 #' @param overlap How far each ridge extends into the next, as a multiple of the
 #'   row spacing. `1` makes the tallest ridge just touch the next baseline;
 #'   larger values overlap more. Defaults to `1.4`.
@@ -44,10 +47,11 @@ ridgeline_plot <- function(data, x, group, overlap = 1.4, alpha = 0.85,
   x_lab <- x_lab %||% x
   y_lab <- y_lab %||% group
 
-  d <- data[stats::complete.cases(data[, c(x, group), drop = FALSE]), ,
-            drop = FALSE]
-  g <- droplevels(as.factor(d[[group]]))
-  groups <- levels(g)
+  prep <- prepare_group(data[!is.na(data[[x]]), , drop = FALSE], group,
+                        palette)
+  d <- prep$data
+  g <- d[[group]]
+  groups <- prep$levels
   pos <- stats::setNames(seq_along(groups), groups)
 
   # Each element carries its density row (NULL if too sparse to estimate) and,
@@ -90,15 +94,13 @@ ridgeline_plot <- function(data, x, group, overlap = 1.4, alpha = 0.85,
   dens$draw_group <- factor(dens$group, levels = rev(groups))
   dens$group <- factor(dens$group, levels = groups)
 
-  pal_fun <- if (is.null(palette)) NULL else function(k) palette
-
   ggplot2::ggplot(dens, ggplot2::aes(x = .data$x, group = .data$draw_group,
                                      fill = .data$group)) +
     ggplot2::geom_ribbon(
       ggplot2::aes(ymin = .data$base, ymax = .data$y),
       colour = "white", linewidth = 0.3, alpha = alpha
     ) +
-    scale_fill_depictr(palette = pal_fun) +
+    ggplot2::scale_fill_manual(values = prep$palette) +
     ggplot2::scale_y_continuous(breaks = pos, labels = groups,
                                 expand = ggplot2::expansion(mult = c(0, 0.08))) +
     ggplot2::labs(x = x_lab, y = y_lab, title = title) +

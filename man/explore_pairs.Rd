@@ -18,10 +18,15 @@ explore_pairs(
 \arguments{
 \item{data}{A data frame.}
 
-\item{cols}{Numeric columns to include. If \code{NULL}, all numeric columns are
-used (up to \code{max_cols}).}
+\item{cols}{Numeric columns to include, which cannot include \code{group}. If
+\code{NULL}, every numeric column other than \code{group} is used (up to
+\code{max_cols}).}
 
-\item{group}{Optional grouping variable mapped to colour.}
+\item{group}{Optional grouping variable mapped to colour, with each level in
+the same colour in every panel. A numeric code counts as a group, but a
+numeric column with more than 20 distinct values is refused as continuous.
+Rows with a missing group are dropped with a message, and levels without
+rows are left out of the plot and its palette.}
 
 \item{max_cols}{Safety cap on the number of variables (a k-by-k matrix grows
 quickly).}

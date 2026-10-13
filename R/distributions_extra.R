@@ -14,7 +14,10 @@
 #'
 #' @param data A data frame.
 #' @param y The numeric variable (string or unquoted name).
-#' @param group Optional grouping variable on the x-axis.
+#' @param group Optional grouping variable on the x-axis. A numeric code counts
+#'   as a group, but a numeric column with more than 20 distinct values is
+#'   refused as continuous. Rows with a missing group are dropped with a
+#'   message, and levels without rows are left out of the plot and its palette.
 #' @param width Maximum width of the half-violin.
 #' @param point_alpha Transparency of the rain points.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
@@ -33,8 +36,11 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
   if (!is.numeric(data[[y]])) stop("`y` must be numeric.", call. = FALSE)
   y_lab <- y_lab %||% y
 
-  d <- data[!is.na(data[[y]]), , drop = FALSE]
-  d$.g <- if (is.null(group)) factor("all") else as.factor(d[[group]])
+  prep <- prepare_group(data[!is.na(data[[y]]), , drop = FALSE], group,
+                        palette)
+  d <- prep$data
+  palette <- prep$palette
+  d$.g <- if (is.null(group)) factor("all") else d[[group]]
   groups <- levels(d$.g)
   pos <- stats::setNames(seq_along(groups), groups)
 
@@ -100,9 +106,12 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
   if (is.null(palette)) {
     p <- p + scale_fill_depictr() + scale_colour_depictr()
   } else {
-    p <- p +
-      ggplot2::scale_fill_manual(values = palette) +
-      ggplot2::scale_colour_manual(values = palette)
+    p <- p + ggplot2::scale_colour_manual(values = palette)
+    # Only the half-violins are filled, so when every group is too sparse for
+    # one, a fill scale named by level would find no level to colour and warn.
+    if (!is.null(dens) && nrow(dens)) {
+      p <- p + ggplot2::scale_fill_manual(values = palette)
+    }
   }
 
   if (is.null(group)) {
@@ -124,7 +133,10 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
 #'
 #' @param data A data frame.
 #' @param y The numeric outcome (string or unquoted name).
-#' @param group The grouping variable (string or unquoted name).
+#' @param group The grouping variable (string or unquoted name). A numeric code
+#'   counts as a group, but a numeric column with more than 20 distinct values
+#'   is refused as continuous. Rows with a missing group are dropped with a
+#'   message, and levels without rows are left out of the plot and its palette.
 #' @param conf_level Confidence level for the intervals (t-based).
 #' @param show_points Whether to draw the raw data behind the means.
 #' @param point_alpha Transparency of the raw points.
@@ -155,22 +167,26 @@ group_comparison_plot <- function(data, y, group, conf_level = 0.95,
                                   differences = FALSE, reference = NULL,
                                   n_boot = 5000, palette = NULL, title = NULL,
                                   x_lab = NULL, y_lab = NULL) {
-  if (isTRUE(differences)) {
-    return(estimation_plot(
-      data, y = {{ y }}, group = {{ group }}, reference = reference,
-      conf_level = conf_level, n_boot = n_boot, show_points = show_points,
-      point_alpha = point_alpha, palette = palette, title = title, y_lab = y_lab
-    ))
-  }
   y <- resolve_var(data, rlang::enquo(y), "y")
   group <- resolve_var(data, rlang::enquo(group), "group")
   if (!is.numeric(data[[y]])) stop("`y` must be numeric.", call. = FALSE)
+
+  prep <- prepare_group(data[!is.na(data[[y]]), , drop = FALSE], group,
+                        palette)
+  if (isTRUE(differences)) {
+    # estimation_plot() draws both panels from the groups formed here, so a
+    # missing or continuous group meets the same rule with the differences.
+    return(estimation_plot(
+      prep$data, y = !!y, group = !!group, reference = reference,
+      conf_level = conf_level, n_boot = n_boot, show_points = show_points,
+      point_alpha = point_alpha, palette = prep$palette, title = title,
+      y_lab = y_lab
+    ))
+  }
   x_lab <- x_lab %||% group
   y_lab <- y_lab %||% y
-
-  d <- data[!is.na(data[[y]]) & !is.na(data[[group]]), , drop = FALSE]
-  d[[group]] <- as.factor(d[[group]])
-  groups <- levels(d[[group]])
+  d <- prep$data
+  groups <- prep$levels
 
   # Each element carries its summary row and, for a sparse group, its name --
   # read back below rather than accumulated with `<<-`.
@@ -215,11 +231,7 @@ group_comparison_plot <- function(data, y, group, conf_level = 0.95,
     ) +
     ggplot2::labs(x = x_lab, y = y_lab, title = title) +
     theme_depictr(grid = "y") +
-    ggplot2::theme(legend.position = "none")
-  if (is.null(palette)) {
-    p <- p + scale_colour_depictr()
-  } else {
-    p <- p + ggplot2::scale_colour_manual(values = palette)
-  }
+    ggplot2::theme(legend.position = "none") +
+    ggplot2::scale_colour_manual(values = prep$palette)
   p
 }

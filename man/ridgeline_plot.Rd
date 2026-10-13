@@ -24,7 +24,10 @@ ridgeline_plot(
 name).}
 
 \item{group}{The grouping variable (string or unquoted name); one ridge per
-level.}
+level. A numeric code counts as a group, but a numeric column with more
+than 20 distinct values is refused as continuous. Rows with a missing group
+are dropped with a message, and levels without rows are left out of the
+plot and its palette.}
 
 \item{overlap}{How far each ridge extends into the next, as a multiple of the
 row spacing. \code{1} makes the tallest ridge just touch the next baseline;

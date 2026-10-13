@@ -12,7 +12,11 @@
 #' @param data A data frame.
 #' @param x The categorical variable (string or unquoted name). Numeric columns
 #'   are accepted only when they have at most 20 distinct values.
-#' @param group Optional grouping variable mapped to fill.
+#' @param group Optional grouping variable mapped to fill, with the groups in
+#'   the order of its levels. A numeric code counts as a group, but a numeric
+#'   column with more than 20 distinct values is refused as continuous. Rows
+#'   with a missing group are dropped with a message, and levels without rows
+#'   are left out of the plot and its palette.
 #' @param proportion Whether to show proportions instead of counts. When
 #'   `group` is set, proportions are computed within each group.
 #' @param position Bar position when `group` is set: `"dodge"`, `"stack"` or
@@ -54,14 +58,19 @@ explore_categorical <- function(data, x, group = NULL, proportion = FALSE,
 
   d <- data[!is.na(data[[x]]), , drop = FALSE]
   d[[x]] <- as.factor(d[[x]])
+  prep <- prepare_group(d, group, palette)
+  d <- prep$data
 
   if (is.null(group)) {
     tab <- as.data.frame(table(level = d[[x]]), stringsAsFactors = FALSE)
     tab$value <- if (proportion) tab$Freq / sum(tab$Freq) else tab$Freq
   } else {
-    d[[group]] <- as.factor(d[[group]])
     tab <- as.data.frame(table(level = d[[x]], grp = d[[group]]),
                          stringsAsFactors = FALSE)
+    # The table hands the groups back as text, which ggplot2 would sort
+    # alphabetically, so they are put back in level order, the order of their
+    # colours.
+    tab$grp <- factor(tab$grp, levels = prep$levels)
     if (proportion) {
       denom <- stats::ave(tab$Freq, tab$grp, FUN = sum)
       tab$value <- ifelse(denom > 0, tab$Freq / denom, 0)
@@ -89,12 +98,8 @@ explore_categorical <- function(data, x, group = NULL, proportion = FALSE,
   if (is.null(group)) {
     p <- p + ggplot2::geom_col(fill = depictr_brand(), width = 0.75)
   } else {
-    p <- p + ggplot2::geom_col(position = position, width = 0.75)
-    if (is.null(palette)) {
-      p <- p + scale_fill_depictr(name = group)
-    } else {
-      p <- p + ggplot2::scale_fill_manual(values = palette, name = group)
-    }
+    p <- p + ggplot2::geom_col(position = position, width = 0.75) +
+      ggplot2::scale_fill_manual(values = prep$palette, name = group)
   }
 
   p <- p + ggplot2::labs(x = x_lab, y = y_lab, title = title) +

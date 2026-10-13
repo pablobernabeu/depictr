@@ -8,7 +8,10 @@
 #' @param data A data frame.
 #' @param x,y The variables for the horizontal and vertical axes (string or
 #'   unquoted column name).
-#' @param group Optional grouping variable mapped to colour.
+#' @param group Optional grouping variable mapped to colour. A numeric code
+#'   counts as a group, but a numeric column with more than 20 distinct values
+#'   is refused as continuous. Rows with a missing group are dropped with a
+#'   message, and levels without rows are left out of the plot and its palette.
 #' @param method Smoothing method passed to [ggplot2::geom_smooth()], e.g.
 #'   `"lm"`, `"loess"`, or `NULL` for no trend line.
 #' @param se Whether to draw the confidence band around the trend.
@@ -30,6 +33,16 @@ scatter_trend <- function(data, x, y, group = NULL, method = "lm",
   group <- resolve_var(data, rlang::enquo(group), "group")
   x_lab <- x_lab %||% x
   y_lab <- y_lab %||% y
+  if (!is.null(group)) {
+    # Rows missing x or y are not drawn (the geoms drop them), so they are set
+    # aside before the groups are formed, and the levels are those of the
+    # points drawn.
+    data <- data[stats::complete.cases(data[, c(x, y), drop = FALSE]), ,
+                 drop = FALSE]
+    prep <- prepare_group(data, group, palette)
+    data <- prep$data
+    palette <- prep$palette
+  }
 
   mapping <- if (is.null(group)) {
     ggplot2::aes(x = .data[[x]], y = .data[[y]])
@@ -63,15 +76,9 @@ scatter_trend <- function(data, x, y, group = NULL, method = "lm",
     theme_depictr()
 
   if (!is.null(group)) {
-    if (is.null(palette)) {
-      p <- p +
-        scale_colour_depictr() +
-        scale_fill_depictr()
-    } else {
-      p <- p +
-        ggplot2::scale_colour_manual(values = palette) +
-        ggplot2::scale_fill_manual(values = palette)
-    }
+    p <- p +
+      ggplot2::scale_colour_manual(values = palette) +
+      ggplot2::scale_fill_manual(values = palette)
   }
   p
 }

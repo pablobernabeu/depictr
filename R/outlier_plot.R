@@ -8,7 +8,10 @@
 #'
 #' @param data A data frame.
 #' @param y The numeric variable (string or unquoted name).
-#' @param group Optional grouping variable on the x-axis.
+#' @param group Optional grouping variable on the x-axis. A numeric code counts
+#'   as a group, but a numeric column with more than 20 distinct values is
+#'   refused as continuous. Rows with a missing group are dropped with a
+#'   message, and levels without rows are left out of the plot and its palette.
 #' @param type One of `"box"`, `"violin"` or `"both"`.
 #' @param flag Whether to highlight outliers (points beyond 1.5 * IQR).
 #' @param outlier_colour Colour for highlighted outliers.
@@ -30,8 +33,10 @@ outlier_plot <- function(data, y, group = NULL,
   if (!is.numeric(data[[y]])) stop("`y` must be numeric.", call. = FALSE)
   y_lab <- y_lab %||% y
 
-  d <- data[!is.na(data[[y]]), , drop = FALSE]
-  d$.x <- if (is.null(group)) factor("") else as.factor(d[[group]])
+  prep <- prepare_group(data[!is.na(data[[y]]), , drop = FALSE], group,
+                        palette)
+  d <- prep$data
+  d$.x <- if (is.null(group)) factor("") else d[[group]]
 
   # Flag outliers within each group using the 1.5 * IQR rule
   d$.outlier <- FALSE
@@ -73,10 +78,8 @@ outlier_plot <- function(data, y, group = NULL,
   if (is.null(group)) {
     p <- p + ggplot2::theme(axis.text.x = ggplot2::element_blank(),
                             axis.ticks.x = ggplot2::element_blank())
-  } else if (is.null(palette)) {
-    p <- p + scale_fill_depictr()
   } else {
-    p <- p + ggplot2::scale_fill_manual(values = palette)
+    p <- p + ggplot2::scale_fill_manual(values = prep$palette)
   }
   p
 }

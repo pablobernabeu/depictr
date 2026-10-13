@@ -23,7 +23,11 @@ explore_categorical(
 \item{x}{The categorical variable (string or unquoted name). Numeric columns
 are accepted only when they have at most 20 distinct values.}
 
-\item{group}{Optional grouping variable mapped to fill.}
+\item{group}{Optional grouping variable mapped to fill, with the groups in
+the order of its levels. A numeric code counts as a group, but a numeric
+column with more than 20 distinct values is refused as continuous. Rows
+with a missing group are dropped with a message, and levels without rows
+are left out of the plot and its palette.}
 
 \item{proportion}{Whether to show proportions instead of counts. When
 \code{group} is set, proportions are computed within each group.}

@@ -9,7 +9,10 @@
 #' @param x The continuous variable to display. Either a string or an unquoted
 #'   column name.
 #' @param group Optional grouping variable (string or unquoted name) mapped to
-#'   colour/fill.
+#'   colour/fill. A numeric code counts as a group, but a numeric column with
+#'   more than 20 distinct values is refused as continuous. Rows with a missing
+#'   group are dropped with a message, and levels without rows are left out of
+#'   the plot and its palette.
 #' @param type One of `"histogram"`, `"density"` or `"both"`.
 #' @param bins Number of histogram bins.
 #' @param alpha Fill transparency (useful when groups overlap).
@@ -54,11 +57,12 @@ explore_distribution <- function(data, x, group = NULL,
   # Default position: dodge keeps grouped bars readable; identity for ungrouped.
   position <- position %||% (if (is.null(group)) "identity" else "dodge")
 
-  # Drop rows with NA in the mapped variables so ggplot2 does not emit a
-  # "Removed N rows" warning at draw time.
-  mapped <- c(x, group)
-  keep <- stats::complete.cases(data[, mapped, drop = FALSE])
-  data <- data[keep, , drop = FALSE]
+  # Drop rows with a missing x so ggplot2 does not emit a "Removed N rows"
+  # warning at draw time. Rows with a missing group go next, with a message.
+  data <- data[!is.na(data[[x]]), , drop = FALSE]
+  prep <- prepare_group(data, group, palette)
+  data <- prep$data
+  palette <- prep$palette
 
   aes_main <- if (is.null(group)) {
     ggplot2::aes(x = .data[[x]])
@@ -85,14 +89,12 @@ explore_distribution <- function(data, x, group = NULL,
     theme_depictr()
 
   if (!is.null(group)) {
-    if (is.null(palette)) {
-      p <- p +
-        scale_fill_depictr() +
-        scale_colour_depictr()
-    } else {
-      p <- p +
-        ggplot2::scale_fill_manual(values = palette) +
-        ggplot2::scale_colour_manual(values = palette)
+    p <- p + ggplot2::scale_fill_manual(values = palette)
+    # Grouped histogram bars have no outline, so only a density draws in the
+    # colour scale. Without one, a scale named by level would find no level
+    # to colour and warn.
+    if (type != "histogram") {
+      p <- p + ggplot2::scale_colour_manual(values = palette)
     }
     # One panel per group declutters the overlay; the strips name the groups, so
     # the now-redundant colour legend is dropped.

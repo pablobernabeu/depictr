@@ -24,7 +24,10 @@ scatter_trend(
 \item{x, y}{The variables for the horizontal and vertical axes (string or
 unquoted column name).}
 
-\item{group}{Optional grouping variable mapped to colour.}
+\item{group}{Optional grouping variable mapped to colour. A numeric code
+counts as a group, but a numeric column with more than 20 distinct values
+is refused as continuous. Rows with a missing group are dropped with a
+message, and levels without rows are left out of the plot and its palette.}
 
 \item{method}{Smoothing method passed to \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}, e.g.
 \code{"lm"}, \code{"loess"}, or \code{NULL} for no trend line.}

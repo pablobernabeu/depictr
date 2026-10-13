@@ -159,7 +159,7 @@ test_that("group_comparison_plot(differences = TRUE) yields an estimation plot",
   expect_silent(build_ok(p))
   expect_s3_class(attr(p, "differences"), "data.frame")
 
-  # Forwarding string column names through {{ }} works too.
+  # String column names are forwarded too.
   set.seed(1)
   p2 <- group_comparison_plot(crop_yield, "yield", "treatment",
                               differences = TRUE)

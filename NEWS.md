@@ -250,6 +250,38 @@
   column's name otherwise, so a decision probability such as pilotr's
   `p_meaningful` is not labelled as power.
 
+* The grouped plots each treated a grouping variable in their own way. A
+  numeric code, such as a block numbered 1 and 2, failed in `scatter_trend()`
+  with "Continuous value supplied to a discrete scale", and
+  `explore_distribution()` and `ecdf_plot()` drew it as one ungrouped curve. A
+  level with no rows, as `subset()` leaves in a factor, took a colour in the
+  correlation panel of `explore_pairs()` but not in its scatter panels, so the
+  levels after it changed colour from one panel to the next.
+  `group_comparison_plot()` and `raincloud_plot()` warned that such a level had
+  too few observations and kept an empty place for it on the axis, which
+  `group_comparison_plot()` moved to the end. Missing groups made
+  `raincloud_plot()` fail, were drawn as a grey group of their own by
+  `scatter_trend()`, `outlier_plot()` and `explore_pairs()`, and vanished
+  without a word elsewhere. `scatter_trend()`, `explore_distribution()`,
+  `ecdf_plot()`, `raincloud_plot()`, `group_comparison_plot()`,
+  `explore_categorical()`, `explore_pairs()`, `ridgeline_plot()` and
+  `outlier_plot()` now share one rule. The group becomes a factor, so a numeric
+  code is a group, but a numeric column with more than 20 distinct values is
+  refused as continuous, as `explore_categorical()` already refused such an
+  `x`. Rows with a missing group are dropped with a message, as
+  `survival_plot()` drops them, and levels left without rows take no colour,
+  legend key or place on an axis. Colours are matched to the levels by name, so
+  a level keeps its colour in every layer and panel, and a group too sparse for
+  a ridge no longer shifts the colours of the ridges after it. An unnamed
+  `palette` is assigned to the levels in use in their order, and a named one
+  still pins a colour to each level. `explore_categorical()` now orders its
+  groups by level, where it sorted them alphabetically, so they take the same
+  colours as in the Python package. `explore_pairs()` leaves a numeric `group`
+  out of its default columns and stops with a clear error when `cols` names
+  it. With the default palette, the warning that more than eight groups lose
+  the colour-vision guarantee now comes once, when the plot is made, where it
+  came each time the plot was drawn.
+
 * `palette_preview()`, `confusion_matrix_plot()` and `correlation_heatmap()`
   drew some labels below the 4.5:1 contrast that WCAG asks of text. The first
   two switched from white to dark grey text at a relative luminance of 0.4,

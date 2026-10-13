@@ -10,7 +10,10 @@
 #' @param data A data frame.
 #' @param x The numeric variable (string or unquoted name).
 #' @param group Optional grouping variable (string or unquoted name) mapped to
-#'   colour, giving one ECDF per group.
+#'   colour, giving one ECDF per group. A numeric code counts as a group, but a
+#'   numeric column with more than 20 distinct values is refused as continuous.
+#'   Rows with a missing group are dropped with a message, and levels without
+#'   rows are left out of the plot and its palette.
 #' @param reference_quantiles Optional numeric vector of probabilities in
 #'   \[0, 1\] to mark with light horizontal guides (e.g. `c(0.25, 0.5, 0.75)`);
 #'   `NULL` (the default) draws none.
@@ -35,8 +38,9 @@ ecdf_plot <- function(data, x, group = NULL, reference_quantiles = NULL,
   if (!is.numeric(data[[x]])) stop("`x` must be numeric.", call. = FALSE)
   x_lab <- x_lab %||% x
 
-  d <- data[stats::complete.cases(data[, c(x, group), drop = FALSE]), ,
-            drop = FALSE]
+  prep <- prepare_group(data[!is.na(data[[x]]), , drop = FALSE], group,
+                        palette)
+  d <- prep$data
 
   p <- ggplot2::ggplot(d, ggplot2::aes(x = .data[[x]]))
 
@@ -56,12 +60,8 @@ ecdf_plot <- function(data, x, group = NULL, reference_quantiles = NULL,
   } else {
     p <- p +
       ggplot2::stat_ecdf(ggplot2::aes(colour = .data[[group]]),
-                         geom = "step", linewidth = 0.9, pad = FALSE)
-    p <- p + if (is.null(palette)) {
-      scale_colour_depictr()
-    } else {
-      ggplot2::scale_colour_manual(values = palette)
-    }
+                         geom = "step", linewidth = 0.9, pad = FALSE) +
+      ggplot2::scale_colour_manual(values = prep$palette)
   }
 
   p <- p +

@@ -8,9 +8,14 @@
 #' Built with 'patchwork', so it shares the package theme and palette.
 #'
 #' @param data A data frame.
-#' @param cols Numeric columns to include. If `NULL`, all numeric columns are
-#'   used (up to `max_cols`).
-#' @param group Optional grouping variable mapped to colour.
+#' @param cols Numeric columns to include, which cannot include `group`. If
+#'   `NULL`, every numeric column other than `group` is used (up to
+#'   `max_cols`).
+#' @param group Optional grouping variable mapped to colour, with each level in
+#'   the same colour in every panel. A numeric code counts as a group, but a
+#'   numeric column with more than 20 distinct values is refused as continuous.
+#'   Rows with a missing group are dropped with a message, and levels without
+#'   rows are left out of the plot and its palette.
 #' @param max_cols Safety cap on the number of variables (a k-by-k matrix grows
 #'   quickly).
 #' @param point_alpha Point transparency in the scatter panels.
@@ -36,9 +41,14 @@ explore_pairs <- function(data, cols = NULL, group = NULL, max_cols = 8,
   method <- match.arg(method)
   group <- resolve_var(data, rlang::enquo(group), "group")
   if (is.null(cols)) {
-    cols <- names(data)[vapply(data, is.numeric, logical(1))]
+    # A numeric group is a set of codes, drawn as colours, not a variable.
+    cols <- setdiff(names(data)[vapply(data, is.numeric, logical(1))], group)
   } else {
     check_columns(data, cols)
+    if (!is.null(group) && group %in% cols) {
+      stop("`group` (", group, ") is drawn in colour, so it cannot also be ",
+           "one of `cols`.", call. = FALSE)
+    }
     non_num <- cols[!vapply(data[cols], is.numeric, logical(1))]
     if (length(non_num)) {
       stop("explore_pairs() needs numeric columns; these are not: ",
@@ -51,9 +61,12 @@ explore_pairs <- function(data, cols = NULL, group = NULL, max_cols = 8,
          "). Select fewer with `cols`.", call. = FALSE)
   }
 
-  d <- data
-  if (!is.null(group)) d[[group]] <- as.factor(d[[group]])
-  pal <- palette %||% (if (!is.null(group)) depictr_palette(nlevels(d[[group]])))
+  # The panels are separate plots, and a level missing from one of them would
+  # shift an unnamed palette along by one there, so the palette is named by
+  # level. Each panel drops its own missing values, pair by pair.
+  prep <- prepare_group(data, group, palette)
+  d <- prep$data
+  pal <- prep$palette
 
   k <- length(cols)
   panels <- vector("list", k * k)
