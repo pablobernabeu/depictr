@@ -83,20 +83,26 @@ test_that("the cycle lines of style = \"season\" clear 3:1 against white", {
   }
 })
 
-test_that("the cycle colours pass every colour check up to six cycles", {
+test_that("the cycle colours pass every colour check up to five cycles", {
   # Past about six cycles, a single-hue ramp shows the order of the cycles
-  # more than which is which. Greyscale separability fails from eight cycles
-  # and colour separability at twelve, so neither is asserted there.
-  # redundant_encoding stays at zero, since colour alone tells the cycles
-  # apart.
+  # more than which is which. Measured with CIEDE2000, six cycles pass every
+  # row but deuteranopia, whose closest pair is 4.93 apart. The Python twin
+  # rounds its interpolated ramp one hex unit away and measures 5.24 there.
+  # Every colour row fails from seven cycles and greyscale separability from
+  # eight, so none is asserted there. redundant_encoding stays at zero, since
+  # colour alone tells the cycles apart.
   rows <- c("colour_separability", "colour_separability_protan",
             "colour_separability_deutan", "colour_separability_tritan",
             "greyscale_separability", "geometry_contrast")
-  for (k in 2:6) {
+  for (k in 2:5) {
     cf <- check_figure(seasonal_plot(air_cycles(k), style = "season"))
     expect_identical(cf$verdict[match(rows, cf$check)], rep("pass", 6),
                      label = paste(k, "cycles"))
   }
+  cf <- check_figure(seasonal_plot(air_cycles(6), style = "season"))
+  expect_identical(cf$verdict[match(rows, cf$check)],
+                   c("pass", "pass", "fail", "pass", "pass", "pass"))
+  expect_equal(cf$measured[cf$check == "colour_separability_deutan"], 4.93)
 })
 
 test_that("a non-integer frequency is rounded down to whole seasons", {

@@ -4,33 +4,48 @@
 \alias{palette_safety}
 \title{Check that a palette stays distinguishable under each deficiency}
 \usage{
-palette_safety(colours = NULL, threshold = 5)
+palette_safety(colours = NULL, threshold = 5, metric = c("ciede2000", "cie76"))
 }
 \arguments{
 \item{colours}{The palette to test. Defaults to the depictr qualitative
 palette. Needs at least two colours: a pairwise distance over fewer than
 two has no value, rather than an infinitely safe one.}
 
-\item{threshold}{The smallest acceptable Delta-E.}
+\item{threshold}{The smallest acceptable colour difference, on the scale of
+\code{metric}.}
+
+\item{metric}{The colour difference to measure: \code{"ciede2000"}, the default,
+or \code{"cie76"}, the Euclidean distance in CIELAB that earlier versions
+measured. \code{"cie76"} is kept so that earlier results can be reproduced, and
+a later release will remove it.}
 }
 \value{
 A list with \code{min_delta_e} (the worst case across conditions),
-\code{by_condition} (a named numeric vector, one minimum Delta-E for normal
-vision and for each deficiency), \code{worst_condition} and \code{worst_pair} (the
-closest colours and where they were closest), \code{safe} and \code{threshold}.
+\code{by_condition} (a named numeric vector, one minimum colour difference for
+normal vision and for each deficiency), \code{worst_condition} and \code{worst_pair}
+(the closest colours and where they were closest), \code{safe} and
+\code{threshold}.
 }
 \description{
 For normal vision and each deficiency at full severity, the palette's colours
-are converted to CIE L\emph{a}b* and the smallest pairwise colour difference
-(CIE76 Delta-E) is found. The lower this minimum, the more likely two
-categories are to be confused. A palette counts as safe when the minimum
-across all four conditions is at least \code{threshold}.
+are converted to CIELAB and the smallest colour difference between any two
+of them is found. The difference is CIEDE2000 (Sharma, Wu & Dalal, 2005)
+unless \code{metric} asks for the older measure. The lower this minimum, the
+more likely two categories are to be confused. A palette counts as safe when
+the minimum across all four conditions is at least \code{threshold}.
 }
 \details{
+Earlier versions measured the Euclidean distance in CIELAB, known as CIE76,
+which overstates the difference between saturated colours: the blues
+\verb{#005b96} and \verb{#0060a8} are 8.20 apart by CIE76 and 2.69 by CIEDE2000.
+ggplot2's default palette of five colours passed the check under CIE76,
+although under deuteranopia its sky blue and its pink come within 2.74 of
+each other in CIEDE2000.
+
 The default \code{threshold} of 5 is calibrated against the reference
 colourblind-safe palette: the Okabe-Ito set's tightest pair (reddish purple
-against grey) sits at Delta-E 7.4 under full deuteranopia, so the cut must
-lie below that to pass the recommended palette, while still flagging colours
+against grey) sits at 6.43 under full deuteranopia, so the cut must lie
+below that to pass the recommended palette, while still flagging colours
 that become near-identical under a deficiency. The difference includes
 lightness, which survives colour-vision deficiency, so two colours that share
 a hue but differ in lightness are correctly treated as distinguishable. Full
@@ -45,9 +60,16 @@ palette_safety()
 
 # Two colours a hair apart are flagged.
 palette_safety(c("#005b96", "#015c97"))
+
+# ggplot2's default palette of five colours, which passed under CIE76.
+hue5 <- c("#F8766D", "#A3A500", "#00BF7D", "#00B0F6", "#E76BF3")
+palette_safety(hue5)$safe
+palette_safety(hue5, metric = "cie76")$safe
 }
 \references{
 \insertRef{okabe2008}{depictr}
 
 \insertRef{machado2009}{depictr}
+
+\insertRef{sharma2005}{depictr}
 }

@@ -9,7 +9,8 @@ check_figure(
   width_cm = 17.78,
   render_width_cm = 17.78,
   min_delta_e = 5,
-  min_text_pt = 6
+  min_text_pt = 6,
+  metric = c("ciede2000", "cie76")
 )
 }
 \arguments{
@@ -25,14 +26,20 @@ draws at, which means no scaling.}
 at. Defaults to the same 17.78 cm. The ratio of the two widths is the
 factor every point size is multiplied by.}
 
-\item{min_delta_e}{The smallest acceptable CIE76 colour difference, used for
-the colour and greyscale separability checks. Defaults to 5, matching
-\code{\link[=palette_safety]{palette_safety()}}.}
+\item{min_delta_e}{The smallest acceptable colour difference, on the scale
+of \code{metric}, for the colour separability checks, and the smallest
+acceptable difference in lightness for the greyscale check. Defaults to 5,
+matching \code{\link[=palette_safety]{palette_safety()}}.}
 
 \item{min_text_pt}{The smallest acceptable printed text size, in points,
 for the text around the panel and the text inside it alike. Defaults to
 6, below the floor most journals set (see "Auditing at the printed
 size").}
+
+\item{metric}{The colour difference the colour separability checks measure:
+\code{"ciede2000"}, the default, or \code{"cie76"}, the Euclidean distance in CIELAB
+that earlier versions measured. \code{"cie76"} is kept so that earlier results
+can be reproduced, and a later release will remove it.}
 }
 \value{
 A data frame with one row per check and columns \code{check}, \code{measured},
@@ -74,8 +81,9 @@ alphas within one layer is measured at the smallest. Where marks overlap
 one another, the colour that shows depends on what lies beneath it, and
 that is not measured.
 
-\code{colour_separability} is the smallest CIE76 colour difference (Delta-E)
-between two of the figure's encoding colours, and the three
+\code{colour_separability} is the smallest colour difference between two of the
+figure's encoding colours, by the CIEDE2000 formula (Sharma, Wu & Dalal,
+2005) unless \code{metric} asks for the older CIE76. The three
 \verb{colour_separability_*} rows repeat that measurement after simulating each
 dichromacy at full severity with \code{\link[=simulate_cvd]{simulate_cvd()}}. Encoding colours are the
 distinct colour and fill values that tell groups apart. A layer contributes
@@ -102,7 +110,9 @@ ordered map, such as viridis or depictr's sequential and diverging ramps,
 over a rainbow (Crameri et al., 2020).
 
 \code{greyscale_separability} is the smallest difference in CIE lightness between
-those same colours, which is what survives printing in black and white.
+those same colours, which is what survives printing in black and white. It
+is the absolute difference in lightness, whichever \code{metric} the colour rows
+use.
 
 \code{text_size} is the smallest point size of the text the theme draws around
 the panel: axis labels and titles, legends, facet strips, titles and
@@ -252,6 +262,8 @@ Nature. Guide to preparing final artwork.
 \url{https://www.nature.com/documents/nature-final-artwork.pdf}
 
 PLOS ONE. Figures. \url{https://journals.plos.org/plosone/s/figures}
+
+\insertRef{sharma2005}{depictr}
 
 \insertRef{wcag22}{depictr}
 }

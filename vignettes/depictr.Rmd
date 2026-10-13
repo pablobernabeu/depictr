@@ -164,8 +164,9 @@ palette_preview(cvd = "deutan")
 
 The simulation is available on its own as `simulate_cvd()`, and `palette_safety()`
 turns it into a verdict: for normal vision and each deficiency at full severity it
-reports the smallest perceptual distance between any two colours in a palette, so
-the accessibility claim comes with a number attached.
+reports the smallest perceptual distance between any two colours in a palette, the
+CIEDE2000 colour difference [@sharma2005], so the accessibility claim comes with a
+number attached.
 
 ```{r}
 palette_safety()

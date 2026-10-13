@@ -151,50 +151,142 @@ simulate_cvd <- function(colours, deficiency, severity = 1) {
   cbind(L = 116 * fy - 16, a = 500 * (fx - fy), b = 200 * (fy - fz))
 }
 
-#' Smallest pairwise CIE76 colour difference within a set
+# Degrees to radians and back, as the products that Python's math.radians()
+# and math.degrees() compute, so that the twins round alike.
+.radians_per_degree <- pi / 180
+.degrees_per_radian <- 180 / pi
+
+#' CIEDE2000 colour difference between the rows of two Lab matrices
 #'
-#' Lower bound on how distinguishable a set of colours is: the minimum Euclidean
-#' distance in CIE Lab space across all colour pairs. Larger is safer. The pair
-#' is walked in the same order as the Python twin so that a tie between two
-#' equally close pairs resolves to the same pair in both engines.
+#' The formula as Sharma, Wu and Dalal (2005) set it out, with the parametric
+#' weights kL, kC and kH at 1. Where the definition leaves a choice, theirs is
+#' followed. A neutral colour has a hue angle of zero. A pair in which either
+#' colour is neutral has no hue difference, and its mean hue is the sum of the
+#' two hue angles. The Python twin's `_ciede2000()` evaluates the same
+#' expressions in the same order. The 34 pairs the authors published are in
+#' tests/testthat/fixtures/sharma2005.csv.
+#'
+#' @param lab1,lab2 Matrices with the columns L, a and b, one colour per row,
+#'   or vectors of length three.
+#' @return A numeric vector, one difference per row.
+#' @noRd
+.ciede2000 <- function(lab1, lab2) {
+  lab1 <- matrix(lab1, ncol = 3)
+  lab2 <- matrix(lab2, ncol = 3)
+  l1 <- lab1[, 1]; a1 <- lab1[, 2]; b1 <- lab1[, 3]
+  l2 <- lab2[, 1]; a2 <- lab2[, 2]; b2 <- lab2[, 3]
+
+  # a* is scaled up for colours of low chroma, the formula's correction for
+  # greys, before chroma and hue are taken.
+  c_bar <- (sqrt(a1^2 + b1^2) + sqrt(a2^2 + b2^2)) / 2
+  g <- 0.5 * (1 - sqrt(c_bar^7 / (c_bar^7 + 25^7)))
+  a1p <- (1 + g) * a1
+  a2p <- (1 + g) * a2
+  c1p <- sqrt(a1p^2 + b1^2)
+  c2p <- sqrt(a2p^2 + b2^2)
+  hue <- function(b, a) {
+    h <- ifelse(b == 0 & a == 0, 0, atan2(b, a) * .degrees_per_radian)
+    ifelse(h < 0, h + 360, h)
+  }
+  h1p <- hue(b1, a1p)
+  h2p <- hue(b2, a2p)
+
+  # The differences in lightness, chroma and hue, the hue difference taken the
+  # short way round the circle.
+  neutral <- c1p * c2p == 0
+  dlp <- l2 - l1
+  dcp <- c2p - c1p
+  dhp <- h2p - h1p
+  dhp <- ifelse(neutral, 0,
+                ifelse(dhp > 180, dhp - 360,
+                       ifelse(dhp < -180, dhp + 360, dhp)))
+  dbig_hp <- 2 * sqrt(c1p * c2p) * sin(dhp / 2 * .radians_per_degree)
+
+  # The weights for lightness, chroma and hue, taken at the pair's means. The
+  # term that couples the chroma and hue differences is the formula's
+  # correction for blues.
+  lbp <- (l1 + l2) / 2
+  cbp <- (c1p + c2p) / 2
+  hbp <- ifelse(neutral, h1p + h2p,
+                ifelse(abs(h1p - h2p) <= 180, (h1p + h2p) / 2,
+                       ifelse(h1p + h2p < 360, (h1p + h2p + 360) / 2,
+                              (h1p + h2p - 360) / 2)))
+  t_term <- 1 - 0.17 * cos((hbp - 30) * .radians_per_degree) +
+    0.24 * cos(2 * hbp * .radians_per_degree) +
+    0.32 * cos((3 * hbp + 6) * .radians_per_degree) -
+    0.20 * cos((4 * hbp - 63) * .radians_per_degree)
+  d_theta <- 30 * exp(-((hbp - 275) / 25)^2)
+  r_c <- 2 * sqrt(cbp^7 / (cbp^7 + 25^7))
+  s_l <- 1 + 0.015 * (lbp - 50)^2 / sqrt(20 + (lbp - 50)^2)
+  s_c <- 1 + 0.045 * cbp
+  s_h <- 1 + 0.015 * cbp * t_term
+  r_t <- -sin(2 * d_theta * .radians_per_degree) * r_c
+
+  lightness <- dlp / s_l
+  chroma <- dcp / s_c
+  hue_term <- dbig_hp / s_h
+  sqrt(lightness^2 + chroma^2 + hue_term^2 + r_t * chroma * hue_term)
+}
+
+#' Smallest pairwise colour difference within a set
+#'
+#' Lower bound on how distinguishable a set of colours is: the minimum colour
+#' difference across all colour pairs, CIEDE2000 or, with `metric = "cie76"`,
+#' the Euclidean distance in CIELAB. Larger is safer. The pairs are walked in
+#' the same order as the Python twin so that a tie between two equally close
+#' pairs resolves to the same pair in both engines.
 #'
 #' @param groups Optional labels, one per colour. A pair whose labels are equal
 #'   is skipped: [check_figure()] labels each drawn colour with the colour it
 #'   was declared as, so that one group drawn in two ways is not set against
 #'   itself.
+#' @param metric `"ciede2000"` or `"cie76"`.
 #' @return A list with `distance` and `pair`, the one-based indices of the two
 #'   closest colours.
 #' @noRd
-.min_pairwise_delta_e <- function(cols, groups = NULL) {
+.min_pairwise_delta_e <- function(cols, groups = NULL, metric = "ciede2000") {
   lab <- .srgb_to_lab(cols)
   n <- nrow(lab)
-  best <- Inf
-  pair <- c(1L, 1L)
-  for (i in seq_len(n - 1)) {
-    for (j in seq(i + 1, n)) {
-      if (!is.null(groups) && groups[[i]] == groups[[j]]) next
-      d <- sqrt(sum((lab[i, ] - lab[j, ])^2))
-      if (d < best) {
-        best <- d
-        pair <- c(i, j)
-      }
-    }
+  none <- list(distance = Inf, pair = c(1L, 1L))
+  if (n < 2) return(none)
+  # utils::combn() lists the pairs as the Python twin's nested loops visit
+  # them, i before j, and which.min() keeps the first of equally close pairs.
+  pairs <- t(utils::combn(n, 2))
+  if (!is.null(groups)) {
+    pairs <- pairs[groups[pairs[, 1]] != groups[pairs[, 2]], , drop = FALSE]
   }
-  list(distance = best, pair = pair)
+  if (!nrow(pairs)) return(none)
+  first <- lab[pairs[, 1], , drop = FALSE]
+  second <- lab[pairs[, 2], , drop = FALSE]
+  d <- if (metric == "cie76") {
+    sqrt(rowSums((first - second)^2))
+  } else {
+    .ciede2000(first, second)
+  }
+  closest <- which.min(d)
+  list(distance = d[[closest]], pair = pairs[closest, ])
 }
 
 #' Check that a palette stays distinguishable under each deficiency
 #'
 #' For normal vision and each deficiency at full severity, the palette's colours
-#' are converted to CIE L*a*b* and the smallest pairwise colour difference
-#' (CIE76 Delta-E) is found. The lower this minimum, the more likely two
-#' categories are to be confused. A palette counts as safe when the minimum
-#' across all four conditions is at least `threshold`.
+#' are converted to CIELAB and the smallest colour difference between any two
+#' of them is found. The difference is CIEDE2000 (Sharma, Wu & Dalal, 2005)
+#' unless `metric` asks for the older measure. The lower this minimum, the
+#' more likely two categories are to be confused. A palette counts as safe when
+#' the minimum across all four conditions is at least `threshold`.
+#'
+#' Earlier versions measured the Euclidean distance in CIELAB, known as CIE76,
+#' which overstates the difference between saturated colours: the blues
+#' `#005b96` and `#0060a8` are 8.20 apart by CIE76 and 2.69 by CIEDE2000.
+#' ggplot2's default palette of five colours passed the check under CIE76,
+#' although under deuteranopia its sky blue and its pink come within 2.74 of
+#' each other in CIEDE2000.
 #'
 #' The default `threshold` of 5 is calibrated against the reference
 #' colourblind-safe palette: the Okabe-Ito set's tightest pair (reddish purple
-#' against grey) sits at Delta-E 7.4 under full deuteranopia, so the cut must
-#' lie below that to pass the recommended palette, while still flagging colours
+#' against grey) sits at 6.43 under full deuteranopia, so the cut must lie
+#' below that to pass the recommended palette, while still flagging colours
 #' that become near-identical under a deficiency. The difference includes
 #' lightness, which survives colour-vision deficiency, so two colours that share
 #' a hue but differ in lightness are correctly treated as distinguishable. Full
@@ -207,23 +299,38 @@ simulate_cvd <- function(colours, deficiency, severity = 1) {
 #' @param colours The palette to test. Defaults to the depictr qualitative
 #'   palette. Needs at least two colours: a pairwise distance over fewer than
 #'   two has no value, rather than an infinitely safe one.
-#' @param threshold The smallest acceptable Delta-E.
+#' @param threshold The smallest acceptable colour difference, on the scale of
+#'   `metric`.
+#' @param metric The colour difference to measure: `"ciede2000"`, the default,
+#'   or `"cie76"`, the Euclidean distance in CIELAB that earlier versions
+#'   measured. `"cie76"` is kept so that earlier results can be reproduced, and
+#'   a later release will remove it.
 #'
 #' @return A list with `min_delta_e` (the worst case across conditions),
-#'   `by_condition` (a named numeric vector, one minimum Delta-E for normal
-#'   vision and for each deficiency), `worst_condition` and `worst_pair` (the
-#'   closest colours and where they were closest), `safe` and `threshold`.
+#'   `by_condition` (a named numeric vector, one minimum colour difference for
+#'   normal vision and for each deficiency), `worst_condition` and `worst_pair`
+#'   (the closest colours and where they were closest), `safe` and
+#'   `threshold`.
 #' @references
 #' \insertRef{okabe2008}{depictr}
 #'
 #' \insertRef{machado2009}{depictr}
+#'
+#' \insertRef{sharma2005}{depictr}
 #' @export
 #' @examples
 #' palette_safety()
 #'
 #' # Two colours a hair apart are flagged.
 #' palette_safety(c("#005b96", "#015c97"))
-palette_safety <- function(colours = NULL, threshold = 5) {
+#'
+#' # ggplot2's default palette of five colours, which passed under CIE76.
+#' hue5 <- c("#F8766D", "#A3A500", "#00BF7D", "#00B0F6", "#E76BF3")
+#' palette_safety(hue5)$safe
+#' palette_safety(hue5, metric = "cie76")$safe
+palette_safety <- function(colours = NULL, threshold = 5,
+                           metric = c("ciede2000", "cie76")) {
+  metric <- match.arg(metric)
   # `colours %||% depictr_palette()` would have swapped in the default palette
   # for an empty vector, reporting on eight colours the caller never passed.
   colours <- if (is.null(colours)) depictr_palette() else as.character(colours)
@@ -237,7 +344,7 @@ palette_safety <- function(colours = NULL, threshold = 5) {
   conditions <- c("normal", names(.cvd_matrices))
   closest <- lapply(conditions, function(cond) {
     seen <- if (cond == "normal") colours else simulate_cvd(colours, cond)
-    .min_pairwise_delta_e(seen)
+    .min_pairwise_delta_e(seen, metric = metric)
   })
   names(closest) <- conditions
   by_condition <- vapply(closest, function(x) x$distance, numeric(1))

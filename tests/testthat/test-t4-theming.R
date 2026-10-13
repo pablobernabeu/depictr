@@ -85,23 +85,30 @@ test_that("simulate_cvd() refuses an unknown deficiency and an out-of-range seve
 # --- automated colourblind-safety assertion ---------------------------------
 
 test_that("the default qualitative palette stays distinguishable under CVD", {
-  # For every vision type, no two palette colours may collapse together. CIE76
-  # distance >= 5 is comfortably above the ~2.3 just-noticeable-difference, so
-  # every pair remains clearly separable. The observed worst case (deutan) is
-  # ~7.4, leaving a healthy margin.
+  # For every vision type, no two palette colours may collapse together. The
+  # worst case is the reddish purple against the grey under deuteranopia, at
+  # 6.43 in CIEDE2000 against the threshold of 5. The Python suite pins the
+  # same four minima.
   report <- palette_safety()
   saf <- report$by_condition
   expect_named(saf, c("normal", "protan", "deutan", "tritan"))
+  expect_equal(saf, c(normal = 21.25, protan = 13.44, deutan = 6.43,
+                      tritan = 11.13))
   expect_true(report$safe)
   expect_identical(report$worst_condition, "deutan")
   expect_identical(report$worst_pair, c("#cc79a7", "#999999"))
-  expect_equal(report$min_delta_e, 7.4)
+  expect_equal(report$min_delta_e, 6.43)
   expect_true(all(saf > 5),
               info = paste("min CVD distances:",
                            paste(round(saf, 2), collapse = ", ")))
+  # The 1976 distance put the same pair 7.4 apart.
+  expect_equal(palette_safety(metric = "cie76")$min_delta_e, 7.4)
 
-  # Cross-check the safety statistic with an independent Lab computation: the
-  # minimum pairwise distance computed directly from col2rgb -> XYZ -> Lab.
+  # Cross-check the Lab conversion with an independent computation: the
+  # minimum pairwise CIE76 distance computed directly from col2rgb -> XYZ ->
+  # Lab. CIEDE2000 is computed from the same Lab values, and its formula is
+  # checked against Sharma, Wu and Dalal's published pairs.
+  cie76 <- palette_safety(metric = "cie76")$by_condition
   independent_min <- function(cols) {
     rgb <- grDevices::col2rgb(cols) / 255
     lin <- ifelse(rgb <= 0.04045, rgb / 12.92, ((rgb + 0.055) / 1.055)^2.4)
@@ -118,7 +125,8 @@ test_that("the default qualitative palette stays distinguishable under CVD", {
   pal <- depictr_palette()
   for (tp in c("normal", "protan", "deutan", "tritan")) {
     seen <- if (tp == "normal") pal else simulate_cvd(pal, tp)
-    expect_equal(saf[[tp]], round(independent_min(seen), 2), tolerance = 1e-3)
+    expect_equal(cie76[[tp]], round(independent_min(seen), 2),
+                 tolerance = 1e-3)
   }
 })
 
@@ -161,6 +169,11 @@ test_that("interpolating past the base set warns, and the base set does not", {
   # package's own check, while the eight it is made for clears it.
   expect_false(palette_safety(pal)$safe)
   expect_true(palette_safety(depictr_palette(8))$safe)
+  # Nine colours fail too, and nine is where the warning starts. The 1976
+  # distance passed them, at 5.84.
+  nine <- suppressWarnings(depictr_palette(9))
+  expect_false(palette_safety(nine)$safe)
+  expect_true(palette_safety(nine, metric = "cie76")$safe)
 })
 
 test_that("a user-supplied palette is interpolated without the Okabe-Ito warning", {

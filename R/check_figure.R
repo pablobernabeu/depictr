@@ -52,8 +52,9 @@
 #' one another, the colour that shows depends on what lies beneath it, and
 #' that is not measured.
 #'
-#' `colour_separability` is the smallest CIE76 colour difference (Delta-E)
-#' between two of the figure's encoding colours, and the three
+#' `colour_separability` is the smallest colour difference between two of the
+#' figure's encoding colours, by the CIEDE2000 formula (Sharma, Wu & Dalal,
+#' 2005) unless `metric` asks for the older CIE76. The three
 #' `colour_separability_*` rows repeat that measurement after simulating each
 #' dichromacy at full severity with [simulate_cvd()]. Encoding colours are the
 #' distinct colour and fill values that tell groups apart. A layer contributes
@@ -80,7 +81,9 @@
 #' over a rainbow (Crameri et al., 2020).
 #'
 #' `greyscale_separability` is the smallest difference in CIE lightness between
-#' those same colours, which is what survives printing in black and white.
+#' those same colours, which is what survives printing in black and white. It
+#' is the absolute difference in lightness, whichever `metric` the colour rows
+#' use.
 #'
 #' `text_size` is the smallest point size of the text the theme draws around
 #' the panel: axis labels and titles, legends, facet strips, titles and
@@ -190,13 +193,18 @@
 #' @param render_width_cm The width, in centimetres, that the figure is drawn
 #'   at. Defaults to the same 17.78 cm. The ratio of the two widths is the
 #'   factor every point size is multiplied by.
-#' @param min_delta_e The smallest acceptable CIE76 colour difference, used for
-#'   the colour and greyscale separability checks. Defaults to 5, matching
-#'   [palette_safety()].
+#' @param min_delta_e The smallest acceptable colour difference, on the scale
+#'   of `metric`, for the colour separability checks, and the smallest
+#'   acceptable difference in lightness for the greyscale check. Defaults to 5,
+#'   matching [palette_safety()].
 #' @param min_text_pt The smallest acceptable printed text size, in points,
 #'   for the text around the panel and the text inside it alike. Defaults to
 #'   6, below the floor most journals set (see "Auditing at the printed
 #'   size").
+#' @param metric The colour difference the colour separability checks measure:
+#'   `"ciede2000"`, the default, or `"cie76"`, the Euclidean distance in CIELAB
+#'   that earlier versions measured. `"cie76"` is kept so that earlier results
+#'   can be reproduced, and a later release will remove it.
 #'
 #' @return A data frame with one row per check and columns `check`, `measured`,
 #'   `threshold`, `verdict` (`"pass"`, `"fail"` or `"not applicable"`) and
@@ -218,6 +226,8 @@
 #' <https://www.nature.com/documents/nature-final-artwork.pdf>
 #'
 #' PLOS ONE. Figures. <https://journals.plos.org/plosone/s/figures>
+#'
+#' \insertRef{sharma2005}{depictr}
 #'
 #' \insertRef{wcag22}{depictr}
 #' @seealso [palette_safety()] for the palette in the abstract, and
@@ -250,7 +260,8 @@
 #' both <- check_figure(arrange_plots(good, small))
 #' both[both$verdict == "fail", c("panel", "check", "measured")]
 check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
-                         min_delta_e = 5, min_text_pt = 6) {
+                         min_delta_e = 5, min_text_pt = 6,
+                         metric = c("ciede2000", "cie76")) {
   # A patchwork inherits from ggplot, since it is its last panel with the
   # others attached, so it is told apart before the build sees it.
   composite <- inherits(plot, "patchwork")
@@ -262,12 +273,14 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
   .positive_scalar(render_width_cm, "render_width_cm")
   .positive_scalar(min_delta_e, "min_delta_e")
   .positive_scalar(min_text_pt, "min_text_pt")
+  metric <- match.arg(metric)
 
   if (composite) {
     return(.audit_composite(plot, width_cm, render_width_cm, min_delta_e,
-                            min_text_pt))
+                            min_text_pt, metric))
   }
-  .audit_plot(plot, width_cm, render_width_cm, min_delta_e, min_text_pt)
+  .audit_plot(plot, width_cm, render_width_cm, min_delta_e, min_text_pt,
+              metric)
 }
 
 # --- composites -------------------------------------------------------------
@@ -302,7 +315,7 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' by the same rule.
 #' @noRd
 .audit_composite <- function(plot, width_cm, render_width_cm, min_delta_e,
-                             min_text_pt) {
+                             min_text_pt, metric) {
   panels <- .composite_panels(plot)
   reports <- list()
   for (number in seq_along(panels)) {
@@ -318,7 +331,7 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
       next
     }
     report <- .audit_plot(panel, width_cm, render_width_cm, min_delta_e,
-                          min_text_pt)
+                          min_text_pt, metric)
     reports[[length(reports) + 1L]] <- cbind(panel = number, report)
   }
   if (!length(reports)) {
@@ -337,7 +350,7 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' The audit of a single plot, its settings already validated
 #' @noRd
 .audit_plot <- function(plot, width_cm, render_width_cm, min_delta_e,
-                        min_text_pt) {
+                        min_text_pt, metric) {
   built <- ggplot2::ggplot_build(plot)
   resolved <- .completed_theme(built$plot$theme)
   # White stands in for the paper under a plot background that paints nothing.
@@ -361,7 +374,7 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
   }
 
   rows <- c(
-    .separability_rows(encoding$sets, min_delta_e, encoding$abstain),
+    .separability_rows(encoding$sets, min_delta_e, metric, encoding$abstain),
     list(.smallest_text_row("text_size", text, width_cm, render_width_cm,
                             min_text_pt, "text", no_text)),
     list(.text_contrast_row(text, width_cm, render_width_cm, no_text)),
@@ -960,9 +973,12 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' Each set holds the drawn colours of one aesthetic, and only colours declared
 #' differently are paired, so a group is never compared with itself. The rows
 #' report the closest pair over the sets, the first set winning a tie.
+#' @param metric The colour difference of the four colour rows, `"ciede2000"`
+#'   or `"cie76"`. The greyscale row is a lightness gap either way.
 #' @param abstain The detail every row gives when no set encodes.
 #' @noRd
-.separability_rows <- function(sets, min_delta_e, abstain = .no_colour_detail) {
+.separability_rows <- function(sets, min_delta_e, metric = "ciede2000",
+                               abstain = .no_colour_detail) {
   check_names <- c("colour_separability", "colour_separability_protan",
                    "colour_separability_deutan", "colour_separability_tritan")
   conditions <- c("normal", names(.cvd_matrices))
@@ -993,7 +1009,7 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
       seen <- if (condition == "normal") set$drawn else {
         simulate_cvd(set$drawn, condition)
       }
-      .min_pairwise_delta_e(seen, set$declared)
+      .min_pairwise_delta_e(seen, set$declared, metric)
     })
     .check_row(nm, closest$distance, min_delta_e, sprintf(
       "Closest pair %s and %s of %d encoding %s.", closest$colours[[1]],
@@ -1001,7 +1017,7 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
   }, check_names, conditions)
   # Lightness is what a black-and-white printer keeps, and CIE L* is a function
   # of luminance alone, so the greyscale difference between two colours is the
-  # CIE76 distance between their lightnesses.
+  # gap between their lightnesses, whichever metric the colour rows use.
   grey <- closest_over_sets(function(set) {
     .min_pairwise_delta_e_1d(.srgb_to_lab(set$drawn)[, "L"], set$declared)
   })
