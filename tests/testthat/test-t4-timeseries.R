@@ -369,3 +369,144 @@ test_that("a frequency-7 series is labelled by season index, not weekday", {
   pw <- seasonal_plot(y, season_labels = wd)
   expect_setequal(unique(as.character(pw$data$season)), wd)
 })
+
+test_that("timeseries_plot() draws a multivariate ts as one series per column", {
+  # Regression: as.numeric() flattened cbind(mdeaths, fdeaths) into 144 rows of
+  # one series on 72 recycled times, so the line zigzagged between the two
+  # columns at every time.
+  y <- cbind(mdeaths, fdeaths)
+  p <- timeseries_plot(y)
+  expect_identical(levels(p$data$series), c("mdeaths", "fdeaths"))
+  for (s in colnames(y)) {
+    d <- p$data[p$data$series == s, ]
+    expect_equal(d$time, as.numeric(stats::time(y)))
+    expect_equal(d$value, as.numeric(y[, s]))
+  }
+  expect_silent(b <- ggplot2::ggplot_build(p))
+  expect_setequal(unique(b$data[[1]]$colour), depictr_palette(2))
+  # The moving average is taken within each series.
+  roll <- timeseries_plot(y, rolling = 12)$layers[[2]]$data
+  expect_equal(roll$roll[roll$series == "fdeaths"],
+               depictr:::moving_average(as.numeric(fdeaths), 12))
+  # A forecast is made for a single series.
+  expect_error(timeseries_plot(y, forecast = 12), "single series")
+})
+
+test_that("timeseries_plot() draws a numeric matrix as one series per column", {
+  m <- cbind(a = 1:10, b = 11:20)
+  p <- timeseries_plot(m)
+  expect_identical(levels(p$data$series), c("a", "b"))
+  expect_equal(p$data$time[p$data$series == "b"], 1:10)
+  expect_equal(p$data$value[p$data$series == "b"], 11:20)
+  # `time` gives one time per row, as it gives one per value of a vector.
+  p <- timeseries_plot(m, time = 2001:2010)
+  expect_equal(p$data$time[p$data$series == "a"], 2001:2010)
+  expect_error(timeseries_plot(m, time = 1:5), "one entry per row")
+  # Columns without names are named as stats::ts() names them.
+  expect_identical(levels(timeseries_plot(unname(m))$data$series),
+                   c("Series 1", "Series 2"))
+  # A single column is a single series.
+  expect_identical(
+    nlevels(timeseries_plot(m[, "a", drop = FALSE])$data$series), 1L
+  )
+})
+
+test_that("the single-series functions refuse several columns", {
+  # acf_plot() returned the autocorrelation of the columns laid end to end,
+  # seasonal_plot() and the classical decompose_plot() drew them over each
+  # other, and ts_forecast() forecast the concatenation at missing times.
+  y <- cbind(mdeaths, fdeaths)
+  two <- "`x` has 2 columns; pass one series at a time."
+  expect_error(acf_plot(y), two, fixed = TRUE)
+  expect_error(acf_plot(y, type = "partial"), two, fixed = TRUE)
+  expect_error(seasonal_plot(y), two, fixed = TRUE)
+  expect_error(decompose_plot(y), two, fixed = TRUE)
+  expect_error(decompose_plot(y, method = "classical"), two, fixed = TRUE)
+  expect_error(ts_forecast(y), two, fixed = TRUE)
+  # A plain matrix with a frequency is refused before it becomes a ts.
+  m <- cbind(as.numeric(mdeaths), as.numeric(fdeaths), as.numeric(ldeaths))
+  three <- "`x` has 3 columns; pass one series at a time."
+  expect_error(acf_plot(m), three, fixed = TRUE)
+  expect_error(seasonal_plot(m, frequency = 12), three, fixed = TRUE)
+  expect_error(decompose_plot(m, frequency = 12), three, fixed = TRUE)
+  expect_error(ts_forecast(m, frequency = 12), three, fixed = TRUE)
+  # One column of a multivariate ts is a series like any other.
+  expect_s3_class(acf_plot(y[, "mdeaths"]), "ggplot")
+  expect_s3_class(seasonal_plot(y[, "fdeaths"]), "ggplot")
+})
+
+test_that("a ts with one column is read as that series", {
+  # ts() of a one-column data frame makes a ts with one column, which stl()
+  # refused with "only univariate series are allowed".
+  y1 <- stats::ts(data.frame(passengers = as.numeric(AirPassengers)),
+                  start = 1949, frequency = 12)
+  expect_identical(dim(y1), c(144L, 1L))
+  for (method in c("stl", "classical")) {
+    pw1 <- decompose_plot(y1, method = method)
+    pw <- decompose_plot(AirPassengers, method = method)
+    for (i in 1:4) expect_equal(pw1[[i]]$data, pw[[i]]$data)
+  }
+  expect_equal(ts_forecast(y1, h = 6), ts_forecast(AirPassengers, h = 6))
+  expect_equal(acf_plot(y1)$data, acf_plot(AirPassengers)$data)
+  expect_equal(seasonal_plot(y1)$data, seasonal_plot(AirPassengers)$data)
+  # The column keeps its times when missing values at the ends are trimmed.
+  y1[c(1, 144)] <- NA
+  expect_equal(ts_forecast(y1, h = 3)$time, 1960 + (11:13) / 12)
+})
+
+test_that("decompose_plot() and ts_forecast() trim missing values at the ends", {
+  # Both stopped with stl()'s "missing values in object" when a value at either
+  # end was missing. The Python twin trims such values.
+  y <- AirPassengers
+  y[c(1, 2, 143, 144)] <- NA
+  observed <- stats::window(AirPassengers, start = c(1949, 3),
+                            end = c(1960, 10))
+  expect_equal(ts_forecast(y, h = 6), ts_forecast(observed, h = 6))
+  # The forecast starts in the month after the last observation.
+  expect_equal(ts_forecast(y, h = 6)$time[1], 1960 + 10 / 12)
+  expect_equal(ts_forecast(as.numeric(y), h = 6, frequency = 12)$fit,
+               ts_forecast(observed, h = 6)$fit)
+  for (method in c("stl", "classical")) {
+    pw <- decompose_plot(y, method = method)
+    expect_equal(pw[[1]]$data$t, as.numeric(stats::time(observed)))
+    expect_equal(pw[[1]]$data$y, as.numeric(observed))
+  }
+})
+
+test_that("an interior missing value is refused by name", {
+  # stl() stopped with "missing values in object" and decompose() with "time
+  # series contains internal NAs", naming neither the argument nor a remedy.
+  y <- AirPassengers
+  y[60] <- NA
+  msg <- paste("`x` must not contain internal missing values; drop or impute",
+               "them before")
+  expect_error(decompose_plot(y), paste(msg, "plotting."), fixed = TRUE)
+  expect_error(decompose_plot(y, method = "classical"),
+               paste(msg, "plotting."), fixed = TRUE)
+  expect_error(ts_forecast(y), paste(msg, "forecasting."), fixed = TRUE)
+  expect_error(ts_forecast(as.numeric(y), frequency = 12), msg, fixed = TRUE)
+  expect_error(timeseries_plot(y, forecast = 6), paste(msg, "forecasting."),
+               fixed = TRUE)
+  # The series alone is still drawn, with its gap.
+  expect_s3_class(timeseries_plot(y), "ggplot")
+  # A series with no observation has nothing to trim to.
+  expect_error(ts_forecast(stats::ts(rep(NA_real_, 36), frequency = 12)),
+               "no non-missing values")
+})
+
+test_that("timeseries_plot() forecasts from the last observation", {
+  # With missing values at the end, the forecast continues from the last value
+  # observed, and the overlay is anchored there.
+  y <- AirPassengers
+  y[c(143, 144)] <- NA
+  observed <- stats::window(AirPassengers, end = c(1960, 10))
+  p <- timeseries_plot(y, forecast = 6)
+  fc <- p$layers[[length(p$layers)]]$data
+  expect_equal(fc$time[1], 1960 + 9 / 12)
+  expect_equal(fc$fit[1], as.numeric(observed)[length(observed)])
+  expect_equal(fc$fit[-1], ts_forecast(observed, h = 6)$fit)
+  expect_silent(ggplot2::ggplot_build(p))
+  # A numeric `x` steps on from its last observed position.
+  q <- timeseries_plot(as.numeric(y), forecast = 3, frequency = 12)
+  expect_equal(q$layers[[length(q$layers)]]$data$time, c(142, 143:145))
+})

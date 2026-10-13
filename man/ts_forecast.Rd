@@ -7,8 +7,11 @@
 ts_forecast(x, h = 12, frequency = NULL, level = 0.95, lambda = NULL)
 }
 \arguments{
-\item{x}{A \code{ts} object, or a numeric vector (then \code{frequency} is required).
-It needs more than two full cycles of observations.}
+\item{x}{A \code{ts} object, or a numeric vector (then \code{frequency} is required),
+holding one series. It needs more than two full cycles of observations.
+Missing values at either end are trimmed, so the forecast starts after the
+last observation, and a missing value inside the series is an error. A
+multivariate \code{ts} or a matrix with several columns is refused.}
 
 \item{h}{Forecast horizon: the number of future steps (a positive integer).}
 

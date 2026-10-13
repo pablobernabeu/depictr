@@ -22,15 +22,18 @@ timeseries_plot(
 )
 }
 \arguments{
-\item{x}{A \code{ts} object, a numeric vector, or a data frame.}
+\item{x}{A \code{ts} object, a numeric vector or matrix, or a data frame.}
 
 \item{time}{When \code{x} is a data frame, the time column (string or unquoted
-name); when \code{x} is a numeric vector, an optional vector of times.}
+name). When \code{x} is a numeric vector or matrix, an optional vector of times,
+one per value or per row.}
 
 \item{value}{When \code{x} is a data frame, the value column.}
 
 \item{group}{When \code{x} is a data frame, an optional grouping column mapped to
-colour.}
+colour. A factor keeps the order of its levels in the legend and the
+palette, and levels no row uses are left out. Other columns are ordered by
+first appearance.}
 
 \item{rolling}{Optional integer window for a centred moving-average overlay.
 The data are ordered by time (within each group) before the moving average
@@ -46,7 +49,9 @@ shaded prediction-interval ribbon is drawn behind it. The built-in
 forecast is captioned with its coverage and method, and its band widens
 with the horizon on the scale it is made on (see \code{lambda}). For a numeric
 \code{x}, it is made from the values in time order and continues the history's
-own time axis, one typical step at a time.}
+own time axis, one typical step at a time. Missing values at either end of
+the series are trimmed before forecasting, so the forecast starts from the
+last observation, and a missing value inside the series is an error.}
 
 \item{frequency}{Number of observations per period, used only to coerce a
 numeric \code{x} to a \code{ts} when an integer \code{forecast} horizon is requested.}
@@ -69,12 +74,16 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 Plots one or more series over time, with an optional moving-average overlay.
-The input can be a \code{ts} object, a numeric vector, or a data frame with a time
-column, a value column and an optional grouping column.
+The input can be a \code{ts} object, a numeric vector or matrix, or a data frame
+with a time column, a value column and an optional grouping column. A
+multivariate \code{ts}, such as \code{cbind(mdeaths, fdeaths)}, or a matrix with
+several columns gives one series per column, named after its column.
 }
 \examples{
 timeseries_plot(AirPassengers, rolling = 12,
                 title = "Air passengers", y_lab = "Passengers")
+# One line per column of a multivariate ts
+timeseries_plot(cbind(mdeaths, fdeaths), y_lab = "Deaths")
 # 24-month forecast with a 90\% prediction interval, made on the log scale
 # because the seasonal swing grows with the number of passengers
 timeseries_plot(AirPassengers, forecast = 24, level = 0.9, lambda = 0)

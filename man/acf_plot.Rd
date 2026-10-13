@@ -15,7 +15,8 @@ acf_plot(
 )
 }
 \arguments{
-\item{x}{A numeric vector or \code{ts} object.}
+\item{x}{A numeric vector or \code{ts} object holding one series. A multivariate
+\code{ts} or a matrix with several columns is refused.}
 
 \item{lag_max}{Maximum lag (passed to \code{\link[stats:acf]{stats::acf()}} / \code{\link[stats:pacf]{stats::pacf()}}).}
 
@@ -32,6 +33,14 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 \description{
 Plots the autocorrelation (or partial autocorrelation) function of a series,
 with the approximate significance bounds, as a clean lollipop chart.
+}
+\details{
+A missing value inside the series is kept in its place, and the
+correlations are computed from the pairs of observations that are both
+present (\code{na.action = na.pass}), with a warning. Dropping it would join the
+observations on either side of the gap as if they were neighbours. The
+Python package refuses such a series and asks for the gap to be dropped or
+imputed first.
 }
 \examples{
 acf_plot(AirPassengers)

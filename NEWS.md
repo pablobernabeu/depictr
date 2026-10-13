@@ -275,6 +275,34 @@
   without an intercept now gives VIFs computed from columns that are not
   centred, with a warning, as `car::vif()` does.
 
+* A multivariate `ts`, such as `cbind(mdeaths, fdeaths)`, or a numeric matrix
+  was read as one series, its columns laid end to end. `timeseries_plot()` drew
+  a single line. For a `ts` it zigzagged between the columns at every time, and
+  for a matrix it ran on from one column into the next. `acf_plot()` returned
+  the autocorrelation of the joined columns. `seasonal_plot()` and the
+  classical `decompose_plot()` recycled the seasons and times of one column
+  over all of them, so the columns were drawn over one another, and
+  `ts_forecast()` forecast the joined columns at missing times.
+  `timeseries_plot()` now draws one line per column, named after the columns.
+  `acf_plot()`, `decompose_plot()`, `seasonal_plot()` and `ts_forecast()`
+  refuse more than one column with a message that gives the count. They read a
+  `ts` with a single column as that series. `ts()` makes one from a one-column
+  data frame, and the STL decomposition stopped on it with "only univariate
+  series are allowed".
+* `decompose_plot()` and `ts_forecast()` now trim missing values at either end
+  of a series, as the Python package does, so a forecast, the overlay of
+  `timeseries_plot()` included, starts after the last observation.
+  `ts_forecast()` and the STL decomposition stopped with the error "missing
+  values in object" from `stl()`. A missing value inside the series is refused
+  with a message that names `x` and asks for the value to be dropped or
+  imputed, where `stl()` and `decompose()` stopped with errors of their own.
+  `acf_plot()` still computes the correlations across such a gap from the pairs
+  of observations present, with a warning, while the Python package refuses the
+  series. The help pages of both packages now say so.
+* `timeseries_plot()` keeps the level order of a factor `group`, which sets the
+  legend and the colours, and leaves out levels that no row uses. It ordered
+  the groups by first appearance.
+
 ## Degenerate input
 
 * `survival_plot()` truncated a non-integer status code, so `c(0, 0.5, 1)` was

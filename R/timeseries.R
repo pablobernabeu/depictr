@@ -3,15 +3,20 @@
 #' Time-series plot
 #'
 #' Plots one or more series over time, with an optional moving-average overlay.
-#' The input can be a `ts` object, a numeric vector, or a data frame with a time
-#' column, a value column and an optional grouping column.
+#' The input can be a `ts` object, a numeric vector or matrix, or a data frame
+#' with a time column, a value column and an optional grouping column. A
+#' multivariate `ts`, such as `cbind(mdeaths, fdeaths)`, or a matrix with
+#' several columns gives one series per column, named after its column.
 #'
-#' @param x A `ts` object, a numeric vector, or a data frame.
+#' @param x A `ts` object, a numeric vector or matrix, or a data frame.
 #' @param time When `x` is a data frame, the time column (string or unquoted
-#'   name); when `x` is a numeric vector, an optional vector of times.
+#'   name). When `x` is a numeric vector or matrix, an optional vector of times,
+#'   one per value or per row.
 #' @param value When `x` is a data frame, the value column.
 #' @param group When `x` is a data frame, an optional grouping column mapped to
-#'   colour.
+#'   colour. A factor keeps the order of its levels in the legend and the
+#'   palette, and levels no row uses are left out. Other columns are ordered by
+#'   first appearance.
 #' @param rolling Optional integer window for a centred moving-average overlay.
 #'   The data are ordered by time (within each group) before the moving average
 #'   is computed, so unsorted input is handled correctly.
@@ -25,7 +30,9 @@
 #'   forecast is captioned with its coverage and method, and its band widens
 #'   with the horizon on the scale it is made on (see `lambda`). For a numeric
 #'   `x`, it is made from the values in time order and continues the history's
-#'   own time axis, one typical step at a time.
+#'   own time axis, one typical step at a time. Missing values at either end of
+#'   the series are trimmed before forecasting, so the forecast starts from the
+#'   last observation, and a missing value inside the series is an error.
 #' @param frequency Number of observations per period, used only to coerce a
 #'   numeric `x` to a `ts` when an integer `forecast` horizon is requested.
 #' @param level Prediction-interval coverage for the built-in forecast (a single
@@ -43,6 +50,8 @@
 #' @examples
 #' timeseries_plot(AirPassengers, rolling = 12,
 #'                 title = "Air passengers", y_lab = "Passengers")
+#' # One line per column of a multivariate ts
+#' timeseries_plot(cbind(mdeaths, fdeaths), y_lab = "Deaths")
 #' # 24-month forecast with a 90% prediction interval, made on the log scale
 #' # because the seasonal swing grows with the number of passengers
 #' timeseries_plot(AirPassengers, forecast = 24, level = 0.9, lambda = 0)
@@ -60,22 +69,38 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
            call. = FALSE)
     }
     df <- data.frame(time = x[[tcol]], value = x[[vcol]])
-    df$series <- if (is.null(gcol)) "series" else as.character(x[[gcol]])
+    df$series <- if (is.null(gcol)) "series" else x[[gcol]]
     x_lab <- x_lab %||% tcol
     y_lab <- y_lab %||% vcol
+  } else if (NCOL(x) > 1) {
+    # One series per column. as.numeric() would lay the columns end to end and
+    # draw them as one series.
+    df <- series_by_column(x, time)
+    x_lab <- x_lab %||% "Time"
   } else if (stats::is.ts(x)) {
     df <- data.frame(time = as.numeric(stats::time(x)),
                      value = as.numeric(x), series = "series")
     x_lab <- x_lab %||% "Time"
   } else {
-    if (!is.numeric(x)) stop("`x` must be a ts, numeric vector or data frame.",
-                             call. = FALSE)
+    if (!is.numeric(x)) {
+      stop("`x` must be a ts, a numeric vector or matrix, or a data frame.",
+           call. = FALSE)
+    }
     tv <- if (!is.null(time)) time else seq_along(x)
     df <- data.frame(time = tv, value = as.numeric(x), series = "series")
     x_lab <- x_lab %||% "Time"
   }
   y_lab <- y_lab %||% "Value"
-  df$series <- factor(df$series, levels = unique(df$series))
+  # A factor keeps the order of its levels, which sets the legend and the
+  # colours, without the levels no row uses. Anything else is ordered by first
+  # appearance.
+  sv <- df$series
+  lev <- if (is.factor(sv)) {
+    levels(droplevels(sv))
+  } else {
+    unique(as.character(sv))
+  }
+  df$series <- factor(as.character(sv), levels = lev)
   # Order by series then time so the moving average (and the drawn lines) follow
   # time order even when the input data frame is unsorted.
   df <- df[order(df$series, df$time), , drop = FALSE]
@@ -164,12 +189,21 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
 #' Plots the autocorrelation (or partial autocorrelation) function of a series,
 #' with the approximate significance bounds, as a clean lollipop chart.
 #'
-#' @param x A numeric vector or `ts` object.
+#' @param x A numeric vector or `ts` object holding one series. A multivariate
+#'   `ts` or a matrix with several columns is refused.
 #' @param lag_max Maximum lag (passed to [stats::acf()] / [stats::pacf()]).
 #' @param type `"correlation"` for the ACF or `"partial"` for the PACF.
 #' @param conf_level Confidence level for the significance bounds; a single
 #'   number strictly between 0 and 1.
 #' @param title,x_lab,y_lab Title and axis labels.
+#'
+#' @details
+#' A missing value inside the series is kept in its place, and the
+#' correlations are computed from the pairs of observations that are both
+#' present (`na.action = na.pass`), with a warning. Dropping it would join the
+#' observations on either side of the gap as if they were neighbours. The
+#' Python package refuses such a series and asks for the gap to be dropped or
+#' imputed first.
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export
@@ -185,6 +219,7 @@ acf_plot <- function(x, lag_max = NULL, type = c("correlation", "partial"),
     stop("`conf_level` must be a single number strictly between 0 and 1.",
          call. = FALSE)
   }
+  x <- as_one_series(x)
   v <- as.numeric(x)
   # Keep the series in place (do not drop interior NAs, which would concatenate
   # across gaps and bias the autocorrelation); na.pass preserves the time
@@ -224,7 +259,10 @@ acf_plot <- function(x, lag_max = NULL, type = c("correlation", "partial"),
 #' Decomposes a seasonal time series into trend, seasonal and remainder
 #' components and shows them, with the original series, as stacked panels.
 #'
-#' @param x A `ts` object, or a numeric vector (then `frequency` is required).
+#' @param x A `ts` object, or a numeric vector (then `frequency` is required),
+#'   holding one series. A multivariate `ts` or a matrix with several columns
+#'   is refused. Missing values at either end are trimmed, and a missing value
+#'   inside the series is an error.
 #' @param frequency Number of observations per period (e.g. 12 for monthly
 #'   data); taken from `x` when it is a `ts`.
 #' @param method `"stl"` (loess-based, Cleveland et al., 1990) or
@@ -276,6 +314,7 @@ decompose_plot <- function(x, frequency = NULL,
                            level = 0.95, title = NULL) {
   method <- match.arg(method)
   s_window <- validate_s_window(s_window)
+  x <- as_one_series(x)
   if (!stats::is.ts(x)) {
     if (is.null(frequency)) {
       stop("Supply `frequency` when `x` is not a ts object.", call. = FALSE)
@@ -292,6 +331,7 @@ decompose_plot <- function(x, frequency = NULL,
     stop("`level` must be a single number strictly between 0 and 1.",
          call. = FALSE)
   }
+  x <- trim_missing_ends(x, "plotting")
   tt <- as.numeric(stats::time(x))
 
   if (method == "stl") {
@@ -394,8 +434,11 @@ decompose_plot <- function(x, frequency = NULL,
 #' different model, fit it with, for example, `forecast::forecast()` and pass
 #' its columns to [timeseries_plot()] as a data frame.
 #'
-#' @param x A `ts` object, or a numeric vector (then `frequency` is required).
-#'   It needs more than two full cycles of observations.
+#' @param x A `ts` object, or a numeric vector (then `frequency` is required),
+#'   holding one series. It needs more than two full cycles of observations.
+#'   Missing values at either end are trimmed, so the forecast starts after the
+#'   last observation, and a missing value inside the series is an error. A
+#'   multivariate `ts` or a matrix with several columns is refused.
 #' @param h Forecast horizon: the number of future steps (a positive integer).
 #' @param frequency Number of observations per period; taken from `x` when it is
 #'   a `ts`.
@@ -429,6 +472,7 @@ decompose_plot <- function(x, frequency = NULL,
 #' diff(log(fc$upr) - log(fc$lwr)) > 0
 ts_forecast <- function(x, h = 12, frequency = NULL, level = 0.95,
                         lambda = NULL) {
+  x <- as_one_series(x)
   if (!stats::is.ts(x)) {
     if (is.null(frequency)) {
       stop("Supply `frequency` when `x` is not a ts object.", call. = FALSE)
@@ -454,6 +498,9 @@ ts_forecast <- function(x, h = 12, frequency = NULL, level = 0.95,
     stop("`ts_forecast()` needs a seasonal series (frequency >= 2).",
          call. = FALSE)
   }
+  # The trimmed series keeps its times, so the forecast starts after the last
+  # observation.
+  x <- trim_missing_ends(x, "forecasting")
   n <- length(x)
   check_stl_length(n, freq, "to forecast")
 
@@ -509,7 +556,8 @@ ts_forecast <- function(x, h = 12, frequency = NULL, level = 0.95,
 #' `ts`, or on a numeric input's values in time order) or a pre-computed data
 #' frame with at least `time` and `fit` columns. The data frame is prepended
 #' with the last observed point so the overlaid forecast line joins the history
-#' without a gap.
+#' without a gap. Missing values at the end of the history are passed over, as
+#' ts_forecast() trims them.
 #' @noRd
 resolve_forecast <- function(forecast, x, df, frequency = NULL, level = 0.95,
                              lambda = NULL) {
@@ -537,8 +585,9 @@ resolve_forecast <- function(forecast, x, df, frequency = NULL, level = 0.95,
       # A numeric `x` is wrapped in a ts that starts at time 1, so
       # ts_forecast() returns times in cycle units the history knows nothing
       # about. The history sits at seq_along(x) or at the caller's `time`, so
-      # the forecast continues that axis, one typical spacing per step.
-      fc$time <- forecast_steps(df$time, nrow(fc))
+      # the forecast continues that axis, one typical spacing per step, from
+      # the last observation.
+      fc$time <- forecast_steps(df$time[!is.na(df$value)], nrow(fc))
     }
   }
   # Reconcile the forecast times with the historical axis. ts_forecast() (and a
@@ -549,7 +598,9 @@ resolve_forecast <- function(forecast, x, df, frequency = NULL, level = 0.95,
   # end of the history on one shared scale.
   fc$time <- reconcile_forecast_time(fc$time, df$time)
   # Anchor the forecast line at the last observed point for a continuous join.
-  last_obs <- df[which.max(df$time), , drop = FALSE]
+  # An anchor at a missing value would break the forecast line instead.
+  observed <- df[!is.na(df$value), , drop = FALSE]
+  last_obs <- observed[which.max(observed$time), , drop = FALSE]
   anchor <- data.frame(time = last_obs$time, fit = last_obs$value,
                        lwr = last_obs$value, upr = last_obs$value)
   rbind(anchor, fc)
@@ -593,6 +644,86 @@ check_stl_length <- function(n, freq, purpose) {
          " observations) ", purpose, ".", call. = FALSE)
   }
   invisible(n)
+}
+
+#' Refuse a series with several columns, and read one column as the series
+#'
+#' A multivariate ts or a matrix holds one series per column. as.numeric()
+#' would lay the columns end to end, so a single-series function would read
+#' them as one series, or recycle the times and seasons of one column over
+#' all of them. The Python twin refuses a frame or 2-D array with several
+#' columns in the same words. A ts with one column, as ts() makes from a
+#' one-column data frame, is returned as that column, since stl() refuses
+#' anything with columns as multivariate. The Python twin reads a single
+#' column the same way.
+#' @noRd
+as_one_series <- function(x) {
+  k <- NCOL(x)
+  if (k > 1) {
+    stop("`x` has ", k, " columns; pass one series at a time.", call. = FALSE)
+  }
+  # The column of a ts keeps its times.
+  if (k == 1 && is.matrix(x)) x <- x[, 1]
+  x
+}
+
+#' Trim missing values from the ends of a ts and refuse interior ones
+#'
+#' Missing values at either end only shorten the series, so they are trimmed
+#' with stats::window(), which keeps the times and the place in the cycle. A
+#' missing value inside the series would stop stl() or decompose() with an
+#' error of its own. Dropping it would move every later observation to the
+#' wrong place in the cycle, so it is refused, in the Python twin's words.
+#' @noRd
+trim_missing_ends <- function(x, purpose) {
+  obs <- which(!is.na(x))
+  if (length(obs) == 0) {
+    stop("`x` has no non-missing values.", call. = FALSE)
+  }
+  first <- obs[1]
+  last <- obs[length(obs)]
+  if (first > 1 || last < length(x)) {
+    tt <- stats::time(x)
+    x <- stats::window(x, start = if (first > 1) tt[first],
+                       end = if (last < length(x)) tt[last])
+  }
+  if (anyNA(x)) {
+    stop("`x` must not contain internal missing values; drop or impute ",
+         "them before ", purpose, ".", call. = FALSE)
+  }
+  x
+}
+
+#' One series per column of a multivariate ts or a numeric matrix, in long form
+#'
+#' Each column is named after its column name, and an unnamed one
+#' "Series <i>", as stats::ts() names it. A ts carries its own times. A matrix
+#' takes `time`, one entry per row, or else the row number.
+#' @noRd
+series_by_column <- function(x, time = NULL) {
+  if (!is.numeric(x)) {
+    stop("`x` must be a ts, a numeric vector or matrix, or a data frame.",
+         call. = FALSE)
+  }
+  n <- NROW(x)
+  k <- NCOL(x)
+  nm <- colnames(x) %||% rep("", k)
+  unnamed <- is.na(nm) | nm == ""
+  nm[unnamed] <- paste("Series", which(unnamed))
+  nm <- make.unique(nm)
+  tv <- if (stats::is.ts(x)) {
+    as.numeric(stats::time(x))
+  } else if (!is.null(time)) {
+    if (length(time) != n) {
+      stop("`time` must have one entry per row of `x` (", n, ").",
+           call. = FALSE)
+    }
+    time
+  } else {
+    seq_len(n)
+  }
+  data.frame(time = rep(tv, k), value = as.numeric(x),
+             series = factor(rep(nm, each = n), levels = nm))
 }
 
 #' Validate the STL seasonal window

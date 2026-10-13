@@ -18,7 +18,9 @@ seasonal_plot(
 )
 }
 \arguments{
-\item{x}{A \code{ts} object, or a numeric vector (then \code{frequency} is required).}
+\item{x}{A \code{ts} object, or a numeric vector (then \code{frequency} is required),
+holding one series. A multivariate \code{ts} or a matrix with several columns
+is refused.}
 
 \item{frequency}{Number of observations per period (e.g. 12 for monthly
 data); taken from \code{x} when it is a \code{ts}.}

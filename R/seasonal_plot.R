@@ -17,7 +17,9 @@
 #' shared axis (the seasonal-plot layout of `forecast::ggseasonplot()`), which is
 #' handy for spotting an unusual year.
 #'
-#' @param x A `ts` object, or a numeric vector (then `frequency` is required).
+#' @param x A `ts` object, or a numeric vector (then `frequency` is required),
+#'   holding one series. A multivariate `ts` or a matrix with several columns
+#'   is refused.
 #' @param frequency Number of observations per period (e.g. 12 for monthly
 #'   data); taken from `x` when it is a `ts`.
 #' @param style `"subseries"` for the faceted cycle plot (one panel per season)
@@ -117,6 +119,9 @@ seasonal_plot <- function(x, frequency = NULL,
 #' `frequency` and `season_labels` are attached.
 #' @noRd
 ts_seasonal_frame <- function(x, frequency = NULL, season_labels = NULL) {
+  # cycle() of a multivariate ts covers one column, and its seasons would be
+  # recycled over the others.
+  x <- as_one_series(x)
   if (!stats::is.ts(x)) {
     if (is.null(frequency)) {
       stop("Supply `frequency` when `x` is not a ts object.", call. = FALSE)
