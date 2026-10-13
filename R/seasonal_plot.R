@@ -15,13 +15,22 @@
 #' classic Cleveland cycle plot, matching `feasts::gg_subseries()`. With
 #' `style = "season"` every cycle is drawn as its own line over the seasons on a
 #' shared axis (the seasonal-plot layout of `forecast::ggseasonplot()`), which is
-#' handy for spotting an unusual year.
+#' handy for spotting an unusual year. The lines run from a mid blue for the
+#' first cycle to a dark blue for the last, so they read in time order. Past
+#' about six cycles, neighbouring cycles take colours too close to tell apart,
+#' and the colours then show the order of the cycles more than which is which.
+#' When individual cycles must be told apart, use `style = "subseries"`, where
+#' each cycle keeps its own place on the axis of every panel, or plot fewer
+#' cycles.
 #'
 #' @param x A `ts` object, or a numeric vector (then `frequency` is required),
 #'   holding one series. A multivariate `ts` or a matrix with several columns
 #'   is refused.
 #' @param frequency Number of observations per period (e.g. 12 for monthly
-#'   data); taken from `x` when it is a `ts`.
+#'   data); taken from `x` when it is a `ts`. A frequency that is not a whole
+#'   number, such as the 365.25 / 7 of weekly data, is rounded down to whole
+#'   seasons, as [stats::stl()] rounds it, and a message says so. The seasons
+#'   are then counted from the first observation.
 #' @param style `"subseries"` for the faceted cycle plot (one panel per season)
 #'   or `"season"` for one line per cycle across the seasons.
 #' @param season_labels Optional character vector of length `frequency` giving
@@ -31,8 +40,11 @@
 #' @param means Whether to draw the per-season mean reference line
 #'   (`style = "subseries"` only).
 #' @param point Whether to add points as well as the connecting line.
-#' @param palette Colours used for the cycle lines when `style = "season"`;
-#'   defaults to a sequential ramp from [depictr_palette()].
+#' @param palette Colours used for the cycle lines when `style = "season"`.
+#'   Defaults to a blue ramp from `#4a8fc0` through the brand blue to
+#'   `#08315a`, whose palest colour has a contrast of 3.51:1 against white. The
+#'   sequential ramp of [depictr_palette()] starts paler, at `#e6eff5`, which
+#'   suits a fill but leaves a line close to invisible.
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -87,7 +99,7 @@ seasonal_plot <- function(x, frequency = NULL,
   # style == "season": one line per cycle across the seasons
   x_lab <- x_lab %||% "Season"
   cycles <- levels(df$cycle_f)
-  pal <- palette %||% depictr_palette(length(cycles), type = "sequential")
+  pal <- palette %||% cycle_palette(length(cycles))
   p <- ggplot2::ggplot(
     df, ggplot2::aes(x = .data$season_idx, y = .data$value,
                      colour = .data$cycle_f, group = .data$cycle_f)
@@ -129,9 +141,31 @@ ts_seasonal_frame <- function(x, frequency = NULL, season_labels = NULL) {
     x <- stats::ts(as.numeric(x), frequency = frequency)
   }
   freq <- stats::frequency(x)
+  # ts() takes a frequency within ts.eps of a whole number for that number,
+  # but a ts whose tsp was set directly can still carry one such as
+  # 12.0000001. cycle() would then count past the twelfth season, so the
+  # series is rebuilt at the whole number, from the same start. The Python
+  # twin reads a period the same way.
+  nearest <- round(freq)
+  if (freq != nearest && abs(freq - nearest) < getOption("ts.eps", 1e-5)) {
+    x <- stats::ts(as.numeric(x), start = stats::tsp(x)[1L],
+                   frequency = nearest)
+    freq <- nearest
+  }
   if (freq < 2) {
     stop("A seasonal plot needs a seasonal series (frequency >= 2).",
          call. = FALSE)
+  }
+  # cycle() numbers the seasons of a frequency such as 365.25 / 7 from 1 to
+  # 53, so no set of labels can name them. stl() takes the whole part of the
+  # frequency and counts its seasons from the first observation, and so does
+  # the plot.
+  if (freq != floor(freq)) {
+    whole <- floor(freq)
+    message("Frequency ", format(freq, digits = 7), " is not a whole number; ",
+            "using ", whole, " seasons per cycle, as stl() does.")
+    x <- stats::ts(as.numeric(x), frequency = whole)
+    freq <- whole
   }
 
   value <- as.numeric(x)
@@ -170,6 +204,20 @@ default_season_labels <- function(freq) {
   if (freq == 12) return(month.abb)
   if (freq == 4) return(paste0("Q", 1:4))
   as.character(seq_len(freq))
+}
+
+#' Colours for the cycle lines of `style = "season"`, earliest first
+#'
+#' The sequential ramp of depictr_palette() without its palest anchor,
+#' `#e6eff5`, which is 1.16:1 against white. That suits a fill, but a line drawn
+#' in it is close to invisible. The ramp starts at the next anchor, `#4a8fc0`,
+#' at 3.51:1, and each colour after it is darker. Every cycle line therefore
+#' clears the 3:1 that WCAG 2.2 asks of a graphical object (success criterion
+#' 1.4.11), however many cycles there are. The Python twin builds its ramp from
+#' the same anchors.
+#' @noRd
+cycle_palette <- function(n) {
+  grDevices::colorRampPalette(c("#4a8fc0", "#005b96", "#08315a"))(n)
 }
 
 #' Pretty integer breaks for a subseries x axis

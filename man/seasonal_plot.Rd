@@ -23,7 +23,10 @@ holding one series. A multivariate \code{ts} or a matrix with several columns
 is refused.}
 
 \item{frequency}{Number of observations per period (e.g. 12 for monthly
-data); taken from \code{x} when it is a \code{ts}.}
+data); taken from \code{x} when it is a \code{ts}. A frequency that is not a whole
+number, such as the 365.25 / 7 of weekly data, is rounded down to whole
+seasons, as \code{\link[stats:stl]{stats::stl()}} rounds it, and a message says so. The seasons
+are then counted from the first observation.}
 
 \item{style}{\code{"subseries"} for the faceted cycle plot (one panel per season)
 or \code{"season"} for one line per cycle across the seasons.}
@@ -38,8 +41,11 @@ labels for frequency 4, otherwise the season index).}
 
 \item{point}{Whether to add points as well as the connecting line.}
 
-\item{palette}{Colours used for the cycle lines when \code{style = "season"};
-defaults to a sequential ramp from \code{\link[=depictr_palette]{depictr_palette()}}.}
+\item{palette}{Colours used for the cycle lines when \code{style = "season"}.
+Defaults to a blue ramp from \verb{#4a8fc0} through the brand blue to
+\verb{#08315a}, whose palest colour has a contrast of 3.51:1 against white. The
+sequential ramp of \code{\link[=depictr_palette]{depictr_palette()}} starts paler, at \verb{#e6eff5}, which
+suits a fill but leaves a line close to invisible.}
 
 \item{title, x_lab, y_lab}{Title and axis labels.}
 }
@@ -61,7 +67,13 @@ are faceted side by side, each tracing one season across cycles: the
 classic Cleveland cycle plot, matching \code{feasts::gg_subseries()}. With
 \code{style = "season"} every cycle is drawn as its own line over the seasons on a
 shared axis (the seasonal-plot layout of \code{forecast::ggseasonplot()}), which is
-handy for spotting an unusual year.
+handy for spotting an unusual year. The lines run from a mid blue for the
+first cycle to a dark blue for the last, so they read in time order. Past
+about six cycles, neighbouring cycles take colours too close to tell apart,
+and the colours then show the order of the cycles more than which is which.
+When individual cycles must be told apart, use \code{style = "subseries"}, where
+each cycle keeps its own place on the axis of every panel, or plot fewer
+cycles.
 }
 \examples{
 # Monthly air passengers: rising within-month trend, summer peak

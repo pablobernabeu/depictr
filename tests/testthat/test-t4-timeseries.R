@@ -59,6 +59,101 @@ test_that("seasonal_plot() validates its inputs", {
                "length")
 })
 
+# AirPassengers cut to its first `k` years, one cycle per year.
+air_cycles <- function(k) stats::window(AirPassengers, end = c(1948 + k, 12))
+
+test_that("the cycle lines of style = \"season\" clear 3:1 against white", {
+  # The lines took depictr_palette(type = "sequential"), which starts at
+  # #e6eff5, 1.16:1 against white, so with twelve cycles four of the lines fell
+  # below the 3:1 that WCAG 2.2 asks of a graphical object. The ramp now runs
+  # from #4a8fc0, at 3.51:1, through the brand blue to #08315a, as in the
+  # Python twin.
+  b <- ggplot2::ggplot_build(seasonal_plot(AirPassengers, style = "season"))
+  lines <- b$data[[1]]
+  ramp <- unique(lines$colour[order(lines$group)])
+  expect_length(ramp, 12)
+  expect_identical(ramp[c(1, 12)], c("#4A8FC0", "#08315A"))
+  # Fills keep the sequential palette, pale end and all.
+  expect_identical(depictr_palette(3, type = "sequential")[1], "#E6EFF5")
+  for (k in c(3, 12)) {
+    cf <- check_figure(seasonal_plot(air_cycles(k), style = "season"))
+    row <- cf[cf$check == "geometry_contrast", ]
+    expect_identical(row$verdict, "pass")
+    expect_equal(row$measured, 3.51)
+  }
+})
+
+test_that("the cycle colours pass every colour check up to six cycles", {
+  # Past about six cycles, a single-hue ramp shows the order of the cycles
+  # more than which is which. Greyscale separability fails from eight cycles
+  # and colour separability at twelve, so neither is asserted there.
+  # redundant_encoding stays at zero, since colour alone tells the cycles
+  # apart.
+  rows <- c("colour_separability", "colour_separability_protan",
+            "colour_separability_deutan", "colour_separability_tritan",
+            "greyscale_separability", "geometry_contrast")
+  for (k in 2:6) {
+    cf <- check_figure(seasonal_plot(air_cycles(k), style = "season"))
+    expect_identical(cf$verdict[match(rows, cf$check)], rep("pass", 6),
+                     label = paste(k, "cycles"))
+  }
+})
+
+test_that("a non-integer frequency is rounded down to whole seasons", {
+  # Such a series was refused with "`season_labels` must have length equal to
+  # the frequency (52.1785714285714)", which no labels could satisfy.
+  # decompose_plot() accepted it, since stl() uses the whole part of the
+  # frequency. The Python twin truncated such a period without a word.
+  set.seed(1)
+  y <- stats::ts(stats::rnorm(130), frequency = 365.25 / 7)
+  msg <- paste("Frequency 52.17857 is not a whole number; using 52 seasons",
+               "per cycle, as stl() does.")
+  expect_message(p <- seasonal_plot(y, style = "season"), msg, fixed = TRUE)
+  expect_identical(p$data$season_idx, c(rep(1:52, 2), 1:26))
+  expect_identical(p$data$cycle, rep(1:3, c(52, 52, 26)))
+  expect_silent(ggplot2::ggplot_build(p))
+  # The default style and a numeric `x` take the same route, and labels are
+  # given for the whole seasons.
+  expect_message(seasonal_plot(as.numeric(y), frequency = 365.25 / 7), msg,
+                 fixed = TRUE)
+  weeks <- sprintf("W%02d", 1:52)
+  expect_message(p <- seasonal_plot(y, season_labels = weeks), msg,
+                 fixed = TRUE)
+  expect_identical(levels(p$data$season), weeks)
+})
+
+test_that("a frequency a rounding error from a whole number is that number", {
+  # ts() takes a frequency within ts.eps of a whole number for that number,
+  # but a ts whose tsp is set directly keeps 12.0000001. Such a series was
+  # rounded down with a message calling 12 not a whole number, and its seasons
+  # were counted from the first observation, so April became season 1. The
+  # Python twin reads a period the same way.
+  y <- stats::ts(1:24, start = c(2016, 4), frequency = 12)
+  tsp(y) <- c(tsp(y)[1:2], 12 + 1e-7)
+  expect_silent(df <- depictr:::ts_seasonal_frame(y))
+  expect_identical(attr(df, "frequency"), 12)
+  expect_identical(df$season_idx, c(4:12, 1:12, 1:3))
+  expect_identical(df$cycle, rep(1:3, c(9L, 12L, 3L)))
+})
+
+test_that("the seasons follow the calendar the ts carries", {
+  # The Python twin counted its seasons from the first observation, so a
+  # series from April drew April as season 1. It now reads the calendar from
+  # the index, as stats::cycle() reads it here, and both suites pin the same
+  # series: one from March 2016 that peaks every July.
+  months <- as.numeric(stats::cycle(
+    stats::ts(numeric(36), start = c(2016, 3), frequency = 12)
+  ))
+  y <- stats::ts(ifelse(months == 7, 10, 1), start = c(2016, 3),
+                 frequency = 12)
+  df <- depictr:::ts_seasonal_frame(y)
+  expect_identical(as.character(unique(df$season[df$value == 10])), "Jul")
+  expect_identical(df$cycle, rep(1:4, c(10L, 12L, 12L, 2L)))
+  april <- stats::ts(1:24, start = c(2016, 4), frequency = 12)
+  expect_identical(depictr:::ts_seasonal_frame(april)$season_idx,
+                   c(4:12, 1:12, 1:3))
+})
+
 test_that("ts_forecast() reproduces STL plus a random walk with drift", {
   # Values from forecast 9.0.2 under R 4.6.1, the $mean, $lower and $upper of
   #   forecast::stlf(AirPassengers, h = 12, method = "rwdrift",

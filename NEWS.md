@@ -362,6 +362,12 @@
   exists, and names the terms they belong to. It failed with an unrelated
   base-R error, "missing value where TRUE/FALSE needed".
 
+* `seasonal_plot()` refused every frequency that is not a whole number, such
+  as the 365.25 / 7 of weekly data, with a message about `season_labels` that
+  no labels could satisfy, while `decompose_plot()` drew the same series. Such
+  a frequency is now rounded down to whole seasons, counted from the first
+  observation as `stl()` counts them, and a message says so.
+
 ## Auditing a finished figure
 
 * `check_figure()` measured all text against the plot background, so text on a
@@ -523,6 +529,17 @@
   band drawn from follow-up times no longer stops one event early. A
   `conf_level` outside (0, 1), such as 95 meant as a percentage, is now an
   error.
+
+* The cycle lines of `seasonal_plot(style = "season")` start from a colour
+  that clears 3:1 against white. They took the sequential ramp of
+  `depictr_palette()`, which starts at `#e6eff5`, 1.16:1 against white, so the
+  earliest cycles were close to invisible. With twelve cycles, four of the
+  lines fell below the 3:1 that WCAG 2.2 asks of a graphical object. The ramp
+  now runs from `#4a8fc0`, at 3.51:1, through the brand blue to `#08315a`, and
+  `palette` still replaces it. The sequential palette keeps its pale end for
+  fills. Past about six cycles, neighbouring lines take colours too close to
+  tell apart, as the help page now says, and `style = "subseries"` keeps each
+  cycle in its own place on the axis.
 
 # depictr 0.3.0
 
