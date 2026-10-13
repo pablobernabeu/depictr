@@ -37,7 +37,14 @@ first appearance.}
 
 \item{rolling}{Optional integer window for a centred moving-average overlay.
 The data are ordered by time (within each group) before the moving average
-is computed, so unsorted input is handled correctly.}
+is computed, so unsorted input is handled correctly. An odd window averages
+each observation with the same number of neighbours on either side. An
+even window, such as 12 for monthly data, gives the 2×12 moving average, a
+12-point average followed by a 2-point one (Hyndman & Athanasopoulos,
+2021, Section 3.3). The two observations at the ends of the 13 it spans
+count half, which centres the average on its observation, as equal weights
+over an even window cannot. It needs a series one observation longer than
+the window.}
 
 \item{forecast}{Optional forecast overlay for a single (non-grouped) series.
 Either an integer horizon (number of future steps) to forecast with the
@@ -87,6 +94,9 @@ timeseries_plot(cbind(mdeaths, fdeaths), y_lab = "Deaths")
 # 24-month forecast with a 90\% prediction interval, made on the log scale
 # because the seasonal swing grows with the number of passengers
 timeseries_plot(AirPassengers, forecast = 24, level = 0.9, lambda = 0)
+}
+\references{
+\insertRef{hyndman2021}{depictr}
 }
 \seealso{
 \code{\link[=ts_forecast]{ts_forecast()}}, \code{\link[=decompose_plot]{decompose_plot()}}, \code{\link[=seasonal_plot]{seasonal_plot()}}

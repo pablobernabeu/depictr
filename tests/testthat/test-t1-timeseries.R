@@ -88,6 +88,49 @@ test_that("multi-group MA overlay is dashed and adds no second legend", {
   expect_false(has_linetype)
 })
 
+test_that("an even window is the centred 2 x m moving average", {
+  # filter(sides = 2) with an even number of equal weights put the mean of
+  # observations 1 to 4 at observation 2, half a step before its centre. The
+  # Python twin put it half a step after. A centred moving average of even
+  # order averages two adjacent windows, which gives the observations at
+  # either end half weight (Hyndman & Athanasopoulos, 2021, Section 3.3). The
+  # Python twin's tests pin the same values.
+  expect_equal(depictr:::moving_average(1:10, 4),
+               c(NA, NA, 3, 4, 5, 6, 7, 8, NA, NA))
+  roll <- timeseries_plot(1:10, rolling = 4)$layers[[2]]$data$roll
+  expect_equal(roll, c(NA, NA, 3, 4, 5, 6, 7, 8, NA, NA))
+  # The 2 x 12 average is the trend of R's classical decomposition.
+  expect_equal(depictr:::moving_average(AirPassengers, 12),
+               as.numeric(stats::decompose(AirPassengers)$trend))
+  # An odd window was already centred on its observation and is unchanged.
+  expect_equal(depictr:::moving_average(1:10, 3), c(NA, 2:9, NA))
+})
+
+test_that("an even window needs one observation more than its length", {
+  # The 2 x 4 average spans five observations. Without a guard, filter() would
+  # stop on four with "'filter' is longer than time series".
+  df4 <- data.frame(t = 1:4, v = c(2, 4, 3, 5))
+  expect_error(timeseries_plot(df4, t, v, rolling = 4), "needs 5 observations")
+  df5 <- rbind(df4, data.frame(t = 5, v = 4))
+  roll <- timeseries_plot(df5, t, v, rolling = 4)$layers[[2]]$data$roll
+  expect_equal(roll, c(NA, NA, (2 / 2 + 4 + 3 + 5 + 4 / 2) / 4, NA, NA))
+  # An odd window needs as many observations as its length.
+  expect_s3_class(timeseries_plot(df4[1:3, ], t, v, rolling = 3), "ggplot")
+})
+
+test_that("the caption of a grouped overlay names a 2 x m average", {
+  dfg <- data.frame(t = rep(1:30, 2), v = sin(1:60),
+                    g = rep(c("a", "b"), each = 30))
+  expect_identical(
+    timeseries_plot(dfg, t, v, group = g, rolling = 12)$labels$caption,
+    "Dashed line: 2×12 centred moving average"
+  )
+  expect_identical(
+    timeseries_plot(dfg, t, v, group = g, rolling = 5)$labels$caption,
+    "Dashed line: 5-point centred moving average"
+  )
+})
+
 test_that("acf_plot keeps interior NAs (na.pass) and warns", {
   set.seed(1)
   x <- as.numeric(arima.sim(list(ar = 0.6), 200))
@@ -115,6 +158,24 @@ test_that("acf_plot keeps interior NAs (na.pass) and warns", {
 test_that("acf_plot does not warn for a clean series", {
   x <- as.numeric(AirPassengers)
   expect_silent(acf_plot(x))
+})
+
+test_that("the PACF is R's pacf(), as the Python twin pins it", {
+  # The Python twin's tests pin these values, which its
+  # dev/goldens/timeseries.R prints from this function. Its default estimator
+  # once differed from them by up to 0.18.
+  pinned <- c(
+    0.948047340752492, -0.229421874117177, 0.038147780503991,
+    0.093785438151741, 0.073606697894160, 0.007727602590501,
+    0.125597130176117, 0.089951343164267, 0.232488542208562,
+    0.166051259804356, 0.171274419743056, -0.135431102278015,
+    -0.539691241907120, -0.026610140069523, 0.090764981938823,
+    0.024955559165498, 0.032515570006784, 0.073432640501125,
+    0.048442114810552, -0.045541680123359, 0.045752935204032
+  )
+  p <- acf_plot(AirPassengers, type = "partial")
+  expect_equal(p$data$lag, 1:21)
+  expect_equal(p$data$acf, pinned, tolerance = 1e-10)
 })
 
 test_that("conf_level is validated to (0, 1)", {

@@ -19,7 +19,14 @@
 #'   first appearance.
 #' @param rolling Optional integer window for a centred moving-average overlay.
 #'   The data are ordered by time (within each group) before the moving average
-#'   is computed, so unsorted input is handled correctly.
+#'   is computed, so unsorted input is handled correctly. An odd window averages
+#'   each observation with the same number of neighbours on either side. An
+#'   even window, such as 12 for monthly data, gives the 2×12 moving average, a
+#'   12-point average followed by a 2-point one (Hyndman & Athanasopoulos,
+#'   2021, Section 3.3). The two observations at the ends of the 13 it spans
+#'   count half, which centres the average on its observation, as equal weights
+#'   over an even window cannot. It needs a series one observation longer than
+#'   the window.
 #' @param forecast Optional forecast overlay for a single (non-grouped) series.
 #'   Either an integer horizon (number of future steps) to forecast with the
 #'   built-in STL plus random walk with drift (see [ts_forecast()]), or a
@@ -45,6 +52,8 @@
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.
+#' @references
+#' \insertRef{hyndman2021}{depictr}
 #' @seealso [ts_forecast()], [decompose_plot()], [seasonal_plot()]
 #' @export
 #' @examples
@@ -132,6 +141,14 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
            min_len, " observation", if (min_len == 1) "" else "s",
            "); choose a smaller window.", call. = FALSE)
     }
+    # An even window is the 2 x m average, which spans one observation more
+    # than the window (see moving_average()).
+    if (rolling %% 2 == 0 && rolling + 1 > min_len) {
+      stop("An even `rolling` window spans one observation more than its ",
+           "length, so `rolling` (", rolling, ") needs ", rolling + 1,
+           " observations, and the shortest series has ", min_len,
+           "; choose a smaller window.", call. = FALSE)
+    }
     df$roll <- stats::ave(df$value, df$series,
                           FUN = function(v) moving_average(v, rolling))
     if (multi) {
@@ -144,8 +161,15 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
                                 colour = .data$series),
         linewidth = 1, linetype = "dashed", na.rm = TRUE, show.legend = FALSE
       )
-      caption <- paste0("Dashed line: ", rolling,
-                        "-point centred moving average")
+      # An even window is named as the 2 x m average it draws, the name
+      # Hyndman and Athanasopoulos (2021, Section 3.3) give it.
+      window_name <- if (rolling %% 2 == 0) {
+        paste0("2\u00d7", rolling)
+      } else {
+        paste0(rolling, "-point")
+      }
+      caption <- paste0("Dashed line: ", window_name,
+                        " centred moving average")
     } else {
       p <- p + ggplot2::geom_line(
         data = df, ggplot2::aes(x = .data$time, y = .data$roll),
@@ -818,8 +842,24 @@ validate_window <- function(window) {
 }
 
 #' Centred moving average
+#'
+#' Equal weights over an odd window centre the average on an observation.
+#' Over an even window they centre it between two observations:
+#' stats::filter(sides = 2) with four equal weights puts the mean of
+#' observations 1 to 4 at observation 2. An even window m therefore gives the
+#' 2 x m average, an m-point average followed by a 2-point one (Hyndman &
+#' Athanasopoulos, 2021, Section 3.3). Its weights,
+#' c(0.5, rep(1, m - 1), 0.5) / m, span m + 1 observations. It is the trend
+#' that stats::decompose() estimates for a frequency of m, and the Python twin
+#' computes the same weights. A window that runs off either end of the series,
+#' or reaches a missing value, gives NA.
 #' @noRd
 moving_average <- function(v, window) {
   window <- validate_window(window)
-  as.numeric(stats::filter(v, rep(1 / window, window), sides = 2))
+  weights <- if (window %% 2 == 0) {
+    c(0.5, rep(1, window - 1), 0.5) / window
+  } else {
+    rep(1 / window, window)
+  }
+  as.numeric(stats::filter(v, weights, sides = 2))
 }

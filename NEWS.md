@@ -335,6 +335,18 @@
   legend and the colours, and leaves out levels that no row uses. It ordered
   the groups by first appearance.
 
+* `timeseries_plot()` drew a moving average over an even window, such as
+  `rolling = 12` for monthly data, half an observation early. Equal weights
+  over twelve observations are centred between two of them, and the mean of
+  observations 1 to 12 was drawn at observation 6, where its centre is 6.5. An
+  even window now gives the 2×12 moving average (Hyndman & Athanasopoulos,
+  2021, Section 3.3), a 12-point average followed by a 2-point one, which is
+  centred on each observation and is the trend that `decompose()` estimates.
+  The caption of a grouped overlay names it, and the window needs a series one
+  observation longer than itself. The Python package drew the same average
+  half an observation late, and the two packages now draw the same values. An
+  odd window is unchanged.
+
 ## Degenerate input
 
 * `survival_plot()` truncated a non-integer status code, so `c(0, 0.5, 1)` was
