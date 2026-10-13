@@ -277,7 +277,9 @@ calibration_bins <- function(actual, score, bins) {
 #'
 #' Cross-tabulates predicted against actual classes and displays the counts as a
 #' heatmap. The input can be a fitted binomial `glm` (with a probability
-#' threshold) or a pair of vectors of actual and predicted classes.
+#' threshold) or a pair of vectors of actual and predicted classes. Each count
+#' is drawn in black or white, whichever has the higher contrast against its
+#' cell.
 #'
 #' @param x A binomial `glm`, or the vector of actual classes.
 #' @param predicted When `x` is an actual-class vector, the matching predicted
@@ -360,17 +362,17 @@ confusion_matrix_plot <- function(x, predicted = NULL, threshold = 0.5,
     tab$label <- as.character(tab$Freq)
   }
 
-  # Source the tile fill from the canonical sequential palette (a single-hue
-  # ramp from a pale tint up to the brand-blue dark end). Choose each label's
-  # colour from the TILE's own luminance, so counts stay legible on both pale
-  # low-count and dark high-count cells. A global shade-vs-median rule fails
-  # when one cell dominates the range (it leaves white text on a pale cell).
+  # The tiles are filled from the canonical sequential palette, a single-hue
+  # ramp from a pale tint up to the brand blue's dark end. Each count is black
+  # or white, whichever contrasts more with its own tile, so the counts stay
+  # legible on pale low-count and dark high-count cells alike. The tile colour
+  # is the one scale_fill_gradientn() draws: the shades rescaled over their
+  # range and read off the ramp that scales::pal_gradient_n() interpolates in
+  # the Lab colour space. grDevices::colorRamp() interpolates in RGB, which
+  # lands slightly off the drawn colour.
   fill_ramp <- depictr_palette(type = "sequential")
-  rng <- range(tab$shade)
-  frac <- if (diff(rng) > 0) (tab$shade - rng[1]) / diff(rng) else rep(0, nrow(tab))
-  tile_hex <- grDevices::rgb(grDevices::colorRamp(fill_ramp)(frac),
-                             maxColorValue = 255)
-  tab$text_col <- ifelse(.relative_luminance(tile_hex) > 0.4, "grey15", "white")
+  tile_fill <- scales::pal_gradient_n(fill_ramp)(scales::rescale(tab$shade))
+  tab$text_col <- .legible_text_colour(tile_fill)
   p <- ggplot2::ggplot(tab, ggplot2::aes(x = .data$Predicted, y = .data$Actual,
                                          fill = .data$shade)) +
     ggplot2::geom_tile(colour = "white", linewidth = 1) +

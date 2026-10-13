@@ -36,7 +36,9 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object. The threshold actually used is 
 \description{
 Cross-tabulates predicted against actual classes and displays the counts as a
 heatmap. The input can be a fitted binomial \code{glm} (with a probability
-threshold) or a pair of vectors of actual and predicted classes.
+threshold) or a pair of vectors of actual and predicted classes. Each count
+is drawn in black or white, whichever has the higher contrast against its
+cell.
 }
 \examples{
 gfit <- glm(accuracy ~ word_frequency + RT + condition,

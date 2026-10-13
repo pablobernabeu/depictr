@@ -4,9 +4,9 @@
 #'
 #' Displays the colours returned by [depictr_palette()] as labelled swatches.
 #' It is useful when choosing how many groups to show, selecting a palette type,
-#' or documenting a figure. Each swatch's hex label is drawn in near-black or
-#' white, whichever is more legible against that tile (chosen by the tile's
-#' relative luminance), so labels stay readable on both light and dark colours.
+#' or documenting a figure. Each swatch's hex label is drawn in black or white,
+#' whichever has the higher WCAG contrast against that tile, so every label
+#' reaches the 4.5:1 that WCAG 2.2 asks of text.
 #'
 #' Set `cvd` to render the swatches as they would appear under a colour-vision
 #' deficiency, using the Machado et al. (2009) simulation. The tiles are
@@ -49,12 +49,9 @@ palette_preview <- function(n = 8, type = c("qualitative", "sequential",
   # The tile is filled with the (possibly CVD-simulated) appearance; the label
   # keeps the true hex so the original colour is always identifiable.
   df$shown <- if (cvd == "none") df$col else simulate_cvd(df$col, cvd)
-  # Pick a legible label colour per swatch: near-black on light tiles, white on
-  # dark ones. Decide by WCAG relative luminance (sRGB-linearised) of the tile
-  # as displayed, which tracks perceived lightness far better than a raw RGB
-  # average and so avoids the white-on-pale contrast failure of a fixed colour.
-  df$label_col <- ifelse(.relative_luminance(df$shown) > 0.4,
-                         "grey10", "white")
+  # Each label is black or white, whichever contrasts more with the tile as
+  # displayed, so that it stays legible on a simulated colour too.
+  df$label_col <- .legible_text_colour(df$shown)
   show_labels <- type != "all"
 
   base_title <- if (type == "all") "depictr palettes" else
@@ -92,9 +89,9 @@ palette_preview <- function(n = 8, type = c("qualitative", "sequential",
 #
 # Linearise each sRGB channel, then take the standard 0.2126/0.7152/0.0722
 # weighting. Vectorised over `cols`, returning a numeric vector of the same
-# length. Two things call it: the tile and bar labels that need a legible text
-# colour against a coloured background, and the contrast ratios `check_figure()`
-# reports.
+# length. Two things use it, through `.contrast_ratio()`: the swatch and tile
+# labels, whose colour `.legible_text_colour()` chooses, and the contrast ratios
+# `check_figure()` reports.
 #
 # The linearisation is the sRGB transfer function that `.srgb_to_linear()`
 # applies everywhere else in the package, with its 0.04045 breakpoint, which is
@@ -106,6 +103,22 @@ palette_preview <- function(n = 8, type = c("qualitative", "sequential",
 .relative_luminance <- function(cols) {
   lin <- .srgb_to_linear(grDevices::col2rgb(cols) / 255)
   as.numeric(0.2126 * lin[1, ] + 0.7152 * lin[2, ] + 0.0722 * lin[3, ])
+}
+
+# Black or white, whichever has the higher WCAG contrast against each fill.
+#
+# Against a fill of relative luminance L, black reaches (L + 0.05) / 0.05 and
+# white 1.05 / (L + 0.05). The two tie at L = 0.179, where each reaches 4.58:1,
+# so the better of the two clears the 4.5:1 that WCAG 2.2 asks of text (success
+# criterion 1.4.3) on any fill. A near-black cannot promise that: against fills
+# of luminance 0.18 to 0.22, neither grey10 nor white reaches 4.5:1. It colours
+# the labels of palette_preview(), confusion_matrix_plot() and
+# correlation_heatmap(). The Python twin's `_legible_text_colour()` makes the
+# same choice, black on a tie.
+.legible_text_colour <- function(fill) {
+  black <- .contrast_ratio("#000000", fill)
+  white <- .contrast_ratio("#ffffff", fill)
+  ifelse(black >= white, "#000000", "#ffffff")
 }
 
 #' Compose several plots into one figure

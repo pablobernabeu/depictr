@@ -234,6 +234,19 @@
   column's name otherwise, so a decision probability such as pilotr's
   `p_meaningful` is not labelled as power.
 
+* `palette_preview()`, `confusion_matrix_plot()` and `correlation_heatmap()`
+  drew some labels below the 4.5:1 contrast that WCAG asks of text. The first
+  two switched from white to dark grey text at a relative luminance of 0.4,
+  although the two colours tie near 0.2. Four of the eight default swatches
+  therefore had white labels at 2.85 to 3.87:1, and counts on mid-blue cells of
+  a confusion matrix fell as low as 2.3:1. `correlation_heatmap()` drew white
+  labels whenever |r| exceeded 0.6, which left the r = -0.70 of
+  `wellbeing_survey` at 3.6:1, and its `n/a` sat in grey40 on a grey85 cell at
+  4.1:1. Each label is now black or white, whichever has the higher contrast
+  against its tile as drawn, which is at least 4.58:1 on any colour. The tile
+  colours are read as the fill scale draws them, interpolated in the Lab colour
+  space, where the confusion matrix used an RGB approximation.
+
 ## Degenerate input
 
 * `survival_plot()` truncated a non-integer status code, so `c(0, 0.5, 1)` was

@@ -26,7 +26,8 @@ numeric columns are used.}
 
 \item{use}{Missing-value handling passed to \code{\link[stats:cor]{stats::cor()}}.}
 
-\item{show_values}{Whether to annotate each cell with its correlation.}
+\item{show_values}{Whether to annotate each cell with its correlation, drawn
+in black or white, whichever has the higher contrast against the cell.}
 
 \item{digits}{Number of decimal places for the annotations.}
 

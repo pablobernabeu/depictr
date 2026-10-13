@@ -27,29 +27,57 @@ test_that(".relative_luminance() is vectorised and matches WCAG anchors", {
   expect_lt(.relative_luminance(depictr_brand()), 0.4)
 })
 
+test_that(".legible_text_colour() takes black or white, whichever contrasts more", {
+  # Black and white tie against a relative luminance of 0.179, which falls
+  # between these two greys, and each reaches 4.58:1 there. The Python twin's
+  # _legible_text_colour() pins the same vector.
+  okabe_ito <- c("#005b96", "#e69f00", "#009e73", "#d55e00", "#cc79a7",
+                 "#56b4e9", "#f0e442", "#999999")
+  expect_identical(
+    .legible_text_colour(c("#757575", "#767676", okabe_ito)),
+    c("#ffffff", "#000000", "#ffffff", rep("#000000", 7))
+  )
+  # Every colour of a 16-level grid over the three channels.
+  levels <- sprintf("%02x", seq(0, 255, by = 17))
+  grid <- expand.grid(r = levels, g = levels, b = levels,
+                      stringsAsFactors = FALSE)
+  fills <- paste0("#", grid$r, grid$g, grid$b)
+  chosen <- .legible_text_colour(fills)
+  other <- ifelse(chosen == "#000000", "#ffffff", "#000000")
+  expect_true(all(.contrast_ratio(chosen, fills) >= .contrast_ratio(other, fills)))
+  expect_gte(min(.contrast_ratio(chosen, fills)), 4.58)
+})
+
+# Each label's colour and its WCAG contrast against the tile drawn beneath it,
+# read back from a built plot, with the contrast the other of black and white
+# would have had.
+label_contrasts <- function(built, tile_layer = 1,
+                            text_layer = length(built$data)) {
+  tiles <- built$data[[tile_layer]][, c("PANEL", "x", "y", "fill")]
+  texts <- built$data[[text_layer]][, c("PANEL", "x", "y", "colour", "label")]
+  cells <- merge(tiles, texts, by = c("PANEL", "x", "y"))
+  other <- ifelse(cells$colour == "#000000", "#ffffff", "#000000")
+  cells$ratio <- .contrast_ratio(cells$colour, cells$fill)
+  cells$other <- .contrast_ratio(other, cells$fill)
+  cells
+}
+
 test_that("palette_preview() labels are legible on every swatch", {
-  p <- palette_preview(8)
-  b <- ggplot2::ggplot_build(p)
-
-  # geom_text is the last layer; gather its drawn colour + the tile fill.
-  text_layer <- b$data[[length(b$data)]]
-  expect_true("label" %in% names(text_layer))
-  expect_true(all(text_layer$colour %in% c("grey10", "white")))
-
-  # For each label, the chosen colour must be the higher-contrast of the two
-  # candidates against its own swatch -- i.e. dark text on light tiles only.
-  fills <- text_layer$label
-  lum <- .relative_luminance(fills)
-  dark_text <- text_layer$colour == "grey10"
-  # Every dark-text tile is lighter than every white-text tile.
-  if (any(dark_text) && any(!dark_text)) {
-    expect_gt(min(lum[dark_text]), max(lum[!dark_text]))
+  # The old rule switched from white to grey10 at a relative luminance of 0.4,
+  # although the two tie near 0.2. Four of the eight default swatches therefore
+  # had white labels at 2.85 to 3.87:1, where grey10 would have reached 4.50 to
+  # 6.11:1.
+  for (tp in c("qualitative", "sequential", "diverging")) {
+    cells <- label_contrasts(ggplot2::ggplot_build(palette_preview(8, type = tp)))
+    expect_identical(nrow(cells), 8L)
+    expect_true(all(cells$colour %in% c("#000000", "#ffffff")))
+    expect_true(all(cells$ratio >= 4.5))
+    expect_true(all(cells$ratio >= cells$other))
   }
-  # The historically unreadable pale yellow now gets dark text.
-  yellow_row <- which(fills == "#f0e442")
-  if (length(yellow_row)) {
-    expect_identical(text_layer$colour[yellow_row], "grey10")
-  }
+  # The pale yellow takes black, the brand blue white.
+  cells <- label_contrasts(ggplot2::ggplot_build(palette_preview(8)))
+  expect_identical(cells$colour[cells$label == "#f0e442"], "#000000")
+  expect_identical(cells$colour[cells$label == "#005b96"], "#ffffff")
 })
 
 test_that("palette_preview() builds for every type without warnings", {

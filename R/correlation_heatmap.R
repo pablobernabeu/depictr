@@ -11,7 +11,8 @@
 #'   numeric columns are used.
 #' @param method Correlation method: `"pearson"`, `"spearman"` or `"kendall"`.
 #' @param use Missing-value handling passed to [stats::cor()].
-#' @param show_values Whether to annotate each cell with its correlation.
+#' @param show_values Whether to annotate each cell with its correlation, drawn
+#'   in black or white, whichever has the higher contrast against the cell.
 #' @param digits Number of decimal places for the annotations.
 #' @param palette Length-3 vector of colours for the lowest, mid (zero) and
 #'   highest correlations. Defaults to the endpoints and midpoint of the
@@ -92,6 +93,9 @@ correlation_heatmap <- function(data, cols = NULL, method = "pearson",
     stringsAsFactors = FALSE
   )
 
+  # The colour of a cell whose correlation is undefined, which its label is
+  # chosen against too.
+  na_fill <- "grey85"
   p <- ggplot2::ggplot(
     long, ggplot2::aes(x = .data$var1, y = .data$var2, fill = .data$corr)
   ) +
@@ -99,7 +103,7 @@ correlation_heatmap <- function(data, cols = NULL, method = "pearson",
     ggplot2::scale_fill_gradient2(
       low = palette[1], mid = palette[2], high = palette[3],
       midpoint = 0, limits = c(-1, 1), name = "Correlation",
-      na.value = "grey85"
+      na.value = na_fill
     ) +
     ggplot2::coord_fixed() +
     ggplot2::labs(x = NULL, y = NULL, title = title) +
@@ -115,10 +119,16 @@ correlation_heatmap <- function(data, cols = NULL, method = "pearson",
       is.na(long$corr), "n/a",
       formatC(long$corr, format = "f", digits = digits)
     )
-    label_colour <- ifelse(
-      is.na(long$corr), "grey40",
-      ifelse(abs(long$corr) > 0.6, "white", "grey20")
+    # Each label is black or white, whichever contrasts more with its cell as
+    # scale_fill_gradient2() draws it. The scale places the correlation about
+    # the midpoint 0 with scales::rescale_mid() and reads the colour off
+    # scales::pal_div_gradient(), or paints the cell grey where the
+    # correlation is undefined.
+    tile_fill <- scales::pal_div_gradient(palette[1], palette[2], palette[3])(
+      scales::rescale_mid(long$corr, to = c(0, 1), from = c(-1, 1), mid = 0)
     )
+    tile_fill[is.na(tile_fill)] <- na_fill
+    label_colour <- .legible_text_colour(tile_fill)
     p <- p + ggplot2::geom_text(
       data = long,
       ggplot2::aes(label = .data$label),

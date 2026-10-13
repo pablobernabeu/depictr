@@ -26,9 +26,9 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 \description{
 Displays the colours returned by \code{\link[=depictr_palette]{depictr_palette()}} as labelled swatches.
 It is useful when choosing how many groups to show, selecting a palette type,
-or documenting a figure. Each swatch's hex label is drawn in near-black or
-white, whichever is more legible against that tile (chosen by the tile's
-relative luminance), so labels stay readable on both light and dark colours.
+or documenting a figure. Each swatch's hex label is drawn in black or white,
+whichever has the higher WCAG contrast against that tile, so every label
+reaches the 4.5:1 that WCAG 2.2 asks of text.
 }
 \details{
 Set \code{cvd} to render the swatches as they would appear under a colour-vision

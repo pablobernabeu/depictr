@@ -86,10 +86,57 @@ test_that("confusion_matrix_plot() fills come from the sequential palette", {
   expect_true(toupper(seq_pal[length(seq_pal)]) %in% fills)
   expect_false("#EAF2F8" %in% fills)
 
-  # Contrast-text logic is preserved: white on the darker (above-median) cells,
-  # dark grey on the lighter ones.
+  # White counts on the darker cells, black on the paler ones.
   txt <- unique(b$data[[2]]$colour)
-  expect_setequal(txt, c("white", "grey15"))
+  expect_setequal(txt, c("#ffffff", "#000000"))
+})
+
+test_that("confusion_matrix_plot() counts are legible on the tile beneath them", {
+  # The grey15/white rule switched at a relative luminance of 0.4. Cells about
+  # a fifth to two fifths of the way up the ramp therefore had white counts at
+  # as little as 2.3:1, where grey15 would have reached 4.5:1. The 15 below sat
+  # at 2.4:1.
+  counts <- c(50, 12, 3,
+              9, 40, 15,
+              2, 18, 60)
+  actual <- rep(rep(c("a", "b", "c"), each = 3), times = counts)
+  predicted <- rep(rep(c("a", "b", "c"), times = 3), times = counts)
+  plots <- list(
+    confusion_matrix_plot(actual, predicted = predicted),
+    confusion_matrix_plot(actual, predicted = predicted, normalise = "row"),
+    confusion_matrix_plot(actual, predicted = predicted, normalise = "col"),
+    confusion_matrix_plot(make_glm(), threshold = 0.5)
+  )
+  for (p in plots) {
+    b <- ggplot2::ggplot_build(p)
+    tiles <- b$data[[1]][, c("PANEL", "x", "y", "fill")]
+    texts <- b$data[[2]][, c("PANEL", "x", "y", "colour")]
+    cells <- merge(tiles, texts, by = c("PANEL", "x", "y"))
+    expect_identical(nrow(cells), nrow(texts))
+    other <- ifelse(cells$colour == "#000000", "#ffffff", "#000000")
+    ratio <- .contrast_ratio(cells$colour, cells$fill)
+    expect_true(all(cells$colour %in% c("#000000", "#ffffff")))
+    expect_true(all(ratio >= 4.5))
+    expect_true(all(ratio >= .contrast_ratio(other, cells$fill)))
+  }
+})
+
+test_that("confusion_matrix_plot() chooses each count against the tile as drawn", {
+  # scale_fill_gradientn() interpolates its ramp in the Lab colour space. The
+  # old code read the tile colours off grDevices::colorRamp(), which
+  # interpolates in RGB, and near the tie between black and white the two
+  # disagree. The count of 228, at 0.456 of the range, is drawn on a tile that
+  # takes black at 4.64:1. The RGB reading of the same tile takes white, which
+  # reaches only 4.52:1 on the tile as drawn.
+  counts <- c(500, 228, 0, 40)
+  actual <- rep(rep(c("a", "b"), each = 2), times = counts)
+  predicted <- rep(rep(c("a", "b"), times = 2), times = counts)
+  b <- ggplot2::ggplot_build(confusion_matrix_plot(actual, predicted = predicted))
+  cells <- merge(b$data[[1]][, c("PANEL", "x", "y", "fill")],
+                 b$data[[2]][, c("PANEL", "x", "y", "colour")],
+                 by = c("PANEL", "x", "y"))
+  expect_identical(nrow(cells), 4L)
+  expect_identical(cells$colour, .legible_text_colour(cells$fill))
 })
 
 test_that("calibration_plot() adds per-bin Wilson confidence intervals", {

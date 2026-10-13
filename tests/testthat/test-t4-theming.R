@@ -209,15 +209,26 @@ test_that("palette_preview(cvd=) recolours tiles but keeps original hex labels",
 })
 
 test_that("palette_preview() label colour is chosen against the SHOWN tile", {
-  # WCAG-luminance label choice must use the simulated tile, so labels stay
-  # legible after CVD recolouring too.
-  built <- ggplot2::ggplot_build(palette_preview(8, cvd = "tritan"))
-  layers <- built$data
-  fills <- layers[[1]]$fill                       # shown (simulated) tiles
-  text_layer <- layers[[length(layers)]]
-  expect_true(all(text_layer$colour %in% c("grey10", "white")))
-  expected <- ifelse(.relative_luminance(fills) > 0.4, "grey10", "white")
-  expect_identical(text_layer$colour, expected)
+  # The label is chosen against the simulated tile, so that it stays legible
+  # after CVD recolouring too.
+  for (cv in c("deutan", "protan", "tritan")) {
+    built <- ggplot2::ggplot_build(palette_preview(8, cvd = cv))
+    layers <- built$data
+    fills <- layers[[1]]$fill                       # shown (simulated) tiles
+    text_layer <- layers[[length(layers)]]
+    black <- .contrast_ratio("#000000", fills)
+    white <- .contrast_ratio("#ffffff", fills)
+    expect_identical(text_layer$colour,
+                     ifelse(black >= white, "#000000", "#ffffff"))
+    expect_true(all(.contrast_ratio(text_layer$colour, fills) >= 4.5))
+  }
+  # Under protanopia the vermillion is shown as an olive that takes white,
+  # where the true colour would take black, so a rule read off the true
+  # colours fails the loop above.
+  built <- ggplot2::ggplot_build(palette_preview(8, cvd = "protan"))
+  text_layer <- built$data[[length(built$data)]]
+  expect_identical(text_layer$colour[text_layer$label == "#d55e00"], "#ffffff")
+  expect_identical(.legible_text_colour("#d55e00"), "#000000")
 })
 
 # --- (b) global options -----------------------------------------------------

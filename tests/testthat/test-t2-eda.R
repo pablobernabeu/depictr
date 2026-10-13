@@ -69,6 +69,47 @@ test_that("correlation_heatmap default palette is single-sourced and ends in bra
   expect_s3_class(correlation_heatmap(wellbeing_survey), "ggplot")
 })
 
+test_that("correlation_heatmap() labels are legible on the tile beneath them", {
+  # Labels were white above |r| = 0.6 and grey20 below, which drew the
+  # r = -0.70 of wellbeing_survey at 3.6:1. An undefined correlation's n/a was
+  # grey40 on grey85, at 4.1:1.
+  cells_of <- function(p) {
+    b <- ggplot2::ggplot_build(p)
+    tiles <- b$data[[1]][, c("PANEL", "x", "y", "fill")]
+    texts <- b$data[[2]][, c("PANEL", "x", "y", "colour", "label")]
+    cells <- merge(tiles, texts, by = c("PANEL", "x", "y"))
+    expect_identical(nrow(cells), nrow(texts))
+    cells
+  }
+  sparse <- data.frame(a = c(1, 2, 3, NA, NA, NA),
+                       b = c(NA, NA, NA, 4, 5, 6),
+                       c = c(1, 2, 3, 4, 5, 6))
+  # The r = -0.80 of this pair is drawn on a red that takes black at 4.72:1.
+  # scale_fill_gradient2() interpolates in the Lab colour space, and the same
+  # tile read off an RGB grDevices::colorRamp() takes white, which reaches only
+  # 4.45:1 on the red as drawn.
+  steep <- data.frame(x = 1:5, y = c(5, 3, 4, 1, 2))
+  plots <- list(
+    correlation_heatmap(wellbeing_survey),
+    correlation_heatmap(sparse),
+    correlation_heatmap(wellbeing_survey,
+                        palette = c("darkorange3", "grey30", "navy")),
+    correlation_heatmap(steep)
+  )
+  for (p in plots) {
+    cells <- cells_of(p)
+    other <- ifelse(cells$colour == "#000000", "#ffffff", "#000000")
+    ratio <- .contrast_ratio(cells$colour, cells$fill)
+    expect_true(all(cells$colour %in% c("#000000", "#ffffff")))
+    expect_true(all(ratio >= 4.5))
+    expect_true(all(ratio >= .contrast_ratio(other, cells$fill)))
+  }
+  # The undefined cells keep their n/a, on the scale's grey85.
+  cells <- cells_of(correlation_heatmap(sparse))
+  expect_true(any(cells$label == "n/a"))
+  expect_true(all(cells$fill[cells$label == "n/a"] == "grey85"))
+})
+
 test_that("raincloud and group_comparison grouped colours use the palette", {
   b <- ggplot2::ggplot_build(
     raincloud_plot(lexical_decision, RT, group = condition)
