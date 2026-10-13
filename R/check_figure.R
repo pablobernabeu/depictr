@@ -64,24 +64,29 @@
 #' layer sets a different one, and so is a lone colour passed through
 #' [ggplot2::scale_colour_identity()]. The audit cannot tell such a colour from
 #' decoration, so a colour meant to tell groups apart should be mapped, with
-#' [ggplot2::scale_colour_manual()] to fix its values. A continuous colour or
-#' fill scale is a smooth ramp rather than a set of codes, so it is excluded.
-#' The outline colours, across every layer, are compared among themselves, and
-#' so are the fill colours, and the row reports the closest pair from either
-#' set. An outline is therefore never compared with its own fill, nor a group
-#' with itself as another layer draws it.
+#' [ggplot2::scale_colour_manual()] to fix its values. The outline colours,
+#' across every layer, are compared among themselves, and so are the fill
+#' colours, and the row reports the closest pair from either set. An outline is
+#' therefore never compared with its own fill, nor a group with itself as
+#' another layer draws it.
+#'
+#' A continuous colour or fill scale, such as a heatmap's, is a smooth ramp
+#' rather than a set of codes, and none of the colour rows audits it. When
+#' nothing else in the figure encodes by colour, each of them abstains with a
+#' `detail` that says so. Whether a ramp reads in order, to a reader with a
+#' colour-vision deficiency and in greyscale as well, depends on how evenly its
+#' lightness changes, which the audit does not measure. Prefer a perceptually
+#' ordered map, such as viridis or depictr's sequential and diverging ramps,
+#' over a rainbow (Crameri et al., 2020).
 #'
 #' `greyscale_separability` is the smallest difference in CIE lightness between
 #' those same colours, which is what survives printing in black and white.
 #'
-#' `text_size` is the smallest point size of any text the figure draws, after
-#' scaling by `width_cm / render_width_cm`: a figure drawn seven inches wide and
-#' printed in an 8.9 cm column has every point size halved. Text drawn inside
-#' the panel, by a layer such as [ggplot2::geom_text()] or by an annotation, is
-#' deliberately left out. It sits on the marks rather than on the background, so
-#' there is no one background to measure its contrast against, and the two
-#' engines size a layer's text in different units, which would leave the check
-#' disagreeing with its Python twin on the same figure.
+#' `text_size` is the smallest point size of the text the theme draws around
+#' the panel: axis labels and titles, legends, facet strips, titles and
+#' captions. It is scaled by `width_cm / render_width_cm`, so a figure drawn
+#' seven inches wide and printed in an 8.9 cm column has every point size
+#' halved. Text drawn inside the panel is measured by `annotation_text_size`.
 #'
 #' `text_contrast` is the WCAG 2.2 contrast ratio of the text that falls
 #' furthest short of its own threshold. Each text is measured against the
@@ -110,7 +115,16 @@
 #' which is the single most common way an otherwise careful figure becomes
 #' unreadable.
 #'
-#' @section A limitation of the default palette:
+#' `annotation_text_size` is the smallest point size of the text drawn inside
+#' the panel, scaled as `text_size` is and held to the same `min_text_pt`. That
+#' text comes from layers such as [ggplot2::geom_text()] and
+#' [ggplot2::geom_label()], from annotations, and from depictr's own cell values
+#' and labels. Its contrast is not measured, since it sits on the marks rather
+#' than on one background. A label that a layer builds only when the figure is
+#' drawn, as ggrepel builds its repelled labels, is not yet in the built plot,
+#' so it is not measured either.
+#'
+#' @section Limitations of the default palette:
 #' The eight-colour qualitative palette clears the colour-separability checks
 #' comfortably and fails `greyscale_separability`: its orange (`#e69f00`) and
 #' sky blue (`#56b4e9`) differ by only 0.79 in lightness, so they print as the
@@ -121,6 +135,29 @@
 #' palette are also not safe in greyscale, since the bluish green and the
 #' vermillion differ by 3.55. The threshold has been left where it is rather
 #' than moved to let the package's own defaults through.
+#'
+#' The palette falls short on contrast as well. Four of its eight colours are
+#' below the 3:1 against white that WCAG asks of a graphical object: the orange
+#' at 2.25:1, the sky blue at 2.31:1, the grey at 2.85:1 and the yellow at
+#' 1.32:1. The orange is the second colour, so a default figure on white whose
+#' colour tells two or more groups apart fails `geometry_contrast`, and drawing
+#' its marks translucent lowers the ratio further. Opaque marks, the vermillion
+#' (`#d55e00`, at 3.87:1) in the orange's place and a redundant shape clear
+#' that row and `redundant_encoding`, as the first example below shows.
+#'
+#' @section Auditing at the printed size:
+#' Text is drawn in points, so the size it prints at depends on the two widths.
+#' A figure drawn at the size it will be printed, as `save_plot()` draws one
+#' given `width = 8.9, units = "cm"`, needs no scaling. Pass the saved width as
+#' both `width_cm` and `render_width_cm`, or leave both at their defaults.
+#' Given alone, `width_cm` audits the figure as though it had been drawn seven
+#' inches wide and then shrunk to fit.
+#'
+#' The default `min_text_pt` of 6 is lenient. As their guidelines stood on 30
+#' September 2026, PLOS asked for text of 8 to 12 pt and APA Style for 8 to 14
+#' pt. Elsevier asked for 7 pt as a rule of thumb, and Nature for 5 to 7 pt,
+#' with panel labels at 8 pt. Pass the floor of the journal the figure is for
+#' as `min_text_pt`. The four pages are listed under References.
 #'
 #' @param plot A plot, as returned by any depictr plotting function, including
 #'   one extended afterwards with `+`. A multi-panel composite is refused: its
@@ -135,14 +172,29 @@
 #' @param min_delta_e The smallest acceptable CIE76 colour difference, used for
 #'   the colour and greyscale separability checks. Defaults to 5, matching
 #'   [palette_safety()].
-#' @param min_text_pt The smallest acceptable printed text size, in points.
-#'   Defaults to 6, a common publisher floor for figure text.
+#' @param min_text_pt The smallest acceptable printed text size, in points,
+#'   for the text around the panel and the text inside it alike. Defaults to
+#'   6, below the floor most journals set (see "Auditing at the printed
+#'   size").
 #'
 #' @return A data frame with one row per check and columns `check`, `measured`,
 #'   `threshold`, `verdict` (`"pass"`, `"fail"` or `"not applicable"`) and
 #'   `detail`, a short note naming what produced the measurement.
 #' @references
+#' APA Style. Figures.
+#' <https://apastyle.apa.org/style-grammar-guidelines/tables-figures/figures>
+#'
+#' \insertRef{crameri2020}{depictr}
+#'
+#' Elsevier. Artwork sizing.
+#' <https://www.elsevier.com/about/policies-and-standards/author/artwork-and-media-instructions/artwork-sizing>
+#'
 #' \insertRef{machado2009}{depictr}
+#'
+#' Nature. Guide to preparing final artwork.
+#' <https://www.nature.com/documents/nature-final-artwork.pdf>
+#'
+#' PLOS ONE. Figures. <https://journals.plos.org/plosone/s/figures>
 #'
 #' \insertRef{wcag22}{depictr}
 #' @seealso [palette_safety()] for the palette in the abstract, and
@@ -151,8 +203,9 @@
 #' @examples
 #' library(ggplot2)
 #'
-#' # A figure that clears every check: two well-separated colours, a redundant
-#' # shape, and text left at the size it was drawn.
+#' # A figure that clears every check it can be held to: two well-separated
+#' # colours, a redundant shape, and text left at the size it was drawn. It
+#' # draws no text inside the panel, so that row is not applicable.
 #' good <- ggplot(crop_yield, aes(rainfall, yield, colour = treatment,
 #'                                shape = treatment)) +
 #'   geom_point() +
@@ -163,6 +216,10 @@
 #' # The same figure destined for an 8.9 cm journal column, where the text is
 #' # half the size it looks on screen.
 #' check_figure(good, width_cm = 8.9)
+#'
+#' # Saved at 8.9 cm in the first place, with save_plot(width = 8.9,
+#' # units = "cm"), it is drawn at the size it prints, so both widths are 8.9.
+#' check_figure(good, width_cm = 8.9, render_width_cm = 8.9)
 check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
                          min_delta_e = 5, min_text_pt = 6) {
   # A composite has several panels, each with its own scales, theme and text.
@@ -192,14 +249,27 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 
   # Marks are drawn on the panel, so a translucent one shows the panel through.
   encoding <- .figure_colour_encoding(built, panel_bg)
-  text <- .figure_text(ggplot2::ggplot_gtable(built), resolved, plot_bg)
+  gt <- ggplot2::ggplot_gtable(built)
+  text <- .figure_text(gt, resolved, plot_bg)
+  panel_text <- .figure_text(gt, resolved, panel_bg, panel = TRUE)
+  # A figure whose only text is inside the panel does draw text, just none that
+  # the two rows for the theme's text measure.
+  no_text <- if (is.null(panel_text)) {
+    "The figure draws no text."
+  } else {
+    "The figure draws no text outside the panel."
+  }
 
   rows <- c(
-    .separability_rows(encoding$sets, min_delta_e),
-    list(.text_size_row(text, width_cm, render_width_cm, min_text_pt)),
-    list(.text_contrast_row(text, width_cm, render_width_cm)),
-    list(.geometry_contrast_row(encoding$marks, panel_bg)),
-    list(.redundant_encoding_row(encoding))
+    .separability_rows(encoding$sets, min_delta_e, encoding$abstain),
+    list(.smallest_text_row("text_size", text, width_cm, render_width_cm,
+                            min_text_pt, "text", no_text)),
+    list(.text_contrast_row(text, width_cm, render_width_cm, no_text)),
+    list(.geometry_contrast_row(encoding$marks, panel_bg, encoding$abstain)),
+    list(.redundant_encoding_row(encoding)),
+    list(.smallest_text_row("annotation_text_size", panel_text, width_cm,
+                            render_width_cm, min_text_pt, "in-panel text",
+                            "The figure draws no text inside the panel."))
   )
   out <- do.call(rbind, rows)
   rownames(out) <- NULL
@@ -511,19 +581,33 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' Every colour is taken as drawn over `background`, the panel, at the alpha
 #' its geom applies to it.
 #'
+#' When nothing encodes by colour, the colour rows abstain, and their detail
+#' says why. It tells a figure that draws its colour or fill from a continuous
+#' scale apart from one that draws no colour code at all. A continuous scale
+#' counts when the build trained it on data. A fill that a stat computes, such
+#' as the counts of `geom_bin_2d()`, therefore counts, and a scale added to a
+#' plot that maps nothing to it does not. The Python twin applies the same rule
+#' through plotnine's own `is_empty()`.
+#'
 #' @return A list with `sets`, the drawn colours of the colour and of the fill
 #'   aesthetic across all layers (each a data frame of `drawn` and `declared`,
 #'   sorted so that a tie between two equally close pairs resolves the same way
 #'   in both engines, and absent when nothing encodes by it), `marks`, one
-#'   drawn colour per encoded group for the geometry check, and `redundant`,
-#'   the names of the non-colour channels that vary alongside them.
+#'   drawn colour per encoded group for the geometry check, `redundant`, the
+#'   names of the non-colour channels that vary alongside them, and `abstain`,
+#'   the detail the colour rows give when nothing encodes.
 #' @noRd
 .figure_colour_encoding <- function(built, background) {
   continuous <- character(0)
   coded <- character(0)
+  graded <- FALSE
   for (scale in built$plot$scales$scales) {
     if (!isTRUE(scale$is_discrete())) {
       continuous <- union(continuous, scale$aesthetics)
+      if (any(c("colour", "fill") %in% scale$aesthetics) &&
+          !isTRUE(scale$is_empty())) {
+        graded <- TRUE
+      }
     } else if (!inherits(scale, "ScaleDiscreteIdentity")) {
       # An identity scale draws each value as given, so a value mapped through
       # it is chosen by hand, as a constant set on a layer is.
@@ -595,7 +679,8 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
   })
   list(sets = Filter(Negate(is.null), sets),
        marks = if (length(marks)) do.call(rbind, marks),
-       redundant = names(others)[lengths(others) >= 2])
+       redundant = names(others)[lengths(others) >= 2],
+       abstain = if (graded) .continuous_colour_detail else .no_colour_detail)
 }
 
 # --- text bookkeeping -------------------------------------------------------
@@ -613,9 +698,17 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' them relatively, and a grob that is never drawn never appears here at all, so
 #' an unused element cannot drag the measurement down.
 #'
-#' The panel cells are skipped, which is what leaves layer and annotation text
-#' out of the measurement. An inside legend sits in a cell of its own rather
-#' than in the panel, so it is still counted.
+#' The outermost table holds the panels, and the walk takes one side of them.
+#' By default, it skips the panel cells and leaves layer and annotation text to
+#' the other walk. An inside legend sits in a cell of its own, so it is still
+#' counted. With `panel = TRUE`, it walks the panel cells alone and takes every
+#' text beneath them, an inset plot's included. Text that a grob builds only
+#' when it is drawn, as ggrepel builds its repelled labels in `makeContent()`,
+#' is not in the table yet, so neither walk sees it.
+#'
+#' A blank label draws nothing. Where a grob's sizes or colours run one per
+#' label, as a text layer's do, a blank label's are left out. The Python twin
+#' sees the same, since matplotlib draws no text for a blank label.
 #'
 #' Each text is paired with the background it is drawn on, which WCAG measures
 #' contrast against. The walk carries a background down the tree: a nested
@@ -629,13 +722,16 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' over the panel. grid multiplies a gpar alpha into the colour's own and
 #' carries it down the tree, so the walk carries it too.
 #'
-#' @param background The plot background, which the outermost gtable's own
-#'   "background" cell paints and which therefore is not read a second time.
+#' @param background The background the walk starts from: the plot background,
+#'   which the outermost gtable's own "background" cell paints and which
+#'   therefore is not read a second time, or the panel's for `panel = TRUE`.
+#' @param panel Whether to walk only the panel cells, for the text drawn
+#'   inside the panel.
 #' @return A data frame of `size` (points), `colour` (the hex drawn),
 #'   `declared` (the hex before compositing), `alpha`, `bold` (logical) and
-#'   `background` (hex), or `NULL` when the figure draws no text.
+#'   `background` (hex), or `NULL` when the walk finds no text.
 #' @noRd
-.figure_text <- function(gt, resolved, background) {
+.figure_text <- function(gt, resolved, background, panel = FALSE) {
   base <- ggplot2::calc_element("text", resolved)
   found <- list()
   walk <- function(grob, bg, face = NULL, alpha = 1, root = FALSE) {
@@ -648,7 +744,9 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
       cells <- grob$layout$name %||% rep_len("", length(grob$grobs))
       if (!root) bg <- .cell_background(grob, cells, bg)
       for (index in seq_along(grob$grobs)) {
-        if (startsWith(cells[[index]], "panel")) next
+        in_panel <- startsWith(cells[[index]], "panel")
+        skip <- if (panel) root && !in_panel else in_panel
+        if (skip) next
         walk(grob$grobs[[index]], bg, face, alpha)
       }
     } else if (inherits(grob, "gTree")) {
@@ -657,15 +755,17 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
     }
     if (!inherits(grob, "text")) return(invisible(NULL))
     labels <- as.character(grob$label)
-    if (!length(labels) || !any(nzchar(trimws(labels)))) {
-      return(invisible(NULL))
-    }
+    drawn <- nzchar(trimws(labels))
+    if (!any(drawn)) return(invisible(NULL))
     # A single grob can carry a vector of sizes or colours, one per label, so
     # both are recycled to the same length rather than reduced to their first
     # element and quietly losing the smallest or the palest.
     sizes <- as.numeric(grob$gp$fontsize %||% base$size) *
       as.numeric(grob$gp$cex %||% 1)
-    ink <- .parse_colours(grob$gp$col %||% base$colour %||% "black")
+    colours <- grob$gp$col %||% base$colour %||% "black"
+    if (length(sizes) == length(labels)) sizes <- sizes[drawn]
+    if (length(colours) == length(labels)) colours <- colours[drawn]
+    ink <- .parse_colours(colours)
     if (!is.null(ink)) {
       ink$alpha <- ink$alpha * alpha
       ink <- ink[ink$alpha > 0, , drop = FALSE]
@@ -740,6 +840,13 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 # colour. Shared so the two halves of the sentence cannot drift apart.
 .no_colour_detail <- "No two encoding colours: nothing is distinguished by colour."
 
+# What they say instead when the figure draws its colour or fill from a
+# continuous scale, which they do not audit. A heatmap distinguishes its cells
+# by colour, so the sentence above would be false of it. The Python twin
+# carries the same sentence.
+.continuous_colour_detail <-
+  "Colour is a continuous scale, which these checks do not audit."
+
 # Fixed two decimals, so a number embedded in a detail string reads the same
 # here as in the Python twin's f-string.
 #' @noRd
@@ -753,17 +860,18 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' Each set holds the drawn colours of one aesthetic, and only colours declared
 #' differently are paired, so a group is never compared with itself. The rows
 #' report the closest pair over the sets, the first set winning a tie.
+#' @param abstain The detail every row gives when no set encodes.
 #' @noRd
-.separability_rows <- function(sets, min_delta_e) {
+.separability_rows <- function(sets, min_delta_e, abstain = .no_colour_detail) {
   check_names <- c("colour_separability", "colour_separability_protan",
                    "colour_separability_deutan", "colour_separability_tritan")
   conditions <- c("normal", names(.cvd_matrices))
   if (!length(sets)) {
     rows <- lapply(check_names, function(nm) {
-      .check_row(nm, NA_real_, min_delta_e, .no_colour_detail)
+      .check_row(nm, NA_real_, min_delta_e, abstain)
     })
     rows[[length(rows) + 1L]] <- .check_row(
-      "greyscale_separability", NA_real_, min_delta_e, .no_colour_detail)
+      "greyscale_separability", NA_real_, min_delta_e, abstain)
     return(rows)
   }
   closest_over_sets <- function(measure) {
@@ -825,16 +933,23 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
   list(distance = best, pair = pair)
 }
 
+#' The smallest of some text at its printed size, against the floor
+#'
+#' Serves `text_size`, for the theme's text, and `annotation_text_size`, for
+#' the text drawn inside the panel.
+#' @param noun How the detail names the text measured.
+#' @param absent The detail when there is no such text.
 #' @noRd
-.text_size_row <- function(text, width_cm, render_width_cm, min_text_pt) {
+.smallest_text_row <- function(check, text, width_cm, render_width_cm,
+                               min_text_pt, noun, absent) {
   if (is.null(text)) {
-    return(.check_row("text_size", NA_real_, min_text_pt,
-                      "The figure draws no text."))
+    return(.check_row(check, NA_real_, min_text_pt, absent))
   }
   nominal <- min(text$size)
-  .check_row("text_size", nominal * width_cm / render_width_cm, min_text_pt,
-             sprintf("Smallest text %s pt, drawn at %s cm and printed at %s cm.",
-                     .fmt(nominal), .fmt(render_width_cm), .fmt(width_cm)))
+  .check_row(check, nominal * width_cm / render_width_cm, min_text_pt,
+             sprintf("Smallest %s %s pt, drawn at %s cm and printed at %s cm.",
+                     noun, .fmt(nominal), .fmt(render_width_cm),
+                     .fmt(width_cm)))
 }
 
 #' The text that falls furthest short of its own WCAG threshold
@@ -844,11 +959,12 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' The row reports the text with the smallest ratio relative to its threshold.
 #' Ties go to the smaller printed size, then to the colour and background in
 #' byte order, which is the order the Python twin breaks them in.
+#' @param absent The detail when the figure draws no such text.
 #' @noRd
-.text_contrast_row <- function(text, width_cm, render_width_cm) {
+.text_contrast_row <- function(text, width_cm, render_width_cm,
+                               absent = "The figure draws no text.") {
   if (is.null(text)) {
-    return(.check_row("text_contrast", NA_real_, .wcag_text_contrast,
-                      "The figure draws no text."))
+    return(.check_row("text_contrast", NA_real_, .wcag_text_contrast, absent))
   }
   printed <- text$size * width_cm / render_width_cm
   large <- printed >= .wcag_large_text_pt |
@@ -877,11 +993,13 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #'
 #' Ties go to the drawn colour, then the declared one, in byte order, which is
 #' the order the Python twin breaks them in.
+#' @param abstain The detail when no group is encoded.
 #' @noRd
-.geometry_contrast_row <- function(marks, background) {
+.geometry_contrast_row <- function(marks, background,
+                                   abstain = .no_colour_detail) {
   if (is.null(marks) || !nrow(marks)) {
     return(.check_row("geometry_contrast", NA_real_, .wcag_object_contrast,
-                      .no_colour_detail))
+                      abstain))
   }
   ratios <- .contrast_ratio(marks$drawn, background)
   worst <- order(ratios, marks$drawn, marks$declared, method = "radix")[[1]]
@@ -895,7 +1013,8 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' @noRd
 .redundant_encoding_row <- function(encoding) {
   if (!length(encoding$sets)) {
-    return(.check_row("redundant_encoding", NA_real_, 1, .no_colour_detail))
+    return(.check_row("redundant_encoding", NA_real_, 1,
+                      encoding$abstain %||% .no_colour_detail))
   }
   channels <- encoding$redundant
   detail <- if (length(channels)) {

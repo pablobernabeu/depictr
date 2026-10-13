@@ -30,8 +30,10 @@ factor every point size is multiplied by.}
 the colour and greyscale separability checks. Defaults to 5, matching
 \code{\link[=palette_safety]{palette_safety()}}.}
 
-\item{min_text_pt}{The smallest acceptable printed text size, in points.
-Defaults to 6, a common publisher floor for figure text.}
+\item{min_text_pt}{The smallest acceptable printed text size, in points,
+for the text around the panel and the text inside it alike. Defaults to
+6, below the floor most journals set (see "Auditing at the printed
+size").}
 }
 \value{
 A data frame with one row per check and columns \code{check}, \code{measured},
@@ -83,24 +85,29 @@ constant, as in \code{geom_point(colour = "red")}, is left out, even when anothe
 layer sets a different one, and so is a lone colour passed through
 \code{\link[ggplot2:scale_colour_identity]{ggplot2::scale_colour_identity()}}. The audit cannot tell such a colour from
 decoration, so a colour meant to tell groups apart should be mapped, with
-\code{\link[ggplot2:scale_colour_manual]{ggplot2::scale_colour_manual()}} to fix its values. A continuous colour or
-fill scale is a smooth ramp rather than a set of codes, so it is excluded.
-The outline colours, across every layer, are compared among themselves, and
-so are the fill colours, and the row reports the closest pair from either
-set. An outline is therefore never compared with its own fill, nor a group
-with itself as another layer draws it.
+\code{\link[ggplot2:scale_colour_manual]{ggplot2::scale_colour_manual()}} to fix its values. The outline colours,
+across every layer, are compared among themselves, and so are the fill
+colours, and the row reports the closest pair from either set. An outline is
+therefore never compared with its own fill, nor a group with itself as
+another layer draws it.
+
+A continuous colour or fill scale, such as a heatmap's, is a smooth ramp
+rather than a set of codes, and none of the colour rows audits it. When
+nothing else in the figure encodes by colour, each of them abstains with a
+\code{detail} that says so. Whether a ramp reads in order, to a reader with a
+colour-vision deficiency and in greyscale as well, depends on how evenly its
+lightness changes, which the audit does not measure. Prefer a perceptually
+ordered map, such as viridis or depictr's sequential and diverging ramps,
+over a rainbow (Crameri et al., 2020).
 
 \code{greyscale_separability} is the smallest difference in CIE lightness between
 those same colours, which is what survives printing in black and white.
 
-\code{text_size} is the smallest point size of any text the figure draws, after
-scaling by \code{width_cm / render_width_cm}: a figure drawn seven inches wide and
-printed in an 8.9 cm column has every point size halved. Text drawn inside
-the panel, by a layer such as \code{\link[ggplot2:geom_text]{ggplot2::geom_text()}} or by an annotation, is
-deliberately left out. It sits on the marks rather than on the background, so
-there is no one background to measure its contrast against, and the two
-engines size a layer's text in different units, which would leave the check
-disagreeing with its Python twin on the same figure.
+\code{text_size} is the smallest point size of the text the theme draws around
+the panel: axis labels and titles, legends, facet strips, titles and
+captions. It is scaled by \code{width_cm / render_width_cm}, so a figure drawn
+seven inches wide and printed in an 8.9 cm column has every point size
+halved. Text drawn inside the panel is measured by \code{annotation_text_size}.
 
 \code{text_contrast} is the WCAG 2.2 contrast ratio of the text that falls
 furthest short of its own threshold. Each text is measured against the
@@ -128,9 +135,18 @@ the two or more it draws, and a shape or line type set as a constant is left
 out. Zero means the distinction between groups is carried by colour alone,
 which is the single most common way an otherwise careful figure becomes
 unreadable.
+
+\code{annotation_text_size} is the smallest point size of the text drawn inside
+the panel, scaled as \code{text_size} is and held to the same \code{min_text_pt}. That
+text comes from layers such as \code{\link[ggplot2:geom_text]{ggplot2::geom_text()}} and
+\code{\link[ggplot2:geom_label]{ggplot2::geom_label()}}, from annotations, and from depictr's own cell values
+and labels. Its contrast is not measured, since it sits on the marks rather
+than on one background. A label that a layer builds only when the figure is
+drawn, as ggrepel builds its repelled labels, is not yet in the built plot,
+so it is not measured either.
 }
 
-\section{A limitation of the default palette}{
+\section{Limitations of the default palette}{
 
 The eight-colour qualitative palette clears the colour-separability checks
 comfortably and fails \code{greyscale_separability}: its orange (\verb{#e69f00}) and
@@ -142,13 +158,39 @@ or add a redundant shape or line type; the four leading colours of the
 palette are also not safe in greyscale, since the bluish green and the
 vermillion differ by 3.55. The threshold has been left where it is rather
 than moved to let the package's own defaults through.
+
+The palette falls short on contrast as well. Four of its eight colours are
+below the 3:1 against white that WCAG asks of a graphical object: the orange
+at 2.25:1, the sky blue at 2.31:1, the grey at 2.85:1 and the yellow at
+1.32:1. The orange is the second colour, so a default figure on white whose
+colour tells two or more groups apart fails \code{geometry_contrast}, and drawing
+its marks translucent lowers the ratio further. Opaque marks, the vermillion
+(\verb{#d55e00}, at 3.87:1) in the orange's place and a redundant shape clear
+that row and \code{redundant_encoding}, as the first example below shows.
+}
+
+\section{Auditing at the printed size}{
+
+Text is drawn in points, so the size it prints at depends on the two widths.
+A figure drawn at the size it will be printed, as \code{save_plot()} draws one
+given \verb{width = 8.9, units = "cm"}, needs no scaling. Pass the saved width as
+both \code{width_cm} and \code{render_width_cm}, or leave both at their defaults.
+Given alone, \code{width_cm} audits the figure as though it had been drawn seven
+inches wide and then shrunk to fit.
+
+The default \code{min_text_pt} of 6 is lenient. As their guidelines stood on 30
+September 2026, PLOS asked for text of 8 to 12 pt and APA Style for 8 to 14
+pt. Elsevier asked for 7 pt as a rule of thumb, and Nature for 5 to 7 pt,
+with panel labels at 8 pt. Pass the floor of the journal the figure is for
+as \code{min_text_pt}. The four pages are listed under References.
 }
 
 \examples{
 library(ggplot2)
 
-# A figure that clears every check: two well-separated colours, a redundant
-# shape, and text left at the size it was drawn.
+# A figure that clears every check it can be held to: two well-separated
+# colours, a redundant shape, and text left at the size it was drawn. It
+# draws no text inside the panel, so that row is not applicable.
 good <- ggplot(crop_yield, aes(rainfall, yield, colour = treatment,
                                shape = treatment)) +
   geom_point() +
@@ -159,9 +201,26 @@ check_figure(good)
 # The same figure destined for an 8.9 cm journal column, where the text is
 # half the size it looks on screen.
 check_figure(good, width_cm = 8.9)
+
+# Saved at 8.9 cm in the first place, with save_plot(width = 8.9,
+# units = "cm"), it is drawn at the size it prints, so both widths are 8.9.
+check_figure(good, width_cm = 8.9, render_width_cm = 8.9)
 }
 \references{
+APA Style. Figures.
+\url{https://apastyle.apa.org/style-grammar-guidelines/tables-figures/figures}
+
+\insertRef{crameri2020}{depictr}
+
+Elsevier. Artwork sizing.
+\url{https://www.elsevier.com/about/policies-and-standards/author/artwork-and-media-instructions/artwork-sizing}
+
 \insertRef{machado2009}{depictr}
+
+Nature. Guide to preparing final artwork.
+\url{https://www.nature.com/documents/nature-final-artwork.pdf}
+
+PLOS ONE. Figures. \url{https://journals.plos.org/plosone/s/figures}
 
 \insertRef{wcag22}{depictr}
 }

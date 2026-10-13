@@ -214,6 +214,14 @@ then printed in an 8.9 cm column arrives at half the size it looked on screen:
 subset(check_figure(grouped, width_cm = 8.9), check == "text_size")
 ```
 
+A figure saved at the size it will be printed is drawn at that size, so give
+the saved width as both `width_cm` and `render_width_cm`, or leave both at
+their defaults. Text drawn inside the panel, such as an annotation, a label or
+a cell value, has a row of its own, `annotation_text_size`, held to the same
+floor. That floor defaults to 6 pt, which is lenient. As their guidelines stood
+on 30 September 2026, PLOS and APA Style asked for at least 8 pt, Elsevier for
+7 pt and Nature for 5 to 7 pt, and `?check_figure` links all four.
+
 One limitation belongs here, beside the claim it qualifies, since the package is
 the one making that claim. The eight-colour qualitative palette clears every
 colour-vision check and fails the greyscale check: its orange and its sky blue
@@ -233,6 +241,12 @@ p8 <- ggplot(eight, aes(x, y, colour = g)) +
 
 subset(check_figure(p8), check == "greyscale_separability")
 ```
+
+The audit does not measure a continuous colour or fill scale, such as a
+heatmap's: its colour rows abstain and say why. A ramp is read by its
+lightness, so prefer one whose lightness runs evenly from end to end, such as
+viridis or depictr's sequential and diverging ramps, over a rainbow
+[@crameri2020].
 
 Set the look once for a whole script with `depictr_options()`. It carries the
 base size and family, the brand and accent colours and a custom palette, so the

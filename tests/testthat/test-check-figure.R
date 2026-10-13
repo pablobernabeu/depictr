@@ -100,11 +100,34 @@ split_figure <- function() {
     theme_depictr()
 }
 
-# The rows that depend on what a figure tells apart by colour, which is every
-# row but the two text rows.
-encoding_rows <- function(report) {
-  report[!report$check %in% c("text_size", "text_contrast"), ]
+# Points coloured by a continuous variable, on the default gradient.
+gradient_figure <- function() {
+  ggplot(crop_yield, aes(rainfall, yield, colour = yield)) +
+    geom_point() +
+    theme_depictr()
 }
+
+# The rows that depend on what a figure tells apart by colour, which is every
+# row but the three text rows.
+encoding_rows <- function(report) {
+  report[!report$check %in% c("text_size", "text_contrast",
+                              "annotation_text_size"), ]
+}
+
+# The good figure with a note drawn inside the panel at 5.7 pt. ggplot2 sizes a
+# layer's text in millimetres, so the size is given as 5.7 pt over .pt. The
+# Python suite draws the same note at size 5.7, which plotnine takes as points.
+annotated_figure <- function(size = 5.7 / ggplot2::.pt) {
+  good_figure() +
+    annotate("text", x = 800, y = 5, label = "note", size = size)
+}
+
+# Every colour row, which abstains with one shared detail when nothing
+# discrete encodes.
+colour_checks <- c("colour_separability", "colour_separability_protan",
+                   "colour_separability_deutan", "colour_separability_tritan",
+                   "greyscale_separability", "geometry_contrast",
+                   "redundant_encoding")
 
 # --- shape of the result -----------------------------------------------------
 
@@ -117,7 +140,8 @@ test_that("check_figure() returns the standard table shape", {
     "colour_separability", "colour_separability_protan",
     "colour_separability_deutan", "colour_separability_tritan",
     "greyscale_separability", "text_size", "text_contrast",
-    "geometry_contrast", "redundant_encoding"))
+    "geometry_contrast", "redundant_encoding", "annotation_text_size"))
+  expect_identical(nrow(report), 10L)
   expect_type(report$measured, "double")
   expect_type(report$threshold, "double")
   expect_true(all(report$verdict %in% c("pass", "fail", "not applicable")))
@@ -127,11 +151,15 @@ test_that("check_figure() returns the standard table shape", {
 
 # --- the two verdicts the audit must be capable of ---------------------------
 
-test_that("a deliberately good figure passes every check", {
+test_that("a deliberately good figure passes every check that applies", {
   report <- check_figure(good_figure())
-  expect_true(all(report$verdict == "pass"),
-              info = paste(report$check[report$verdict != "pass"],
+  # It draws no text inside the panel, so that row has nothing to measure.
+  measured <- report[report$check != "annotation_text_size", ]
+  expect_true(all(measured$verdict == "pass"),
+              info = paste(measured$check[measured$verdict != "pass"],
                            collapse = ", "))
+  expect_identical(verdict_for(report, "annotation_text_size"),
+                   "not applicable")
 })
 
 test_that("a deliberately bad figure fails the checks it should, and only those", {
@@ -154,18 +182,19 @@ test_that("a deliberately bad figure fails the checks it should, and only those"
 
 test_that("the audit reports the numbers its Python twin reports", {
   # Pinned so the two engines cannot drift apart unnoticed. Each figure below is
-  # constructible in both, and the Python suite pins the same vectors.
+  # constructible in both, and the Python suite pins the same vectors. None of
+  # them draws text inside the panel, so each ends in NA.
   expect_equal(check_figure(good_figure())$measured,
-               c(111.87, 89.87, 107.07, 98.5, 16.92, 8.8, 8.45, 3.87, 1))
+               c(111.87, 89.87, 107.07, 98.5, 16.92, 8.8, 8.45, 3.87, 1, NA))
   expect_equal(check_figure(bad_figure())$measured,
-               c(116.25, 35.04, 0.37, 119.38, 6.32, 4, 8.45, 4.01, 0))
+               c(116.25, 35.04, 0.37, 119.38, 6.32, 4, 8.45, 4.01, 0, NA))
 
   eight <- data.frame(g = factor(letters[1:8]), x = 1:8, y = 1:8)
   p <- ggplot(eight, aes(x, y, colour = g)) + geom_point() +
     scale_colour_depictr() + theme_depictr()
   report <- check_figure(p)
   expect_equal(report$measured,
-               c(33.43, 18.15, 7.4, 16.18, 0.79, 8.8, 8.45, 1.32, 0))
+               c(33.43, 18.15, 7.4, 16.18, 0.79, 8.8, 8.45, 1.32, 0, NA))
   # The detail strings are part of the contract too, since they carry the
   # colours the numbers came from.
   expect_identical(report$detail[1:5], c(
@@ -174,11 +203,21 @@ test_that("the audit reports the numbers its Python twin reports", {
     "Closest pair #999999 and #cc79a7 of 8 encoding colours.",
     "Closest pair #009e73 and #56b4e9 of 8 encoding colours.",
     "Closest pair #56b4e9 and #e69f00 in CIE lightness."))
-  expect_identical(report$detail[6:9], c(
+  expect_identical(report$detail[6:10], c(
     "Smallest text 8.80 pt, drawn at 17.78 cm and printed at 17.78 cm.",
     "Lowest-contrast text #4d4d4d on #ffffff at 8.80 pt.",
     "Lowest-contrast colour #f0e442 on #ffffff.",
-    "Colour alone distinguishes the groups."))
+    "Colour alone distinguishes the groups.",
+    "The figure draws no text inside the panel."))
+
+  # A note drawn inside the panel at 5.7 pt, below the 6 pt floor. The text-size
+  # check never saw it, so the report used to read 8.80 pt as the smallest text.
+  annotated <- check_figure(annotated_figure())
+  expect_equal(annotated$measured,
+               c(111.87, 89.87, 107.07, 98.5, 16.92, 8.8, 8.45, 3.87, 1, 5.7))
+  expect_identical(annotated$detail[c(6, 10)], c(
+    "Smallest text 8.80 pt, drawn at 17.78 cm and printed at 17.78 cm.",
+    "Smallest in-panel text 5.70 pt, drawn at 17.78 cm and printed at 17.78 cm."))
 
   # A dark plot background behind a blank panel: the geometry is measured
   # against the plot background in both twins. The Python twin used to read the
@@ -186,7 +225,7 @@ test_that("the audit reports the numbers its Python twin reports", {
   dark <- check_figure(good_figure() +
     theme(plot.background = ggplot2::element_rect(fill = "#333333")))
   expect_equal(dark$measured,
-               c(111.87, 89.87, 107.07, 98.5, 16.92, 8.8, 1.49, 1.77, 1))
+               c(111.87, 89.87, 107.07, 98.5, 16.92, 8.8, 1.49, 1.77, 1, NA))
   expect_identical(dark$detail[dark$check == "geometry_contrast"],
                    "Lowest-contrast colour #005b96 on #333333.")
 
@@ -195,7 +234,7 @@ test_that("the audit reports the numbers its Python twin reports", {
   # 3.87 and greyscale at 16.92.
   bars <- check_figure(bars_figure(alpha = 0.3))
   expect_equal(bars$measured,
-               c(33.44, 27.98, 33.13, 35.37, 4.03, 8.8, 8.45, 1.46, 0))
+               c(33.44, 27.98, 33.13, 35.37, 4.03, 8.8, 8.45, 1.46, 0, NA))
   expect_identical(bars$detail, c(
     rep("Closest pair #b3cee0 and #f2cfb3 of 2 encoding fill colours.", 4),
     "Closest pair #b3cee0 and #f2cfb3 in CIE lightness.",
@@ -203,13 +242,14 @@ test_that("the audit reports the numbers its Python twin reports", {
     "Lowest-contrast text #4d4d4d on #ffffff at 8.80 pt.",
     paste("Lowest-contrast colour #d55e00 at alpha 0.30, drawn as #f2cfb3,",
           "on #ffffff."),
-    "Colour alone distinguishes the groups."))
+    "Colour alone distinguishes the groups.",
+    "The figure draws no text inside the panel."))
 
   # The good figure's points at alpha 0.7, which the Get started vignette used
   # to show as mended. Its vermillion is drawn as #e28e4d, at 2.56:1.
   points <- check_figure(points_figure(alpha = 0.7))
   expect_equal(points$measured,
-               c(83.25, 69.5, 80.89, 85.03, 10.77, 8.8, 8.45, 2.56, 1))
+               c(83.25, 69.5, 80.89, 85.03, 10.77, 8.8, 8.45, 2.56, 1, NA))
   expect_identical(detail_for(points, "geometry_contrast"), paste(
     "Lowest-contrast colour #d55e00 at alpha 0.70, drawn as #e28e4d,",
     "on #ffffff."))
@@ -218,11 +258,19 @@ test_that("the audit reports the numbers its Python twin reports", {
   # colour to a constant. Every colour row used to read "not applicable".
   split <- check_figure(split_figure())
   expect_equal(split$measured,
-               c(116.25, 35.04, 0.37, 119.38, 6.32, 8.8, 8.45, 4.01, 0))
+               c(116.25, 35.04, 0.37, 119.38, 6.32, 8.8, 8.45, 4.01, 0, NA))
   expect_identical(split$detail[c(1:5, 8)], c(
     rep("Closest pair #309208 and #d62728 of 2 encoding colours.", 4),
     "Closest pair #309208 and #d62728 in CIE lightness.",
     "Lowest-contrast colour #309208 on #ffffff."))
+
+  # A scatter coloured by a continuous variable. Every colour row abstains and
+  # says why, where it used to say that nothing is distinguished by colour.
+  gradient <- check_figure(gradient_figure())
+  expect_equal(gradient$measured,
+               c(NA, NA, NA, NA, NA, 8.8, 8.45, NA, NA, NA))
+  expect_identical(unique(gradient$detail[gradient$check %in% colour_checks]),
+                   "Colour is a continuous scale, which these checks do not audit.")
 })
 
 # --- the measurements themselves ---------------------------------------------
@@ -725,29 +773,112 @@ test_that("frequentist_bayesian_plot() with draws is audited by colour", {
     "Closest pair %s and %s of 2 encoding colours.", pair[[1]], pair[[2]]))
 })
 
+# --- text drawn inside the panel ---------------------------------------------
+
+test_that("text inside the panel is held to the size floor in a row of its own", {
+  # A 5.7 pt note fails the 6 pt floor. The theme's text keeps the row it
+  # always had, still 8.80 pt.
+  report <- check_figure(annotated_figure())
+  expect_equal(measured_for(report, "annotation_text_size"), 5.7)
+  expect_identical(verdict_for(report, "annotation_text_size"), "fail")
+  expect_equal(report$threshold[report$check == "annotation_text_size"], 6)
+  expect_equal(measured_for(report, "text_size"), 8.8)
+  expect_identical(verdict_for(report, "text_size"), "pass")
+  # The note scales with the printed width as the theme's text does.
+  column <- check_figure(annotated_figure(), width_cm = 8.89)
+  expect_equal(measured_for(column, "annotation_text_size"), 2.85)
+  expect_identical(detail_for(column, "annotation_text_size"), paste(
+    "Smallest in-panel text 5.70 pt, drawn at 17.78 cm and printed at",
+    "8.89 cm."))
+  expect_equal(measured_for(check_figure(annotated_figure(), width_cm = 8.89,
+                                         render_width_cm = 8.89),
+                            "annotation_text_size"), 5.7)
+  # The smallest text across all the panels of a facetted figure: the note is
+  # drawn in both, and a smaller label in the first alone.
+  facetted <- check_figure(good_figure() + facet_wrap(~treatment) +
+    annotate("text", x = 800, y = 5, label = "note", size = 7 / ggplot2::.pt) +
+    geom_text(aes(rainfall, yield, label = "one"), data = standard[1, ],
+              size = 6.5 / ggplot2::.pt, inherit.aes = FALSE))
+  expect_equal(measured_for(facetted, "annotation_text_size"), 6.5)
+  # A label's text is measured as text is: the box around it is not.
+  labelled <- check_figure(good_figure() +
+    annotate("label", x = 800, y = 5, label = "boxed", size = 5 / ggplot2::.pt))
+  expect_equal(measured_for(labelled, "annotation_text_size"), 5)
+})
+
+test_that("a blank label draws nothing, so its size is not measured", {
+  # One label is empty and set smaller than the other. The Python twin never
+  # sees it, since matplotlib draws no text for it.
+  labels <- data.frame(x = c(1, 2), y = c(1, 2), label = c("", "b"),
+                       size = c(4, 9) / ggplot2::.pt)
+  report <- check_figure(
+    ggplot(labels, aes(x, y, label = label, size = size)) +
+      geom_text() + scale_size_identity() + theme_depictr())
+  expect_equal(measured_for(report, "annotation_text_size"), 9)
+})
+
+test_that("a figure whose only text is inside the panel says so", {
+  # The theme draws no text, so the two rows that measure it abstain, and they
+  # no longer claim that the figure draws no text at all.
+  p <- ggplot(crop_yield[1:3, ], aes(rainfall, yield, label = field)) +
+    geom_text(size = 8 / ggplot2::.pt) + theme_void()
+  report <- check_figure(p)
+  for (check in c("text_size", "text_contrast")) {
+    expect_identical(verdict_for(report, check), "not applicable")
+    expect_identical(detail_for(report, check),
+                     "The figure draws no text outside the panel.")
+  }
+  expect_equal(measured_for(report, "annotation_text_size"), 8)
+})
+
 # --- what the audit declines to measure --------------------------------------
 
 test_that("a continuous colour scale is not treated as a set of category codes", {
   # A gradient's neighbouring colours are meant to be close, so measuring the
   # distance between them would only ever report that a gradient is a gradient.
-  report <- check_figure(correlation_heatmap(wellbeing_survey))
-  for (check in c("colour_separability", "greyscale_separability",
-                  "geometry_contrast", "redundant_encoding")) {
+  heatmap <- correlation_heatmap(wellbeing_survey)
+  report <- check_figure(heatmap)
+  for (check in colour_checks) {
     expect_identical(verdict_for(report, check), "not applicable")
     expect_true(is.na(measured_for(report, check)))
+    # The detail says why. It used to say that nothing is distinguished by
+    # colour, which is false of a heatmap.
+    expect_identical(detail_for(report, check),
+                     "Colour is a continuous scale, which these checks do not audit.")
   }
   # The heatmap's cell labels are a text layer, so they neither count as
   # encoding colours nor drag the text-size measurement down to their own size.
   expect_equal(measured_for(report, "text_size"), 8.8)
+  # They are measured in the row for text inside the panel instead. The Python
+  # twin draws them at another size, so the value is read from this plot's own
+  # text layer and is not pinned across the twins.
+  labels <- Filter(function(layer) inherits(layer$geom, "GeomText"),
+                   heatmap$layers)[[1]]
+  expect_equal(measured_for(report, "annotation_text_size"),
+               round(labels$aes_params$size * ggplot2::.pt, 2))
+})
+
+test_that("a continuous scale counts when the figure draws from it", {
+  continuous_detail <- function(p) {
+    report <- check_figure(p)
+    unique(report$detail[report$check %in% colour_checks])
+  }
+  # A fill that a stat computes comes from a continuous scale, though no layer
+  # maps it by name. The Python suite pins the same two cases.
+  expect_identical(
+    continuous_detail(ggplot(crop_yield, aes(rainfall, yield)) +
+                        geom_bin_2d(bins = 10) + theme_depictr()),
+    "Colour is a continuous scale, which these checks do not audit.")
+  # A continuous scale added to a plot that maps nothing to it draws nothing.
+  expect_identical(
+    continuous_detail(ggplot(crop_yield, aes(rainfall, yield)) + geom_point() +
+                        scale_colour_gradient() + theme_depictr()),
+    "No two encoding colours: nothing is distinguished by colour.")
 })
 
 test_that("a figure with no colour encoding abstains rather than passing", {
   p <- ggplot(crop_yield, aes(rainfall, yield)) + geom_point() + theme_depictr()
   report <- check_figure(p)
-  colour_checks <- c("colour_separability", "colour_separability_protan",
-                     "colour_separability_deutan", "colour_separability_tritan",
-                     "greyscale_separability", "geometry_contrast",
-                     "redundant_encoding")
   expect_true(all(report$verdict[report$check %in% colour_checks] ==
                     "not applicable"))
   expect_true(all(is.na(report$measured[report$check %in% colour_checks])))
@@ -795,6 +926,10 @@ test_that("a figure that draws no text says so rather than reporting a size", {
   expect_identical(verdict_for(report, "text_contrast"), "not applicable")
   expect_identical(report$detail[report$check == "text_size"],
                    "The figure draws no text.")
+  expect_identical(verdict_for(report, "annotation_text_size"),
+                   "not applicable")
+  expect_identical(detail_for(report, "annotation_text_size"),
+                   "The figure draws no text inside the panel.")
 })
 
 # --- degenerate inputs -------------------------------------------------------
@@ -803,7 +938,7 @@ test_that("a single row and a zero-variance grouping still audit", {
   one <- crop_yield[1, , drop = FALSE]
   report <- check_figure(ggplot(one, aes(rainfall, yield)) + geom_point() +
                            theme_depictr())
-  expect_identical(nrow(report), 9L)
+  expect_identical(nrow(report), 10L)
   expect_identical(verdict_for(report, "colour_separability"), "not applicable")
 
   # One group means one colour, which is not a pair, so the colour checks
@@ -820,7 +955,7 @@ test_that("a single row and a zero-variance grouping still audit", {
 
 test_that("an empty plot audits without error", {
   report <- check_figure(ggplot() + theme_depictr())
-  expect_identical(nrow(report), 9L)
+  expect_identical(nrow(report), 10L)
 })
 
 test_that("a measurement exactly on the threshold passes", {

@@ -75,20 +75,34 @@ A safe palette is not a safe figure, though, so `check_figure()` audits the plot
 you are about to submit. It measures how separable the encoding colours are under
 each dichromacy and in greyscale, how small the text becomes at a stated output
 width, how well text and geometry contrast with their backgrounds under WCAG, and
-whether any distinction rests on colour alone. Each row reports the value it
-measured next to the threshold, so a verdict can be argued with.
+whether any distinction rests on colour alone. The size check covers the text
+drawn inside the panel as well as around it, and the contrast check covers the
+text around it alone. Each row reports the value it measured next to the
+threshold, so a verdict can be argued with. For a figure saved at its final
+width, give that width as both `width_cm` and `render_width_cm`, or neither.
 
 ```r
 check_figure(explore_distribution(lexical_decision, RT, group = condition),
              width_cm = 8.9)
 ```
 
-Two limits are worth knowing. The colourblind-safety guarantee covers the eight
-base colours, and past those the palette interpolates, with a warning from
-`depictr_palette()`. The guarantee is also confined to hue confusion: in
-greyscale the palette's orange and sky blue differ by only 0.79 in CIE lightness,
-so they print as the same grey. A figure that may be printed in black and white wants fewer
-groups, a sequential palette, or a redundant shape or line type.
+The audit leaves continuous colour scales alone, and the colour rows of a
+heatmap say so. For those, prefer a perceptually ordered map such as viridis or
+the package's sequential and diverging ramps.
+
+Three limits of the palette are worth knowing. The colourblind-safety guarantee
+covers the eight base colours, and past those the palette interpolates, with a
+warning from `depictr_palette()`. The guarantee is also confined to hue
+confusion: in greyscale the palette's orange and sky blue differ by only 0.79 in
+CIE lightness, so they print as the same grey. A figure that may be printed in
+black and white wants fewer groups, a sequential palette, or a redundant shape or
+line type. The palette also falls short on contrast. Four of the eight colours
+fall below the 3:1 against white that WCAG asks of a graphical object. The orange
+is one of them, and it is the second colour, so every default figure that
+colours two or more groups uses it. The example above therefore fails
+`geometry_contrast`, as well as `redundant_encoding` and, at 8.9 cm, `text_size`.
+Opaque marks, the vermillion `#d55e00` in the orange's place and a redundant
+shape or line type clear the two colour rows.
 
 ## A first plot
 
