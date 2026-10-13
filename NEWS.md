@@ -95,6 +95,22 @@
   the summary path for it, and `posterior_plot()`, which needs draws, refuses
   it. The summary path also no longer warns about label keys you never
   supplied.
+* `conf_level` in `frequentist_bayesian_plot()` set the level of the
+  frequentist intervals only. With draws, the half-eyes stayed at 66% and 95%,
+  so `conf_level = 0.8` drew 80% confidence intervals beside 95% credible ones,
+  and nothing on the figure named either level. The level now sets the outer
+  posterior interval too. The interval drawn when ggdist is not installed
+  follows it, and so does the span that decides which faceted panels draw the
+  reference line. The 66% inner interval is kept while `conf_level`
+  exceeds 0.66, so that it stays the narrower of the two. A caption now names
+  the level of each source's intervals on either path, and the new `caption`
+  argument replaces it or, with `NA`, omits it. A table of estimates keeps the
+  intervals it holds, and the caption says that they are as supplied.
+* The two paths of `frequentist_bayesian_plot()` no longer swap the sources'
+  colours. With draws, the Bayesian half-eyes were brand blue and the
+  frequentist overlay orange, the reverse of the forest plot drawn from
+  summaries and of the Python package. The frequentist estimates are now brand
+  blue and the Bayesian ones orange on both paths.
 
 * `survival_plot()` read the `status` coding separately in each group. Under the
   `survival::Surv()` 1/2 convention, a group whose subjects were all censored
@@ -290,7 +306,7 @@
   every colour row read "not applicable", whereas the same figure drawn in one
   layer fails the deuteranopia check at 0.37. `frequentist_bayesian_plot()`
   with draws, whose half-eyes and frequentist overlay are separate layers, was
-  never audited for colour. It now is, and the orange of its overlay fails
+  never audited for colour. It now is, and the orange of its half-eyes fails
   `geometry_contrast` at 2.25:1, as that colour does on white in any figure.
   Shape and line type split across layers count towards `redundant_encoding` in
   the same way. A colour set as a constant, as in `geom_point(colour = "red")`,

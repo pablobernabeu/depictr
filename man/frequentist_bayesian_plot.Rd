@@ -18,6 +18,7 @@ frequentist_bayesian_plot(
   title = NULL,
   subtitle = NULL,
   x_lab = "Estimate",
+  caption = NULL,
   ...
 )
 }
@@ -29,7 +30,9 @@ frequentist_bayesian_plot(
 matrix/data frame, a tidy data frame of posterior summaries or a summary
 matrix such as \code{brms::fixef()} returns.}
 
-\item{conf_level}{Confidence/credible level for models.}
+\item{conf_level}{Level of the intervals the function computes: the
+confidence intervals of a frequentist model and, when \code{bayesian} holds
+draws, the outer credible interval of each posterior (see Details).}
 
 \item{labels, interaction, intercept}{See \code{\link[=compare_models]{compare_models()}}. On both paths,
 an unnamed \code{labels} vector takes the frequentist terms first, then any
@@ -52,6 +55,9 @@ omit).}
 
 \item{title, subtitle, x_lab}{Title, subtitle and x-axis label.}
 
+\item{caption}{Plot caption. The default (\code{NULL}) names the level of each
+source's intervals. Pass \code{NA} to omit the caption.}
+
 \item{...}{Further arguments passed to \code{\link[=compare_models]{compare_models()}} on the summary
 path (ignored on the distribution path).}
 }
@@ -60,8 +66,9 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 Presents the estimates from a frequentist model and a Bayesian model on one
-plot, with the two sources distinguished by the first two colours of the
-colourblind-safe \code{\link[=depictr_palette]{depictr_palette()}} (brand blue and orange).
+plot, in the first two colours of the colourblind-safe \code{\link[=depictr_palette]{depictr_palette()}}:
+brand blue for the frequentist estimates and orange for the Bayesian ones,
+whether the Bayesian side is drawn from draws or from summaries.
 }
 \details{
 This is the modernised successor to the original \code{frequentist_bayesian_plot()}
@@ -84,6 +91,15 @@ keeps only those, and two terms that would share a label are an error. With
 draws, only the terms both sides share are drawn, and a message names any
 dropped, such as a \code{sigma} in the posterior. The forest plot of summaries
 draws every term of either input.
+
+\code{conf_level} is the level of every interval the function computes. For a
+frequentist model, that is its confidence interval. For posterior draws, it
+is the outer of the equal-tailed credible intervals drawn beneath each
+half-eye, so the two sources are compared at one level. The inner interval
+is 66\%, drawn only when \code{conf_level} exceeds 0.66 so that it stays the
+narrower of the two. A table of estimates keeps the interval limits it
+holds, at whatever level they were computed. By default, a caption names the
+level of each source's intervals or says that they are as supplied.
 }
 \examples{
 # Summary path: a tidy "Bayesian" summary as a data frame. The summary here

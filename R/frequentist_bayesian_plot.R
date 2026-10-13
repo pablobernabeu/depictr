@@ -3,8 +3,9 @@
 #' Plot frequentist and Bayesian estimates together
 #'
 #' Presents the estimates from a frequentist model and a Bayesian model on one
-#' plot, with the two sources distinguished by the first two colours of the
-#' colourblind-safe [depictr_palette()] (brand blue and orange).
+#' plot, in the first two colours of the colourblind-safe [depictr_palette()]:
+#' brand blue for the frequentist estimates and orange for the Bayesian ones,
+#' whether the Bayesian side is drawn from draws or from summaries.
 #'
 #' This is the modernised successor to the original `frequentist_bayesian_plot()`
 #' gist, which built on `brms::mcmc_plot()` to show the full Bayesian posterior
@@ -27,12 +28,23 @@
 #' dropped, such as a `sigma` in the posterior. The forest plot of summaries
 #' draws every term of either input.
 #'
+#' `conf_level` is the level of every interval the function computes. For a
+#' frequentist model, that is its confidence interval. For posterior draws, it
+#' is the outer of the equal-tailed credible intervals drawn beneath each
+#' half-eye, so the two sources are compared at one level. The inner interval
+#' is 66%, drawn only when `conf_level` exceeds 0.66 so that it stays the
+#' narrower of the two. A table of estimates keeps the interval limits it
+#' holds, at whatever level they were computed. By default, a caption names the
+#' level of each source's intervals or says that they are as supplied.
+#'
 #' @param frequentist A frequentist model (e.g. from `lm`, `glm` or
 #'   `lmerTest::lmer`) or a tidy data frame of estimates.
 #' @param bayesian A Bayesian model, a `posterior` draws object, a draws
 #'   matrix/data frame, a tidy data frame of posterior summaries or a summary
 #'   matrix such as `brms::fixef()` returns.
-#' @param conf_level Confidence/credible level for models.
+#' @param conf_level Level of the intervals the function computes: the
+#'   confidence intervals of a frequentist model and, when `bayesian` holds
+#'   draws, the outer credible interval of each posterior (see Details).
 #' @param labels,interaction,intercept See [compare_models()]. On both paths,
 #'   an unnamed `labels` vector takes the frequentist terms first, then any
 #'   that only the Bayesian input holds. `intercept` defaults to `TRUE` here,
@@ -49,6 +61,8 @@
 #' @param vertical_line_at_x Position of the vertical reference line (`NA` to
 #'   omit).
 #' @param title,subtitle,x_lab Title, subtitle and x-axis label.
+#' @param caption Plot caption. The default (`NULL`) names the level of each
+#'   source's intervals. Pass `NA` to omit the caption.
 #' @param ... Further arguments passed to [compare_models()] on the summary
 #'   path (ignored on the distribution path).
 #'
@@ -91,6 +105,7 @@ frequentist_bayesian_plot <- function(frequentist,
                                       title = NULL,
                                       subtitle = NULL,
                                       x_lab = "Estimate",
+                                      caption = NULL,
                                       ...) {
   interaction <- match.arg(interaction)
   # `facet` is the primary control; `scales` is honoured only when supplied
@@ -122,7 +137,7 @@ frequentist_bayesian_plot <- function(frequentist,
       conf_level = conf_level, labels = labels, interaction = interaction,
       intercept = intercept, freq_label = freq_label, bayes_label = bayes_label,
       reference_line = vertical_line_at_x, scales = scales,
-      title = title, subtitle = subtitle, x_lab = x_lab
+      title = title, subtitle = subtitle, x_lab = x_lab, caption = caption
     ))
   }
 
@@ -133,7 +148,7 @@ frequentist_bayesian_plot <- function(frequentist,
   args <- list(frequentist, bayesian)
   names(args) <- c(freq_label, bayes_label)
 
-  do.call(
+  p <- do.call(
     compare_models,
     c(args, list(
       conf_level = conf_level,
@@ -151,6 +166,17 @@ frequentist_bayesian_plot <- function(frequentist,
       ...
     ))
   )
+  # compare_models() takes no caption, so it is added here. A table of
+  # posterior summaries keeps its own intervals, whose level it does not
+  # record.
+  caption <- fbp_caption(
+    caption,
+    fbp_level_text("Frequentist", frequentist, conf_level,
+                   "confidence interval"),
+    fbp_level_text("Bayesian", bayesian, conf_level, "interval")
+  )
+  if (!is.null(caption)) p <- p + ggplot2::labs(caption = caption)
+  p
 }
 
 # ---- distribution path ------------------------------------------------------
@@ -158,19 +184,26 @@ frequentist_bayesian_plot <- function(frequentist,
 #' Posterior distributions with the frequentist point + CI overlaid
 #'
 #' Draws a 'ggdist' half-eye per term from the Bayesian draws and overlays the
-#' frequentist estimate and confidence interval at the same y position, in the
-#' two leading colours of [depictr_palette()]. Terms are matched by canonical
-#' label so `b_`-prefixed Bayesian names line up with the frequentist ones, and
-#' only the matched terms are drawn. Falls back to point + interval slabs when
-#' 'ggdist' is unavailable.
+#' frequentist estimate and confidence interval at the same y position, the
+#' half-eyes in orange and the overlay in brand blue. Terms are matched by
+#' canonical label so `b_`-prefixed Bayesian names line up with the frequentist
+#' ones, and only the matched terms are drawn. Falls back to point + interval
+#' slabs when 'ggdist' is unavailable.
 #' @noRd
 fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
                              interaction, intercept, freq_label, bayes_label,
                              reference_line, scales = "fixed",
-                             title, subtitle, x_lab) {
+                             title, subtitle, x_lab, caption = NULL) {
+  # On the summary path, compare_models() colours the sources in order,
+  # frequentist first, and the same mapping here keeps each source's colour on
+  # either path.
   pal <- depictr_palette(2)
-  bayes_colour <- pal[1]
-  freq_colour  <- pal[2]
+  freq_colour  <- pal[1]
+  bayes_colour <- pal[2]
+  # The posterior's outer interval is drawn at the level of the frequentist
+  # one. The 66% inner interval is kept only while it is the narrower.
+  widths <- if (conf_level > 0.66) c(0.66, conf_level) else conf_level
+  tails <- c((1 - conf_level) / 2, 1 - (1 - conf_level) / 2)
 
   # Bayesian draws -> long, labelled by canonical display label.
   draws <- extract_draws(bayesian)
@@ -261,13 +294,16 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
       data = draws,
       ggplot2::aes(x = .data$.value, y = .data$label,
                    colour = bayes_label, fill = bayes_label),
-      .width = c(0.66, 0.95), point_interval = "median_qi",
+      .width = widths, point_interval = "median_qi",
       slab_alpha = 0.6, na.rm = TRUE
     )
   } else {
-    # Summarise the draws to a point + 95% interval for the fallback.
+    # The fallback summarises the draws to their median and the conf_level
+    # interval alone, and the caption says so.
+    widths <- conf_level
     bsumm <- do.call(rbind, lapply(split(draws$.value, draws$label), function(v) {
-      q <- stats::quantile(v, c(0.025, 0.5, 0.975), names = FALSE, na.rm = TRUE)
+      q <- stats::quantile(v, c(tails[1], 0.5, tails[2]), names = FALSE,
+                           na.rm = TRUE)
       data.frame(centre = q[2], lo = q[1], hi = q[3])
     }))
     bsumm$label <- factor(rownames(bsumm), levels = lvls)
@@ -302,6 +338,15 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
       size = 2.4, position = nudge, na.rm = TRUE
     )
 
+  caption <- fbp_caption(
+    caption,
+    fbp_level_text("Frequentist", frequentist, conf_level,
+                   "confidence interval"),
+    sprintf("Bayesian: posterior median with %s equal-tailed credible %s.",
+            and_list(sprintf("%g%%", 100 * widths)),
+            if (length(widths) > 1) "intervals" else "interval")
+  )
+
   p <- p +
     ggplot2::scale_colour_manual(
       values = stats::setNames(c(bayes_colour, freq_colour),
@@ -311,18 +356,20 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
     ggplot2::scale_fill_manual(
       values = stats::setNames(bayes_colour, bayes_label), guide = "none"
     ) +
-    ggplot2::labs(x = x_lab, y = NULL, title = title, subtitle = subtitle) +
+    ggplot2::labs(x = x_lab, y = NULL, title = title, subtitle = subtitle,
+                  caption = caption) +
     theme_depictr(grid = "x")
 
   # Free-scaled, one-term-per-row layout (the flagship default): a large
   # intercept no longer squishes the slopes. The reference line is drawn only in
-  # panels whose span (Bayesian 95% interval unioned with the frequentist CI)
-  # brackets it, so a far-from-zero panel is not stretched back to the line.
+  # panels whose span (the posterior's conf_level interval unioned with the
+  # frequentist CI) brackets it, so a far-from-zero panel is not stretched back
+  # to the line.
   if (scales == "free") {
     if (!is.na(ref)) {
       labs_all <- levels(draws$label)
       dq <- tapply(draws$.value, draws$label, function(v)
-        stats::quantile(v, c(0.025, 0.975), names = FALSE, na.rm = TRUE))
+        stats::quantile(v, tails, names = FALSE, na.rm = TRUE))
       lo <- vapply(labs_all, function(l)
         min(c(dq[[l]][1], freq$conf.low[freq$label == l]), na.rm = TRUE),
         numeric(1))
@@ -360,4 +407,34 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
                      panel.spacing.y = ggplot2::unit(2, "pt"))
   }
   p
+}
+
+# ---- caption ----------------------------------------------------------------
+
+#' The caption of either path
+#'
+#' `NULL` asks for the automatic caption, one sentence per source, and `NA`
+#' omits it. Anything else is used as given. Each sentence takes a line of its
+#' own: ggplot2 does not wrap a caption, and on one line the posterior's
+#' sentence ran past the left edge of a figure seven inches wide.
+#' @noRd
+fbp_caption <- function(caption, frequentist_text, bayesian_text) {
+  if (is.null(caption)) {
+    return(paste(frequentist_text, bayesian_text, sep = "\n"))
+  }
+  if (length(caption) == 1 && is.na(caption)) return(NULL)
+  caption
+}
+
+#' The caption's sentence on one source's intervals
+#'
+#' A table that holds interval limits of its own is drawn with them, at a level
+#' the table does not record. Any other limits are computed at `conf_level`,
+#' from a fitted model or from a table's standard errors.
+#' @noRd
+fbp_level_text <- function(source, x, conf_level, interval) {
+  if (holds_intervals(x)) {
+    return(sprintf("%s: intervals as supplied.", source))
+  }
+  sprintf("%s: %g%% %s.", source, 100 * conf_level, interval)
 }

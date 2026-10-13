@@ -55,10 +55,8 @@ tidy_estimates.data.frame <- function(x, conf_level = 0.95, ...) {
   est_col   <- pick(c("estimate", "Estimate", "frequentist_estimate",
                       "coef", "mean", "value"))
   se_col    <- pick(c("std.error", "Std. Error", "std_error", "SE", "se"))
-  low_col   <- pick(c("conf.low", "CI_2.5", "2.5 %", "lower", "ci_low",
-                      "Q2.5", "lwr", "l-95% CI"))
-  high_col  <- pick(c("conf.high", "CI_97.5", "97.5 %", "upper", "ci_high",
-                      "Q97.5", "upr", "u-95% CI"))
+  low_col   <- pick(interval_low_columns)
+  high_col  <- pick(interval_high_columns)
 
   if (is.na(est_col)) {
     stop("Could not find an estimate column in the data frame. Expected one ",
@@ -128,6 +126,24 @@ tidy_estimates.default <- function(x, conf_level = 0.95, ...) {
 }
 
 # ---- internal helpers ------------------------------------------------------
+
+# The columns the data-frame method reads as the lower and upper interval
+# limits, in order of preference.
+interval_low_columns <- c("conf.low", "CI_2.5", "2.5 %", "lower", "ci_low",
+                          "Q2.5", "lwr", "l-95% CI")
+interval_high_columns <- c("conf.high", "CI_97.5", "97.5 %", "upper",
+                           "ci_high", "Q97.5", "upr", "u-95% CI")
+
+#' Does a table of estimates hold interval limits of its own?
+#'
+#' Such limits are drawn as they stand, at whatever level they were computed.
+#' Without them, the data-frame method fills the limits in from the standard
+#' errors at `conf_level`, as the model methods compute theirs.
+#' @noRd
+holds_intervals <- function(x) {
+  is.data.frame(x) && any(interval_low_columns %in% names(x)) &&
+    any(interval_high_columns %in% names(x))
+}
 
 #' @noRd
 wald_ci <- function(est, se, conf_level) {

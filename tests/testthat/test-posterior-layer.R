@@ -266,6 +266,182 @@ test_that("fbp distribution path falls back to point+interval without ggdist", {
   expect_true(all(depictr_palette(2) %in% cols))
 })
 
+# ---- frequentist_bayesian_plot(): one stated level, stable colours ---------
+
+# Draws spaced evenly over a normal posterior for each coefficient, so the
+# intervals a plot computes from them are known without a seed.
+quantile_draws <- function(fit, n = 400) {
+  co <- stats::coef(fit)
+  draws <- as.data.frame(lapply(co, function(m) {
+    stats::qnorm(stats::ppoints(n), m, abs(m) * 0.1 + 0.05)
+  }))
+  names(draws) <- names(co)
+  draws
+}
+
+# The point-and-interval rows of a built half-eye, one per term and width.
+halfeye_intervals <- function(p) {
+  d <- ggplot2::ggplot_build(p)$data[[slab_layer_idx(p)]]
+  d[!is.na(d$xmin), c(".width", "xmin", "xmax")]
+}
+
+# Brand blue for the frequentist source and orange for the Bayesian one.
+fbp_colours <- function() {
+  pal <- depictr_palette(2)
+  c(`Frequentist analysis` = pal[[1]], `Bayesian analysis` = pal[[2]])
+}
+
+# The colour each source takes in the built legend.
+legend_colours <- function(p) {
+  guide <- ggplot2::get_guide_data(p, "colour")
+  stats::setNames(guide$colour, guide$.label)[names(fbp_colours())]
+}
+
+test_that("fbp draws the posterior's outer interval at conf_level", {
+  # Regression: conf_level moved the frequentist bars but not the half-eyes,
+  # which stayed at 66% and 95%, so conf_level = 0.8 set 80% confidence
+  # intervals beside 95% credible ones.
+  skip_if_not_installed("ggdist")
+  fit <- lm(life_satisfaction ~ stress, data = wellbeing_survey)
+  draws <- quantile_draws(fit)
+  p <- frequentist_bayesian_plot(fit, draws, conf_level = 0.8,
+                                 intercept = FALSE)
+  iv <- halfeye_intervals(p)
+  expect_equal(sort(iv$.width), c(0.66, 0.8))
+  expect_equal(unlist(iv[iv$.width == 0.8, c("xmin", "xmax")],
+                      use.names = FALSE),
+               stats::quantile(draws$stress, c(0.1, 0.9), names = FALSE))
+  # The frequentist bars are drawn at the same level.
+  bars <- p$layers[[which(geom_classes(p) == "GeomErrorbar")]]$data
+  expect_equal(c(bars$conf.low, bars$conf.high),
+               unname(stats::confint(fit, level = 0.8)["stress", ]))
+  # The default keeps the 66% and 95% pair.
+  p95 <- frequentist_bayesian_plot(fit, draws, intercept = FALSE)
+  expect_equal(sort(halfeye_intervals(p95)$.width), c(0.66, 0.95))
+  # At or below 66%, an inner interval would be the wider of the two, so a
+  # single interval is drawn.
+  for (level in c(0.5, 0.66)) {
+    p_low <- frequentist_bayesian_plot(fit, draws, conf_level = level,
+                                       intercept = FALSE)
+    expect_equal(halfeye_intervals(p_low)$.width, level)
+  }
+})
+
+test_that("fbp's fallback without ggdist draws the conf_level interval", {
+  orig <- base::requireNamespace
+  testthat::local_mocked_bindings(
+    requireNamespace = function(package, ...) {
+      if (identical(package, "ggdist")) FALSE else orig(package, ...)
+    },
+    .package = "base"
+  )
+  fit <- lm(life_satisfaction ~ stress, data = wellbeing_survey)
+  draws <- quantile_draws(fit)
+  p <- suppressMessages(frequentist_bayesian_plot(
+    fit, draws, conf_level = 0.8, intercept = FALSE
+  ))
+  ranges <- p$layers[[which(geom_classes(p) == "GeomLinerange")]]$data
+  expect_equal(c(ranges$lo, ranges$hi),
+               stats::quantile(draws$stress, c(0.1, 0.9), names = FALSE))
+  # The fallback draws one posterior interval, and its caption says so.
+  expect_identical(p$labels$caption, paste0(
+    "Frequentist: 80% confidence interval.\n",
+    "Bayesian: posterior median with 80% equal-tailed credible interval."
+  ))
+  expect_identical(legend_colours(p), fbp_colours())
+})
+
+test_that("fbp places reference lines by the conf_level interval", {
+  # The faceted layout draws the zero line only in panels whose span reaches
+  # it, and the span took the 95% posterior interval whatever conf_level said.
+  freq <- data.frame(term = c("a", "b"), estimate = c(0.35, 2),
+                     conf.low = c(0.3, 1.9), conf.high = c(0.4, 2.1))
+  n <- 400
+  # The 95% posterior interval of `a` reaches below zero, and its 80%
+  # interval stays above it.
+  draws <- data.frame(a = stats::qnorm(stats::ppoints(n), 0.15, 0.1),
+                      b = stats::qnorm(stats::ppoints(n), 2, 0.05))
+  zero_panels <- function(p) {
+    lines <- Filter(function(l) inherits(l$geom, "GeomVline"), p$layers)
+    unlist(lapply(lines, function(l) as.character(l$data$label)),
+           use.names = FALSE)
+  }
+  p95 <- suppressMessages(frequentist_bayesian_plot(freq, draws))
+  expect_identical(zero_panels(p95), "a")
+  p80 <- suppressMessages(
+    frequentist_bayesian_plot(freq, draws, conf_level = 0.8)
+  )
+  expect_null(zero_panels(p80))
+})
+
+test_that("fbp captions the level of each source's intervals", {
+  # Regression: nothing on the figure named either level. Each source's
+  # sentence takes a line, since ggplot2 does not wrap a caption.
+  fit <- lm(life_satisfaction ~ stress, data = wellbeing_survey)
+  summ <- tidy_estimates(fit)
+  # On the summary path, the Bayesian table keeps its own intervals, at a
+  # level depictr cannot read, and so does a frequentist table.
+  expect_identical(
+    frequentist_bayesian_plot(fit, summ, conf_level = 0.9)$labels$caption,
+    "Frequentist: 90% confidence interval.\nBayesian: intervals as supplied."
+  )
+  expect_identical(
+    frequentist_bayesian_plot(summ, summ)$labels$caption,
+    "Frequentist: intervals as supplied.\nBayesian: intervals as supplied."
+  )
+  expect_null(
+    frequentist_bayesian_plot(fit, summ, caption = NA)$labels$caption
+  )
+  own <- frequentist_bayesian_plot(fit, summ, caption = "Own words.")
+  expect_identical(own$labels$caption, "Own words.")
+
+  skip_if_not_installed("ggdist")
+  draws <- quantile_draws(fit)
+  expect_identical(
+    frequentist_bayesian_plot(fit, draws, conf_level = 0.9)$labels$caption,
+    paste0("Frequentist: 90% confidence interval.\n",
+           "Bayesian: posterior median with 66% and 90% equal-tailed ",
+           "credible intervals.")
+  )
+  expect_identical(
+    frequentist_bayesian_plot(fit, draws, conf_level = 0.5)$labels$caption,
+    paste0("Frequentist: 50% confidence interval.\n",
+           "Bayesian: posterior median with 50% equal-tailed credible ",
+           "interval.")
+  )
+  expect_identical(
+    frequentist_bayesian_plot(summ, draws)$labels$caption,
+    paste0("Frequentist: intervals as supplied.\n",
+           "Bayesian: posterior median with 66% and 95% equal-tailed ",
+           "credible intervals.")
+  )
+  expect_null(
+    frequentist_bayesian_plot(fit, draws, caption = NA)$labels$caption
+  )
+})
+
+test_that("fbp gives each source the same colour on both paths", {
+  # Regression: with draws, the Bayesian side was brand blue and the
+  # frequentist side orange, the reverse of the summary path and of the Python
+  # twin.
+  fit <- lm(life_satisfaction ~ stress, data = wellbeing_survey)
+  expect_identical(
+    legend_colours(frequentist_bayesian_plot(fit, tidy_estimates(fit))),
+    fbp_colours()
+  )
+  skip_if_not_installed("ggdist")
+  p <- frequentist_bayesian_plot(fit, quantile_draws(fit))
+  expect_identical(legend_colours(p), fbp_colours())
+  # The layers draw what the legend says.
+  b <- ggplot2::ggplot_build(p)
+  slab <- b$data[[slab_layer_idx(p)]]
+  expect_identical(unique(c(slab$colour, slab$fill)),
+                   fbp_colours()[["Bayesian analysis"]])
+  bars <- b$data[[which(geom_classes(p) == "GeomErrorbar")]]
+  expect_identical(unique(bars$colour),
+                   fbp_colours()[["Frequentist analysis"]])
+})
+
 # ---- draws extraction helpers ----------------------------------------------
 
 test_that("extract_draws() handles wide, long and matrix inputs", {
