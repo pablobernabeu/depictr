@@ -424,6 +424,25 @@
   the one `arm::binnedplot()` draws. Observations with zero prior weight, which
   take no part in the fit, are now left out of the bins.
 
+* `survival_plot()` draws log-log confidence limits by default. They stay
+  between 0 and 1 and cover better in small samples than the untransformed
+  Greenwood limits it drew before (Borgan & Liestøl, 1990). The new
+  `conf_type` argument restores those with `"plain"` and gives the default of
+  `survival::survfit()` with `"log"`. The limits of a `survfit` object were
+  copied from the object, at the level and on the scale it was made with, so
+  `conf_level` was ignored and a 90% band showed the object's 95% limits. They
+  are now recomputed from the object's standard errors at the requested
+  `conf_level` and `conf_type`, so they equal those that `survfit()` gives with
+  the same `conf.int` and `conf.type`. An object made with
+  `conf.type = "none"` keeps its standard errors, so it now gets limits as
+  well, which `conf_level = NA` leaves out. An object without standard errors,
+  or one whose lower limits follow `conf.lower = "peto"` or `"modified"`, keeps
+  its own limits, with a warning when they differ from those requested. Where
+  a curve falls to zero, the limits keep the values of the step before, so a
+  band drawn from follow-up times no longer stops one event early. A
+  `conf_level` outside (0, 1), such as 95 meant as a percentage, is now an
+  error.
+
 # depictr 0.3.0
 
 ## Auditing a finished figure

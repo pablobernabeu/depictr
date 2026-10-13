@@ -7,6 +7,23 @@
 #' Greenwood standard error are computed with base R, so no modelling package is
 #' required; a `survfit` object from the 'survival' package is also accepted.
 #'
+#' The confidence limits are pointwise. By default, they are built on the
+#' log-log scale, as
+#' \eqn{S^{\exp(\pm z \sigma / \log S)}}{S^exp(+/- z * se / log(S))},
+#' where \eqn{\sigma}{se} is the Greenwood standard error of
+#' \eqn{\log S}{log(S)}. These limits stay between 0 and 1, and in small
+#' samples they cover better than the untransformed limits
+#' \eqn{S \pm z S \sigma}{S +/- z * S * se} (Borgan & Liestøl, 1990).
+#' `conf_type = "plain"` draws the untransformed limits, clipped to that range,
+#' and `conf_type = "log"` draws
+#' \eqn{S \exp(\pm z \sigma)}{S * exp(+/- z * se)},
+#' capped at 1, as [survival::survfit()] does by default. The limits are 1
+#' while the estimate is 1, and where a curve falls to 0, they keep the values
+#' of the step before. The limits of a `survfit` object are recomputed from its
+#' standard errors at `conf_level` and `conf_type`, so they equal those that
+#' `survfit()` gives with the same `conf.int` and `conf.type` (`conf_level`
+#' names the objects that keep their own).
+#'
 #' For publication-ready figures the plot offers the three annotations that
 #' define a "survminer-style" Kaplan-Meier display, each behind its own
 #' argument and off by default so existing behaviour is unchanged:
@@ -41,7 +58,13 @@
 #'   `time` is a data frame (by default its `group`, `strata` or `arm` column,
 #'   if any). Observations whose group is missing are dropped with a message,
 #'   since they belong to no arm.
-#' @param conf_level Confidence level for the limits (`NA` to omit them).
+#' @param conf_level Confidence level for the limits, a single number strictly
+#'   between 0 and 1 (`NA` to omit them). For a `survfit` object, the limits are
+#'   recomputed at this level, even for one made with `conf.type = "none"`,
+#'   since it keeps its standard errors. An object that stores no standard
+#'   errors, or whose lower limits follow `conf.lower = "peto"` or
+#'   `"modified"`, keeps the limits it holds, with a warning when they are not
+#'   the ones asked for.
 #' @param censor_marks Whether to mark censoring times with a `+`.
 #' @param risk_table Whether to add a number-at-risk table beneath the curves
 #'   (composed with 'patchwork'). Defaults to `FALSE`.
@@ -57,6 +80,9 @@
 #'   monotone-decreasing survival curve always leaves empty) over a translucent
 #'   background, instead of in a right-hand margin. Defaults to `FALSE`.
 #' @param title,x_lab,y_lab Title and axis labels.
+#' @param conf_type The scale on which the confidence limits are built:
+#'   `"log-log"` (the default), `"log"` or `"plain"`, as set out under
+#'   Details.
 #'
 #' @return A [ggplot2::ggplot] object or, when `risk_table = TRUE`, a
 #'   'patchwork' object stacking the curves above the risk table.
@@ -64,6 +90,8 @@
 #' \insertRef{kaplan1958}{depictr}
 #'
 #' \insertRef{greenwood1926}{depictr}
+#'
+#' \insertRef{borgan1990}{depictr}
 #'
 #' \insertRef{mantel1966}{depictr}
 #' @export
@@ -88,8 +116,19 @@ survival_plot <- function(time, status = NULL, group = NULL, conf_level = 0.95,
                           median_line = FALSE, logrank = FALSE,
                           risk_breaks = NULL, palette = NULL,
                           legend_inside = FALSE, title = NULL,
-                          x_lab = "Time", y_lab = "Survival probability") {
-  km <- km_input(time, status, group, conf_level)
+                          x_lab = "Time", y_lab = "Survival probability",
+                          conf_type = c("log-log", "log", "plain")) {
+  conf_type <- match.arg(conf_type)
+  # A level outside (0, 1), such as 95 meant as a percentage, has no normal
+  # quantile, and km_limits() would carry the origin's limits of 1 through the
+  # whole curve.
+  if (length(conf_level) != 1L ||
+      (!is.na(conf_level) &&
+       (!is.numeric(conf_level) || conf_level <= 0 || conf_level >= 1))) {
+    stop("`conf_level` must be a single number strictly between 0 and 1, ",
+         "or NA to leave the limits out.", call. = FALSE)
+  }
+  km <- km_input(time, status, group, conf_level, conf_type)
   has_ci <- !is.na(conf_level) && all(c("lower", "upper") %in% names(km$curve))
   groups <- unique(km$curve$group)
   # Use one factor order so the colour legend and the risk-table rows match.
@@ -185,8 +224,10 @@ survival_plot <- function(time, status = NULL, group = NULL, conf_level = 0.95,
 
 #' Build Kaplan-Meier curve and censoring data from flexible input
 #' @noRd
-km_input <- function(time, status, group, conf_level) {
-  if (inherits(time, "survfit")) return(km_from_survfit(time, conf_level))
+km_input <- function(time, status, group, conf_level, conf_type = "log-log") {
+  if (inherits(time, "survfit")) {
+    return(km_from_survfit(time, conf_level, conf_type))
+  }
 
   if (is.data.frame(time)) {
     df <- time
@@ -252,7 +293,7 @@ km_input <- function(time, status, group, conf_level) {
   counts <- list()
   for (g in groups) {
     sub <- gv == g
-    out <- km_estimate(tv[sub], sv[sub], conf_level)
+    out <- km_estimate(tv[sub], sv[sub], conf_level, conf_type)
     # Assign group with rep() so a zero-row censor data frame is left untouched
     # (direct `$group <- g` errors when the frame has no rows).
     out$curve$group <- rep(g, nrow(out$curve))
@@ -296,7 +337,7 @@ km_column <- function(value, df, defaults, what) {
 
 #' Base-R Kaplan-Meier estimate with Greenwood standard errors
 #' @noRd
-km_estimate <- function(time, status, conf_level) {
+km_estimate <- function(time, status, conf_level, conf_type = "log-log") {
   # Dropping a follow-up time silently would move the number at risk (and so
   # every step of the curve) without the figure or the risk table saying so, and
   # whether to drop or impute is the analyst's call rather than ours.
@@ -333,11 +374,12 @@ km_estimate <- function(time, status, conf_level) {
 
   curve <- data.frame(time = c(0, ut), surv = c(1, surv))
   if (has_ci) {
+    # Greenwood's sum estimates the variance of log S. It is infinite at a
+    # step to zero, where km_limits() keeps the limits of the step before.
     cum <- cumsum(n_event / (n_risk * (n_risk - n_event)))
-    se <- surv * sqrt(cum)
-    z <- stats::qnorm(1 - (1 - conf_level) / 2)
-    curve$lower <- c(1, pmax(0, surv - z * se))
-    curve$upper <- c(1, pmin(1, surv + z * se))
+    lim <- km_limits(curve$surv, c(0, sqrt(cum)), conf_level, conf_type)
+    curve$lower <- lim$lower
+    curve$upper <- lim$upper
   }
 
   # Extend the flat step to the last follow-up time when censoring continues
@@ -354,6 +396,41 @@ km_estimate <- function(time, status, conf_level) {
   counts <- list(time = ut, n_risk = n_risk, n_event = n_event,
                  n = n_obs, tmax = tmax, all_time = time, all_status = status)
   list(curve = curve, censor = censor, counts = counts)
+}
+
+#' Pointwise confidence limits for a survival curve
+#'
+#' `se_log` is the standard error of log S, the square root of Greenwood's sum
+#' for a Kaplan-Meier curve. The formulas are those of survival's survfit. On
+#' the log-log scale, the limits are S^exp(-z se / log S) and
+#' S^exp(z se / log S). On the log scale, they are S exp(-z se) and
+#' S exp(z se), with the upper limit capped at 1, and untransformed they are
+#' S - z S se and S + z S se, kept between 0 and 1. Where S is 1, the log-log
+#' formula is 0/0 and the limits are 1, as survfit gives. Where S is 0, every
+#' formula breaks down, and survfit gives NA, which would end a band drawn as
+#' steps at the previous event. The limits keep the previous row's values
+#' there, so the band runs to the last event, as the curve does.
+#' @noRd
+km_limits <- function(surv, se_log, conf_level, conf_type) {
+  z <- stats::qnorm(1 - (1 - conf_level) / 2)
+  lower <- upper <- rep(NA_real_, length(surv))
+  inside <- !is.na(surv) & !is.na(se_log) & surv > 0 & surv < 1
+  s <- surv[inside]
+  w <- z * se_log[inside]
+  if (conf_type == "log-log") {
+    lower[inside] <- s^exp(-w / log(s))
+    upper[inside] <- s^exp(w / log(s))
+  } else if (conf_type == "log") {
+    lower[inside] <- s * exp(-w)
+    upper[inside] <- pmin(1, s * exp(w))
+  } else {
+    lower[inside] <- pmax(0, s - w * s)
+    upper[inside] <- pmin(1, s + w * s)
+  }
+  top <- !is.na(surv) & surv >= 1
+  lower[top] <- 1
+  upper[top] <- 1
+  list(lower = fill_forward(lower, 1), upper = fill_forward(upper, 1))
 }
 
 #' Coerce an event-status vector to the 0/1 convention used internally
@@ -403,12 +480,27 @@ censor_marks_df <- function(ct, ut, surv) {
 empty_censor <- function() data.frame(time = numeric(0), surv = numeric(0))
 
 #' @noRd
-km_from_survfit <- function(sf, conf_level) {
+km_from_survfit <- function(sf, conf_level, conf_type = "log-log") {
   # Use the survfit components directly rather than summary(): the latter drops
   # pure-censoring time rows, so the censoring marks and the flat tail would be
   # lost. This keeps the survfit path consistent with the vector/data-frame one
   # (origin row at time 0, censoring marks, extension to last follow-up).
-  has_ci <- !is.na(conf_level) && !is.null(sf$lower)
+  #
+  # The limits the object stores are at the level and on the scale it was
+  # created with, so they are recomputed from its standard errors. survfit and
+  # survfit.coxph store the standard error of log S (logse = TRUE). A robust
+  # variance over clusters is stored on the survival scale (logse = FALSE), and
+  # survfit divides it by S for its own limits, as done below. The object keeps
+  # the limits it holds when it has no standard errors or does not say on
+  # which scale they are. One with the "peto" or "modified" lower limits of
+  # survfit's conf.lower keeps them too, since km_limits() does not follow
+  # their rules.
+  want_ci <- !is.na(conf_level)
+  usual_lower <- is.null(sf$conf.lower) || identical(sf$conf.lower, "usual")
+  recompute <- want_ci && usual_lower && !is.null(sf$std.err) &&
+    !is.null(sf$logse)
+  stored <- want_ci && !recompute && !is.null(sf$lower) && !is.null(sf$upper)
+  if (stored) warn_stored_limits(sf, conf_level, conf_type)
   if (!is.null(sf$strata)) {
     grp_levels <- names(sf$strata)
     grp <- rep(grp_levels, times = sf$strata)
@@ -448,7 +540,13 @@ km_from_survfit <- function(sf, conf_level) {
     # Build the step curve, prepending the (time = 0, surv = 1) origin.
     curve <- data.frame(time = c(0, tt), surv = c(1, ss),
                         group = rep(g, length(tt) + 1L))
-    if (has_ci) {
+    if (recompute) {
+      se <- sf$std.err[sel][ord]
+      if (!isTRUE(sf$logse)) se <- ifelse(se == 0, 0, se / ss)
+      lim <- km_limits(curve$surv, c(0, se), conf_level, conf_type)
+      curve$lower <- lim$lower
+      curve$upper <- lim$upper
+    } else if (stored) {
       lo <- sf$lower[sel][ord]
       up <- sf$upper[sel][ord]
       # survfit reports NA limits at points with no events (e.g. tail rows);
@@ -474,6 +572,33 @@ km_from_survfit <- function(sf, conf_level) {
   curve <- do.call(rbind, curves)
   censor <- if (length(censors)) do.call(rbind, censors) else empty_censor()
   list(curve = curve, censor = censor, counts = counts)
+}
+
+#' Warn that a survfit object's own limits are drawn, when they are not the
+#' limits asked for
+#' @noRd
+warn_stored_limits <- function(sf, conf_level, conf_type) {
+  level <- sf$conf.int
+  type <- sf$conf.type
+  if (isTRUE(all.equal(level, conf_level)) && identical(type, conf_type)) {
+    return(invisible(NULL))
+  }
+  why <- if (is.null(sf$std.err)) {
+    "stores no standard errors"
+  } else if (is.null(sf$logse)) {
+    "does not record the scale of its standard errors"
+  } else {
+    sprintf("was made with conf.lower = \"%s\"", sf$conf.lower)
+  }
+  held <- if (is.null(level) || is.null(type)) {
+    "the limits it holds"
+  } else {
+    sprintf("its %s%% %s limits", format(100 * level), type)
+  }
+  warning("The survfit object ", why, ", so ", held,
+          " are drawn in place of the ", format(100 * conf_level), "% ",
+          conf_type, " limits requested.", call. = FALSE)
+  invisible(NULL)
 }
 
 #' Replace leading/internal NAs by carrying the previous value forward

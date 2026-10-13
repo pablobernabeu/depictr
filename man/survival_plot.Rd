@@ -18,7 +18,8 @@ survival_plot(
   legend_inside = FALSE,
   title = NULL,
   x_lab = "Time",
-  y_lab = "Survival probability"
+  y_lab = "Survival probability",
+  conf_type = c("log-log", "log", "plain")
 )
 }
 \arguments{
@@ -42,7 +43,13 @@ neither an event nor a censoring.}
 if any). Observations whose group is missing are dropped with a message,
 since they belong to no arm.}
 
-\item{conf_level}{Confidence level for the limits (\code{NA} to omit them).}
+\item{conf_level}{Confidence level for the limits, a single number strictly
+between 0 and 1 (\code{NA} to omit them). For a \code{survfit} object, the limits are
+recomputed at this level, even for one made with \code{conf.type = "none"},
+since it keeps its standard errors. An object that stores no standard
+errors, or whose lower limits follow \code{conf.lower = "peto"} or
+\code{"modified"}, keeps the limits it holds, with a warning when they are not
+the ones asked for.}
 
 \item{censor_marks}{Whether to mark censoring times with a \code{+}.}
 
@@ -66,6 +73,10 @@ monotone-decreasing survival curve always leaves empty) over a translucent
 background, instead of in a right-hand margin. Defaults to \code{FALSE}.}
 
 \item{title, x_lab, y_lab}{Title and axis labels.}
+
+\item{conf_type}{The scale on which the confidence limits are built:
+\code{"log-log"} (the default), \code{"log"} or \code{"plain"}, as set out under
+Details.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object or, when \code{risk_table = TRUE}, a
@@ -78,6 +89,23 @@ Greenwood standard error are computed with base R, so no modelling package is
 required; a \code{survfit} object from the 'survival' package is also accepted.
 }
 \details{
+The confidence limits are pointwise. By default, they are built on the
+log-log scale, as
+\eqn{S^{\exp(\pm z \sigma / \log S)}}{S^exp(+/- z * se / log(S))},
+where \eqn{\sigma}{se} is the Greenwood standard error of
+\eqn{\log S}{log(S)}. These limits stay between 0 and 1, and in small
+samples they cover better than the untransformed limits
+\eqn{S \pm z S \sigma}{S +/- z * S * se} (Borgan & Liestøl, 1990).
+\code{conf_type = "plain"} draws the untransformed limits, clipped to that range,
+and \code{conf_type = "log"} draws
+\eqn{S \exp(\pm z \sigma)}{S * exp(+/- z * se)},
+capped at 1, as \code{\link[survival:survfit]{survival::survfit()}} does by default. The limits are 1
+while the estimate is 1, and where a curve falls to 0, they keep the values
+of the step before. The limits of a \code{survfit} object are recomputed from its
+standard errors at \code{conf_level} and \code{conf_type}, so they equal those that
+\code{survfit()} gives with the same \code{conf.int} and \code{conf.type} (\code{conf_level}
+names the objects that keep their own).
+
 For publication-ready figures the plot offers the three annotations that
 define a "survminer-style" Kaplan-Meier display, each behind its own
 argument and off by default so existing behaviour is unchanged:
@@ -117,6 +145,8 @@ survival_plot(clinical_trial$time, clinical_trial$event,
 \insertRef{kaplan1958}{depictr}
 
 \insertRef{greenwood1926}{depictr}
+
+\insertRef{borgan1990}{depictr}
 
 \insertRef{mantel1966}{depictr}
 }
