@@ -75,12 +75,20 @@ that is not measured.
 between two of the figure's encoding colours, and the three
 \verb{colour_separability_*} rows repeat that measurement after simulating each
 dichromacy at full severity with \code{\link[=simulate_cvd]{simulate_cvd()}}. Encoding colours are the
-distinct colour and fill values a layer uses to tell groups apart; a
-continuous colour or fill scale is a smooth ramp rather than a set of codes,
-so it is excluded. The outline colours, across every layer, are compared
-among themselves, and so are the fill colours, and the row reports the
-closest pair from either set. An outline is therefore never compared with
-its own fill, nor a group with itself as another layer draws it.
+distinct colour and fill values that tell groups apart. A layer contributes
+its colours when it maps colour or fill to a discrete scale, even if it
+draws a single colour, or when it draws two or more. Groups drawn one per
+layer are therefore audited as they would be in one layer. A colour set as a
+constant, as in \code{geom_point(colour = "red")}, is left out, even when another
+layer sets a different one, and so is a lone colour passed through
+\code{\link[ggplot2:scale_colour_identity]{ggplot2::scale_colour_identity()}}. The audit cannot tell such a colour from
+decoration, so a colour meant to tell groups apart should be mapped, with
+\code{\link[ggplot2:scale_colour_manual]{ggplot2::scale_colour_manual()}} to fix its values. A continuous colour or
+fill scale is a smooth ramp rather than a set of codes, so it is excluded.
+The outline colours, across every layer, are compared among themselves, and
+so are the fill colours, and the row reports the closest pair from either
+set. An outline is therefore never compared with its own fill, nor a group
+with itself as another layer draws it.
 
 \code{greyscale_separability} is the smallest difference in CIE lightness between
 those same colours, which is what survives printing in black and white.
@@ -113,10 +121,13 @@ two, since WCAG lets a border carry a graphical object's contrast. For a
 translucent colour, the \code{detail} names the colour, its alpha and the colour
 it is drawn as.
 
-\code{redundant_encoding} counts how many of shape and line type also vary in a
-layer whose colour varies. Zero means the distinction between groups is
-carried by colour alone, which is the single most common way an otherwise
-careful figure becomes unreadable.
+\code{redundant_encoding} counts how many of shape and line type also vary
+across the layers that draw the encoding colours. They are gathered as the
+colours are. A layer contributes the values it maps to a discrete scale, or
+the two or more it draws, and a shape or line type set as a constant is left
+out. Zero means the distinction between groups is carried by colour alone,
+which is the single most common way an otherwise careful figure becomes
+unreadable.
 }
 
 \section{A limitation of the default palette}{

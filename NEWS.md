@@ -271,6 +271,17 @@
   colour it is drawn as, and the separability rows say whether their closest
   pair are colours or fill colours. Verdicts on translucent figures can change
   in either direction. The vignette's example now draws its points opaque.
+* `check_figure()` now treats a colour or fill mapped in several layers, one
+  value per layer, as the encoding it is. Such figures were reported as
+  encoding nothing by colour. With red and green drawn one group per layer,
+  every colour row read "not applicable", whereas the same figure drawn in one
+  layer fails the deuteranopia check at 0.37. `frequentist_bayesian_plot()`
+  with draws, whose half-eyes and frequentist overlay are separate layers, was
+  never audited for colour. It now is, and the orange of its overlay fails
+  `geometry_contrast` at 2.25:1, as that colour does on white in any figure.
+  Shape and line type split across layers count towards `redundant_encoding` in
+  the same way. A colour set as a constant, as in `geom_point(colour = "red")`,
+  is still left out, as the help page now says.
 
 ## Metadata and documentation
 

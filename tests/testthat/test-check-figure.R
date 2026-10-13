@@ -87,6 +87,25 @@ density_figure <- function(alpha = 0.2) {
     theme_depictr()
 }
 
+# The bad figure's red and green, drawn one group per layer. Each layer maps
+# colour to a constant, so neither varies in colour on its own.
+standard <- crop_yield[crop_yield$treatment == "standard", ]
+enhanced <- crop_yield[crop_yield$treatment == "enhanced", ]
+
+split_figure <- function() {
+  ggplot(mapping = aes(rainfall, yield)) +
+    geom_point(data = standard, aes(colour = "a")) +
+    geom_point(data = enhanced, aes(colour = "b")) +
+    scale_colour_manual(values = c("#d62728", "#309208")) +
+    theme_depictr()
+}
+
+# The rows that depend on what a figure tells apart by colour, which is every
+# row but the two text rows.
+encoding_rows <- function(report) {
+  report[!report$check %in% c("text_size", "text_contrast"), ]
+}
+
 # --- shape of the result -----------------------------------------------------
 
 test_that("check_figure() returns the standard table shape", {
@@ -135,7 +154,7 @@ test_that("a deliberately bad figure fails the checks it should, and only those"
 
 test_that("the audit reports the numbers its Python twin reports", {
   # Pinned so the two engines cannot drift apart unnoticed. Each figure below is
-  # constructible in both, and the Python suite pins the same three vectors.
+  # constructible in both, and the Python suite pins the same vectors.
   expect_equal(check_figure(good_figure())$measured,
                c(111.87, 89.87, 107.07, 98.5, 16.92, 8.8, 8.45, 3.87, 1))
   expect_equal(check_figure(bad_figure())$measured,
@@ -194,6 +213,16 @@ test_that("the audit reports the numbers its Python twin reports", {
   expect_identical(detail_for(points, "geometry_contrast"), paste(
     "Lowest-contrast colour #d55e00 at alpha 0.70, drawn as #e28e4d,",
     "on #ffffff."))
+
+  # The bad figure's red and green with one group per layer, each layer mapping
+  # colour to a constant. Every colour row used to read "not applicable".
+  split <- check_figure(split_figure())
+  expect_equal(split$measured,
+               c(116.25, 35.04, 0.37, 119.38, 6.32, 8.8, 8.45, 4.01, 0))
+  expect_identical(split$detail[c(1:5, 8)], c(
+    rep("Closest pair #309208 and #d62728 of 2 encoding colours.", 4),
+    "Closest pair #309208 and #d62728 in CIE lightness.",
+    "Lowest-contrast colour #309208 on #ffffff."))
 })
 
 # --- the measurements themselves ---------------------------------------------
@@ -597,6 +626,105 @@ test_that("redundant encoding counts the channels that vary alongside colour", {
                    "Colour is joined by shape and linetype.")
 })
 
+# --- colours split across layers ---------------------------------------------
+
+test_that("a colour mapped in several layers, one value each, is an encoding", {
+  # The same red and green in one layer fail deuteranopia at 0.37. Split one
+  # group per layer, every colour row read "not applicable".
+  one_layer <- check_figure(
+    ggplot(crop_yield, aes(rainfall, yield, colour = treatment)) +
+      geom_point() +
+      scale_colour_manual(values = c("#d62728", "#309208")) +
+      theme_depictr())
+  split <- check_figure(split_figure())
+  expect_identical(encoding_rows(split), encoding_rows(one_layer))
+  expect_equal(measured_for(split, "colour_separability_deutan"), 0.37)
+  expect_identical(verdict_for(split, "colour_separability_deutan"), "fail")
+  # A layer inherits a constant the plot maps, as it inherits any mapping.
+  inherited <- check_figure(
+    ggplot(standard, aes(rainfall, yield, colour = "a")) +
+      geom_point() +
+      geom_point(data = enhanced, aes(colour = "b")) +
+      scale_colour_manual(values = c("#d62728", "#309208")) +
+      theme_depictr())
+  expect_identical(encoding_rows(inherited), encoding_rows(one_layer))
+  # Fills split across layers form one set, measured as drawn: translucent bars
+  # drawn one per layer read as the one-layer bars do.
+  two <- data.frame(g = c("a", "b"), y = c(1, 2))
+  split_bars <- check_figure(
+    ggplot(mapping = aes(g, y)) +
+      geom_col(data = two[1, ], aes(fill = "a"), alpha = 0.3) +
+      geom_col(data = two[2, ], aes(fill = "b"), alpha = 0.3) +
+      scale_fill_manual(values = c("#005b96", "#d55e00")) +
+      theme_depictr())
+  expect_identical(encoding_rows(split_bars),
+                   encoding_rows(check_figure(bars_figure(alpha = 0.3))))
+})
+
+test_that("shape and line type split across layers count as redundant", {
+  shapes <- check_figure(
+    ggplot(mapping = aes(rainfall, yield)) +
+      geom_point(data = standard, aes(colour = "a", shape = "a")) +
+      geom_point(data = enhanced, aes(colour = "b", shape = "b")) +
+      scale_colour_manual(values = c("#005b96", "#d55e00")) +
+      theme_depictr())
+  expect_equal(measured_for(shapes, "redundant_encoding"), 1)
+  expect_identical(detail_for(shapes, "redundant_encoding"),
+                   "Colour is joined by shape.")
+  lines <- check_figure(
+    ggplot(mapping = aes(rainfall, yield)) +
+      geom_line(data = standard, aes(colour = "a", linetype = "a")) +
+      geom_line(data = enhanced, aes(colour = "b", linetype = "b")) +
+      scale_colour_manual(values = c("#005b96", "#d55e00")) +
+      theme_depictr())
+  expect_identical(detail_for(lines, "redundant_encoding"),
+                   "Colour is joined by linetype.")
+  # Points that vary in shape beside lines that vary in line type count both
+  # channels. Each layer varies in one, and the count used to stop at one.
+  points_and_lines <- check_figure(
+    ggplot(crop_yield, aes(rainfall, yield, colour = treatment)) +
+      geom_point(aes(shape = treatment)) +
+      geom_line(aes(linetype = treatment)) +
+      scale_colour_manual(values = c("#005b96", "#d55e00")) +
+      theme_depictr())
+  expect_equal(measured_for(points_and_lines, "redundant_encoding"), 2)
+  expect_identical(detail_for(points_and_lines, "redundant_encoding"),
+                   "Colour is joined by shape and linetype.")
+  # A shape set on each layer is a constant, so it is not counted.
+  set_shapes <- check_figure(
+    ggplot(mapping = aes(rainfall, yield)) +
+      geom_point(data = standard, aes(colour = "a"), shape = 16) +
+      geom_point(data = enhanced, aes(colour = "b"), shape = 17) +
+      scale_colour_manual(values = c("#005b96", "#d55e00")) +
+      theme_depictr())
+  expect_equal(measured_for(set_shapes, "redundant_encoding"), 0)
+  expect_identical(detail_for(set_shapes, "redundant_encoding"),
+                   "Colour alone distinguishes the groups.")
+})
+
+test_that("frequentist_bayesian_plot() with draws is audited by colour", {
+  # The half-eyes map colour to the Bayesian label and the overlay to the
+  # frequentist one, in layers of their own, so every colour row of the
+  # posterior figure used to read "not applicable". Without ggdist, the
+  # fallback splits the colour across layers the same way.
+  freq <- lm(life_satisfaction ~ stress + sleep_hours + exercise_days,
+             data = wellbeing_survey)
+  withr::local_seed(1)
+  co <- coef(freq)
+  draws <- as.data.frame(lapply(co, function(m) {
+    rnorm(400, m, abs(m) * 0.1 + 0.05)
+  }))
+  names(draws) <- names(co)
+  posterior <- suppressMessages(frequentist_bayesian_plot(freq, draws))
+  report <- check_figure(posterior)
+  expect_false(anyNA(encoding_rows(report)$measured))
+  pair <- depictr_palette(2)
+  expect_equal(measured_for(report, "colour_separability"),
+               palette_safety(pair)$by_condition[["normal"]])
+  expect_identical(detail_for(report, "colour_separability"), sprintf(
+    "Closest pair %s and %s of 2 encoding colours.", pair[[1]], pair[[2]]))
+})
+
 # --- what the audit declines to measure --------------------------------------
 
 test_that("a continuous colour scale is not treated as a set of category codes", {
@@ -628,6 +756,35 @@ test_that("a figure with no colour encoding abstains rather than passing", {
     "No two encoding colours: nothing is distinguished by colour.")
   # Text is still there to measure.
   expect_identical(verdict_for(report, "text_size"), "pass")
+})
+
+test_that("colours set layer by layer as constants abstain", {
+  abstains <- function(p) {
+    rows <- encoding_rows(check_figure(p))
+    expect_identical(unique(rows$verdict), "not applicable")
+    expect_identical(
+      unique(rows$detail),
+      "No two encoding colours: nothing is distinguished by colour.")
+  }
+  # A constant set on each layer is not a mapping. The audit cannot tell it
+  # from decoration, so it leaves it out, as the help page says.
+  abstains(ggplot(mapping = aes(rainfall, yield)) +
+             geom_point(data = standard, colour = "#d62728") +
+             geom_point(data = enhanced, colour = "#309208") +
+             theme_depictr())
+  # Nor is a colour passed through an identity scale.
+  abstains(ggplot(mapping = aes(rainfall, yield)) +
+             geom_point(data = standard, aes(colour = "#d62728")) +
+             geom_point(data = enhanced, aes(colour = "#309208")) +
+             scale_colour_identity() +
+             theme_depictr())
+  # One mapped value is one colour, which is not a pair.
+  abstains(ggplot(crop_yield, aes(rainfall, yield, colour = "a")) +
+             geom_point() + theme_depictr())
+  # A reference line does not inherit the plot's mapping, so its black does
+  # not join the mapped colour.
+  abstains(ggplot(crop_yield, aes(rainfall, yield, colour = "a")) +
+             geom_point() + geom_hline(yintercept = 5) + theme_depictr())
 })
 
 test_that("a figure that draws no text says so rather than reporting a size", {

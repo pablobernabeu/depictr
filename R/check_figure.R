@@ -56,12 +56,20 @@
 #' between two of the figure's encoding colours, and the three
 #' `colour_separability_*` rows repeat that measurement after simulating each
 #' dichromacy at full severity with [simulate_cvd()]. Encoding colours are the
-#' distinct colour and fill values a layer uses to tell groups apart; a
-#' continuous colour or fill scale is a smooth ramp rather than a set of codes,
-#' so it is excluded. The outline colours, across every layer, are compared
-#' among themselves, and so are the fill colours, and the row reports the
-#' closest pair from either set. An outline is therefore never compared with
-#' its own fill, nor a group with itself as another layer draws it.
+#' distinct colour and fill values that tell groups apart. A layer contributes
+#' its colours when it maps colour or fill to a discrete scale, even if it
+#' draws a single colour, or when it draws two or more. Groups drawn one per
+#' layer are therefore audited as they would be in one layer. A colour set as a
+#' constant, as in `geom_point(colour = "red")`, is left out, even when another
+#' layer sets a different one, and so is a lone colour passed through
+#' [ggplot2::scale_colour_identity()]. The audit cannot tell such a colour from
+#' decoration, so a colour meant to tell groups apart should be mapped, with
+#' [ggplot2::scale_colour_manual()] to fix its values. A continuous colour or
+#' fill scale is a smooth ramp rather than a set of codes, so it is excluded.
+#' The outline colours, across every layer, are compared among themselves, and
+#' so are the fill colours, and the row reports the closest pair from either
+#' set. An outline is therefore never compared with its own fill, nor a group
+#' with itself as another layer draws it.
 #'
 #' `greyscale_separability` is the smallest difference in CIE lightness between
 #' those same colours, which is what survives printing in black and white.
@@ -94,10 +102,13 @@
 #' translucent colour, the `detail` names the colour, its alpha and the colour
 #' it is drawn as.
 #'
-#' `redundant_encoding` counts how many of shape and line type also vary in a
-#' layer whose colour varies. Zero means the distinction between groups is
-#' carried by colour alone, which is the single most common way an otherwise
-#' careful figure becomes unreadable.
+#' `redundant_encoding` counts how many of shape and line type also vary
+#' across the layers that draw the encoding colours. They are gathered as the
+#' colours are. A layer contributes the values it maps to a discrete scale, or
+#' the two or more it draws, and a shape or line type set as a constant is left
+#' out. Zero means the distinction between groups is carried by colour alone,
+#' which is the single most common way an otherwise careful figure becomes
+#' unreadable.
 #'
 #' @section A limitation of the default palette:
 #' The eight-colour qualitative palette clears the colour-separability checks
@@ -382,6 +393,17 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
   c("colour", "fill")
 }
 
+#' The aesthetics a layer maps
+#'
+#' ggplot2 resolves a layer's own mapping, and whatever it inherits from the
+#' plot, into `computed_mapping` as it builds the plot. An aesthetic also set
+#' to a constant, in `aes_params`, is drawn as the constant, so it does not
+#' count as mapped.
+#' @noRd
+.layer_mapped <- function(layer) {
+  setdiff(names(layer$computed_mapping), names(layer$aes_params))
+}
+
 #' The colour one aesthetic of a layer draws on each row, and its alpha
 #'
 #' ggplot2 draws a colour through `scales::alpha()`, which replaces the
@@ -470,10 +492,21 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 
 #' The colours a figure uses to tell groups apart, and what else varies with them
 #'
-#' A colour or fill counts as encoding when a single layer draws more than one
-#' of them and the scale behind it is discrete. A continuous scale is a smooth
-#' ramp, where neighbouring colours are meant to be close, so measuring the
-#' distance between them would only ever say that a gradient is a gradient.
+#' A layer carries colour or fill when it maps the aesthetic to a discrete
+#' scale that is not an identity scale, even if every row draws the same
+#' colour. It also carries one in which it draws two or more distinct colours.
+#' The figure encodes by the aesthetic when the layers that carry it draw two
+#' or more distinct colours between them, so groups drawn one per layer count
+#' as they would in a single layer. A constant set on a layer is not a mapping,
+#' and a colour passed through an identity scale is drawn as given. A layer
+#' that draws one such colour alone carries nothing, since the audit cannot
+#' tell it from decoration. A continuous scale is a smooth ramp, where
+#' neighbouring colours are meant to be close, so measuring the distance
+#' between them would only ever say that a gradient is a gradient.
+#'
+#' Shape and line type are gathered by the same rule from the layers that draw
+#' the encoding colours. Either counts as varying alongside them when those
+#' layers draw two or more distinct values of it between them.
 #'
 #' Every colour is taken as drawn over `background`, the panel, at the alpha
 #' its geom applies to it.
@@ -487,20 +520,20 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' @noRd
 .figure_colour_encoding <- function(built, background) {
   continuous <- character(0)
+  coded <- character(0)
   for (scale in built$plot$scales$scales) {
     if (!isTRUE(scale$is_discrete())) {
       continuous <- union(continuous, scale$aesthetics)
+    } else if (!inherits(scale, "ScaleDiscreteIdentity")) {
+      # An identity scale draws each value as given, so a value mapped through
+      # it is chosen by hand, as a constant set on a layer is.
+      coded <- union(coded, scale$aesthetics)
     }
   }
-  varies <- function(layer_data, aesthetic) {
-    if (!aesthetic %in% names(layer_data)) return(FALSE)
-    values <- layer_data[[aesthetic]]
-    length(unique(values[!is.na(values)])) >= 2
-  }
 
-  sets <- list(colour = NULL, fill = NULL)
-  marks <- list()
-  redundant <- character(0)
+  # What each layer carries in colour and fill, gathered before it is known
+  # whether the figure as a whole encodes by either.
+  carriers <- list()
   for (index in seq_along(built$data)) {
     layer_data <- built$data[[index]]
     layer <- built$plot$layers[[index]]
@@ -508,16 +541,36 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
     # on, not to code a group, so counting it would report the distance between
     # black and white labels as though it were the distance between categories.
     if (.is_text_layer(layer)) next
+    mapped <- intersect(.layer_mapped(layer), coded)
     targets <- .alpha_targets(layer$geom)
     ink <- list()
     for (aesthetic in c("colour", "fill")) {
-      if (aesthetic %in% continuous || !varies(layer_data, aesthetic)) next
+      if (aesthetic %in% continuous) next
       rows <- .layer_ink(layer_data, aesthetic, aesthetic %in% targets)
+      if (is.null(rows)) next
       # Distinct after normalisation: two spellings of one colour are one
-      # colour, and a layer that draws only that encodes nothing.
-      if (is.null(rows) || length(unique(rows$declared)) < 2) next
-      ink[[aesthetic]] <- rows
+      # colour, and an unmapped layer that draws only that carries nothing.
+      if (aesthetic %in% mapped || length(unique(rows$declared)) >= 2) {
+        ink[[aesthetic]] <- rows
+      }
     }
+    if (length(ink)) {
+      carriers[[length(carriers) + 1L]] <- list(ink = ink, data = layer_data,
+                                                mapped = mapped)
+    }
+  }
+  encodes <- Filter(function(aesthetic) {
+    declared <- unlist(lapply(carriers, function(carrier) {
+      carrier$ink[[aesthetic]]$declared
+    }))
+    length(unique(declared)) >= 2
+  }, c("colour", "fill"))
+
+  sets <- list(colour = NULL, fill = NULL)
+  marks <- list()
+  others <- list(shape = character(0), linetype = character(0))
+  for (carrier in carriers) {
+    ink <- carrier$ink[intersect(names(carrier$ink), encodes)]
     if (!length(ink)) next
     drawn <- lapply(ink, .drawn_by_value, background = background)
     for (aesthetic in names(drawn)) {
@@ -525,11 +578,13 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
                                  drawn[[aesthetic]][, c("drawn", "declared")])
     }
     marks[[length(marks) + 1L]] <- .layer_marks(ink, drawn, background)
-    also <- c("shape", "linetype")[
-      vapply(c("shape", "linetype"), function(a) varies(layer_data, a),
-             logical(1))
-    ]
-    if (length(also) > length(redundant)) redundant <- also
+    for (aesthetic in names(others)) {
+      values <- carrier$data[[aesthetic]]
+      values <- unique(as.character(values[!is.na(values)]))
+      if (aesthetic %in% carrier$mapped || length(values) >= 2) {
+        others[[aesthetic]] <- union(others[[aesthetic]], values)
+      }
+    }
   }
   # Radix order is byte order, which is what Python's sorted() gives, so the two
   # engines pick the same pair when two are equally close.
@@ -540,7 +595,7 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
   })
   list(sets = Filter(Negate(is.null), sets),
        marks = if (length(marks)) do.call(rbind, marks),
-       redundant = redundant)
+       redundant = names(others)[lengths(others) >= 2])
 }
 
 # --- text bookkeeping -------------------------------------------------------
