@@ -79,7 +79,10 @@ whether any distinction rests on colour alone. The size check covers the text
 drawn inside the panel as well as around it, and the contrast check covers the
 text around it alone. Each row reports the value it measured next to the
 threshold, so a verdict can be argued with. For a figure saved at its final
-width, give that width as both `width_cm` and `render_width_cm`, or neither.
+width, give that width as both `width_cm` and `render_width_cm`, or neither, or
+let `save_plot(check = TRUE)` audit it at the width it saves. A journal that
+caps text size, as Nature does at 7 pt, can be held to its cap with
+`max_text_pt`.
 
 ```r
 check_figure(explore_distribution(lexical_decision, RT, group = condition),

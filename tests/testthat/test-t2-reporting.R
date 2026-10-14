@@ -333,3 +333,113 @@ test_that("save_plot() reads ggsave()'s named resolutions as numbers", {
   expect_identical(.dpi_number("print"), 300)
   expect_identical(.dpi_number(150), 150)
 })
+
+# save_plot(check = TRUE): the audit at the width the figure is saved at -------
+
+# The reference figures of the check_figure() tests. The good one clears every
+# check that applies, and the bad one fails deuteranopia, the text floor and
+# redundant encoding. The Python suite saves the same two.
+audited_good <- function() {
+  ggplot2::ggplot(crop_yield, ggplot2::aes(rainfall, yield, colour = treatment,
+                                           shape = treatment)) +
+    ggplot2::geom_point() +
+    ggplot2::scale_colour_manual(values = c("#005b96", "#d55e00")) +
+    theme_depictr()
+}
+
+audited_bad <- function() {
+  ggplot2::ggplot(crop_yield, ggplot2::aes(rainfall, yield,
+                                           colour = treatment)) +
+    ggplot2::geom_point() +
+    ggplot2::scale_colour_manual(values = c("#d62728", "#309208")) +
+    theme_depictr(base_size = 5)
+}
+
+# The audit does not read the file, so these tests leave the device alone.
+skip_the_device <- function(env = parent.frame()) {
+  local_mocked_bindings(ggsave = function(...) invisible(NULL),
+                        .package = "ggplot2", .env = env)
+}
+
+test_that("save_plot(check = TRUE) audits at the saved width, as both widths", {
+  skip_the_device()
+  path <- file.path(tempdir(), "column.png")
+  # Drawn at 8.9 cm and printed at 8.9 cm, the text is the size it was drawn
+  # at, so the good figure fails nothing and save_plot() says nothing.
+  expect_no_warning(
+    saved <- save_plot(path, audited_good(), width = 8.9, height = 6,
+                       units = "cm", check = TRUE)
+  )
+  expect_identical(as.vector(saved), path)
+  report <- attr(saved, "check")
+  expect_identical(report, check_figure(audited_good(), width_cm = 8.9,
+                                        render_width_cm = 8.9))
+  expect_equal(report$measured[report$check == "text_size"], 8.8)
+  expect_identical(report$detail[report$check == "text_size"],
+                   "Smallest text 8.80 pt, drawn at 8.90 cm and printed at 8.90 cm.")
+})
+
+test_that("save_plot(check = TRUE) warns with the checks the figure fails", {
+  skip_the_device()
+  path <- file.path(tempdir(), "column.png")
+  # A row with nothing to measure, here the text inside the panel, is not a
+  # failure.
+  expect_warning(
+    saved <- save_plot(path, audited_bad(), width = 8.9, height = 6,
+                       units = "cm", check = TRUE),
+    paste0("^The figure fails 3 checks at the 8\\.90 cm it is saved at: ",
+           "colour_separability_deutan 0\\.11 \\(threshold 5\\.00\\), ",
+           "text_size 4\\.00 \\(threshold 6\\.00\\) and redundant_encoding ",
+           "0\\.00 \\(threshold 1\\.00\\)\\. The full report is attached to ",
+           "the file name returned, as attr\\(, \"check\"\\)\\.$")
+  )
+  report <- attr(saved, "check")
+  expect_identical(report$verdict[report$check == "text_size"], "fail")
+  # In a composite, each failure names its panel.
+  expect_warning(
+    save_plot(path, arrange_plots(audited_good(), audited_bad(),
+                                  tag_levels = NULL),
+              width = 8.9, height = 6, units = "cm", check = TRUE),
+    "fails 3 checks .*: panel 2 colour_separability_deutan 0\\.11"
+  )
+})
+
+test_that("save_plot(check = TRUE) takes the saved width in any unit", {
+  expect_equal(.saved_width_cm(7, "in", 300), 17.78)
+  expect_equal(.saved_width_cm(8.9, "cm", 300), 8.9)
+  expect_equal(.saved_width_cm(89, "mm", 300), 8.9)
+  expect_equal(.saved_width_cm(1050, "px", 300), 8.89)
+  expect_equal(.saved_width_cm(1050, "px", "print"), 8.89)
+  skip_the_device()
+  saved <- save_plot(file.path(tempdir(), "column.png"), audited_good(),
+                     width = 89, height = 60, units = "mm", check = TRUE)
+  report <- attr(saved, "check")
+  expect_identical(report$detail[report$check == "text_size"],
+                   "Smallest text 8.80 pt, drawn at 8.90 cm and printed at 8.90 cm.")
+})
+
+test_that("save_plot() writes the file it audits and attaches nothing unasked", {
+  path <- withr::local_tempfile(fileext = ".png")
+  saved <- save_plot(path, audited_good(), width = 8.9, height = 6,
+                     units = "cm", dpi = 72, check = TRUE)
+  expect_true(file.exists(path))
+  expect_s3_class(attr(saved, "check"), "data.frame")
+  # Without check, the file name comes back as it always did.
+  expect_identical(save_plot(path, audited_good(), dpi = 72), path)
+})
+
+test_that("save_plot() refuses a check it cannot run, before writing anything", {
+  path <- withr::local_tempfile(fileext = ".png")
+  expect_error(save_plot(path, audited_good(), check = NA),
+               "^`check` must be TRUE or FALSE\\.$")
+  expect_error(save_plot(path, audited_good(), check = "yes"),
+               "^`check` must be TRUE or FALSE\\.$")
+  expect_error(save_plot(path, audited_good(), width = NA, check = TRUE),
+               "^`check = TRUE` needs the width the figure is saved at")
+  expect_error(save_plot(path, audited_good(), units = "pt", check = TRUE),
+               "^`check = TRUE` needs the width the figure is saved at")
+  # The audit refuses what it cannot read, as check_figure() does.
+  expect_error(save_plot(path, grid::textGrob("note"), check = TRUE),
+               "^`plot` must be a plot object")
+  expect_false(file.exists(path))
+})

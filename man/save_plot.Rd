@@ -11,6 +11,7 @@ save_plot(
   height = 4.5,
   units = "in",
   dpi = 300,
+  check = FALSE,
   ...
 )
 }
@@ -28,19 +29,29 @@ save_plot(
 layers, and whatever they overlap, at this resolution or at 600 dpi,
 whichever is higher.}
 
+\item{check}{Whether to audit the figure with \code{\link[=check_figure]{check_figure()}} at the width
+it is saved at, given as both \code{width_cm} and \code{render_width_cm}, so that the
+text sizes it reports are the printed ones. A warning names each check the
+figure fails. Defaults to \code{FALSE}. The audit runs before the file is
+written, so a plot it cannot read is refused without saving. For other
+thresholds, such as a journal's own text floor, call \code{\link[=check_figure]{check_figure()}} with
+the saved width as both widths.}
+
 \item{...}{Passed to \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}, which passes what it does not use
 on to the device. A \code{device} or device argument given here overrides the
 defaults described under "Formats journals accept".}
 }
 \value{
-The \code{filename}, invisibly.
+The \code{filename}, invisibly. With \code{check = TRUE}, the audit report is
+attached to it as the attribute \code{"check"}, which \code{attr(, "check")} reads.
 }
 \description{
 A convenience wrapper around \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}} with sensible defaults for
 figures in papers and reports: a moderate size, 300 dpi, and the output
 directory created if needed. The device is inferred from the file extension,
 and PDF, EPS and TIFF files are written to pass the technical checks
-journals run on submitted figures.
+journals run on submitted figures. With \code{check = TRUE}, the figure is also
+audited with \code{\link[=check_figure]{check_figure()}} at the width it is saved at.
 }
 \section{Formats journals accept}{
 
@@ -99,6 +110,12 @@ save_plot(tmp, p)
 
 # A TIFF well within the 10 MB that PLOS allows.
 save_plot(file.path(tempdir(), "yield.tiff"), p)
+
+# Audited at the 8.9 cm column it is saved for, where its text prints at
+# the size it is drawn.
+saved <- save_plot(file.path(tempdir(), "yield-column.png"), p,
+                   width = 8.9, height = 6, units = "cm", check = TRUE)
+attr(saved, "check")
 }
 \references{
 PLOS ONE. Figures. \url{https://journals.plos.org/plosone/s/figures}

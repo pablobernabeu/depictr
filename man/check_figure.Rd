@@ -10,7 +10,8 @@ check_figure(
   render_width_cm = 17.78,
   min_delta_e = 5,
   min_text_pt = 6,
-  metric = c("ciede2000", "cie76")
+  metric = c("ciede2000", "cie76"),
+  max_text_pt = NULL
 )
 }
 \arguments{
@@ -40,13 +41,18 @@ size").}
 \code{"ciede2000"}, the default, or \code{"cie76"}, the Euclidean distance in CIELAB
 that earlier versions measured. \code{"cie76"} is kept so that earlier results
 can be reproduced, and a later release will remove it.}
+
+\item{max_text_pt}{The largest acceptable printed text size, in points, or
+\code{NULL}, the default, for no ceiling. When given, a \code{text_size_max} row is
+appended (see "What each check measures").}
 }
 \value{
 A data frame with one row per check and columns \code{check}, \code{measured},
 \code{threshold}, \code{verdict} (\code{"pass"}, \code{"fail"} or \code{"not applicable"}) and
-\code{detail}, a short note naming what produced the measurement. For a
-composite, the rows of each panel in turn, after a leading integer column
-\code{panel}.
+\code{detail}, a short note naming what produced the measurement. There are
+ten rows, and an eleventh, \code{text_size_max}, when \code{max_text_pt} is given.
+For a composite, the rows of each panel in turn, after a leading integer
+column \code{panel}.
 }
 \description{
 Checks a figure as it will be submitted, rather than the palette it was built
@@ -61,7 +67,9 @@ questions with numbers.
 \details{
 Every row carries the value it measured next to the threshold it was measured
 against, so a verdict can be argued with rather than merely accepted. A check
-passes when the measured value is at least the threshold. A check that has
+passes when the measured value is at least the threshold. The one exception
+is \code{text_size_max}, a ceiling added when \code{max_text_pt} is given, which
+passes when the measured value is at most its threshold. A check that has
 nothing to measure, such as colour separability on a figure that encodes
 nothing by colour, reports \code{NA} and a verdict of \code{"not applicable"} instead
 of a free pass.
@@ -155,6 +163,11 @@ and labels. Its contrast is not measured, since it sits on the marks rather
 than on one background. A label that a layer builds only when the figure is
 drawn, as ggrepel builds its repelled labels, is not yet in the built plot,
 so it is not measured either.
+
+\code{text_size_max} is reported only when \code{max_text_pt} is given, as the last
+row. It is the largest point size of all the text measured, around the
+panel and inside it, scaled as \code{text_size} is. It is the one row that
+passes at or below its threshold.
 }
 
 \section{Limitations of the default palette}{
@@ -191,13 +204,18 @@ A figure drawn at the size it will be printed, as \code{save_plot()} draws one
 given \verb{width = 8.9, units = "cm"}, needs no scaling. Pass the saved width as
 both \code{width_cm} and \code{render_width_cm}, or leave both at their defaults.
 Given alone, \code{width_cm} audits the figure as though it had been drawn seven
-inches wide and then shrunk to fit.
+inches wide and then shrunk to fit. \code{\link[=save_plot]{save_plot()}} with \code{check = TRUE} audits
+a figure at the width it saves it at, given as both.
 
 The default \code{min_text_pt} of 6 is lenient. As their guidelines stood on 30
 September 2026, PLOS asked for text of 8 to 12 pt and APA Style for 8 to 14
 pt. Elsevier asked for 7 pt as a rule of thumb, and Nature for 5 to 7 pt,
 with panel labels at 8 pt. Pass the floor of the journal the figure is for
-as \code{min_text_pt}. The four pages are listed under References.
+as \code{min_text_pt}, and its ceiling, where it sets one, as \code{max_text_pt}.
+Nature's 7 pt applies to all text but the panel labels. The tags of a
+composite, where patchwork puts them, are not measured, but a panel label
+drawn as a panel's title or annotation is measured with the rest. The four
+pages are listed under References.
 }
 
 \section{Composites}{
@@ -244,6 +262,10 @@ check_figure(good, width_cm = 8.9)
 # Saved at 8.9 cm in the first place, with save_plot(width = 8.9,
 # units = "cm"), it is drawn at the size it prints, so both widths are 8.9.
 check_figure(good, width_cm = 8.9, render_width_cm = 8.9)
+
+# Nature allowed no text above 7 pt but the panel labels. The axis titles
+# here are 11 pt, so the ceiling row fails.
+subset(check_figure(good, max_text_pt = 7), check == "text_size_max")
 
 # Each panel of a composite is audited, and a column says which panel each
 # row describes. At base size 5, the second panel's text is too small.

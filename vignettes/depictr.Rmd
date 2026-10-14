@@ -233,6 +233,11 @@ floor. That floor defaults to 6 pt, which is lenient. As their guidelines stood
 on 30 September 2026, PLOS and APA Style asked for at least 8 pt, Elsevier for
 7 pt and Nature for 5 to 7 pt, and `?check_figure` links all four.
 
+Nature's range has a ceiling as well as a floor, since no text but the panel
+labels may exceed 7 pt. Passing `max_text_pt = 7` holds a figure to it in a row
+of its own, `text_size_max`. `save_plot(check = TRUE)` runs the audit as it
+saves, at the width it saves at, and warns about each check the figure fails.
+
 One limitation belongs here, beside the claim it qualifies, since the package is
 the one making that claim. The eight-colour qualitative palette clears every
 colour-vision check and fails the greyscale check: its orange and its sky blue

@@ -435,6 +435,16 @@
   panel. A spacer or a guide area takes no panel number, and a wrapped element,
   such as a grob or a table, is left out with a warning. Composite-level titles
   and tags are not measured.
+* `check_figure(max_text_pt =)` checks a ceiling as well as a floor, and
+  `save_plot(check = TRUE)` audits the figure at the width it is saved at, so
+  the text sizes are the printed ones. The ceiling adds a last row,
+  `text_size_max`, for the largest text at its printed size, around the panel
+  and inside it, and that row passes at or below its threshold. Nature, for
+  one, allowed no text above 7 pt but the panel labels. Without `max_text_pt`,
+  the report keeps its ten rows. `save_plot(check = TRUE)` gives the saved
+  width, converted to centimetres from inches, millimetres or pixels, as both
+  `width_cm` and `render_width_cm`. It warns with each check the figure fails
+  and attaches the report to the file name it returns, as `attr(, "check")`.
 
 ## Metadata and documentation
 

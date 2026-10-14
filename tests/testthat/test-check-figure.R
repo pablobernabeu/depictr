@@ -1054,6 +1054,59 @@ test_that("a measurement exactly on the threshold passes", {
     "fail")
 })
 
+# --- a text ceiling ----------------------------------------------------------
+
+test_that("max_text_pt appends a ceiling row that passes at or below it", {
+  # Without a ceiling, the report keeps its ten rows, so the default output and
+  # the vectors both suites pin are unchanged. With one, its row comes last and
+  # the ten before it are those of the plain report.
+  plain <- check_figure(good_figure())
+  report <- check_figure(good_figure(), max_text_pt = 7)
+  expect_identical(nrow(report), 11L)
+  expect_identical(report$check, c(plain$check, "text_size_max"))
+  expect_identical(report[1:10, ], plain)
+  # The largest text is the axis titles at the base size of 11 pt, which
+  # Nature's 7 pt ceiling refuses. The Python suite pins the same row.
+  expect_equal(measured_for(report, "text_size_max"), 11)
+  expect_equal(report$threshold[report$check == "text_size_max"], 7)
+  expect_identical(verdict_for(report, "text_size_max"), "fail")
+  expect_identical(detail_for(report, "text_size_max"), paste(
+    "Largest text 11.00 pt, drawn at 17.78 cm and printed at 17.78 cm."))
+  # The one inverted row: it passes at or below its threshold, the boundary
+  # included.
+  expect_identical(verdict_for(check_figure(good_figure(), max_text_pt = 11),
+                               "text_size_max"), "pass")
+  expect_identical(verdict_for(check_figure(good_figure(),
+                                            max_text_pt = 10.99),
+                               "text_size_max"), "fail")
+  # Printed at half the width it is drawn at, the same text clears it.
+  column <- check_figure(good_figure(), width_cm = 8.89, max_text_pt = 7)
+  expect_equal(measured_for(column, "text_size_max"), 5.5)
+  expect_identical(verdict_for(column, "text_size_max"), "pass")
+})
+
+test_that("the ceiling measures the text inside the panel too", {
+  # A 12 pt note is larger than any text the theme draws.
+  report <- check_figure(annotated_figure(size = 12 / ggplot2::.pt),
+                         max_text_pt = 7)
+  expect_equal(measured_for(report, "text_size_max"), 12)
+  # A figure that draws no text has nothing to hold to a ceiling.
+  blank <- check_figure(ggplot() + theme_void(), max_text_pt = 7)
+  expect_identical(verdict_for(blank, "text_size_max"), "not applicable")
+  expect_identical(detail_for(blank, "text_size_max"),
+                   "The figure draws no text.")
+})
+
+test_that("each panel of a composite is held to the ceiling", {
+  report <- check_figure(arrange_plots(good_figure(), bad_figure(),
+                                       tag_levels = NULL), max_text_pt = 7)
+  expect_identical(nrow(report), 22L)
+  ceiling <- report[report$check == "text_size_max", ]
+  expect_identical(ceiling$panel, 1:2)
+  expect_equal(ceiling$measured, c(11, 5))
+  expect_identical(ceiling$verdict, c("fail", "pass"))
+})
+
 # --- composites --------------------------------------------------------------
 
 test_that("a composite is audited panel by panel, in reading order", {
@@ -1153,7 +1206,8 @@ test_that("check_figure() refuses a metric it does not know", {
 
 test_that("check_figure() refuses non-positive and non-scalar settings", {
   p <- good_figure()
-  for (arg in c("width_cm", "render_width_cm", "min_delta_e", "min_text_pt")) {
+  for (arg in c("width_cm", "render_width_cm", "min_delta_e", "min_text_pt",
+                "max_text_pt")) {
     pattern <- paste0("^`", arg, "` must be a single positive number\\.$")
     expect_error(do.call(check_figure, c(list(p), stats::setNames(list(0), arg))),
                  pattern)

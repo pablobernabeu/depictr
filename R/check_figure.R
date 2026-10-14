@@ -33,7 +33,9 @@
 #'
 #' Every row carries the value it measured next to the threshold it was measured
 #' against, so a verdict can be argued with rather than merely accepted. A check
-#' passes when the measured value is at least the threshold. A check that has
+#' passes when the measured value is at least the threshold. The one exception
+#' is `text_size_max`, a ceiling added when `max_text_pt` is given, which
+#' passes when the measured value is at most its threshold. A check that has
 #' nothing to measure, such as colour separability on a figure that encodes
 #' nothing by colour, reports `NA` and a verdict of `"not applicable"` instead
 #' of a free pass.
@@ -127,6 +129,11 @@
 #' drawn, as ggrepel builds its repelled labels, is not yet in the built plot,
 #' so it is not measured either.
 #'
+#' `text_size_max` is reported only when `max_text_pt` is given, as the last
+#' row. It is the largest point size of all the text measured, around the
+#' panel and inside it, scaled as `text_size` is. It is the one row that
+#' passes at or below its threshold.
+#'
 #' @section Limitations of the default palette:
 #' The eight-colour qualitative palette clears the colour-separability checks
 #' comfortably and fails `greyscale_separability`: its orange (`#e69f00`) and
@@ -158,13 +165,18 @@
 #' given `width = 8.9, units = "cm"`, needs no scaling. Pass the saved width as
 #' both `width_cm` and `render_width_cm`, or leave both at their defaults.
 #' Given alone, `width_cm` audits the figure as though it had been drawn seven
-#' inches wide and then shrunk to fit.
+#' inches wide and then shrunk to fit. [save_plot()] with `check = TRUE` audits
+#' a figure at the width it saves it at, given as both.
 #'
 #' The default `min_text_pt` of 6 is lenient. As their guidelines stood on 30
 #' September 2026, PLOS asked for text of 8 to 12 pt and APA Style for 8 to 14
 #' pt. Elsevier asked for 7 pt as a rule of thumb, and Nature for 5 to 7 pt,
 #' with panel labels at 8 pt. Pass the floor of the journal the figure is for
-#' as `min_text_pt`. The four pages are listed under References.
+#' as `min_text_pt`, and its ceiling, where it sets one, as `max_text_pt`.
+#' Nature's 7 pt applies to all text but the panel labels. The tags of a
+#' composite, where patchwork puts them, are not measured, but a panel label
+#' drawn as a panel's title or annotation is measured with the rest. The four
+#' pages are listed under References.
 #'
 #' @section Composites:
 #' A composite, such as [arrange_plots()], [residual_diagnostics_plot()] and
@@ -209,12 +221,16 @@
 #'   `"ciede2000"`, the default, or `"cie76"`, the Euclidean distance in CIELAB
 #'   that earlier versions measured. `"cie76"` is kept so that earlier results
 #'   can be reproduced, and a later release will remove it.
+#' @param max_text_pt The largest acceptable printed text size, in points, or
+#'   `NULL`, the default, for no ceiling. When given, a `text_size_max` row is
+#'   appended (see "What each check measures").
 #'
 #' @return A data frame with one row per check and columns `check`, `measured`,
 #'   `threshold`, `verdict` (`"pass"`, `"fail"` or `"not applicable"`) and
-#'   `detail`, a short note naming what produced the measurement. For a
-#'   composite, the rows of each panel in turn, after a leading integer column
-#'   `panel`.
+#'   `detail`, a short note naming what produced the measurement. There are
+#'   ten rows, and an eleventh, `text_size_max`, when `max_text_pt` is given.
+#'   For a composite, the rows of each panel in turn, after a leading integer
+#'   column `panel`.
 #' @references
 #' APA Style. Figures.
 #' <https://apastyle.apa.org/style-grammar-guidelines/tables-figures/figures>
@@ -258,6 +274,10 @@
 #' # units = "cm"), it is drawn at the size it prints, so both widths are 8.9.
 #' check_figure(good, width_cm = 8.9, render_width_cm = 8.9)
 #'
+#' # Nature allowed no text above 7 pt but the panel labels. The axis titles
+#' # here are 11 pt, so the ceiling row fails.
+#' subset(check_figure(good, max_text_pt = 7), check == "text_size_max")
+#'
 #' # Each panel of a composite is audited, and a column says which panel each
 #' # row describes. At base size 5, the second panel's text is too small.
 #' small <- good + theme_depictr(base_size = 5)
@@ -265,7 +285,8 @@
 #' both[both$verdict == "fail", c("panel", "check", "measured")]
 check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
                          min_delta_e = 5, min_text_pt = 6,
-                         metric = c("ciede2000", "cie76")) {
+                         metric = c("ciede2000", "cie76"),
+                         max_text_pt = NULL) {
   # A patchwork inherits from ggplot, since it is its last panel with the
   # others attached, so it is told apart before the build sees it.
   composite <- inherits(plot, "patchwork")
@@ -277,14 +298,15 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
   .positive_scalar(render_width_cm, "render_width_cm")
   .positive_scalar(min_delta_e, "min_delta_e")
   .positive_scalar(min_text_pt, "min_text_pt")
+  if (!is.null(max_text_pt)) .positive_scalar(max_text_pt, "max_text_pt")
   metric <- match.arg(metric)
 
   if (composite) {
     return(.audit_composite(plot, width_cm, render_width_cm, min_delta_e,
-                            min_text_pt, metric))
+                            min_text_pt, metric, max_text_pt))
   }
   .audit_plot(plot, width_cm, render_width_cm, min_delta_e, min_text_pt,
-              metric)
+              metric, max_text_pt)
 }
 
 # --- composites -------------------------------------------------------------
@@ -319,7 +341,7 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' by the same rule.
 #' @noRd
 .audit_composite <- function(plot, width_cm, render_width_cm, min_delta_e,
-                             min_text_pt, metric) {
+                             min_text_pt, metric, max_text_pt = NULL) {
   panels <- .composite_panels(plot)
   reports <- list()
   for (number in seq_along(panels)) {
@@ -335,7 +357,7 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
       next
     }
     report <- .audit_plot(panel, width_cm, render_width_cm, min_delta_e,
-                          min_text_pt, metric)
+                          min_text_pt, metric, max_text_pt)
     reports[[length(reports) + 1L]] <- cbind(panel = number, report)
   }
   if (!length(reports)) {
@@ -352,9 +374,12 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 # --- one plot ---------------------------------------------------------------
 
 #' The audit of a single plot, its settings already validated
+#'
+#' The ceiling row is appended only when `max_text_pt` is given, so the report
+#' asked for without one keeps its ten rows.
 #' @noRd
 .audit_plot <- function(plot, width_cm, render_width_cm, min_delta_e,
-                        min_text_pt, metric) {
+                        min_text_pt, metric, max_text_pt = NULL) {
   built <- ggplot2::ggplot_build(plot)
   resolved <- .completed_theme(built$plot$theme)
   # White stands in for the paper under a plot background that paints nothing.
@@ -388,6 +413,11 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
                             render_width_cm, min_text_pt, "in-panel text",
                             "The figure draws no text inside the panel."))
   )
+  if (!is.null(max_text_pt)) {
+    rows <- c(rows, list(.largest_text_row(c(text$size, panel_text$size),
+                                           width_cm, render_width_cm,
+                                           max_text_pt)))
+  }
   out <- do.call(rbind, rows)
   rownames(out) <- NULL
   out
@@ -935,19 +965,22 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 
 # --- rows -------------------------------------------------------------------
 
+#' A row's verdict: a floor passes at or above its threshold, and a ceiling at
+#' or below it
 #' @noRd
-.verdict <- function(measured, threshold) {
+.verdict <- function(measured, threshold, ceiling = FALSE) {
   if (is.na(measured)) return("not applicable")
-  if (measured >= threshold) "pass" else "fail"
+  passes <- if (ceiling) measured <= threshold else measured >= threshold
+  if (passes) "pass" else "fail"
 }
 
 #' @noRd
-.check_row <- function(check, measured, threshold, detail) {
+.check_row <- function(check, measured, threshold, detail, ceiling = FALSE) {
   data.frame(
     check = check,
     measured = if (is.na(measured)) NA_real_ else round(measured, 2),
     threshold = threshold,
-    verdict = .verdict(measured, threshold),
+    verdict = .verdict(measured, threshold, ceiling),
     detail = detail,
     stringsAsFactors = FALSE
   )
@@ -1070,6 +1103,26 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
              sprintf("Smallest %s %s pt, drawn at %s cm and printed at %s cm.",
                      noun, .fmt(nominal), .fmt(render_width_cm),
                      .fmt(width_cm)))
+}
+
+#' The largest text at its printed size, against a ceiling
+#'
+#' Serves `text_size_max`, over the text around the panel and inside it
+#' together, since a ceiling such as Nature's applies to all of it. It is the
+#' one row that passes at or below its threshold.
+#' @param sizes The point sizes of every text the figure draws, as drawn.
+#' @noRd
+.largest_text_row <- function(sizes, width_cm, render_width_cm, max_text_pt) {
+  if (!length(sizes)) {
+    return(.check_row("text_size_max", NA_real_, max_text_pt,
+                      "The figure draws no text.", ceiling = TRUE))
+  }
+  nominal <- max(sizes)
+  .check_row("text_size_max", nominal * width_cm / render_width_cm,
+             max_text_pt,
+             sprintf("Largest text %s pt, drawn at %s cm and printed at %s cm.",
+                     .fmt(nominal), .fmt(render_width_cm), .fmt(width_cm)),
+             ceiling = TRUE)
 }
 
 #' The text that falls furthest short of its own WCAG threshold

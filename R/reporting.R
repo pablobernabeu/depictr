@@ -171,7 +171,8 @@ arrange_plots <- function(..., ncol = NULL, nrow = NULL,
 #' figures in papers and reports: a moderate size, 300 dpi, and the output
 #' directory created if needed. The device is inferred from the file extension,
 #' and PDF, EPS and TIFF files are written to pass the technical checks
-#' journals run on submitted figures.
+#' journals run on submitted figures. With `check = TRUE`, the figure is also
+#' audited with [check_figure()] at the width it is saved at.
 #'
 #' @section Formats journals accept:
 #' When no `device` is given, three formats are written differently from
@@ -229,11 +230,19 @@ arrange_plots <- function(..., ncol = NULL, nrow = NULL,
 #' @param dpi Resolution for raster devices. An EPS rasterises its translucent
 #'   layers, and whatever they overlap, at this resolution or at 600 dpi,
 #'   whichever is higher.
+#' @param check Whether to audit the figure with [check_figure()] at the width
+#'   it is saved at, given as both `width_cm` and `render_width_cm`, so that the
+#'   text sizes it reports are the printed ones. A warning names each check the
+#'   figure fails. Defaults to `FALSE`. The audit runs before the file is
+#'   written, so a plot it cannot read is refused without saving. For other
+#'   thresholds, such as a journal's own text floor, call [check_figure()] with
+#'   the saved width as both widths.
 #' @param ... Passed to [ggplot2::ggsave()], which passes what it does not use
 #'   on to the device. A `device` or device argument given here overrides the
 #'   defaults described under "Formats journals accept".
 #'
-#' @return The `filename`, invisibly.
+#' @return The `filename`, invisibly. With `check = TRUE`, the audit report is
+#'   attached to it as the attribute `"check"`, which `attr(, "check")` reads.
 #' @references
 #' PLOS ONE. Figures. <https://journals.plos.org/plosone/s/figures>
 #'
@@ -253,8 +262,31 @@ arrange_plots <- function(..., ncol = NULL, nrow = NULL,
 #'
 #' # A TIFF well within the 10 MB that PLOS allows.
 #' save_plot(file.path(tempdir(), "yield.tiff"), p)
+#'
+#' # Audited at the 8.9 cm column it is saved for, where its text prints at
+#' # the size it is drawn.
+#' saved <- save_plot(file.path(tempdir(), "yield-column.png"), p,
+#'                    width = 8.9, height = 6, units = "cm", check = TRUE)
+#' attr(saved, "check")
 save_plot <- function(filename, plot = ggplot2::last_plot(),
-                      width = 7, height = 4.5, units = "in", dpi = 300, ...) {
+                      width = 7, height = 4.5, units = "in", dpi = 300,
+                      check = FALSE, ...) {
+  if (!is.logical(check) || length(check) != 1 || is.na(check)) {
+    stop("`check` must be TRUE or FALSE.", call. = FALSE)
+  }
+  # The audit runs before anything is written, so a figure it cannot read, or
+  # a width it cannot convert, leaves no file behind.
+  report <- NULL
+  if (check) {
+    saved_cm <- .saved_width_cm(width, units, dpi)
+    if (is.na(saved_cm)) {
+      stop("`check = TRUE` needs the width the figure is saved at: a single ",
+           "positive number in \"in\", \"cm\", \"mm\" or \"px\".",
+           call. = FALSE)
+    }
+    report <- check_figure(plot, width_cm = saved_cm,
+                           render_width_cm = saved_cm)
+  }
   dir <- dirname(filename)
   if (!dir.exists(dir)) dir.create(dir, recursive = TRUE)
   args <- list(...)
@@ -287,7 +319,39 @@ save_plot <- function(filename, plot = ggplot2::last_plot(),
   }
   do.call(save, args)
   .report_device(format, opened$device, plot, args[["fallback_resolution"]])
-  invisible(filename)
+  if (is.null(report)) return(invisible(filename))
+  .warn_failed_checks(report, saved_cm)
+  invisible(structure(filename, check = report))
+}
+
+# The width a figure is saved at, in centimetres, from ggsave()'s units, or NA
+# when it is not a single positive number in one of them. A width in pixels
+# converts at the resolution the figure is saved at.
+.saved_width_cm <- function(width, units, dpi) {
+  if (!is.numeric(width) || length(width) != 1 || !is.finite(width) ||
+      width <= 0 || !is.character(units) || length(units) != 1) {
+    return(NA_real_)
+  }
+  cm_per_unit <- switch(units, "in" = 2.54, cm = 1, mm = 0.1,
+                        px = 2.54 / .dpi_number(dpi), NA_real_)
+  width * cm_per_unit
+}
+
+# A warning that names each check the saved figure fails, with what it
+# measured against its threshold, and in a composite the panel it is in. A
+# check with nothing to measure is not a failure, so it is not named.
+.warn_failed_checks <- function(report, width_cm) {
+  failed <- report[report$verdict == "fail", , drop = FALSE]
+  if (!nrow(failed)) return(invisible(NULL))
+  where <- if (is.null(failed$panel)) "" else paste0("panel ", failed$panel, " ")
+  items <- sprintf("%s%s %s (threshold %s)", where, failed$check,
+                   .fmt(failed$measured), .fmt(failed$threshold))
+  warning(sprintf(
+    paste("The figure fails %d %s at the %s cm it is saved at: %s. The full",
+          "report is attached to the file name returned, as attr(, \"check\")."),
+    nrow(failed), if (nrow(failed) == 1) "check" else "checks",
+    .fmt(width_cm), and_list(items)), call. = FALSE)
+  invisible(NULL)
 }
 
 # The lower-case extension of a file name, or "" when it has none.
