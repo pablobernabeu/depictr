@@ -90,7 +90,10 @@ quantiles, medians and group shifts easy to read directly off the curve.</p>
 
 <dt id="arg-group">group<a class="anchor" aria-label="anchor" href="#arg-group"></a></dt>
 <dd><p>Optional grouping variable (string or unquoted name) mapped to
-colour, giving one ECDF per group.</p></dd>
+colour, giving one ECDF per group. A numeric code counts as a group, but a
+numeric column with more than 20 distinct values is refused as continuous.
+Rows with a missing group are dropped with a message, and levels without
+rows are left out of the plot and its palette.</p></dd>
 
 
 <dt id="arg-reference-quantiles">reference_quantiles<a class="anchor" aria-label="anchor" href="#arg-reference-quantiles"></a></dt>

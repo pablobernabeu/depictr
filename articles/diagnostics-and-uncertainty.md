@@ -58,9 +58,10 @@ For a binary `glm` the raw residuals take only a few values, so a plain
 residual-versus-fitted plot is hard to read.
 [`binned_residual_plot()`](https://pablobernabeu.github.io/depictr/reference/binned_residual_plot.md)
 instead splits the data into equal-count bins of fitted values and plots
-the mean residual per bin against a +/- 2 standard-error band ([Gelman &
-Hill, 2007](#ref-gelman2007)). Most points should sit inside the band,
-scattered around zero.
+the mean residual per bin ([Gelman & Hill, 2007](#ref-gelman2007))
+against a band of +/- 2 standard errors, which the fitted model implies
+for each bin’s mean. Under a correct model, about 95% of the points sit
+inside the band, scattered around zero.
 
 We model the *rare* adverse-event outcome from the clinical trial (about
 a 10% base rate) on the baseline biomarker, age and treatment arm.

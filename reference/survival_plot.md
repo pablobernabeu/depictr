@@ -23,7 +23,8 @@ survival_plot(
   legend_inside = FALSE,
   title = NULL,
   x_lab = "Time",
-  y_lab = "Survival probability"
+  y_lab = "Survival probability",
+  conf_type = c("log-log", "log", "plain")
 )
 ```
 
@@ -59,7 +60,13 @@ survival_plot(
 
 - conf_level:
 
-  Confidence level for the limits (`NA` to omit them).
+  Confidence level for the limits, a single number strictly between 0
+  and 1 (`NA` to omit them). For a `survfit` object, the limits are
+  recomputed at this level, even for one made with `conf.type = "none"`,
+  since it keeps its standard errors. An object that stores no standard
+  errors, or whose lower limits follow `conf.lower = "peto"` or
+  `"modified"`, keeps the limits it holds, with a warning when they are
+  not the ones asked for.
 
 - censor_marks:
 
@@ -101,6 +108,11 @@ survival_plot(
 
   Title and axis labels.
 
+- conf_type:
+
+  The scale on which the confidence limits are built: `"log-log"` (the
+  default), `"log"` or `"plain"`, as set out under Details.
+
 ## Value
 
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
@@ -108,6 +120,22 @@ object or, when `risk_table = TRUE`, a 'patchwork' object stacking the
 curves above the risk table.
 
 ## Details
+
+The confidence limits are pointwise. By default, they are built on the
+log-log scale, as \\S^{\exp(\pm z \sigma / \log S)}\\, where \\\sigma\\
+is the Greenwood standard error of \\\log S\\. These limits stay between
+0 and 1, and in small samples they cover better than the untransformed
+limits \\S \pm z S \sigma\\ (Borgan & Liestøl, 1990).
+`conf_type = "plain"` draws the untransformed limits, clipped to that
+range, and `conf_type = "log"` draws \\S \exp(\pm z \sigma)\\, capped at
+1, as
+[`survival::survfit()`](https://rdrr.io/pkg/survival/man/survfit.html)
+does by default. The limits are 1 while the estimate is 1, and where a
+curve falls to 0, they keep the values of the step before. The limits of
+a `survfit` object are recomputed from its standard errors at
+`conf_level` and `conf_type`, so they equal those that `survfit()` gives
+with the same `conf.int` and `conf.type` (`conf_level` names the objects
+that keep their own).
 
 For publication-ready figures the plot offers the three annotations that
 define a "survminer-style" Kaplan-Meier display, each behind its own
@@ -141,6 +169,10 @@ observations.” *Journal of the American Statistical Association*,
 Greenwood M (1926). *The natural duration of cancer*, volume 33 of
 *Reports on Public Health and Medical Subjects*. His Majesty's
 Stationery Office, London.
+
+Borgan Ø, Liestøl K (1990). “A note on confidence intervals and bands
+for the survival function based on transformations.” *Scandinavian
+Journal of Statistics*, **17**(1), 35–41.
 
 Mantel N (1966). “Evaluation of survival data and two new rank order
 statistics arising in its consideration.” *Cancer Chemotherapy Reports*,

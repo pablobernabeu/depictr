@@ -22,7 +22,8 @@ acf_plot(
 
 - x:
 
-  A numeric vector or `ts` object.
+  A numeric vector or `ts` object holding one series. A multivariate
+  `ts` or a matrix with several columns is refused.
 
 - lag_max:
 
@@ -47,6 +48,15 @@ acf_plot(
 
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
 object.
+
+## Details
+
+A missing value inside the series is kept in its place, and the
+correlations are computed from the pairs of observations that are both
+present (`na.action = na.pass`), with a warning. Dropping it would join
+the observations on either side of the gap as if they were neighbours.
+The Python package refuses such a series and asks for the gap to be
+dropped or imputed first.
 
 ## Examples
 

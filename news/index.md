@@ -135,6 +135,29 @@
   which needs draws, refuses it. The summary path also no longer warns
   about label keys you never supplied.
 
+- `conf_level` in
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  set the level of the frequentist intervals only. With draws, the
+  half-eyes stayed at 66% and 95%, so `conf_level = 0.8` drew 80%
+  confidence intervals beside 95% credible ones, and nothing on the
+  figure named either level. The level now sets the outer posterior
+  interval too. The interval drawn when ggdist is not installed follows
+  it, and so does the span that decides which faceted panels draw the
+  reference line. The 66% inner interval is kept while `conf_level`
+  exceeds 0.66, so that it stays the narrower of the two. A caption now
+  names the level of each source’s intervals on either path, and the new
+  `caption` argument replaces it or, with `NA`, omits it. A table of
+  estimates keeps the intervals it holds, and the caption says that they
+  are as supplied.
+
+- The two paths of
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  no longer swap the sources’ colours. With draws, the Bayesian
+  half-eyes were brand blue and the frequentist overlay orange, the
+  reverse of the forest plot drawn from summaries and of the Python
+  package. The frequentist estimates are now brand blue and the Bayesian
+  ones orange on both paths.
+
 - [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
   read the `status` coding separately in each group. Under the
   [`survival::Surv()`](https://rdrr.io/pkg/survival/man/Surv.html) 1/2
@@ -322,18 +345,195 @@
   name otherwise, so a decision probability such as pilotr’s
   `p_meaningful` is not labelled as power.
 
+- The grouped plots each treated a grouping variable in their own way. A
+  numeric code, such as a block numbered 1 and 2, failed in
+  [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md)
+  with “Continuous value supplied to a discrete scale”, and
+  [`explore_distribution()`](https://pablobernabeu.github.io/depictr/reference/explore_distribution.md)
+  and
+  [`ecdf_plot()`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot.md)
+  drew it as one ungrouped curve. A level with no rows, as
+  [`subset()`](https://rdrr.io/r/base/subset.html) leaves in a factor,
+  took a colour in the correlation panel of
+  [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md)
+  but not in its scatter panels, so the levels after it changed colour
+  from one panel to the next.
+  [`group_comparison_plot()`](https://pablobernabeu.github.io/depictr/reference/group_comparison_plot.md)
+  and
+  [`raincloud_plot()`](https://pablobernabeu.github.io/depictr/reference/raincloud_plot.md)
+  warned that such a level had too few observations and kept an empty
+  place for it on the axis, which
+  [`group_comparison_plot()`](https://pablobernabeu.github.io/depictr/reference/group_comparison_plot.md)
+  moved to the end. Missing groups made
+  [`raincloud_plot()`](https://pablobernabeu.github.io/depictr/reference/raincloud_plot.md)
+  fail, were drawn as a grey group of their own by
+  [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md),
+  [`outlier_plot()`](https://pablobernabeu.github.io/depictr/reference/outlier_plot.md)
+  and
+  [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md),
+  and vanished without a word elsewhere.
+  [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md),
+  [`explore_distribution()`](https://pablobernabeu.github.io/depictr/reference/explore_distribution.md),
+  [`ecdf_plot()`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot.md),
+  [`raincloud_plot()`](https://pablobernabeu.github.io/depictr/reference/raincloud_plot.md),
+  [`group_comparison_plot()`](https://pablobernabeu.github.io/depictr/reference/group_comparison_plot.md),
+  [`explore_categorical()`](https://pablobernabeu.github.io/depictr/reference/explore_categorical.md),
+  [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md),
+  [`ridgeline_plot()`](https://pablobernabeu.github.io/depictr/reference/ridgeline_plot.md)
+  and
+  [`outlier_plot()`](https://pablobernabeu.github.io/depictr/reference/outlier_plot.md)
+  now share one rule. The group becomes a factor, so a numeric code is a
+  group, but a numeric column with more than 20 distinct values is
+  refused as continuous, as
+  [`explore_categorical()`](https://pablobernabeu.github.io/depictr/reference/explore_categorical.md)
+  already refused such an `x`. Rows with a missing group are dropped
+  with a message, as
+  [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  drops them, and levels left without rows take no colour, legend key or
+  place on an axis. Colours are matched to the levels by name, so a
+  level keeps its colour in every layer and panel, and a group too
+  sparse for a ridge no longer shifts the colours of the ridges after
+  it. An unnamed `palette` is assigned to the levels in use in their
+  order, and a named one still pins a colour to each level.
+  [`explore_categorical()`](https://pablobernabeu.github.io/depictr/reference/explore_categorical.md)
+  now orders its groups by level, where it sorted them alphabetically,
+  so they take the same colours as in the Python package.
+  [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md)
+  leaves a numeric `group` out of its default columns and stops with a
+  clear error when `cols` names it. With the default palette, the
+  warning that more than eight groups lose the colour-vision guarantee
+  now comes once, when the plot is made, where it came each time the
+  plot was drawn.
+
+- [`palette_preview()`](https://pablobernabeu.github.io/depictr/reference/palette_preview.md),
+  [`confusion_matrix_plot()`](https://pablobernabeu.github.io/depictr/reference/confusion_matrix_plot.md)
+  and
+  [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md)
+  drew some labels below the 4.5:1 contrast that WCAG asks of text. The
+  first two switched from white to dark grey text at a relative
+  luminance of 0.4, although the two colours tie near 0.2. Four of the
+  eight default swatches therefore had white labels at 2.85 to 3.87:1,
+  and counts on mid-blue cells of a confusion matrix fell as low as
+  2.3:1.
+  [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md)
+  drew white labels whenever \|r\| exceeded 0.6, which left the r =
+  -0.70 of `wellbeing_survey` at 3.6:1, and its `n/a` sat in grey40 on a
+  grey85 cell at 4.1:1. Each label is now black or white, whichever has
+  the higher contrast against its tile as drawn, which is at least
+  4.58:1 on any colour. The tile colours are read as the fill scale
+  draws them, interpolated in the Lab colour space, where the confusion
+  matrix used an RGB approximation.
+
+- [`vif_plot()`](https://pablobernabeu.github.io/depictr/reference/vif_plot.md)
+  computed the VIFs of a weighted `lm` or a `glm` from the correlations
+  of the design matrix, which leave out the weights of the fit. The
+  generalised VIF of Fox and Monette (1992) compares the confidence
+  region of a term’s coefficients with the one they would have without
+  collinearity, so it depends on those weights. The VIFs now come from
+  the covariance of the coefficients, as
+  [`car::vif()`](https://rdrr.io/pkg/car/man/vif.html) computes them,
+  and agree with it. For
+  `glm(adverse_event ~ biomarker + age + arm, family = binomial)` fitted
+  to `clinical_trial`, the VIF of age moves from 1.0073 to 1.0046. An
+  unweighted `lm` with an intercept gives the values it gave before. A
+  model fitted without an intercept now gives VIFs computed from columns
+  that are not centred, with a warning, as
+  [`car::vif()`](https://rdrr.io/pkg/car/man/vif.html) does.
+
+- A multivariate `ts`, such as `cbind(mdeaths, fdeaths)`, or a numeric
+  matrix was read as one series, its columns laid end to end.
+  [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
+  drew a single line. For a `ts` it zigzagged between the columns at
+  every time, and for a matrix it ran on from one column into the next.
+  [`acf_plot()`](https://pablobernabeu.github.io/depictr/reference/acf_plot.md)
+  returned the autocorrelation of the joined columns.
+  [`seasonal_plot()`](https://pablobernabeu.github.io/depictr/reference/seasonal_plot.md)
+  and the classical
+  [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md)
+  recycled the seasons and times of one column over all of them, so the
+  columns were drawn over one another, and
+  [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)
+  forecast the joined columns at missing times.
+  [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
+  now draws one line per column, named after the columns.
+  [`acf_plot()`](https://pablobernabeu.github.io/depictr/reference/acf_plot.md),
+  [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md),
+  [`seasonal_plot()`](https://pablobernabeu.github.io/depictr/reference/seasonal_plot.md)
+  and
+  [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)
+  refuse more than one column with a message that gives the count. They
+  read a `ts` with a single column as that series.
+  [`ts()`](https://rdrr.io/r/stats/ts.html) makes one from a one-column
+  data frame, and the STL decomposition stopped on it with “only
+  univariate series are allowed”.
+
+- [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md)
+  and
+  [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)
+  now trim missing values at either end of a series, as the Python
+  package does, so a forecast, the overlay of
+  [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
+  included, starts after the last observation.
+  [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)
+  and the STL decomposition stopped with the error “missing values in
+  object” from [`stl()`](https://rdrr.io/r/stats/stl.html). A missing
+  value inside the series is refused with a message that names `x` and
+  asks for the value to be dropped or imputed, where
+  [`stl()`](https://rdrr.io/r/stats/stl.html) and
+  [`decompose()`](https://rdrr.io/r/stats/decompose.html) stopped with
+  errors of their own.
+  [`acf_plot()`](https://pablobernabeu.github.io/depictr/reference/acf_plot.md)
+  still computes the correlations across such a gap from the pairs of
+  observations present, with a warning, while the Python package refuses
+  the series. The help pages of both packages now say so.
+
+- [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
+  keeps the level order of a factor `group`, which sets the legend and
+  the colours, and leaves out levels that no row uses. It ordered the
+  groups by first appearance.
+
+- [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
+  drew a moving average over an even window, such as `rolling = 12` for
+  monthly data, half an observation early. Equal weights over twelve
+  observations are centred between two of them, and the mean of
+  observations 1 to 12 was drawn at observation 6, where its centre is
+  6.5. An even window now gives the 2×12 moving average (Hyndman &
+  Athanasopoulos, 2021, Section 3.3), a 12-point average followed by a
+  2-point one, which is centred on each observation and is the trend
+  that [`decompose()`](https://rdrr.io/r/stats/decompose.html)
+  estimates. The caption of a grouped overlay names it, and the window
+  needs a series one observation longer than itself. The Python package
+  drew the same average half an observation late, and the two packages
+  now draw the same values. An odd window is unchanged.
+
 ### Degenerate input
 
 - [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
   truncated a non-integer status code, so `c(0, 0.5, 1)` was read as two
   censored observations and an event. Non-integer codes are now refused
   with the existing coding message.
+
 - [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
   kept an arm whose every `status` was missing when `group` was a
   factor. The arm stayed in the legend with no curve and a row of zeros
   in the risk table, and `logrank = TRUE` failed with an error that did
   not say why. The arm is now dropped with the missing statuses, as it
   already was for a character `group`.
+
+- [`vif_plot()`](https://pablobernabeu.github.io/depictr/reference/vif_plot.md)
+  refuses a model with aliased coefficients, for which no VIF exists,
+  and names the terms they belong to. It failed with an unrelated base-R
+  error, “missing value where TRUE/FALSE needed”.
+
+- [`seasonal_plot()`](https://pablobernabeu.github.io/depictr/reference/seasonal_plot.md)
+  refused every frequency that is not a whole number, such as the 365.25
+  / 7 of weekly data, with a message about `season_labels` that no
+  labels could satisfy, while
+  [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md)
+  drew the same series. Such a frequency is now rounded down to whole
+  seasons, counted from the first observation as
+  [`stl()`](https://rdrr.io/r/stats/stl.html) counts them, and a message
+  says so.
 
 ### Auditing a finished figure
 
@@ -365,6 +565,60 @@
   as, and the separability rows say whether their closest pair are
   colours or fill colours. Verdicts on translucent figures can change in
   either direction. The vignette’s example now draws its points opaque.
+- [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  now treats a colour or fill mapped in several layers, one value per
+  layer, as the encoding it is. Such figures were reported as encoding
+  nothing by colour. With red and green drawn one group per layer, every
+  colour row read “not applicable”, whereas the same figure drawn in one
+  layer fails the deuteranopia check at 0.37.
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  with draws, whose half-eyes and frequentist overlay are separate
+  layers, was never audited for colour. It now is, and the orange of its
+  half-eyes fails `geometry_contrast` at 2.25:1, as that colour does on
+  white in any figure. Shape and line type split across layers count
+  towards `redundant_encoding` in the same way. A colour set as a
+  constant, as in `geom_point(colour = "red")`, is still left out, as
+  the help page now says.
+- [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  gains an `annotation_text_size` row for the text drawn inside the
+  panel: annotations, the labels of layers such as
+  [`geom_text()`](https://ggplot2.tidyverse.org/reference/geom_text.html)
+  and
+  [`geom_label()`](https://ggplot2.tidyverse.org/reference/geom_text.html),
+  and the cell values and labels of depictr’s own plots. The text-size
+  check never saw that text, so a 5.7 pt annotation passed a 6 pt floor
+  while the report gave 8.80 pt as the smallest text. The new row holds
+  it to the same floor at its printed size. It is appended last, so the
+  report now has ten rows. The contrast of that text is not measured,
+  and nor is text a layer builds only when it is drawn, such as
+  ggrepel’s labels. When all of a figure’s text is inside the panel, the
+  two rows for the text around it no longer say that the figure draws no
+  text.
+- The colour rows of a figure coloured by a continuous scale, such as a
+  heatmap, said that nothing was distinguished by colour. They now say
+  that colour is a continuous scale, which these checks do not audit,
+  and the documentation recommends a perceptually ordered map such as
+  viridis for one. The help page and the README now also give the
+  default palette’s contrast limit, which the Get started vignette
+  already stated: four of its eight colours fall below the 3:1 that WCAG
+  asks of a graphical object against white, the orange from the second
+  group on. The documentation shows how to audit a figure saved at its
+  final width, with that width given as both widths or neither, and the
+  help page gives four publishers’ text floors, dated and linked, where
+  it called 6 pt a common publisher floor.
+- [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  accepts a multi-panel composite and audits each panel on its own, in
+  the order patchwork tags them, with a leading `panel` column. It used
+  to refuse one, which left the package’s own composites without an
+  audit. Among them are the figures of
+  [`arrange_plots()`](https://pablobernabeu.github.io/depictr/reference/arrange_plots.md),
+  [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md),
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md),
+  [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md)
+  and `survival_plot(risk_table = TRUE)`. Each panel’s legend is
+  measured with the panel. A spacer or a guide area takes no panel
+  number, and a wrapped element, such as a grob or a table, is left out
+  with a warning. Composite-level titles and tags are not measured.
 
 ### Metadata and documentation
 
@@ -401,14 +655,18 @@
   package declares it.
 
 - `citation("depictr")`, the website and `CITATION.cff` give the DOI
-  that CRAN assigned to the package, 10.32614/CRAN.package.depictr, in
-  place of the Zenodo concept DOI. It names the R package across all its
-  versions, and it is the DOI that the CRAN page and the citation R
-  generates for a CRAN package already gave, so the package no longer
-  circulates under two. Zenodo still archives every GitHub release, and
-  `CITATION.cff` lists both identifiers. Its release date is now the day
-  CRAN published 0.3.0, 2026-09-01, where it gave a date that matched
-  neither CRAN nor the GitHub release.
+  that CRAN assigned to the package,
+  <https://doi.org/10.32614/CRAN.package.depictr>, in place of the
+  Zenodo concept DOI. It names the R package across all its versions,
+  and it is the DOI that the CRAN page and the citation R generates for
+  a CRAN package already gave, so the package no longer circulates under
+  two. Zenodo still archives every GitHub release, and `CITATION.cff`
+  lists both identifiers. Its release date is now the day CRAN published
+  0.3.0, 2026-09-01, where it gave a date that matched neither CRAN nor
+  the GitHub release. The CRAN DOI and the Zenodo DOI are shown as full
+  links on the website and in the README, and the sidebar of the home
+  page shows the CRAN DOI once: the DOI badge in the README no longer
+  appears there a second time.
 
 ### Changed defaults
 
@@ -447,6 +705,73 @@
   panel is titled “Coefficients (per SD of continuous predictors)”. The
   help page and the model-estimates vignette no longer claim that the
   standardised magnitudes are comparable.
+
+- [`binned_residual_plot()`](https://pablobernabeu.github.io/depictr/reference/binned_residual_plot.md)
+  draws its band from the model, as twice the standard error of a bin’s
+  mean residual that the fitted model implies. The old band, twice the
+  standard deviation of the bin’s residuals over the square root of its
+  count, collapsed wherever a bin held no events. On the package’s own
+  example, a correctly specified model, it flagged five of seventeen
+  bins. When the adverse events were redrawn 200 times from the fitted
+  model, so that each refit was correct by construction, the old band
+  flagged 31% of the bins and the new one 3%. The binned-residual panel
+  that
+  [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
+  and
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
+  draw for a `glm` changes with it. `band = "empirical"` reproduces the
+  earlier figure, whose band is the one `arm::binnedplot()` draws.
+  Observations with zero prior weight, which take no part in the fit,
+  are now left out of the bins.
+
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  draws log-log confidence limits by default. They stay between 0 and 1
+  and cover better in small samples than the untransformed Greenwood
+  limits it drew before (Borgan & Liestøl, 1990). The new `conf_type`
+  argument restores those with `"plain"` and gives the default of
+  [`survival::survfit()`](https://rdrr.io/pkg/survival/man/survfit.html)
+  with `"log"`. The limits of a `survfit` object were copied from the
+  object, at the level and on the scale it was made with, so
+  `conf_level` was ignored and a 90% band showed the object’s 95%
+  limits. They are now recomputed from the object’s standard errors at
+  the requested `conf_level` and `conf_type`, so they equal those that
+  `survfit()` gives with the same `conf.int` and `conf.type`. An object
+  made with `conf.type = "none"` keeps its standard errors, so it now
+  gets limits as well, which `conf_level = NA` leaves out. An object
+  without standard errors, or one whose lower limits follow
+  `conf.lower = "peto"` or `"modified"`, keeps its own limits, with a
+  warning when they differ from those requested. Where a curve falls to
+  zero, the limits keep the values of the step before, so a band drawn
+  from follow-up times no longer stops one event early. A `conf_level`
+  outside (0, 1), such as 95 meant as a percentage, is now an error.
+
+- The cycle lines of `seasonal_plot(style = "season")` start from a
+  colour that clears 3:1 against white. They took the sequential ramp of
+  [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md),
+  which starts at `#e6eff5`, 1.16:1 against white, so the earliest
+  cycles were close to invisible. With twelve cycles, four of the lines
+  fell below the 3:1 that WCAG 2.2 asks of a graphical object. The ramp
+  now runs from `#4a8fc0`, at 3.51:1, through the brand blue to
+  `#08315a`, and `palette` still replaces it. The sequential palette
+  keeps its pale end for fills. Past about six cycles, neighbouring
+  lines take colours too close to tell apart, as the help page now says,
+  and `style = "subseries"` keeps each cycle in its own place on the
+  axis.
+
+- Colour separability in
+  [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
+  and
+  [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  is now measured with CIEDE2000 (Sharma, Wu & Dalal, 2005). The 1976
+  Euclidean distance it replaces overstates differences between
+  saturated colours: ggplot2’s default five-colour palette was certified
+  safe under deuteranopia, though two of its colours become almost
+  identical, 2.74 apart in CIEDE2000. The threshold stays at 5, and the
+  Okabe-Ito palette’s closest pair now measures 6.43, where it measured
+  7.4. `depictr_palette(9)` already warned that interpolated colours
+  lose the guarantee, and its nine colours now fail the check too.
+  `metric = "cie76"` restores the old measure for this release, and the
+  greyscale check is the lightness gap under either.
 
 ## depictr 0.3.0
 

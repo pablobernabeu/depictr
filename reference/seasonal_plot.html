@@ -91,12 +91,17 @@ visible at the same time, which a single overlaid line cannot show.</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A <code>ts</code> object, or a numeric vector (then <code>frequency</code> is required).</p></dd>
+<dd><p>A <code>ts</code> object, or a numeric vector (then <code>frequency</code> is required),
+holding one series. A multivariate <code>ts</code> or a matrix with several columns
+is refused.</p></dd>
 
 
 <dt id="arg-frequency">frequency<a class="anchor" aria-label="anchor" href="#arg-frequency"></a></dt>
 <dd><p>Number of observations per period (e.g. 12 for monthly
-data); taken from <code>x</code> when it is a <code>ts</code>.</p></dd>
+data); taken from <code>x</code> when it is a <code>ts</code>. A frequency that is not a whole
+number, such as the 365.25 / 7 of weekly data, is rounded down to whole
+seasons, as <code><a href="https://rdrr.io/r/stats/stl.html" class="external-link">stats::stl()</a></code> rounds it, and a message says so. The seasons
+are then counted from the first observation.</p></dd>
 
 
 <dt id="arg-style">style<a class="anchor" aria-label="anchor" href="#arg-style"></a></dt>
@@ -121,8 +126,11 @@ labels for frequency 4, otherwise the season index).</p></dd>
 
 
 <dt id="arg-palette">palette<a class="anchor" aria-label="anchor" href="#arg-palette"></a></dt>
-<dd><p>Colours used for the cycle lines when <code>style = "season"</code>;
-defaults to a sequential ramp from <code><a href="depictr_palette.html">depictr_palette()</a></code>.</p></dd>
+<dd><p>Colours used for the cycle lines when <code>style = "season"</code>.
+Defaults to a blue ramp from <code>#4a8fc0</code> through the brand blue to
+<code>#08315a</code>, whose palest colour has a contrast of 3.51:1 against white. The
+sequential ramp of <code><a href="depictr_palette.html">depictr_palette()</a></code> starts paler, at <code>#e6eff5</code>, which
+suits a fill but leaves a line close to invisible.</p></dd>
 
 
 <dt id="arg-title-x-lab-y-lab">title, x_lab, y_lab<a class="anchor" aria-label="anchor" href="#arg-title-x-lab-y-lab"></a></dt>
@@ -140,7 +148,13 @@ are faceted side by side, each tracing one season across cycles: the
 classic Cleveland cycle plot, matching <code>feasts::gg_subseries()</code>. With
 <code>style = "season"</code> every cycle is drawn as its own line over the seasons on a
 shared axis (the seasonal-plot layout of <code><a href="https://pkg.robjhyndman.com/forecast/reference/seasonplot.html" class="external-link">forecast::ggseasonplot()</a></code>), which is
-handy for spotting an unusual year.</p>
+handy for spotting an unusual year. The lines run from a mid blue for the
+first cycle to a dark blue for the last, so they read in time order. Past
+about six cycles, neighbouring cycles take colours too close to tell apart,
+and the colours then show the order of the cycles more than which is which.
+When individual cycles must be told apart, use <code>style = "subseries"</code>, where
+each cycle keeps its own place on the axis of every panel, or plot fewer
+cycles.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

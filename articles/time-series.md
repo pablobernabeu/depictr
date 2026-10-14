@@ -22,6 +22,11 @@ timeseries_plot(monthly_sales, time = date, value = sales, group = series,
 
 ![](time-series_files/figure-html/unnamed-chunk-1-1.png)
 
+Twelve months is an even window, so the overlay is the 2×12 moving
+average that the caption names ([Hyndman & Athanasopoulos, 2021, Section
+3.3](#ref-hyndman2021)). It is a twelve-month average followed by a
+two-month one, which centres it on each month.
+
 For the single-series views (decomposition, autocorrelation, the
 seasonal plot and forecasting) we extract one line as a monthly `ts`
 object of frequency 12.

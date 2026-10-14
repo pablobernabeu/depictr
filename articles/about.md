@@ -55,14 +55,14 @@ retained. The full text is on the site’s licence page.
 ## Versioning and archival
 
 CRAN assigned the package the DOI
-[10.32614/CRAN.package.depictr](https://doi.org/10.32614/CRAN.package.depictr)
-on publication. It names the package across all its versions, so the
-version in the citation identifies the release used. Releases are also
-tagged on [GitHub](https://github.com/pablobernabeu/depictr/releases)
-and archived on Zenodo, where the concept DOI
-[10.5281/zenodo.21266308](https://doi.org/10.5281/zenodo.21266308)
-resolves to the latest archived release and each release has a DOI of
-its own. What changed in each release is recorded in the
+<https://doi.org/10.32614/CRAN.package.depictr> on publication. It names
+the package across all its versions, so the version in the citation
+identifies the release used. Releases are also tagged on
+[GitHub](https://github.com/pablobernabeu/depictr/releases) and archived
+on Zenodo, where the concept DOI
+<https://doi.org/10.5281/zenodo.21266308> resolves to the latest
+archived release and each release has a DOI of its own. What changed in
+each release is recorded in the
 [changelog](https://pablobernabeu.github.io/depictr/news/index.md).
 
 ## Contributing and support

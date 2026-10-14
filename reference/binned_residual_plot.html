@@ -3,21 +3,19 @@
 residuals against fitted values is hard to read because the residuals take
 only a few values. Following Gelman and Hill (2007), this plot instead splits
 the data into equal-count bins of fitted values and plots, for each bin, the
-mean residual against the mean fitted value. Under a well-specified model the
+mean residual against the mean fitted value, inside a grey band of
+\(\pm 2\) standard errors of that mean. Under a well-specified model, the
 binned residuals scatter around zero, and about 95% of them should fall
-within the grey \(\pm 2\) standard-error band, computed per bin as
-\(2\,\hat{\sigma}_{\text{bin}}/\sqrt{n_{\text{bin}}}\) from the residuals in
-that bin. Systematic departures (a trend, or many points outside the band)
-indicate a misspecified mean structure."><meta property="og:description" content="For a fitted glm (especially binary or count models), a plot of raw
+within the band. Systematic departures (a trend, or many points outside the
+band) indicate a misspecified mean structure."><meta property="og:description" content="For a fitted glm (especially binary or count models), a plot of raw
 residuals against fitted values is hard to read because the residuals take
 only a few values. Following Gelman and Hill (2007), this plot instead splits
 the data into equal-count bins of fitted values and plots, for each bin, the
-mean residual against the mean fitted value. Under a well-specified model the
+mean residual against the mean fitted value, inside a grey band of
+\(\pm 2\) standard errors of that mean. Under a well-specified model, the
 binned residuals scatter around zero, and about 95% of them should fall
-within the grey \(\pm 2\) standard-error band, computed per bin as
-\(2\,\hat{\sigma}_{\text{bin}}/\sqrt{n_{\text{bin}}}\) from the residuals in
-that bin. Systematic departures (a trend, or many points outside the band)
-indicate a misspecified mean structure."><meta property="og:image" content="https://pablobernabeu.github.io/depictr/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Spectral:ital,wght@0,500;0,600;1,400&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"></head><body>
+within the band. Systematic departures (a trend, or many points outside the
+band) indicate a misspecified mean structure."><meta property="og:image" content="https://pablobernabeu.github.io/depictr/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Spectral:ital,wght@0,500;0,600;1,400&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -71,12 +69,11 @@ indicate a misspecified mean structure."><meta property="og:image" content="http
 residuals against fitted values is hard to read because the residuals take
 only a few values. Following Gelman and Hill (2007), this plot instead splits
 the data into equal-count bins of fitted values and plots, for each bin, the
-mean residual against the mean fitted value. Under a well-specified model the
+mean residual against the mean fitted value, inside a grey band of
+\(\pm 2\) standard errors of that mean. Under a well-specified model, the
 binned residuals scatter around zero, and about 95% of them should fall
-within the grey \(\pm 2\) standard-error band, computed per bin as
-\(2\,\hat{\sigma}_{\text{bin}}/\sqrt{n_{\text{bin}}}\) from the residuals in
-that bin. Systematic departures (a trend, or many points outside the band)
-indicate a misspecified mean structure.</p>
+within the band. Systematic departures (a trend, or many points outside the
+band) indicate a misspecified mean structure.</p>
     </div>
 
     <div class="section level2">
@@ -87,7 +84,8 @@ indicate a misspecified mean structure.</p>
 <span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"response"</span>, <span class="st">"pearson"</span><span class="op">)</span>,</span>
 <span>  point_colour <span class="op">=</span> <span class="fu">depictr_brand</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  band_colour <span class="op">=</span> <span class="fu">depictr_accent</span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  title <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  band <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"model"</span>, <span class="st">"empirical"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -119,12 +117,46 @@ minus fitted on the response scale, the Gelman-Hill default) or
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
 <dd><p>Plot title.</p></dd>
 
+
+<dt id="arg-band">band<a class="anchor" aria-label="anchor" href="#arg-band"></a></dt>
+<dd><p>Where the standard errors come from. The default, <code>"model"</code>,
+takes them from the variance the fitted model implies for each residual.
+<code>"empirical"</code> takes them from the spread of the residuals in each bin, as
+in depictr 0.3.0 and <code>arm::binnedplot()</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A <a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot</a> object. The per-bin summary (mean fitted, mean
-residual, SE bound and an <code>outside</code> flag) is attached as
-<code>attr(plot, "bins")</code>.</p>
+    <p>A <a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot</a> object. The per-bin summary (mean fitted value,
+mean residual, number of observations <code>n</code>, the band's half-width <code>se2</code>
+and an <code>outside</code> flag) is attached as <code>attr(plot, "bins")</code>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>By default (<code>band = "model"</code>), the standard error is the one the fitted
+model implies. The model gives the response \(y_i\) the variance
+\(\phi V(\hat\mu_i) / w_i\), where \(V\) is the family's variance
+function, \(w_i\) the prior weight and \(\phi\) the dispersion. The
+dispersion is 1 for the binomial and Poisson families,
+<code>summary(model)$dispersion</code> for the others and \(\hat\sigma^2\) for an
+<code>lm</code>. Taking this as the variance of the response residual
+\(y_i - \hat\mu_i\), the band gives the mean of the \(n_b\) residuals in
+bin \(b\) the standard error
+\(\sqrt{\sum_{i \in b} \phi V(\hat\mu_i) / w_i} / n_b\). A Pearson
+residual, \((y_i - \hat\mu_i) \sqrt{w_i / V(\hat\mu_i)}\), then has
+variance \(\phi\), so its bin mean has standard error
+\(\sqrt{\phi / n_b}\). The fit absorbs a little of each observation's
+variance, so a residual varies slightly less than this and the band errs on
+the wide side. Observations with zero prior weight take no part in the fit
+and are left out of the bins.</p>
+<p><code>band = "empirical"</code> draws the band of depictr 0.3.0 and earlier, the one
+<code>arm::binnedplot()</code> draws: twice the standard deviation of the residuals in
+the bin, divided by \(\sqrt{n_b}\). It collapses wherever the outcomes in
+a bin are all alike. The residuals in a logistic model's bin without events
+all lie just below zero, so its band nearly vanishes and the bin is flagged.
+Where events are rare, such bins are what the model expects. The example
+below, a correctly specified model, has five of its seventeen bins flagged
+by that band and none by the model's.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -142,6 +174,10 @@ ISBN 978-0-521-68689-1.
 <span class="r-in"><span>            data <span class="op">=</span> <span class="va">clinical_trial</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">binned_residual_plot</span><span class="op">(</span><span class="va">gfit</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="binned_residual_plot-1.png" alt="" width="672" height="432"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># The band of depictr 0.3.0, which flags the bins that hold no events:</span></span></span>
+<span class="r-in"><span><span class="fu">binned_residual_plot</span><span class="op">(</span><span class="va">gfit</span>, band <span class="op">=</span> <span class="st">"empirical"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="binned_residual_plot-2.png" alt="" width="672" height="432"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

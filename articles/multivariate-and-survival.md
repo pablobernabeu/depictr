@@ -179,12 +179,18 @@ silhouette_plot(na.omit(wellbeing_survey[wb_num]), wcl,
 
 [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
 draws Kaplan-Meier curves ([Kaplan & Meier, 1958](#ref-kaplan1958)) with
-stepwise confidence limits from Greenwood’s formula ([Greenwood,
-1926](#ref-greenwood1926)) and censoring marks. The estimate is computed
-in base R, so no modelling package is needed. You can pass follow-up
-times and an event indicator directly, a data frame or a
+stepwise confidence limits and censoring marks. The limits come from
+Greenwood’s formula ([Greenwood, 1926](#ref-greenwood1926)) on the
+log-log scale, which keeps them between 0 and 1, and they cover better
+in small samples than untransformed limits ([Borgan & Liestøl,
+1990](#ref-borgan1990)). `conf_type = "plain"` draws the untransformed
+limits and `conf_type = "log"` the default of
+[`survival::survfit()`](https://rdrr.io/pkg/survival/man/survfit.html).
+The estimate is computed in base R, so no modelling package is needed.
+You can pass follow-up times and an event indicator directly, a data
+frame or a
 [`survival::survfit`](https://rdrr.io/pkg/survival/man/survfit.html)
-object.
+object, whose limits are recomputed at the requested `conf_level`.
 
 The `clinical_trial` dataset has two arms with a real survival
 difference (the treatment arm has a lower hazard), so the curves
@@ -212,6 +218,10 @@ more often right-censored at the 36-month study end, visible as the
 denser run of censoring marks.
 
 ## References
+
+Borgan, Ø., & Liestøl, K. (1990). A note on confidence intervals and
+bands for the survival function based on transformations. *Scandinavian
+Journal of Statistics*, *17*(1), 35–41.
 
 Greenwood, M. (1926). *The natural duration of cancer* (Vol. 33, pp.
 1–26). His Majesty’s Stationery Office.

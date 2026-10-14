@@ -83,8 +83,11 @@ back. The result reproduces
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A <code>ts</code> object, or a numeric vector (then <code>frequency</code> is required).
-It needs more than two full cycles of observations.</p></dd>
+<dd><p>A <code>ts</code> object, or a numeric vector (then <code>frequency</code> is required),
+holding one series. It needs more than two full cycles of observations.
+Missing values at either end are trimmed, so the forecast starts after the
+last observation, and a missing value inside the series is an error. A
+multivariate <code>ts</code> or a matrix with several columns is refused.</p></dd>
 
 
 <dt id="arg-h">h<a class="anchor" aria-label="anchor" href="#arg-h"></a></dt>

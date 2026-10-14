@@ -102,9 +102,9 @@ Defaults to the colourblind-safe <code><a href="depictr_palette.html">depictr_pa
     <p>For single-degree-of-freedom terms this is the ordinary VIF, \(1/(1-R^2)\).
 For terms that span several design-matrix columns (multi-level factors, or
 spline/polynomial bases) the function reports the generalised VIF of Fox and
-Monette (1992): with \(R\) the correlation matrix of the (centred)
-predictor columns, \(R_{11}\) the block for the term and \(R_{22}\) the
-block for the remaining columns,
+Monette (1992): with \(R\) the correlation matrix of the coefficient
+estimates other than the intercept, \(R_{11}\) the block for the term and
+\(R_{22}\) the block for the remaining coefficients,
 $$\mathrm{GVIF} = \frac{\det(R_{11})\,\det(R_{22})}{\det(R)}.$$
 When every term has a single degree of freedom the bars are the ordinary
 VIFs, on a plain "Variance inflation factor" axis with the reference line at
@@ -114,6 +114,14 @@ term equals \(\sqrt{\mathrm{VIF}}\)) and the reference line moves to
 \(\sqrt{\mathrm{threshold}}\) accordingly. The x-axis is kept tight to the
 data: when every bar is comfortably below the threshold the line is reported
 in the caption rather than drawn into a wide empty band.</p>
+<p>The correlations come from the fit's unscaled coefficient covariance, so a
+<code>glm</code> or a weighted <code>lm</code> is measured with the weights of its fit, and the
+values agree with those of <code><a href="https://rdrr.io/pkg/car/man/vif.html" class="external-link">car::vif()</a></code>. For an unweighted <code>lm</code> with an
+intercept, they are the values the formula gives with \(R\) the
+correlation matrix of the predictor columns, as Fox and Monette state it. A
+model with aliased coefficients has no VIF and is refused, with the terms
+they belong to named. A model without an intercept warns, as <code><a href="https://rdrr.io/pkg/car/man/vif.html" class="external-link">car::vif()</a></code>
+does, because its VIFs then come from columns that are not centred.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>

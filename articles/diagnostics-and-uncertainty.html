@@ -125,8 +125,10 @@ near 6, above the rule-of-thumb line at 5, while fertiliser stays at
 values, so a plain residual-versus-fitted plot is hard to read.
 <code><a href="../reference/binned_residual_plot.html">binned_residual_plot()</a></code> instead splits the data into
 equal-count bins of fitted values and plots the mean residual per bin
-against a +/- 2 standard-error band <span class="citation">(<a href="#ref-gelman2007">Gelman &amp; Hill, 2007</a>)</span>. Most points
-should sit inside the band, scattered around zero.</p>
+<span class="citation">(<a href="#ref-gelman2007">Gelman &amp; Hill,
+2007</a>)</span> against a band of +/- 2 standard errors, which the
+fitted model implies for each bin’s mean. Under a correct model, about
+95% of the points sit inside the band, scattered around zero.</p>
 <p>We model the <em>rare</em> adverse-event outcome from the clinical
 trial (about a 10% base rate) on the baseline biomarker, age and
 treatment arm.</p>

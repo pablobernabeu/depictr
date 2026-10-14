@@ -221,15 +221,16 @@ colour-vision deficiency, so you can check a palette as a deuteranope
 <code><a href="../reference/simulate_cvd.html">simulate_cvd()</a></code>, and <code><a href="../reference/palette_safety.html">palette_safety()</a></code> turns it
 into a verdict: for normal vision and each deficiency at full severity
 it reports the smallest perceptual distance between any two colours in a
-palette, so the accessibility claim comes with a number attached.</p>
+palette, the CIEDE2000 colour difference <span class="citation">(<a href="#ref-sharma2005">Sharma et al., 2005</a>)</span>, so the
+accessibility claim comes with a number attached.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/palette_safety.html">palette_safety</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code>$min_delta_e
-[1] 7.4
+[1] 6.43
 
 $by_condition
 normal protan deutan tritan 
- 33.43  18.15   7.40  16.18 
+ 21.25  13.44   6.43  11.13 
 
 $worst_condition
 [1] "deutan"
@@ -259,26 +260,28 @@ measured against, so each verdict can be argued with.</p>
 <span>  <span class="fu"><a href="../reference/theme_depictr.html">theme_depictr</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/check_figure.html">check_figure</a></span><span class="op">(</span><span class="va">grouped</span><span class="op">)</span></span></code></pre></div>
-<pre><code>                       check measured threshold verdict
-1        colour_separability    93.16       5.0    pass
-2 colour_separability_protan    90.12       5.0    pass
-3 colour_separability_deutan    94.81       5.0    pass
-4 colour_separability_tritan    70.34       5.0    pass
-5     greyscale_separability    23.06       5.0    pass
-6                  text_size     8.80       6.0    pass
-7              text_contrast     8.45       4.5    pass
-8          geometry_contrast     1.76       3.0    fail
-9         redundant_encoding     0.00       1.0    fail
-                                                                       detail
-1                     Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
-2                     Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
-3                     Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
-4                     Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
-5                          Closest pair #4d8cb6 and #eebc4d in CIE lightness.
-6           Smallest text 8.80 pt, drawn at 17.78 cm and printed at 17.78 cm.
-7                         Lowest-contrast text #4d4d4d on #ffffff at 8.80 pt.
-8 Lowest-contrast colour #e69f00 at alpha 0.70, drawn as #eebc4d, on #ffffff.
-9                                      Colour alone distinguishes the groups.</code></pre>
+<pre><code>                        check measured threshold        verdict
+1         colour_separability    52.37       5.0           pass
+2  colour_separability_protan    48.53       5.0           pass
+3  colour_separability_deutan    53.10       5.0           pass
+4  colour_separability_tritan    49.09       5.0           pass
+5      greyscale_separability    23.06       5.0           pass
+6                   text_size     8.80       6.0           pass
+7               text_contrast     8.45       4.5           pass
+8           geometry_contrast     1.76       3.0           fail
+9          redundant_encoding     0.00       1.0           fail
+10       annotation_text_size       NA       6.0 not applicable
+                                                                        detail
+1                      Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
+2                      Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
+3                      Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
+4                      Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
+5                           Closest pair #4d8cb6 and #eebc4d in CIE lightness.
+6            Smallest text 8.80 pt, drawn at 17.78 cm and printed at 17.78 cm.
+7                          Lowest-contrast text #4d4d4d on #ffffff at 8.80 pt.
+8  Lowest-contrast colour #e69f00 at alpha 0.70, drawn as #eebc4d, on #ffffff.
+9                                       Colour alone distinguishes the groups.
+10                                  The figure draws no text inside the panel.</code></pre>
 <p>Two rows are worth dwelling on. <code>geometry_contrast</code>
 measures each encoding colour, as it is drawn, against the panel
 background. The palette’s orange falls below the 3:1 that WCAG asks of a
@@ -297,16 +300,17 @@ clears both:</p>
 <span>  <span class="fu"><a href="../reference/theme_depictr.html">theme_depictr</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/check_figure.html">check_figure</a></span><span class="op">(</span><span class="va">mended</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"check"</span>, <span class="st">"measured"</span>, <span class="st">"threshold"</span>, <span class="st">"verdict"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<pre><code>                       check measured threshold verdict
-1        colour_separability   111.87       5.0    pass
-2 colour_separability_protan    89.87       5.0    pass
-3 colour_separability_deutan   107.07       5.0    pass
-4 colour_separability_tritan    98.50       5.0    pass
-5     greyscale_separability    16.92       5.0    pass
-6                  text_size     8.80       6.0    pass
-7              text_contrast     8.45       4.5    pass
-8          geometry_contrast     3.87       3.0    pass
-9         redundant_encoding     1.00       1.0    pass</code></pre>
+<pre><code>                        check measured threshold        verdict
+1         colour_separability    50.12       5.0           pass
+2  colour_separability_protan    49.67       5.0           pass
+3  colour_separability_deutan    58.30       5.0           pass
+4  colour_separability_tritan    61.99       5.0           pass
+5      greyscale_separability    16.92       5.0           pass
+6                   text_size     8.80       6.0           pass
+7               text_contrast     8.45       4.5           pass
+8           geometry_contrast     3.87       3.0           pass
+9          redundant_encoding     1.00       1.0           pass
+10       annotation_text_size       NA       6.0 not applicable</code></pre>
 <p>The audit also takes a stated output width, which is where most
 figure text quietly fails. Text is drawn in points, so a figure saved
 seven inches wide and then printed in an 8.9 cm column arrives at half
@@ -317,6 +321,15 @@ the size it looked on screen:</p>
 6 text_size      4.4         6    fail
                                                             detail
 6 Smallest text 8.80 pt, drawn at 17.78 cm and printed at 8.90 cm.</code></pre>
+<p>A figure saved at the size it will be printed is drawn at that size,
+so give the saved width as both <code>width_cm</code> and
+<code>render_width_cm</code>, or leave both at their defaults. Text
+drawn inside the panel, such as an annotation, a label or a cell value,
+has a row of its own, <code>annotation_text_size</code>, held to the
+same floor. That floor defaults to 6 pt, which is lenient. As their
+guidelines stood on 30 September 2026, PLOS and APA Style asked for at
+least 8 pt, Elsevier for 7 pt and Nature for 5 to 7 pt, and
+<code><a href="../reference/check_figure.html">?check_figure</a></code> links all four.</p>
 <p>One limitation belongs here, beside the claim it qualifies, since the
 package is the one making that claim. The eight-colour qualitative
 palette clears every colour-vision check and fails the greyscale check:
@@ -339,6 +352,12 @@ or line type.</p>
 5 greyscale_separability     0.79         5    fail
                                               detail
 5 Closest pair #56b4e9 and #e69f00 in CIE lightness.</code></pre>
+<p>The audit does not measure a continuous colour or fill scale, such as
+a heatmap’s: its colour rows abstain and say why. A ramp is read by its
+lightness, so prefer one whose lightness runs evenly from end to end,
+such as viridis or depictr’s sequential and diverging ramps, over a
+rainbow <span class="citation">(<a href="#ref-crameri2020">Crameri et
+al., 2020</a>)</span>.</p>
 <p>Set the look once for a whole script with
 <code><a href="../reference/depictr_options.html">depictr_options()</a></code>. It carries the base size and family, the
 brand and accent colours and a custom palette, so the same arguments
@@ -396,10 +415,22 @@ power curves. Two further articles,
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0" line-spacing="2">
+<div id="ref-crameri2020" class="csl-entry">
+Crameri, F., Shephard, G. E., &amp; Heron, P. J. (2020). The misuse of
+colour in science communication. <em>Nature Communications</em>,
+<em>11</em>(1), 5444. <a href="https://doi.org/10.1038/s41467-020-19160-7" class="external-link">https://doi.org/10.1038/s41467-020-19160-7</a>
+</div>
 <div id="ref-okabe2008" class="csl-entry">
 Okabe, M., &amp; Ito, K. (2008). <em><span>Color Universal Design</span>
 (<span>CUD</span>): <span>How</span> to make figures and presentations
 that are friendly to colorblind people</em>. <a href="https://jfly.uni-koeln.de/color/" class="external-link uri">https://jfly.uni-koeln.de/color/</a>.
+</div>
+<div id="ref-sharma2005" class="csl-entry">
+Sharma, G., Wu, W., &amp; Dalal, E. N. (2005). The
+<span>CIEDE2000</span> color-difference formula:
+<span>Implementation</span> notes, supplementary test data, and
+mathematical observations. <em>Color Research &amp; Application</em>,
+<em>30</em>(1), 21–30. <a href="https://doi.org/10.1002/col.20070" class="external-link">https://doi.org/10.1002/col.20070</a>
 </div>
 <div id="ref-wickham2016" class="csl-entry">
 Wickham, H. (2016). <em><span class="nocase">ggplot2</span>:

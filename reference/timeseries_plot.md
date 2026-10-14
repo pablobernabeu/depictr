@@ -1,8 +1,10 @@
 # Time-series plot
 
 Plots one or more series over time, with an optional moving-average
-overlay. The input can be a `ts` object, a numeric vector, or a data
-frame with a time column, a value column and an optional grouping
+overlay. The input can be a `ts` object, a numeric vector or matrix, or
+a data frame with a time column, a value column and an optional grouping
+column. A multivariate `ts`, such as `cbind(mdeaths, fdeaths)`, or a
+matrix with several columns gives one series per column, named after its
 column.
 
 ## Usage
@@ -30,12 +32,13 @@ timeseries_plot(
 
 - x:
 
-  A `ts` object, a numeric vector, or a data frame.
+  A `ts` object, a numeric vector or matrix, or a data frame.
 
 - time:
 
-  When `x` is a data frame, the time column (string or unquoted name);
-  when `x` is a numeric vector, an optional vector of times.
+  When `x` is a data frame, the time column (string or unquoted name).
+  When `x` is a numeric vector or matrix, an optional vector of times,
+  one per value or per row.
 
 - value:
 
@@ -44,13 +47,22 @@ timeseries_plot(
 - group:
 
   When `x` is a data frame, an optional grouping column mapped to
-  colour.
+  colour. A factor keeps the order of its levels in the legend and the
+  palette, and levels no row uses are left out. Other columns are
+  ordered by first appearance.
 
 - rolling:
 
   Optional integer window for a centred moving-average overlay. The data
   are ordered by time (within each group) before the moving average is
-  computed, so unsorted input is handled correctly.
+  computed, so unsorted input is handled correctly. An odd window
+  averages each observation with the same number of neighbours on either
+  side. An even window, such as 12 for monthly data, gives the 2×12
+  moving average, a 12-point average followed by a 2-point one (Hyndman
+  & Athanasopoulos, 2021, Section 3.3). The two observations at the ends
+  of the 13 it spans count half, which centres the average on its
+  observation, as equal weights over an even window cannot. It needs a
+  series one observation longer than the window.
 
 - forecast:
 
@@ -66,7 +78,10 @@ timeseries_plot(
   is captioned with its coverage and method, and its band widens with
   the horizon on the scale it is made on (see `lambda`). For a numeric
   `x`, it is made from the values in time order and continues the
-  history's own time axis, one typical step at a time.
+  history's own time axis, one typical step at a time. Missing values at
+  either end of the series are trimmed before forecasting, so the
+  forecast starts from the last observation, and a missing value inside
+  the series is an error.
 
 - frequency:
 
@@ -103,6 +118,12 @@ timeseries_plot(
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
 object.
 
+## References
+
+Hyndman RJ, Athanasopoulos G (2021). *Forecasting: Principles and
+practice*, 3rd edition. OTexts, Melbourne, Australia.
+<https://otexts.com/fpp3/>.
+
 ## See also
 
 [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md),
@@ -114,6 +135,9 @@ object.
 ``` r
 timeseries_plot(AirPassengers, rolling = 12,
                 title = "Air passengers", y_lab = "Passengers")
+
+# One line per column of a multivariate ts
+timeseries_plot(cbind(mdeaths, fdeaths), y_lab = "Deaths")
 
 # 24-month forecast with a 90% prediction interval, made on the log scale
 # because the seasonal swing grows with the number of passengers

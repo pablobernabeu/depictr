@@ -42,7 +42,8 @@ correlation_heatmap(
 
 - show_values:
 
-  Whether to annotate each cell with its correlation.
+  Whether to annotate each cell with its correlation, drawn in black or
+  white, whichever has the higher contrast against the cell.
 
 - digits:
 

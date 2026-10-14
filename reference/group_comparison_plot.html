@@ -93,7 +93,10 @@ conveys whether the groups differ more faithfully than a bar chart does.</p>
 
 
 <dt id="arg-group">group<a class="anchor" aria-label="anchor" href="#arg-group"></a></dt>
-<dd><p>The grouping variable (string or unquoted name).</p></dd>
+<dd><p>The grouping variable (string or unquoted name). A numeric code
+counts as a group, but a numeric column with more than 20 distinct values
+is refused as continuous. Rows with a missing group are dropped with a
+message, and levels without rows are left out of the plot and its palette.</p></dd>
 
 
 <dt id="arg-conf-level">conf_level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>

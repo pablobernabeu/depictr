@@ -3,7 +3,8 @@
 Cross-tabulates predicted against actual classes and displays the counts
 as a heatmap. The input can be a fitted binomial `glm` (with a
 probability threshold) or a pair of vectors of actual and predicted
-classes.
+classes. Each count is drawn in black or white, whichever has the higher
+contrast against its cell.
 
 ## Usage
 

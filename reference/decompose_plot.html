@@ -74,7 +74,10 @@ components and shows them, with the original series, as stacked panels.</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A <code>ts</code> object, or a numeric vector (then <code>frequency</code> is required).</p></dd>
+<dd><p>A <code>ts</code> object, or a numeric vector (then <code>frequency</code> is required),
+holding one series. A multivariate <code>ts</code> or a matrix with several columns
+is refused. Missing values at either end are trimmed, and a missing value
+inside the series is an error.</p></dd>
 
 
 <dt id="arg-frequency">frequency<a class="anchor" aria-label="anchor" href="#arg-frequency"></a></dt>

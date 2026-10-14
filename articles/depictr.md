@@ -185,7 +185,8 @@ and
 [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
 turns it into a verdict: for normal vision and each deficiency at full
 severity it reports the smallest perceptual distance between any two
-colours in a palette, so the accessibility claim comes with a number
+colours in a palette, the CIEDE2000 colour difference ([Sharma et al.,
+2005](#ref-sharma2005)), so the accessibility claim comes with a number
 attached.
 
 ``` r
@@ -194,11 +195,11 @@ palette_safety()
 ```
 
     $min_delta_e
-    [1] 7.4
+    [1] 6.43
 
     $by_condition
     normal protan deutan tritan 
-     33.43  18.15   7.40  16.18 
+     21.25  13.44   6.43  11.13 
 
     $worst_condition
     [1] "deutan"
@@ -232,26 +233,28 @@ grouped <- ggplot(crop_yield, aes(fertiliser, yield, colour = treatment)) +
 check_figure(grouped)
 ```
 
-                           check measured threshold verdict
-    1        colour_separability    93.16       5.0    pass
-    2 colour_separability_protan    90.12       5.0    pass
-    3 colour_separability_deutan    94.81       5.0    pass
-    4 colour_separability_tritan    70.34       5.0    pass
-    5     greyscale_separability    23.06       5.0    pass
-    6                  text_size     8.80       6.0    pass
-    7              text_contrast     8.45       4.5    pass
-    8          geometry_contrast     1.76       3.0    fail
-    9         redundant_encoding     0.00       1.0    fail
-                                                                           detail
-    1                     Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
-    2                     Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
-    3                     Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
-    4                     Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
-    5                          Closest pair #4d8cb6 and #eebc4d in CIE lightness.
-    6           Smallest text 8.80 pt, drawn at 17.78 cm and printed at 17.78 cm.
-    7                         Lowest-contrast text #4d4d4d on #ffffff at 8.80 pt.
-    8 Lowest-contrast colour #e69f00 at alpha 0.70, drawn as #eebc4d, on #ffffff.
-    9                                      Colour alone distinguishes the groups.
+                            check measured threshold        verdict
+    1         colour_separability    52.37       5.0           pass
+    2  colour_separability_protan    48.53       5.0           pass
+    3  colour_separability_deutan    53.10       5.0           pass
+    4  colour_separability_tritan    49.09       5.0           pass
+    5      greyscale_separability    23.06       5.0           pass
+    6                   text_size     8.80       6.0           pass
+    7               text_contrast     8.45       4.5           pass
+    8           geometry_contrast     1.76       3.0           fail
+    9          redundant_encoding     0.00       1.0           fail
+    10       annotation_text_size       NA       6.0 not applicable
+                                                                            detail
+    1                      Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
+    2                      Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
+    3                      Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
+    4                      Closest pair #4d8cb6 and #eebc4d of 2 encoding colours.
+    5                           Closest pair #4d8cb6 and #eebc4d in CIE lightness.
+    6            Smallest text 8.80 pt, drawn at 17.78 cm and printed at 17.78 cm.
+    7                          Lowest-contrast text #4d4d4d on #ffffff at 8.80 pt.
+    8  Lowest-contrast colour #e69f00 at alpha 0.70, drawn as #eebc4d, on #ffffff.
+    9                                       Colour alone distinguishes the groups.
+    10                                  The figure draws no text inside the panel.
 
 Two rows are worth dwelling on. `geometry_contrast` measures each
 encoding colour, as it is drawn, against the panel background. The
@@ -274,16 +277,17 @@ mended <- ggplot(crop_yield, aes(fertiliser, yield, colour = treatment,
 check_figure(mended)[, c("check", "measured", "threshold", "verdict")]
 ```
 
-                           check measured threshold verdict
-    1        colour_separability   111.87       5.0    pass
-    2 colour_separability_protan    89.87       5.0    pass
-    3 colour_separability_deutan   107.07       5.0    pass
-    4 colour_separability_tritan    98.50       5.0    pass
-    5     greyscale_separability    16.92       5.0    pass
-    6                  text_size     8.80       6.0    pass
-    7              text_contrast     8.45       4.5    pass
-    8          geometry_contrast     3.87       3.0    pass
-    9         redundant_encoding     1.00       1.0    pass
+                            check measured threshold        verdict
+    1         colour_separability    50.12       5.0           pass
+    2  colour_separability_protan    49.67       5.0           pass
+    3  colour_separability_deutan    58.30       5.0           pass
+    4  colour_separability_tritan    61.99       5.0           pass
+    5      greyscale_separability    16.92       5.0           pass
+    6                   text_size     8.80       6.0           pass
+    7               text_contrast     8.45       4.5           pass
+    8           geometry_contrast     3.87       3.0           pass
+    9          redundant_encoding     1.00       1.0           pass
+    10       annotation_text_size       NA       6.0 not applicable
 
 The audit also takes a stated output width, which is where most figure
 text quietly fails. Text is drawn in points, so a figure saved seven
@@ -299,6 +303,17 @@ subset(check_figure(grouped, width_cm = 8.9), check == "text_size")
     6 text_size      4.4         6    fail
                                                                 detail
     6 Smallest text 8.80 pt, drawn at 17.78 cm and printed at 8.90 cm.
+
+A figure saved at the size it will be printed is drawn at that size, so
+give the saved width as both `width_cm` and `render_width_cm`, or leave
+both at their defaults. Text drawn inside the panel, such as an
+annotation, a label or a cell value, has a row of its own,
+`annotation_text_size`, held to the same floor. That floor defaults to 6
+pt, which is lenient. As their guidelines stood on 30 September 2026,
+PLOS and APA Style asked for at least 8 pt, Elsevier for 7 pt and Nature
+for 5 to 7 pt, and
+[`?check_figure`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+links all four.
 
 One limitation belongs here, beside the claim it qualifies, since the
 package is the one making that claim. The eight-colour qualitative
@@ -326,6 +341,12 @@ subset(check_figure(p8), check == "greyscale_separability")
     5 greyscale_separability     0.79         5    fail
                                                   detail
     5 Closest pair #56b4e9 and #e69f00 in CIE lightness.
+
+The audit does not measure a continuous colour or fill scale, such as a
+heatmap’s: its colour rows abstain and say why. A ramp is read by its
+lightness, so prefer one whose lightness runs evenly from end to end,
+such as viridis or depictr’s sequential and diverging ramps, over a
+rainbow ([Crameri et al., 2020](#ref-crameri2020)).
 
 Set the look once for a whole script with
 [`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md).
@@ -397,9 +418,18 @@ cover the remaining methods.
 
 ## References
 
+Crameri, F., Shephard, G. E., & Heron, P. J. (2020). The misuse of
+colour in science communication. *Nature Communications*, *11*(1), 5444.
+<https://doi.org/10.1038/s41467-020-19160-7>
+
 Okabe, M., & Ito, K. (2008). *Color Universal Design (CUD): How to make
 figures and presentations that are friendly to colorblind people*.
 <https://jfly.uni-koeln.de/color/>.
+
+Sharma, G., Wu, W., & Dalal, E. N. (2005). The CIEDE2000
+color-difference formula: Implementation notes, supplementary test data,
+and mathematical observations. *Color Research & Application*, *30*(1),
+21–30. <https://doi.org/10.1002/col.20070>
 
 Wickham, H. (2016). *ggplot2: Elegant graphics for data analysis* (2nd
 ed.). Springer. <https://doi.org/10.1007/978-3-319-24277-4>

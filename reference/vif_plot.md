@@ -47,18 +47,29 @@ For single-degree-of-freedom terms this is the ordinary VIF,
 \\1/(1-R^2)\\. For terms that span several design-matrix columns
 (multi-level factors, or spline/polynomial bases) the function reports
 the generalised VIF of Fox and Monette (1992): with \\R\\ the
-correlation matrix of the (centred) predictor columns, \\R\_{11}\\ the
-block for the term and \\R\_{22}\\ the block for the remaining columns,
-\$\$\mathrm{GVIF} = \frac{\det(R\_{11})\\\det(R\_{22})}{\det(R)}.\$\$
-When every term has a single degree of freedom the bars are the ordinary
-VIFs, on a plain "Variance inflation factor" axis with the reference
-line at `threshold`. If any term spans several columns the bars switch
-to the comparable \\\mathrm{GVIF}^{1/(2\\\mathrm{df})}\\ (which for a
-single-df term equals \\\sqrt{\mathrm{VIF}}\\) and the reference line
-moves to \\\sqrt{\mathrm{threshold}}\\ accordingly. The x-axis is kept
-tight to the data: when every bar is comfortably below the threshold the
-line is reported in the caption rather than drawn into a wide empty
-band.
+correlation matrix of the coefficient estimates other than the
+intercept, \\R\_{11}\\ the block for the term and \\R\_{22}\\ the block
+for the remaining coefficients, \$\$\mathrm{GVIF} =
+\frac{\det(R\_{11})\\\det(R\_{22})}{\det(R)}.\$\$ When every term has a
+single degree of freedom the bars are the ordinary VIFs, on a plain
+"Variance inflation factor" axis with the reference line at `threshold`.
+If any term spans several columns the bars switch to the comparable
+\\\mathrm{GVIF}^{1/(2\\\mathrm{df})}\\ (which for a single-df term
+equals \\\sqrt{\mathrm{VIF}}\\) and the reference line moves to
+\\\sqrt{\mathrm{threshold}}\\ accordingly. The x-axis is kept tight to
+the data: when every bar is comfortably below the threshold the line is
+reported in the caption rather than drawn into a wide empty band.
+
+The correlations come from the fit's unscaled coefficient covariance, so
+a `glm` or a weighted `lm` is measured with the weights of its fit, and
+the values agree with those of
+[`car::vif()`](https://rdrr.io/pkg/car/man/vif.html). For an unweighted
+`lm` with an intercept, they are the values the formula gives with \\R\\
+the correlation matrix of the predictor columns, as Fox and Monette
+state it. A model with aliased coefficients has no VIF and is refused,
+with the terms they belong to named. A model without an intercept warns,
+as [`car::vif()`](https://rdrr.io/pkg/car/man/vif.html) does, because
+its VIFs then come from columns that are not centred.
 
 ## References
 

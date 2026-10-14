@@ -20,8 +20,12 @@ ts_forecast(x, h = 12, frequency = NULL, level = 0.95, lambda = NULL)
 
 - x:
 
-  A `ts` object, or a numeric vector (then `frequency` is required). It
-  needs more than two full cycles of observations.
+  A `ts` object, or a numeric vector (then `frequency` is required),
+  holding one series. It needs more than two full cycles of
+  observations. Missing values at either end are trimmed, so the
+  forecast starts after the last observation, and a missing value inside
+  the series is an error. A multivariate `ts` or a matrix with several
+  columns is refused.
 
 - h:
 

@@ -105,6 +105,10 @@ overlay is one argument away.</p>
 <span>                rolling <span class="op">=</span> <span class="fl">12</span>, title <span class="op">=</span> <span class="st">"Monthly sales by product line"</span>,</span>
 <span>                y_lab <span class="op">=</span> <span class="st">"Units"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="time-series_files/figure-html/unnamed-chunk-1-1.png" class="r-plt" alt="" width="672"></p>
+<p>Twelve months is an even window, so the overlay is the 2×12 moving
+average that the caption names <span class="citation">(<a href="#ref-hyndman2021">Hyndman &amp; Athanasopoulos, 2021, Section
+3.3</a>)</span>. It is a twelve-month average followed by a two-month
+one, which centres it on each month.</p>
 <p>For the single-series views (decomposition, autocorrelation, the
 seasonal plot and forecasting) we extract one line as a monthly
 <code>ts</code> object of frequency 12.</p>

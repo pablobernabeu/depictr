@@ -22,7 +22,10 @@ decompose_plot(
 
 - x:
 
-  A `ts` object, or a numeric vector (then `frequency` is required).
+  A `ts` object, or a numeric vector (then `frequency` is required),
+  holding one series. A multivariate `ts` or a matrix with several
+  columns is refused. Missing values at either end are trimmed, and a
+  missing value inside the series is an error.
 
 - frequency:
 

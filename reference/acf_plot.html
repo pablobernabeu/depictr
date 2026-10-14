@@ -73,7 +73,8 @@ with the approximate significance bounds, as a clean lollipop chart.</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A numeric vector or <code>ts</code> object.</p></dd>
+<dd><p>A numeric vector or <code>ts</code> object holding one series. A multivariate
+<code>ts</code> or a matrix with several columns is refused.</p></dd>
 
 
 <dt id="arg-lag-max">lag_max<a class="anchor" aria-label="anchor" href="#arg-lag-max"></a></dt>
@@ -96,6 +97,15 @@ number strictly between 0 and 1.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot</a> object.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>A missing value inside the series is kept in its place, and the
+correlations are computed from the pairs of observations that are both
+present (<code>na.action = na.pass</code>), with a warning. Dropping it would join the
+observations on either side of the gap as if they were neighbours. The
+Python package refuses such a series and asks for the gap to be dropped or
+imputed first.</p>
     </div>
 
     <div class="section level2">

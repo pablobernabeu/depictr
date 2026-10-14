@@ -33,7 +33,11 @@ explore_categorical(
 
 - group:
 
-  Optional grouping variable mapped to fill.
+  Optional grouping variable mapped to fill, with the groups in the
+  order of its levels. A numeric code counts as a group, but a numeric
+  column with more than 20 distinct values is refused as continuous.
+  Rows with a missing group are dropped with a message, and levels
+  without rows are left out of the plot and its palette.
 
 - proportion:
 
