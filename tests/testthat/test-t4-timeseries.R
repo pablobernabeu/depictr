@@ -86,11 +86,16 @@ test_that("the cycle lines of style = \"season\" clear 3:1 against white", {
 test_that("the cycle colours pass every colour check up to five cycles", {
   # Past about six cycles, a single-hue ramp shows the order of the cycles
   # more than which is which. Measured with CIEDE2000, six cycles pass every
-  # row but deuteranopia, whose closest pair is 4.93 apart. The Python twin
-  # rounds its interpolated ramp one hex unit away and measures 5.24 there.
-  # Every colour row fails from seven cycles and greyscale separability from
-  # eight, so none is asserted there. redundant_encoding stays at zero, since
-  # colour alone tells the cycles apart.
+  # row but possibly deuteranopia, whose closest pair sits on the default
+  # min_delta_e of 5. It measures 4.93 on Linux and Windows, where it fails,
+  # and 5.03 on macOS on arm64, where it passes, with the same package
+  # versions. The cause is not yet traced: on x86-64 neither the ramp nor the
+  # simulated colours put a channel near the half-unit where rounding could
+  # flip. So the row's verdict is left open and its value held near the
+  # threshold. The Python twin interpolates its ramp one hex unit away and
+  # measures 5.24. Every colour row fails from seven cycles and greyscale
+  # separability from eight, so none is asserted there. redundant_encoding
+  # stays at zero, since colour alone tells the cycles apart.
   rows <- c("colour_separability", "colour_separability_protan",
             "colour_separability_deutan", "colour_separability_tritan",
             "greyscale_separability", "geometry_contrast")
@@ -100,9 +105,11 @@ test_that("the cycle colours pass every colour check up to five cycles", {
                      label = paste(k, "cycles"))
   }
   cf <- check_figure(seasonal_plot(air_cycles(6), style = "season"))
-  expect_identical(cf$verdict[match(rows, cf$check)],
-                   c("pass", "pass", "fail", "pass", "pass", "pass"))
-  expect_equal(cf$measured[cf$check == "colour_separability_deutan"], 4.93)
+  stable <- setdiff(rows, "colour_separability_deutan")
+  expect_identical(cf$verdict[match(stable, cf$check)], rep("pass", 5))
+  deutan <- cf$measured[cf$check == "colour_separability_deutan"]
+  expect_true(deutan > 4.8 && deutan < 5.1,
+              label = paste("deuteranopia at six cycles,", deutan))
 })
 
 test_that("a non-integer frequency is rounded down to whole seasons", {
