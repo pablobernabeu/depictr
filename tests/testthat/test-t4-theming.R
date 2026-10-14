@@ -65,6 +65,111 @@ test_that("simulate_cvd() matches colorspace, an independent implementation", {
   }
 })
 
+test_that("partial severities use Machado et al.'s tabulated matrices", {
+  # Machado et al. publish a matrix for every tenth of severity. Interpolating
+  # from the identity to the severity-1 matrix gave a protan 0.5 first row of
+  # 0.576143, 0.526292 and -0.102434 instead of the published one below.
+  expect_equal(.cvd_matrix("protan", 0.5)[1, ],
+               c(0.458064, 0.679578, -0.137642))
+  expect_equal(.cvd_matrix("deutan", 0.5)[1, ],
+               c(0.547494, 0.607765, -0.155259))
+  expect_equal(.cvd_matrix("tritan", 0.5)[1, ],
+               c(1.017277, 0.027029, -0.044306))
+  # Between two tenths, the transform lies on the line between their matrices.
+  tab <- .cvd_matrices_by_severity$deutan
+  expect_equal(.cvd_matrix("deutan", 0.25), (tab[[3]] + tab[[4]]) / 2)
+  for (tp in names(.cvd_matrices)) {
+    m <- .cvd_matrices_by_severity[[tp]]
+    expect_length(m, 11)
+    # Severity zero is normal vision, and full severity keeps the matrices the
+    # safety checks have always used, bit for bit.
+    expect_identical(m[[1]], diag(3))
+    expect_identical(m[[11]], .cvd_matrices[[tp]])
+    expect_identical(.cvd_matrix(tp, 1), .cvd_matrices[[tp]])
+    expect_identical(.cvd_matrix(tp, 0), diag(3))
+    # Every published matrix maps a grey to itself, up to the six decimals the
+    # table is printed to, which catches a mistyped entry.
+    for (k in seq_along(m)) {
+      expect_equal(unname(rowSums(m[[k]])), c(1, 1, 1), tolerance = 1e-5,
+                   info = paste(tp, k - 1))
+    }
+  }
+})
+
+test_that("the tabulated matrices are those colorspace transcribed", {
+  # colorspace and Python's colorspacious copied the same table from Machado
+  # et al.'s supplementary page, and agree with each other entry for entry.
+  skip_if_not_installed("colorspace")
+  theirs <- list(protan = colorspace::protanomaly_cvd,
+                 deutan = colorspace::deutanomaly_cvd,
+                 tritan = colorspace::tritanomaly_cvd)
+  for (tp in names(theirs)) {
+    for (k in 0:10) {
+      expect_identical(.cvd_matrices_by_severity[[tp]][[k + 1]],
+                       unname(theirs[[tp]][[as.character(k)]]),
+                       info = paste(tp, k))
+    }
+  }
+})
+
+test_that("simulate_cvd() at partial severity matches colorspace", {
+  # colorspace interpolates linearly between the two neighbouring tenths, so
+  # 0.25 and 0.75 test the interpolation and 0.3, 0.5 and 0.7 the table.
+  skip_if_not_installed("colorspace")
+  pal <- depictr_palette()
+  # Each of the three tables, and the interpolation between them, is checked on
+  # colours spread over the gamut as well as on the palette.
+  pal <- c(pal, "#ff0000", "#00ff00", "#0000ff", "#3366cc", "#7f3f00",
+           "#00ffff", "#ff00ff", "#202020")
+  for (s in c(0.25, 0.3, 0.5, 0.7, 0.75)) {
+    for (tp in c("protan", "deutan", "tritan")) {
+      theirs <- tolower(switch(
+        tp,
+        protan = colorspace::protan(pal, severity = s),
+        deutan = colorspace::deutan(pal, severity = s),
+        tritan = colorspace::tritan(pal, severity = s)
+      ))
+      expect_identical(simulate_cvd(pal, tp, severity = s), theirs,
+                       info = paste(tp, s))
+    }
+  }
+})
+
+test_that("simulate_cvd() at partial severity gives the twins' shared golden", {
+  # The default palette's colours, simulated by this package and identical to
+  # colorspace's. The Python suite pins the same colours, so the twins are held
+  # to them where neither colorspace nor colorspacious is installed.
+  okabe_ito <- c("#005b96", "#e69f00", "#009e73", "#d55e00", "#cc79a7",
+                 "#56b4e9", "#f0e442", "#999999")
+  golden <- list(
+    "protan@0.25" = c("#235b97", "#d7a200", "#629873", "#bb6900", "#b482a7",
+                      "#75b2ea", "#f4e13c", "#999999"),
+    "deutan@0.25" = c("#1a5896", "#daa700", "#5e9574", "#bf7200", "#b686a6",
+                      "#70aee9", "#f5e345", "#999999"),
+    "tritan@0.25" = c("#0d5c8f", "#e2a042", "#389b79", "#ce632a", "#c57ea3",
+                      "#60b4e2", "#f2e26e", "#999999"),
+    "protan@0.5" = c("#305c97", "#cba300", "#7e9573", "#a66e00", "#a087a7",
+                     "#87b2ea", "#f6df35", "#999999"),
+    "deutan@0.5" = c("#225695", "#d2ac04", "#768f75", "#b07e00", "#a78fa6",
+                     "#7caae9", "#f8e348", "#999999"),
+    "tritan@0.5" = c("#005f8a", "#e99b55", "#059d7f", "#d75a32", "#cc7b9d",
+                     "#4bb7dd", "#f4df86", "#999999"),
+    "protan@0.75" = c("#385d98", "#c2a300", "#8f9372", "#937000", "#8f89a8",
+                      "#92b2eb", "#f7de2d", "#999999"),
+    "deutan@0.75" = c("#265495", "#cdb00a", "#828a76", "#a58600", "#9c94a5",
+                      "#83a7e8", "#fae34b", "#999999"),
+    "tritan@0.75" = c("#006580", "#f7916e", "#00a089", "#e7483e", "#d77694",
+                      "#00bed3", "#fbdaa5", "#999999")
+  )
+  for (key in names(golden)) {
+    parts <- strsplit(key, "@", fixed = TRUE)[[1]]
+    expect_identical(
+      simulate_cvd(okabe_ito, parts[1], severity = as.numeric(parts[2])),
+      golden[[key]], info = key
+    )
+  }
+})
+
 test_that("simulate_cvd() reddens out: red loses red, gains green under protan", {
   rp <- grDevices::col2rgb(simulate_cvd("#ff0000", "protan"))[, 1]
   expect_lt(rp["red"], 255)

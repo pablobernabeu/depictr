@@ -562,6 +562,19 @@
   now fail the check too. `metric = "cie76"` restores the old measure for this
   release, and the greyscale check is the lightness gap under either.
 
+* `simulate_cvd()` at partial severity now uses Machado et al.'s published
+  matrices, interpolated between the tabulated severities. Interpolating
+  towards normal vision missed them on the default palette by up to 11 units
+  of the 1976 Delta-E, or 6.2 in CIEDE2000. Full-severity results, and so
+  `palette_safety()`, `palette_preview()` and `check_figure()`, are unchanged.
+  The authors tabulate a matrix for each tenth of severity, and a severity
+  between two tenths now takes the linear interpolation of the two, as the
+  colorspace package does, whose output it matches. The old transform drew the
+  full-severity matrix towards the identity. Between severities 0.3 and 0.7, it
+  moved the palette's colours too little under protan and deutan and too far
+  under tritan, so under a red-green deficiency they looked further apart than
+  the model predicts.
+
 ## New features
 
 * `depictr_palette(order = "contrast")`, also accepted by

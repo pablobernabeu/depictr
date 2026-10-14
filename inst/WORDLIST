@@ -30,7 +30,9 @@ bayesian
 brms
 cairo
 colorblind
+colorspace
 colourblind
+deutan
 easystats
 fixef
 ggplot
@@ -39,7 +41,9 @@ gridlines
 heatmaps
 lme4
 powercurvePlot
+protan
 ragg
 raincloud
 reproducibly
 simr
+tritan

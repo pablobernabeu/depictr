@@ -14,9 +14,10 @@ simulate_cvd(colours, deficiency, severity = 1)
 (the two red-green forms) or \code{"tritan"} (blue-yellow).}
 
 \item{severity}{Severity in \verb{[0, 1]}. Zero leaves the colours unchanged and
-one is the full deficiency. Intermediate values interpolate the transform
-towards the identity, an approximation to Machado et al.'s per-severity
-matrices.}
+one is the full deficiency. Machado et al. publish a matrix for each tenth
+of severity, which is used as it stands at 0.1, 0.2 and so on. A severity
+between two tenths takes the linear interpolation of their matrices, as
+the authors suggest and as the colorspace package does.}
 }
 \value{
 A character vector of lower-case hex colours, the same length as

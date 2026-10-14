@@ -46,9 +46,9 @@ DESCRIPTION.
   lmerTest, broom, simr, survival, ggdist, posterior, cluster and boot) are in
   Suggests and used conditionally, so the package installs and checks without
   them. The depends-only run listed above is the evidence for that. colorspace
-  is suggested for one test only, as an independent implementation of the
+  is suggested for tests only, as an independent implementation of the
   Machado colour-vision transforms against which the package's own transforms
-  are compared; that test skips when colorspace is absent.
+  are compared; those tests skip when colorspace is absent.
 * Every example, test and vignette runs either on base models ('lm', 'glm') and
   the bundled simulated datasets or, where a Bayesian or mixed-model result is
   shown, on a small precomputed model object shipped in inst/extdata. No
