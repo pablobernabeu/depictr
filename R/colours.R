@@ -248,7 +248,8 @@ depictr_reference <- function() depictr_opt("reference")
 #'
 #' This is the simulator behind [palette_preview()]'s `cvd` argument, behind
 #' [palette_safety()], and behind the colour-separability rows of
-#' [check_figure()].
+#' [check_figure()]. [simulate_figure()] applies it to every colour of a
+#' finished figure.
 #'
 #' @param colours Character vector of colours, in any form
 #'   [grDevices::col2rgb()] understands.
@@ -271,6 +272,12 @@ depictr_reference <- function() depictr_opt("reference")
 #' # Half severity moves the colours only part of the way.
 #' simulate_cvd(c("#005b96", "#e69f00"), "deutan", severity = 0.5)
 simulate_cvd <- function(colours, deficiency, severity = 1) {
+  .check_vision(deficiency, severity)
+  .cvd_hex(colours, .cvd_matrix(deficiency, severity))
+}
+
+# Refuses a deficiency or severity the simulation does not cover.
+.check_vision <- function(deficiency, severity) {
   if (!is.character(deficiency) || length(deficiency) != 1 ||
       is.na(deficiency) || !deficiency %in% names(.cvd_matrices)) {
     stop("`deficiency` must be one of 'protan', 'deutan' or 'tritan'.",
@@ -280,10 +287,128 @@ simulate_cvd <- function(colours, deficiency, severity = 1) {
       severity < 0 || severity > 1) {
     stop("`severity` must lie in [0, 1].", call. = FALSE)
   }
-  m <- .cvd_matrix(deficiency, severity)
+  invisible(NULL)
+}
+
+# The colours through the transform `m`, as opaque lower-case hex. Any alpha
+# is ignored.
+.cvd_hex <- function(colours, m) {
   rgb <- grDevices::col2rgb(colours) / 255   # 3 x n, sRGB in [0, 1]
   out <- .linear_to_srgb(m %*% .srgb_to_linear(rgb))
   tolower(grDevices::rgb(out[1, ], out[2, ], out[3, ]))
+}
+
+#' Show a finished figure as a reader with a colour-vision deficiency sees it
+#'
+#' [simulate_cvd()] simulates a set of colours, and this function the figure
+#' they end up in, legend, colourbar, text and background included.
+#'
+#' The plot is turned into the table of grobs that would be drawn, with
+#' [ggplot2::ggplotGrob()] or, for a patchwork, [patchwork::patchworkGrob()].
+#' Every colour in that table then goes through [simulate_cvd()]. That covers
+#' the line and fill colours of each grob, at any depth, and each cell of a
+#' raster, such as a colourbar, a [ggplot2::geom_raster()] layer or an image
+#' added with [ggplot2::annotation_raster()]. Each colour keeps its alpha
+#' channel. Missing and transparent colours are left as they are, and so are
+#' gradient and pattern fills such as [grid::linearGradient()], which keep
+#' their original colours.
+#'
+#' The colours are changed after the plot is built. Changing the colours of
+#' the data before it is built would leave the legend keys and any colourbar
+#' in their original colours, so the legend would no longer match the figure.
+#'
+#' The figure stays vector graphics, so it can be saved at any size. The Python
+#' twin's `simulate_figure()` uses the same matrices but rasterises the figure
+#' and simulates its pixels, so it returns an image.
+#'
+#' @param plot A ggplot or a patchwork, as it would be saved.
+#' @inheritParams simulate_cvd
+#'
+#' @return A gtable, which [grid::grid.draw()] draws and [save_plot()] saves.
+#' @references
+#' \insertRef{machado2009}{depictr}
+#' @seealso [check_figure()], which measures what this shows.
+#' @export
+#' @examples
+#' library(ggplot2)
+#' p <- ggplot(crop_yield, aes(rainfall, yield, colour = treatment)) +
+#'   geom_point() +
+#'   scale_colour_depictr() +
+#'   theme_depictr()
+#'
+#' # The figure as a reader with deuteranopia sees it.
+#' seen <- simulate_figure(p, "deutan")
+#' grid::grid.newpage()
+#' grid::grid.draw(seen)
+#'
+#' # Saved for a side-by-side comparison with the original.
+#' save_plot(file.path(tempdir(), "yield-deutan.png"), seen)
+simulate_figure <- function(plot, deficiency, severity = 1) {
+  .check_vision(deficiency, severity)
+  # A patchwork is a ggplot too, so it is recognised first.
+  drawn <- if (inherits(plot, "patchwork")) {
+    patchwork::patchworkGrob(plot)
+  } else if (inherits(plot, "ggplot")) {
+    ggplot2::ggplotGrob(plot)
+  } else {
+    stop("`plot` must be a ggplot or a patchwork.", call. = FALSE)
+  }
+  .simulate_grob(drawn, .cvd_matrix(deficiency, severity))
+}
+
+# A grob with every colour it draws, and every colour of the grobs it holds,
+# passed through the transform `m`. A gtable keeps its grobs in `grobs`, and
+# any other gTree in `children`. The children keep their names, so the order
+# in which a gTree draws them still holds.
+.simulate_grob <- function(g, m) {
+  if (!is.null(g$gp$col)) g$gp$col <- .simulate_colours(g$gp$col, m)
+  if (!is.null(g$gp$fill)) g$gp$fill <- .simulate_colours(g$gp$fill, m)
+  if (inherits(g, "rastergrob")) g$raster <- .simulate_raster(g$raster, m)
+  if (!is.null(g$grobs)) {
+    g$grobs <- lapply(g$grobs, .simulate_grob, m = m)
+  }
+  if (!is.null(g$children)) {
+    g$children <- do.call(grid::gList,
+                          lapply(g$children, .simulate_grob, m = m))
+  }
+  g
+}
+
+# Colours through the transform `m`, each keeping its alpha. An opaque colour
+# comes back as six hex digits, as simulate_cvd() gives it, and a translucent
+# one with its alpha appended as two more. Missing and transparent colours,
+# and a fill that is not a colour, such as a gradient, are left as they are.
+.simulate_colours <- function(colours, m) {
+  if (!is.character(colours)) return(colours)
+  shown <- !is.na(colours) & !colours %in% c("transparent", "NA")
+  if (!any(shown)) return(colours)
+  # A raster or a scatter repeats a few colours many times over.
+  distinct <- unique(colours[shown])
+  alpha <- grDevices::col2rgb(distinct, alpha = TRUE)[4, ]
+  seen <- .cvd_hex(distinct, m)
+  seen[alpha < 255] <- paste0(seen[alpha < 255],
+                              sprintf("%02x", alpha[alpha < 255]))
+  colours[shown] <- seen[match(colours[shown], distinct)]
+  colours
+}
+
+# The cells of a raster through the transform `m`, as a raster of colours. A
+# nativeRaster, as png::readPNG(native = TRUE) returns, packs each pixel into
+# one integer, red in the lowest byte and alpha in the highest, and stores the
+# image row by row, so it is unpacked into colours first.
+.simulate_raster <- function(raster, m) {
+  if (inherits(raster, "nativeRaster")) {
+    packed <- as.vector(unclass(raster))
+    byte <- function(shift) bitwAnd(bitwShiftR(packed, shift), 255L)
+    colours <- grDevices::rgb(byte(0L), byte(8L), byte(16L), byte(24L),
+                              maxColorValue = 255)
+    cells <- matrix(colours, nrow = dim(raster)[1], ncol = dim(raster)[2],
+                    byrow = TRUE)
+  } else {
+    cells <- as.matrix(grDevices::as.raster(raster))
+  }
+  grDevices::as.raster(matrix(.simulate_colours(as.vector(cells), m),
+                              nrow = nrow(cells), ncol = ncol(cells)))
 }
 
 # Perceptual distance and the colourblind-safety check -----------------------

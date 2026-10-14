@@ -33,7 +33,8 @@ defined on linear-light RGB, so a colour is decoded from sRGB to linear RGB
 \details{
 This is the simulator behind \code{\link[=palette_preview]{palette_preview()}}'s \code{cvd} argument, behind
 \code{\link[=palette_safety]{palette_safety()}}, and behind the colour-separability rows of
-\code{\link[=check_figure]{check_figure()}}.
+\code{\link[=check_figure]{check_figure()}}. \code{\link[=simulate_figure]{simulate_figure()}} applies it to every colour of a
+finished figure.
 }
 \examples{
 simulate_cvd(c("#005b96", "#e69f00"), "deutan")

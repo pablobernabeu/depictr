@@ -187,6 +187,7 @@ reference:
   - check_figure
   - palette_safety
   - simulate_cvd
+  - simulate_figure
   - format_terms
   - model_report
   - arrange_plots

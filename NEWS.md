@@ -588,6 +588,16 @@
   makes the order the default for every later plot. The default order is
   unchanged, and the Python twin gives the same order.
 
+* `simulate_figure()` shows a finished figure, legend and colourbar included,
+  as a reader with a colour-vision deficiency sees it. It builds the grob
+  table of a ggplot or a patchwork and passes every colour in it through
+  `simulate_cvd()`. That covers the line and fill colours of each grob and the
+  cells of each raster, and each colour keeps its alpha. It returns a gtable,
+  which `grid::grid.draw()` draws and `save_plot()` saves. Recolouring the data
+  before the plot is built would have left the legend keys and colourbars in
+  their original colours. The Python twin's `simulate_figure()` uses the same
+  matrices on the pixels of the rendered figure.
+
 # depictr 0.3.0
 
 ## Auditing a finished figure

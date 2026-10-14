@@ -35,6 +35,11 @@ transparent_bg <- ggplot2::theme(
 )
 knit_print.ggplot <- function(x, ...) knitr::normal_print(x + transparent_bg)
 knit_print.patchwork <- function(x, ...) knitr::normal_print(x & transparent_bg)
+# simulate_figure() returns a gtable, which is drawn with grid and never passes
+# through knit_print(), so its plot has the backgrounds cleared on the way in.
+simulate_figure <- function(plot, ...) {
+  depictr::simulate_figure(plot + transparent_bg, ...)
+}
 
 ```
 
@@ -170,6 +175,22 @@ number attached.
 
 ```{r}
 palette_safety()
+```
+
+`simulate_figure()` applies the same simulation to a whole figure. Every colour
+the figure draws goes through it, in the legend keys, the text and any
+colourbar as well as in the data. The result is a gtable that
+`grid::grid.draw()` draws and `save_plot()` saves. Here is the scatter plot
+from the start of this section as a reader with deuteranopia sees it:
+
+```{r}
+by_treatment <- ggplot(crop_yield, aes(fertiliser, yield, colour = treatment)) +
+  geom_point(alpha = 0.7) +
+  scale_colour_depictr() +
+  theme_depictr()
+
+grid::grid.newpage()
+grid::grid.draw(simulate_figure(by_treatment, "deutan"))
 ```
 
 ## Auditing the figure you are about to submit

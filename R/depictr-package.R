@@ -93,6 +93,8 @@
 #'   \item [check_figure()]: audit a finished figure for accessibility.
 #'   \item [palette_safety()]: check a palette's colour-vision safety.
 #'   \item [simulate_cvd()]: simulate a colour-vision deficiency.
+#'   \item [simulate_figure()]: show a finished figure as a reader with a
+#'     colour-vision deficiency sees it.
 #'   \item [format_terms()]: tidy raw coefficient names for display.
 #'   \item [model_report()]: a one-figure overview of a fitted model.
 #'   \item [arrange_plots()]: compose plots with a shared legend and title.
