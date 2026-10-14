@@ -4,7 +4,11 @@
 \alias{depictr_palette}
 \title{The depictr colour palettes}
 \usage{
-depictr_palette(n = NULL, type = c("qualitative", "sequential", "diverging"))
+depictr_palette(
+  n = NULL,
+  type = c("qualitative", "sequential", "diverging"),
+  order = c("default", "contrast")
+)
 }
 \arguments{
 \item{n}{Number of colours to return. If \code{NULL} (the default) the full
@@ -18,6 +22,10 @@ the sequential ramp when many groups are needed.}
 \item{type}{Palette type: \code{"qualitative"} (categorical groups),
 \code{"sequential"} (ordered low-to-high) or \code{"diverging"} (a midpoint with two
 directions).}
+
+\item{order}{The order of the built-in qualitative palette: \code{"default"}, or
+\code{"contrast"} for the contrast-first order described below. The ramps have
+an order of their own and refuse \code{"contrast"}.}
 }
 \value{
 A character vector of hex colour codes.
@@ -43,11 +51,47 @@ custom palette replaces the built-in Okabe-Ito set and is interpolated when
 more colours are requested than it provides. The sequential and diverging
 ramps are unaffected.
 }
+\section{The contrast-first order}{
+
+In the default order the second colour is the orange (\verb{#e69f00}), at 2.25:1
+against white. Any figure on white whose colour tells two or more groups
+apart therefore fails the \code{geometry_contrast} row of \code{\link[=check_figure]{check_figure()}}. No
+more than three of the eight colours pass every colour row of that audit
+together.
+
+\code{order = "contrast"} puts those three first: the brand blue, the vermillion
+(\verb{#d55e00}) and the reddish purple (\verb{#cc79a7}), then the bluish green
+(\verb{#009e73}) and the other four in their default order. Up to three groups
+then pass every colour row, contrast against white included. They stay at
+least 14.01 apart in CIEDE2000 under every vision type, 6.86 apart in
+lightness and 3.06:1 against white. Four groups keep 3:1 against white, but
+the bluish green and the vermillion are 3.31 apart in lightness, which fails
+\code{greyscale_separability}. Asking for more than four colours warns, since the
+fifth, the orange, falls below 3:1.
+
+Under this order, the second group is drawn in the vermillion. That is also
+the accent (\code{\link[=depictr_options]{depictr_options()}}) that depictr uses for single highlights,
+such as the flagged points of \code{\link[=outlier_plot]{outlier_plot()}} and the missing cells of
+\code{\link[=missingness_map]{missingness_map()}}. The default order is unchanged.
+
+The order applies to the built-in palette alone. A palette set with
+\code{depictr_options(palette = )} is the user's own, so it is returned in the
+order it was set, with a warning. That is also how to make the order the
+default for every later plot:
+\code{depictr_options(palette = depictr_palette(order = "contrast"))}. The
+palette is then the user's own, so asking for more than four colours no
+longer warns. \code{\link[=scale_colour_depictr]{scale_colour_depictr()}} and \code{\link[=scale_fill_depictr]{scale_fill_depictr()}} take
+\code{order} for a single plot.
+}
+
 \examples{
 depictr_palette(3)
+depictr_palette(3, order = "contrast")
 depictr_palette(7, type = "sequential")
 scales::show_col(depictr_palette())
 }
 \references{
 \insertRef{okabe2008}{depictr}
+
+\insertRef{wcag22}{depictr}
 }

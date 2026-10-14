@@ -177,7 +177,11 @@ at 2.25:1, the sky blue at 2.31:1, the grey at 2.85:1 and the yellow at
 colour tells two or more groups apart fails \code{geometry_contrast}, and drawing
 its marks translucent lowers the ratio further. Opaque marks, the vermillion
 (\verb{#d55e00}, at 3.87:1) in the orange's place and a redundant shape clear
-that row and \code{redundant_encoding}, as the first example below shows.
+that row and \code{redundant_encoding}, as the first example below shows. The
+contrast-first order of \code{\link[=depictr_palette]{depictr_palette()}} puts the vermillion second and
+the reddish purple third, and \code{\link[=scale_colour_depictr]{scale_colour_depictr()}} takes it as
+\code{order = "contrast"}. Up to three groups then pass every colour row, and
+four keep 3:1 against white.
 }
 
 \section{Auditing at the printed size}{

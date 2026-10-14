@@ -103,6 +103,9 @@ colours two or more groups uses it. The example above therefore fails
 `geometry_contrast`, as well as `redundant_encoding` and, at 8.9 cm, `text_size`.
 Opaque marks, the vermillion `#d55e00` in the orange's place and a redundant
 shape or line type clear the two colour rows.
+`scale_colour_depictr(order = "contrast")` puts the vermillion there for one
+plot, and `depictr_options(palette = depictr_palette(order = "contrast"))` does
+so for every later one.
 
 ## A first plot
 

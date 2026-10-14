@@ -353,6 +353,48 @@ test_that("greyscale separability is the lightness gap, and the default palette 
   }
 })
 
+test_that("two and three groups in the contrast-first order pass every colour row", {
+  old <- options(depictr.palette = NULL)
+  on.exit(options(old), add = TRUE)
+  colour_rows <- c("colour_separability", "colour_separability_protan",
+                   "colour_separability_deutan", "colour_separability_tritan",
+                   "greyscale_separability", "geometry_contrast")
+  grouped <- function(data, mapping, order) {
+    ggplot(data, mapping) + geom_point() +
+      scale_colour_depictr(order = order) + theme_depictr()
+  }
+  two <- aes(rainfall, yield, colour = treatment, shape = treatment)
+  three <- aes(age, stress, colour = education, shape = education)
+  # Education is an ordered factor, and ggplot2 advises against shapes for
+  # one, so the three groups are drawn as plain categories.
+  wellbeing_survey$education <- factor(wellbeing_survey$education,
+                                       ordered = FALSE)
+
+  for (p in list(grouped(crop_yield, two, "contrast"),
+                 grouped(wellbeing_survey, three, "contrast"))) {
+    report <- check_figure(p)
+    expect_identical(report$verdict[report$check %in% colour_rows],
+                     rep("pass", length(colour_rows)))
+  }
+  # Three groups sit where the documentation says: 6.86 apart in lightness,
+  # with the reddish purple the lowest contrast at 3.06:1.
+  report <- check_figure(grouped(wellbeing_survey, three, "contrast"))
+  expect_equal(measured_for(report, "greyscale_separability"), 6.86)
+  expect_equal(measured_for(report, "geometry_contrast"), 3.06)
+
+  # In the default order the orange draws the second group, at 2.25:1.
+  report <- check_figure(grouped(crop_yield, two, "default"))
+  expect_identical(verdict_for(report, "geometry_contrast"), "fail")
+  expect_equal(measured_for(report, "geometry_contrast"), 2.25)
+
+  # The global route the documentation gives reaches depictr's own plots.
+  old_pal <- depictr_options(palette = depictr_palette(order = "contrast"))
+  on.exit(do.call(depictr_options, old_pal), add = TRUE)
+  report <- check_figure(ecdf_plot(wellbeing_survey, stress, group = education))
+  expect_identical(report$verdict[report$check %in% colour_rows],
+                   rep("pass", length(colour_rows)))
+})
+
 test_that("text size scales with the printed width", {
   p <- good_figure()
   full <- measured_for(check_figure(p), "text_size")

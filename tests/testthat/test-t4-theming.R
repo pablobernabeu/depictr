@@ -195,6 +195,111 @@ test_that("scale_colour_depictr() warns at draw time past eight groups", {
                  "colour-vision-deficiency guarantee holds only up to 8")
 })
 
+# --- the contrast-first order -------------------------------------------------
+
+# Pinned identically in the Python twin's tests/test_palette_cvd.py.
+contrast_first <- c("#005b96", "#d55e00", "#cc79a7", "#009e73",
+                    "#e69f00", "#56b4e9", "#f0e442", "#999999")
+
+test_that("depictr_palette(order = \"contrast\") puts the darker colours first", {
+  old <- options(depictr.palette = NULL, depictr.accent = NULL)
+  on.exit(options(old), add = TRUE)
+
+  expect_identical(depictr_palette(order = "contrast"), contrast_first)
+  expect_identical(depictr_palette(3, order = "contrast"), contrast_first[1:3])
+  # The same eight colours, so the guarantee about the set still holds, and the
+  # default order is unchanged.
+  expect_setequal(depictr_palette(order = "contrast"), depictr_palette())
+  expect_identical(depictr_palette(order = "default"), depictr_palette())
+  expect_identical(depictr_palette(3), c("#005b96", "#e69f00", "#009e73"))
+
+  # The figures the documentation quotes. Three colours stay 14.01 apart in
+  # CIEDE2000 under every vision type and 6.86 apart in lightness, and the
+  # first four clear 3:1 against white, which the fifth does not.
+  expect_equal(palette_safety(contrast_first[1:3])$min_delta_e, 14.01)
+  lightness <- sort(.srgb_to_lab(contrast_first[1:3])[, 1])
+  expect_equal(round(min(diff(lightness)), 2), 6.86)
+  ratios <- .contrast_ratio(contrast_first, "#ffffff")
+  expect_true(all(ratios[1:4] >= 3))
+  expect_lt(ratios[5], 3)
+
+  # Under this order the accent is the second group's colour.
+  expect_identical(depictr_palette(2, order = "contrast")[2], depictr_accent())
+})
+
+test_that("the contrast-first order warns past four colours", {
+  old <- options(depictr.palette = NULL)
+  on.exit(options(old), add = TRUE)
+
+  expect_no_warning(depictr_palette(4, order = "contrast"))
+  # The whole set, as handed to depictr_options(), names no number of groups.
+  expect_no_warning(depictr_palette(order = "contrast"))
+  expect_warning(
+    pal <- depictr_palette(5, order = "contrast"),
+    paste0("^Past four colours the contrast-first order no longer keeps every ",
+           "colour at 3:1 against white\\.$")
+  )
+  expect_identical(pal, contrast_first[1:5])
+})
+
+test_that("only the built-in qualitative palette takes an order", {
+  expect_error(depictr_palette(5, type = "sequential", order = "contrast"),
+               paste0("^`order` applies to the qualitative palette, not to ",
+                      "the sequential ramp\\.$"))
+  expect_error(depictr_palette(type = "diverging", order = "contrast"),
+               paste0("^`order` applies to the qualitative palette, not to ",
+                      "the diverging ramp\\.$"))
+  expect_no_error(depictr_palette(5, type = "sequential", order = "default"))
+  expect_error(depictr_palette(3, order = "brightest"), "should be one of")
+
+  # A palette set through the option is the user's own, so it comes back in
+  # the order it was set.
+  old <- depictr_options(palette = c("#1b9e77", "#d95f02", "#7570b3"))
+  on.exit(do.call(depictr_options, old), add = TRUE)
+  expect_warning(
+    pal <- depictr_palette(3, order = "contrast"),
+    paste0("^`order` applies to the built-in palette, so the depictr\\.palette ",
+           "option is returned as it was set\\.$")
+  )
+  expect_identical(pal, c("#1b9e77", "#d95f02", "#7570b3"))
+})
+
+test_that("the depictr scales take the contrast-first order", {
+  old <- options(depictr.palette = NULL)
+  on.exit(options(old), add = TRUE)
+
+  three <- data.frame(g = factor(letters[1:3]), v = 1:3)
+  built <- ggplot2::ggplot_build(
+    ggplot2::ggplot(three, ggplot2::aes(g, v, colour = g, fill = g)) +
+      ggplot2::geom_col() +
+      scale_colour_depictr(order = "contrast") +
+      scale_fill_depictr(order = "contrast")
+  )
+  expect_identical(built$data[[1]]$colour, contrast_first[1:3])
+  expect_identical(built$data[[1]]$fill, contrast_first[1:3])
+
+  # Past four groups the warning comes when the plot is built, as it does past
+  # eight.
+  five <- data.frame(g = factor(letters[1:5]), v = 1:5)
+  p <- ggplot2::ggplot(five, ggplot2::aes(g, v, colour = g)) +
+    ggplot2::geom_point() + scale_colour_depictr(order = "contrast")
+  expect_warning(ggplot2::ggplot_build(p), "^Past four colours")
+
+  # A palette of one's own already fixes the colours and their order.
+  expect_error(
+    scale_fill_depictr(palette = function(k) rep("#000000", k),
+                       order = "contrast"),
+    "^Give `palette` or `order = \"contrast\"`, not both\\.$"
+  )
+  expect_error(scale_colour_depictr(order = "brightest"), "should be one of")
+
+  # The global route the documentation gives: the reordered set as the
+  # palette option.
+  old_pal <- depictr_options(palette = depictr_palette(order = "contrast"))
+  on.exit(do.call(depictr_options, old_pal), add = TRUE)
+  expect_identical(depictr_palette(3), contrast_first[1:3])
+})
+
 # --- palette_preview() CVD rendering ----------------------------------------
 
 test_that("palette_preview() builds without warnings for every cvd setting", {

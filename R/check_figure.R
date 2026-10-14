@@ -146,7 +146,11 @@
 #' colour tells two or more groups apart fails `geometry_contrast`, and drawing
 #' its marks translucent lowers the ratio further. Opaque marks, the vermillion
 #' (`#d55e00`, at 3.87:1) in the orange's place and a redundant shape clear
-#' that row and `redundant_encoding`, as the first example below shows.
+#' that row and `redundant_encoding`, as the first example below shows. The
+#' contrast-first order of [depictr_palette()] puts the vermillion second and
+#' the reddish purple third, and [scale_colour_depictr()] takes it as
+#' `order = "contrast"`. Up to three groups then pass every colour row, and
+#' four keep 3:1 against white.
 #'
 #' @section Auditing at the printed size:
 #' Text is drawn in points, so the size it prints at depends on the two widths.

@@ -552,6 +552,19 @@
   now fail the check too. `metric = "cie76"` restores the old measure for this
   release, and the greyscale check is the lightness gap under either.
 
+## New features
+
+* `depictr_palette(order = "contrast")`, also accepted by
+  `scale_colour_depictr()` and `scale_fill_depictr()`, reorders the built-in
+  palette so that up to three groups pass every colour check of
+  `check_figure()`, contrast against white included, and up to four keep 3:1.
+  It leads with the brand blue, the vermillion and the reddish purple, then the
+  bluish green. It warns past four colours. The ramps refuse it, and a palette
+  set with `depictr_options(palette = )` is returned as it was set, with a
+  warning. `depictr_options(palette = depictr_palette(order = "contrast"))`
+  makes the order the default for every later plot. The default order is
+  unchanged, and the Python twin gives the same order.
+
 # depictr 0.3.0
 
 ## Auditing a finished figure

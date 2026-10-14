@@ -207,6 +207,16 @@ mended <- ggplot(crop_yield, aes(fertiliser, yield, colour = treatment,
 check_figure(mended)[, c("check", "measured", "threshold", "verdict")]
 ```
 
+The vermillion need not be typed by hand.
+`scale_colour_depictr(order = "contrast")` draws the groups in the
+contrast-first order of `depictr_palette()`. It leads with the brand blue, the
+vermillion and the reddish purple, the only three of the eight colours that
+clear every colour row together. The bluish green comes fourth, and with it
+four groups still keep 3:1 against white.
+`depictr_options(palette = depictr_palette(order = "contrast"))` makes that
+order the default for every later plot. Under it, the second group takes the
+vermillion, which depictr also uses as its accent for single highlights.
+
 The audit also takes a stated output width, which is where most figure text
 quietly fails. Text is drawn in points, so a figure saved seven inches wide and
 then printed in an 8.9 cm column arrives at half the size it looked on screen:

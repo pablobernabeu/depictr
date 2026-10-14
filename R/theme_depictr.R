@@ -25,6 +25,9 @@
 #' @param type Palette type: `"qualitative"` (categorical groups),
 #'   `"sequential"` (ordered low-to-high) or `"diverging"` (a midpoint with two
 #'   directions).
+#' @param order The order of the built-in qualitative palette: `"default"`, or
+#'   `"contrast"` for the contrast-first order described below. The ramps have
+#'   an order of their own and refuse `"contrast"`.
 #'
 #' @details The qualitative palette can be overridden globally with
 #'   `options(depictr.palette = )` (see [depictr_options()]); when set, that
@@ -32,21 +35,61 @@
 #'   more colours are requested than it provides. The sequential and diverging
 #'   ramps are unaffected.
 #'
+#' @section The contrast-first order:
+#' In the default order the second colour is the orange (`#e69f00`), at 2.25:1
+#' against white. Any figure on white whose colour tells two or more groups
+#' apart therefore fails the `geometry_contrast` row of [check_figure()]. No
+#' more than three of the eight colours pass every colour row of that audit
+#' together.
+#'
+#' `order = "contrast"` puts those three first: the brand blue, the vermillion
+#' (`#d55e00`) and the reddish purple (`#cc79a7`), then the bluish green
+#' (`#009e73`) and the other four in their default order. Up to three groups
+#' then pass every colour row, contrast against white included. They stay at
+#' least 14.01 apart in CIEDE2000 under every vision type, 6.86 apart in
+#' lightness and 3.06:1 against white. Four groups keep 3:1 against white, but
+#' the bluish green and the vermillion are 3.31 apart in lightness, which fails
+#' `greyscale_separability`. Asking for more than four colours warns, since the
+#' fifth, the orange, falls below 3:1.
+#'
+#' Under this order, the second group is drawn in the vermillion. That is also
+#' the accent ([depictr_options()]) that depictr uses for single highlights,
+#' such as the flagged points of [outlier_plot()] and the missing cells of
+#' [missingness_map()]. The default order is unchanged.
+#'
+#' The order applies to the built-in palette alone. A palette set with
+#' `depictr_options(palette = )` is the user's own, so it is returned in the
+#' order it was set, with a warning. That is also how to make the order the
+#' default for every later plot:
+#' `depictr_options(palette = depictr_palette(order = "contrast"))`. The
+#' palette is then the user's own, so asking for more than four colours no
+#' longer warns. [scale_colour_depictr()] and [scale_fill_depictr()] take
+#' `order` for a single plot.
+#'
 #' @return A character vector of hex colour codes.
 #' @references
 #' \insertRef{okabe2008}{depictr}
+#'
+#' \insertRef{wcag22}{depictr}
 #' @export
 #' @examples
 #' depictr_palette(3)
+#' depictr_palette(3, order = "contrast")
 #' depictr_palette(7, type = "sequential")
 #' scales::show_col(depictr_palette())
 depictr_palette <- function(n = NULL, type = c("qualitative", "sequential",
-                                               "diverging")) {
+                                               "diverging"),
+                            order = c("default", "contrast")) {
   type <- match.arg(type)
+  order <- match.arg(order)
   if (!is.null(n) && (!is.numeric(n) || length(n) != 1 || n < 1)) {
     stop("`n` must be a single positive number.", call. = FALSE)
   }
   if (!is.null(n)) n <- as.integer(n)
+  if (type != "qualitative" && order != "default") {
+    stop("`order` applies to the qualitative palette, not to the ", type,
+         " ramp.", call. = FALSE)
+  }
 
   if (type == "sequential") {
     ramp <- grDevices::colorRampPalette(c("#e6eff5", "#4a8fc0", "#005b96",
@@ -75,9 +118,24 @@ depictr_palette <- function(n = NULL, type = c("qualitative", "sequential",
       yellow         = "#f0e442",
       grey           = "#999999"
     )
+    if (order == "contrast") {
+      # The only three colours of the eight that clear every colour row of
+      # check_figure() together lead, then the bluish green, which keeps 3:1
+      # against white, then the rest in their default order. The Python twin
+      # pins the same order.
+      base <- base[c("blue", "vermillion", "reddish_purple", "bluish_green",
+                     "orange", "sky_blue", "yellow", "grey")]
+    }
+  } else if (order != "default") {
+    warning("`order` applies to the built-in palette, so the depictr.palette ",
+            "option is returned as it was set.", call. = FALSE)
   }
   base <- unname(base)
   if (is.null(n)) return(base)
+  if (builtin && order == "contrast" && n > 4L) {
+    warning("Past four colours the contrast-first order no longer keeps every ",
+            "colour at 3:1 against white.", call. = FALSE)
+  }
   if (n <= length(base)) return(base[seq_len(n)])
   # Interpolating past the base set puts the colours close enough together to
   # fail palette_safety(), so say so instead of quietly breaking the package's
@@ -111,6 +169,10 @@ depictr_palette <- function(n = NULL, type = c("qualitative", "sequential",
 #'   [depictr_palette()].
 #' @param na.value Colour for `NA` levels. Defaults to the resolved
 #'   `depictr.na_value` option (the muted grey `"grey80"` unless changed).
+#' @param order `"default"`, or `"contrast"` to draw the groups in the
+#'   contrast-first order of [depictr_palette()], with which two or three
+#'   groups pass every colour row of [check_figure()]. More than four groups
+#'   warn at draw time. It cannot be combined with `palette`.
 #' @param ... Passed to [ggplot2::discrete_scale()].
 #' @return A ggplot2 scale that can be added to a plot.
 #' @export
@@ -120,9 +182,17 @@ depictr_palette <- function(n = NULL, type = c("qualitative", "sequential",
 #'   geom_point() +
 #'   scale_colour_depictr() +
 #'   theme_depictr()
+#'
+#' # The vermillion in the orange's place, at 3.87:1 against white
+#' ggplot(crop_yield, aes(rainfall, yield, colour = treatment,
+#'                        shape = treatment)) +
+#'   geom_point() +
+#'   scale_colour_depictr(order = "contrast") +
+#'   theme_depictr()
 scale_colour_depictr <- function(n = NULL, palette = NULL,
-                                 na.value = depictr_opt("na_value"), ...) {
-  pal <- palette %||% function(k) depictr_palette(n %||% k)
+                                 na.value = depictr_opt("na_value"),
+                                 order = c("default", "contrast"), ...) {
+  pal <- depictr_scale_palette(n, palette, order)
   ggplot2::discrete_scale(
     "colour",
     palette = pal,
@@ -138,14 +208,32 @@ scale_color_depictr <- scale_colour_depictr
 #' @rdname scale_colour_depictr
 #' @export
 scale_fill_depictr <- function(n = NULL, palette = NULL,
-                               na.value = depictr_opt("na_value"), ...) {
-  pal <- palette %||% function(k) depictr_palette(n %||% k)
+                               na.value = depictr_opt("na_value"),
+                               order = c("default", "contrast"), ...) {
+  pal <- depictr_scale_palette(n, palette, order)
   ggplot2::discrete_scale(
     "fill",
     palette = pal,
     na.value = na.value,
     ...
   )
+}
+
+#' The palette function behind the depictr discrete scales
+#'
+#' `order` is matched when the scale is made, so a misspelt order fails at
+#' once. The palette is asked for `k` colours at draw time, which is when the
+#' warnings past four or eight groups come.
+#' @noRd
+depictr_scale_palette <- function(n, palette, order) {
+  order <- match.arg(order, c("default", "contrast"))
+  if (!is.null(palette)) {
+    if (order != "default") {
+      stop("Give `palette` or `order = \"contrast\"`, not both.", call. = FALSE)
+    }
+    return(palette)
+  }
+  function(k) depictr_palette(n %||% k, order = order)
 }
 
 #' The depictr ggplot2 theme

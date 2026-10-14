@@ -61,7 +61,8 @@ depictr_opt <- function(name) {
 #' @param palette An optional custom qualitative palette: a character vector of
 #'   hex colours used by [depictr_palette()] (type `"qualitative"`) and the
 #'   discrete scales in place of the built-in Okabe-Ito set. `NULL` restores the
-#'   built-in palette.
+#'   built-in palette. `depictr_palette(order = "contrast")` here draws every
+#'   later plot in the contrast-first order (see [depictr_palette()]).
 #' @param na_value Colour used for `NA` levels by [scale_colour_depictr()] and
 #'   [scale_fill_depictr()].
 #'
@@ -79,6 +80,11 @@ depictr_opt <- function(name) {
 #'
 #' # Use a custom qualitative palette everywhere
 #' old <- depictr_options(palette = c("#1b9e77", "#d95f02", "#7570b3"))
+#' depictr_palette(3)
+#' do.call(depictr_options, old)
+#'
+#' # Or the built-in palette in its contrast-first order
+#' old <- depictr_options(palette = depictr_palette(order = "contrast"))
 #' depictr_palette(3)
 #' do.call(depictr_options, old)
 depictr_options <- function(base_size, base_family, brand, accent, reference,

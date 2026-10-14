@@ -10,6 +10,7 @@ scale_colour_depictr(
   n = NULL,
   palette = NULL,
   na.value = depictr_opt("na_value"),
+  order = c("default", "contrast"),
   ...
 )
 
@@ -17,6 +18,7 @@ scale_color_depictr(
   n = NULL,
   palette = NULL,
   na.value = depictr_opt("na_value"),
+  order = c("default", "contrast"),
   ...
 )
 
@@ -24,6 +26,7 @@ scale_fill_depictr(
   n = NULL,
   palette = NULL,
   na.value = depictr_opt("na_value"),
+  order = c("default", "contrast"),
   ...
 )
 }
@@ -42,6 +45,11 @@ number of colours) returning a character vector of colours. Defaults to
 \item{na.value}{Colour for \code{NA} levels. Defaults to the resolved
 \code{depictr.na_value} option (the muted grey \code{"grey80"} unless changed).}
 
+\item{order}{\code{"default"}, or \code{"contrast"} to draw the groups in the
+contrast-first order of \code{\link[=depictr_palette]{depictr_palette()}}, with which two or three
+groups pass every colour row of \code{\link[=check_figure]{check_figure()}}. More than four groups
+warn at draw time. It cannot be combined with \code{palette}.}
+
 \item{...}{Passed to \code{\link[ggplot2:discrete_scale]{ggplot2::discrete_scale()}}.}
 }
 \value{
@@ -58,5 +66,12 @@ library(ggplot2)
 ggplot(crop_yield, aes(rainfall, yield, colour = treatment)) +
   geom_point() +
   scale_colour_depictr() +
+  theme_depictr()
+
+# The vermillion in the orange's place, at 3.87:1 against white
+ggplot(crop_yield, aes(rainfall, yield, colour = treatment,
+                       shape = treatment)) +
+  geom_point() +
+  scale_colour_depictr(order = "contrast") +
   theme_depictr()
 }

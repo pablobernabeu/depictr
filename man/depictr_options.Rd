@@ -31,7 +31,8 @@ by \code{depictr_reference()}.}
 \item{palette}{An optional custom qualitative palette: a character vector of
 hex colours used by \code{\link[=depictr_palette]{depictr_palette()}} (type \code{"qualitative"}) and the
 discrete scales in place of the built-in Okabe-Ito set. \code{NULL} restores the
-built-in palette.}
+built-in palette. \code{depictr_palette(order = "contrast")} here draws every
+later plot in the contrast-first order (see \code{\link[=depictr_palette]{depictr_palette()}}).}
 
 \item{na_value}{Colour used for \code{NA} levels by \code{\link[=scale_colour_depictr]{scale_colour_depictr()}} and
 \code{\link[=scale_fill_depictr]{scale_fill_depictr()}}.}
@@ -70,6 +71,11 @@ do.call(depictr_options, old)
 
 # Use a custom qualitative palette everywhere
 old <- depictr_options(palette = c("#1b9e77", "#d95f02", "#7570b3"))
+depictr_palette(3)
+do.call(depictr_options, old)
+
+# Or the built-in palette in its contrast-first order
+old <- depictr_options(palette = depictr_palette(order = "contrast"))
 depictr_palette(3)
 do.call(depictr_options, old)
 }
