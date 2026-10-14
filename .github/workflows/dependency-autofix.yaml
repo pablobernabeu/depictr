@@ -30,13 +30,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: r-lib/actions/setup-pandoc@d3c5be51b12e724e68f33216ca3c148b66d5f0b6  # v2.12.1
+      - uses: r-lib/actions/setup-pandoc@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
 
-      - uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6  # v2.12.1
+      - uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
         with:
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6  # v2.12.1
+      - uses: r-lib/actions/setup-r-dependencies@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
         with:
           extra-packages: any::rcmdcheck, any::roxygen2
           needs: check
@@ -48,7 +48,7 @@ jobs:
         # anthropics is outside the small set of publishers whose actions this
         # repository trusts on a floating major tag, so the action is pinned to
         # the exact release commit named in the trailing comment.
-        uses: anthropics/claude-code-action@6b082c41935b4c8a3b8b0ef85ba4ba4d9eeb8975 # v1.0.189
+        uses: anthropics/claude-code-action@34968b5981d5d170904281aa3df6f3c0d4a28855 # v1.0.249
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           # Without this input the action asks for an OIDC token to exchange
