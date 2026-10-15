@@ -33,8 +33,11 @@
 #'   risk in each group at the x-axis breaks.
 #' * **Median-survival guides** (`median_line = TRUE`): dashed reference lines
 #'   from the 0.5 survival level down to each group's median survival time, with
-#'   the median value labelled. Groups whose curve never reaches 0.5 (median not
-#'   estimable) are skipped.
+#'   the median value labelled. The median is the time at which the curve falls
+#'   below 0.5. Where the curve stays at 0.5 until a later drop, or until its
+#'   last time, the median is the midpoint of that stretch, as in
+#'   [survival::quantile.survfit()]. Groups whose curve never reaches 0.5
+#'   (median not estimable) are skipped.
 #' * **Log-rank test** (`logrank = TRUE`): for two or more groups, the
 #'   chi-squared log-rank statistic and its p-value are added as a subtitle.
 #'   [survival::survdiff()] is used when the 'survival' package is installed,
@@ -615,29 +618,34 @@ fill_forward <- function(x, init) {
 
 #' Median survival time per group from the step curve
 #'
-#' Matches the interpolated convention of [survival::quantile.survfit()]: the
-#' median is the smallest time at which the survival estimate first drops below
-#' 0.5; but when the curve lands *exactly* on 0.5 and stays flat there, the
-#' median is the midpoint of that flat segment (the average of the time it
-#' reaches 0.5 and the next time point on the curve - an event or the last
-#' follow-up). `NA` when the curve never reaches 0.5, or reaches exactly 0.5 and
-#' stays there with no later time (median not estimable).
+#' Follows the rule of [survival::quantile.survfit()] (its internal findq()).
+#' S is compared with 0.5 to a tolerance of sqrt(.Machine$double.eps), so a
+#' step that lands on 0.5 is read as 0.5 even where the product of the step
+#' factors leaves it a rounding error away. Let i be the first row with
+#' S <= 0.5 + tol. If S is below 0.5 - tol there, the curve stepped past 0.5
+#' and the median is that row's time. Otherwise, the curve sits at 0.5 from
+#' that time, and the median is the midpoint between it and the next drop below
+#' 0.5 - tol or, when there is none, the curve's last time. The search for the
+#' next drop passes over the rows at which the curve does not move, such as
+#' the row a curve built from a survfit object keeps at each censoring time.
+#' `NA` when the curve never comes within the tolerance of 0.5. The rule is
+#' base R, so a label does not depend on whether survival is installed.
 #' @noRd
 km_medians <- function(curve, groups) {
+  tol <- sqrt(.Machine$double.eps)
   out <- lapply(groups, function(g) {
     sub <- curve[curve$group == g, , drop = FALSE]
     sub <- sub[order(sub$time), , drop = FALSE]
-    idx <- which(sub$surv <= 0.5)
-    if (!length(idx)) {
-      med <- NA_real_
-    } else {
-      i <- idx[1]
-      if (sub$surv[i] < 0.5) {
-        med <- sub$time[i]                 # curve jumped strictly below 0.5
-      } else if (i < nrow(sub)) {
-        med <- (sub$time[i] + sub$time[i + 1]) / 2  # flat at 0.5: interpolate
+    med <- NA_real_
+    reach <- which(sub$surv <= 0.5 + tol)
+    if (length(reach)) {
+      i <- reach[1]
+      if (sub$surv[i] < 0.5 - tol) {
+        med <- sub$time[i]
       } else {
-        med <- NA_real_                    # ends exactly at 0.5: not estimable
+        below <- which(sub$surv < 0.5 - tol)
+        end <- if (length(below)) sub$time[below[1]] else sub$time[nrow(sub)]
+        med <- (sub$time[i] + end) / 2
       }
     }
     data.frame(group = g, median = med, stringsAsFactors = FALSE)

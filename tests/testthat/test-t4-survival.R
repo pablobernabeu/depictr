@@ -127,6 +127,100 @@ test_that("median uses the interpolated KM convention (vs quantile.survfit)", {
   }
 })
 
+test_that("a plateau a rounding error away from 0.5 still counts as 0.5", {
+  # Regression: on x86-64, the product of the step factors puts S(8) at
+  # 0.50000000000000011. The untoleranced S <= 0.5 missed it, and the guide
+  # was labelled 'median 10'. quantile.survfit() gives the midpoint 9 of the
+  # plateau from 8 to the next drop at 10. cumprod() accumulates in long
+  # double, so the last digit can differ on a platform without one.
+  tt <- c(2, 3, 4, 8, 8, 10, 10, 11)
+  ev <- c(1, 1, 1, 1, 0, 1, 0, 1)
+  curve <- depictr:::km_input(tt, ev, NULL, NA)$curve
+  expect_equal(depictr:::km_medians(curve, "all")$median, 9)
+  p <- survival_plot(tt, ev, median_line = TRUE)
+  labels <- unlist(lapply(ggplot2::ggplot_build(p)$data, function(d) {
+    if ("label" %in% names(d)) as.character(d$label)
+  }))
+  expect_length(labels, 1)
+  expect_match(labels, "^median +9$")
+})
+
+test_that("a curve that ends at 0.5 has the median quantile.survfit gives", {
+  # Regression: a curve that stayed at 0.5 to its last time gave NA, and no
+  # guide was drawn. quantile.survfit() takes the midpoint of the time the
+  # curve reaches 0.5 and its last time, which here are both 2.
+  med_of <- function(curve) depictr:::km_medians(curve, "all")$median
+  expect_equal(med_of(depictr:::km_input(c(1, 2, 2, 2), c(1, 1, 0, 0),
+                                         NULL, NA)$curve), 2)
+  # With follow-up beyond the step to 0.5, the midpoint runs to the last
+  # censoring time.
+  expect_equal(med_of(depictr:::km_input(c(1, 2, 3, 4), c(1, 1, 0, 0),
+                                         NULL, NA)$curve), 3)
+  skip_if_not_installed("survival")
+  sf <- survival::survfit(survival::Surv(c(1, 2, 2, 2), c(1, 1, 0, 0)) ~ 1)
+  expect_equal(med_of(depictr:::km_from_survfit(sf, NA)$curve), 2)
+  expect_equal(as.numeric(stats::quantile(sf, 0.5)$quantile), 2)
+  sf <- survival::survfit(survival::Surv(c(1, 2, 3, 4), c(1, 1, 0, 0)) ~ 1)
+  expect_equal(med_of(depictr:::km_from_survfit(sf, NA)$curve), 3)
+  expect_equal(as.numeric(stats::quantile(sf, 0.5)$quantile), 3)
+})
+
+test_that("the survfit route skips censoring rows to find the next drop", {
+  # Regression: survfit keeps a row at every censoring time, and the median of
+  # a curve flat at 0.5 was the midpoint with the next row, the censoring at 4,
+  # which gave 3.5. The next drop is at 5, so quantile.survfit() gives 4, as
+  # the vector route did.
+  skip_if_not_installed("survival")
+  tt <- 1:6
+  ev <- c(1, 1, 1, 0, 1, 1)
+  sf <- survival::survfit(survival::Surv(tt, ev) ~ 1)
+  expect_equal(as.numeric(stats::quantile(sf, 0.5)$quantile), 4)
+  expect_equal(depictr:::km_medians(depictr:::km_from_survfit(sf, NA)$curve,
+                                    "all")$median, 4)
+  expect_equal(depictr:::km_medians(depictr:::km_input(tt, ev, NULL, NA)$curve,
+                                    "all")$median, 4)
+})
+
+test_that("medians on both routes match quantile.survfit on random data", {
+  # Small samples with tied integer times land on 0.5, a rounding error away
+  # from it, or end there, far more often than real data do. Before the fix,
+  # 4 of these datasets drew a different median on the vector route and 33 on
+  # the survfit route, whose strata are smaller still.
+  skip_if_not_installed("survival")
+  withr::local_seed(20261015)
+  same <- function(a, b) {
+    identical(is.na(a), is.na(b)) &&
+      isTRUE(all(abs(a - b) < 1e-9, na.rm = TRUE))
+  }
+  off_vector <- off_survfit <- 0
+  for (k in seq_len(300)) {
+    n <- sample(4:14, 1)
+    tt <- sample(1:12, n, replace = TRUE)
+    ev <- stats::rbinom(n, 1, 0.7)
+    if (!any(ev == 1)) next
+    # The vector route, one group.
+    curve <- depictr:::km_input(tt, ev, NULL, NA)$curve
+    sf1 <- survival::survfit(survival::Surv(tt, ev) ~ 1)
+    if (!same(depictr:::km_medians(curve, "all")$median,
+              as.numeric(stats::quantile(sf1, 0.5)$quantile))) {
+      off_vector <- off_vector + 1
+    }
+    # The survfit route, with two strata unless the draw gave one group only,
+    # when survfit() keeps none.
+    g <- sample(c("a", "b"), n, replace = TRUE)
+    sf2 <- survival::survfit(survival::Surv(tt, ev) ~ g)
+    curve <- depictr:::km_from_survfit(sf2, NA)$curve
+    mine <- depictr:::km_medians(curve, unique(curve$group))
+    ref <- stats::quantile(sf2, 0.5)$quantile
+    if (is.matrix(ref)) ref <- ref[mine$group, 1]
+    if (!same(mine$median, as.numeric(ref))) {
+      off_survfit <- off_survfit + 1
+    }
+  }
+  expect_identical(off_vector, 0)
+  expect_identical(off_survfit, 0)
+})
+
 test_that("log-rank p-value matches survival::survdiff (survival path)", {
   skip_if_not_installed("survival")
   data(clinical_trial)

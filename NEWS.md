@@ -136,6 +136,17 @@
   subject followed up to exactly 0.6 was left out of the count there. A last
   break equal to the longest follow-up was lost the same way. The breaks are
   now rounded to their step before the counts are taken.
+* The median-survival guides of `survival_plot()` mislabelled some medians.
+  The survival estimate was compared with 0.5 without a tolerance, so a step
+  that the arithmetic left a rounding error above 0.5 was taken to stay above
+  it. With times `c(2, 3, 4, 8, 8, 10, 10, 11)` and status
+  `c(1, 1, 1, 1, 0, 1, 0, 1)`, the guide read 'median 10' where
+  `survival::quantile.survfit()` gives 9. A curve that ended at 0.5 drew no
+  guide. For a `survfit` object, the midpoint of a curve that sat at 0.5 was
+  taken with the next row, which can be a censoring time at which the curve
+  does not move. The medians now follow the rule of `quantile.survfit()`,
+  including its tolerance and its midpoint for a curve that ends at 0.5,
+  whatever the input and whether or not survival is installed.
 
 * `save_plot()` wrote files that fail the checks journals run on submitted
   figures. An EPS left out every translucent element, including all the points
