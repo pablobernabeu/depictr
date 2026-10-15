@@ -731,6 +731,11 @@
   `reference_line` now defaults to 1 when exponentiating and to 0 otherwise.
   The Python twin gains the same arguments.
 
+* `power_curve_plot()` gains `solved`, which marks a solved sample size and its
+  interval, such as the result of pilotr's `target_n()`. The value is drawn as
+  a dashed vertical line and the interval as a grey band behind the curve. The
+  Python twin gains the same argument.
+
 # depictr 0.3.0
 
 ## Auditing a finished figure

@@ -14,7 +14,9 @@
 #' `n_subject`, `effect`, `power`, `power_lo` and `power_hi`, and
 #' `precision_curve()` gives `n_subject`, `param` and the decision
 #' probabilities `p_meaningful` and `p_equivalent` with their own `_lo` and
-#' `_hi` bounds, which `power` can name.
+#' `_hi` bounds, which `power` can name. The sample size that pilotr's
+#' `target_n()` solves from such a curve, and its interval, can be marked on
+#' the plot with `solved`.
 #'
 #' @param x A `powerCurve` object from 'simr', or a data frame with a sample
 #'   size column (`n`, `nlevels`, `x`, `sample_size` or `n_subject`), a power
@@ -46,6 +48,12 @@
 #'   under `x`.
 #' @param y_lab Y-axis label. By default, "Power" when the power column is one
 #'   of the names listed under `x`, and the column's name otherwise.
+#' @param solved A sample size solved from the curve, with its confidence
+#'   interval: a list with numeric `value`, `lo` and `hi`, as pilotr's
+#'   `target_n()` and `solve_curve()` return, or a one-row data frame with the
+#'   same columns. Other fields are ignored. The solved value is drawn as a
+#'   dashed vertical line and its interval as a grey band behind the curve. An
+#'   interval that reaches past the swept sizes widens the x-axis to show it.
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export
@@ -68,6 +76,10 @@
 #'   power_hi = c(0.41, 0.19, 0.67, 0.30, 0.85, 0.43, 0.94, 0.55)
 #' )
 #' power_curve_plot(curves, group = "effect", x_lab = "Participants")
+#'
+#' # The sample size at which pc reaches 80% power, with its interval, in the
+#' # form pilotr's target_n() returns. The values here are illustrative.
+#' power_curve_plot(pc, solved = list(value = 51, lo = 44, hi = 60))
 power_curve_plot <- function(x,
                              target = 0.8,
                              x_lab = "Sample size",
@@ -82,8 +94,10 @@ power_curve_plot <- function(x,
                              group = NULL,
                              lower = NULL,
                              upper = NULL,
-                             y_lab = NULL) {
+                             y_lab = NULL,
+                             solved = NULL) {
   interaction <- match.arg(interaction)
+  marks <- solved_marks(solved)
   pc <- powercurve_to_df(x, n = rlang::enquo(n), power = rlang::enquo(power),
                          group = rlang::enquo(group),
                          lower = rlang::enquo(lower),
@@ -117,6 +131,15 @@ power_curve_plot <- function(x,
     ggplot2::ggplot(pc, ggplot2::aes(x = .data$n, y = .data$power))
   }
 
+  if (!is.null(marks)) {
+    # First, so that the interval lies behind the confidence band and the
+    # curve. The fill and opacity are those of posterior_plot()'s ROPE band.
+    p <- p + ggplot2::annotate(
+      "rect", xmin = marks[["lo"]], xmax = marks[["hi"]],
+      ymin = -Inf, ymax = Inf, fill = depictr_reference(), alpha = 0.15
+    )
+  }
+
   if (has_band) {
     band <- ggplot2::aes(ymin = .data$lower, ymax = .data$upper)
     if (ribbon && grouped) {
@@ -139,6 +162,11 @@ power_curve_plot <- function(x,
   if (!is.na(target)) {
     p <- p + ggplot2::geom_hline(
       yintercept = target, linetype = 2, colour = depictr_reference()
+    )
+  }
+  if (!is.null(marks)) {
+    p <- p + ggplot2::geom_vline(
+      xintercept = marks[["value"]], linetype = 2, colour = depictr_reference()
     )
   }
 
@@ -268,6 +296,30 @@ powercurve_to_df <- function(x, n = rlang::quo(NULL),
   attr(out, "power_col") <- power_col
   attr(out, "group_col") <- group_col
   out
+}
+
+#' The solved value and its bounds, as a named numeric vector
+#'
+#' pilotr's `target_n()` and `solve_curve()` return a list with the solved
+#' value in `value` and its confidence bounds in `lo` and `hi`, among other
+#' fields. A one-row data frame holding the three is read alike, and anything
+#' else is refused, a named vector included.
+#' @noRd
+solved_marks <- function(solved) {
+  if (is.null(solved)) return(NULL)
+  fields <- c("value", "lo", "hi")
+  ok <- is.list(solved) && (!is.data.frame(solved) || nrow(solved) == 1L)
+  if (ok) {
+    marks <- lapply(fields, function(nm) solved[[nm]])
+    ok <- all(vapply(marks, function(v) {
+      is.numeric(v) && length(v) == 1L && is.finite(v)
+    }, logical(1)))
+  }
+  if (!ok) {
+    stop("`solved` needs numeric `value`, `lo` and `hi`, as pilotr's ",
+         "target_n() returns.", call. = FALSE)
+  }
+  stats::setNames(as.numeric(unlist(marks)), fields)
 }
 
 #' @noRd

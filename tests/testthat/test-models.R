@@ -132,6 +132,93 @@ test_that("power_curve_plot() keeps its positional arguments", {
   expect_equal(b$data[[which(geoms == "GeomHline")]]$yintercept, 0.9)
 })
 
+# The fields pilotr's target_n() returns for a solved sample size, of which the
+# plot reads value, lo and hi. Built by hand, so the test does not depend on
+# pilotr.
+pilotr_solved <- function() {
+  list(value = 120, lo = 104, hi = 139, level = 0.95, target = 0.8,
+       x = "n_subject", y = "power", transform = "sqrt",
+       n = 120, n_lo = 104, n_hi = 139)
+}
+
+test_that("power_curve_plot() marks a solved sample size and its interval", {
+  pc <- data.frame(n_subject = c(40, 80, 120, 160, 200),
+                   power = c(0.31, 0.62, 0.80, 0.90, 0.95),
+                   power_lo = c(0.25, 0.55, 0.74, 0.85, 0.91),
+                   power_hi = c(0.38, 0.68, 0.85, 0.93, 0.97))
+  p <- power_curve_plot(pc, solved = pilotr_solved())
+  geoms <- vapply(p$layers, function(l) class(l$geom)[1], "")
+  b <- ggplot2::ggplot_build(p)
+
+  vline <- b$data[[which(geoms == "GeomVline")]]
+  expect_equal(vline$xintercept, 120)
+  expect_equal(vline$colour, depictr_reference())
+  band <- b$data[[which(geoms == "GeomRect")]]
+  expect_equal(c(band$xmin, band$xmax), c(104, 139))
+  expect_equal(band$fill, depictr_reference())
+  # The band lies beneath the confidence ribbon and the curve.
+  expect_lt(which(geoms == "GeomRect"), which(geoms == "GeomRibbon"))
+  expect_lt(which(geoms == "GeomRect"), which(geoms == "GeomLine"))
+
+  # A one-row data frame of the same fields is read alike, and with no
+  # `solved` neither layer is drawn.
+  p2 <- power_curve_plot(pc, solved = data.frame(value = 120, lo = 104,
+                                                 hi = 139))
+  geoms2 <- vapply(p2$layers, function(l) class(l$geom)[1], "")
+  expect_identical(geoms2, geoms)
+  geoms3 <- vapply(power_curve_plot(pc)$layers,
+                   function(l) class(l$geom)[1], "")
+  expect_false(any(c("GeomVline", "GeomRect") %in% geoms3))
+
+  # An interval that reaches past the swept sizes widens the axis to show it.
+  wide <- ggplot2::ggplot_build(power_curve_plot(
+    pc, solved = list(value = 190, lo = 150, hi = 260)
+  ))
+  x_range <- wide$layout$panel_params[[1]]$x.range
+  expect_lte(x_range[1], 40)
+  expect_gte(x_range[2], 260)
+})
+
+test_that("power_curve_plot() refuses a `solved` it cannot read", {
+  pc <- data.frame(n = c(40, 80, 120), power = c(0.31, 0.62, 0.80))
+  msg <- "`solved` needs numeric `value`, `lo` and `hi`, as pilotr's target_n() returns."
+  expect_error(power_curve_plot(pc, solved = 120), msg, fixed = TRUE)
+  expect_error(power_curve_plot(pc, solved = c(value = 120, lo = 104,
+                                               hi = 139)),
+               msg, fixed = TRUE)
+  expect_error(power_curve_plot(pc, solved = list(value = 120, lo = 104)),
+               msg, fixed = TRUE)
+  expect_error(power_curve_plot(pc, solved = list(value = "120", lo = 104,
+                                                  hi = 139)),
+               msg, fixed = TRUE)
+  expect_error(power_curve_plot(pc, solved = list(value = NA_real_, lo = 104,
+                                                  hi = 139)),
+               msg, fixed = TRUE)
+  expect_error(power_curve_plot(pc, solved = list(value = TRUE, lo = 104,
+                                                  hi = 139)),
+               msg, fixed = TRUE)
+  expect_error(power_curve_plot(pc, solved = list(value = c(120, 130),
+                                                  lo = 104, hi = 139)),
+               msg, fixed = TRUE)
+  expect_error(power_curve_plot(pc, solved = data.frame(value = c(120, 130),
+                                                        lo = 104, hi = 139)),
+               msg, fixed = TRUE)
+})
+
+test_that("power_curve_plot() draws one line without a legend for a one-level effect", {
+  # pilotr's power_curve_mixed() names the focal effect even when there is only
+  # one, and a column with one level separates nothing.
+  pc <- pilotr_power_table()
+  pc <- pc[pc$effect == "cond", ]
+  expect_no_message(p <- power_curve_plot(pc))
+  geoms <- vapply(p$layers, function(l) class(l$geom)[1], "")
+  line <- ggplot2::ggplot_build(p)$data[[which(geoms == "GeomLine")]]
+  expect_length(unique(line$group), 1)
+  expect_null(p$mapping$colour)
+  expect_null(p$mapping$linetype)
+  expect_false(any(c("colour", "linetype") %in% names(p$labels)))
+})
+
 test_that("optimizer_fixef_plot() works from a data frame", {
   df <- expand.grid(optimizer = c("bobyqa", "Nelder_Mead"),
                     term = c("(Intercept)", "x1"))
