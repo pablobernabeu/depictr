@@ -19,8 +19,9 @@ correlation_heatmap(
 \arguments{
 \item{data}{A data frame.}
 
-\item{cols}{Optional character vector of columns to include. If \code{NULL}, all
-numeric columns are used.}
+\item{cols}{Optional character vector of columns to include, each numeric or
+logical. Any other column, such as a factor or a date, is an error that
+names it. If \code{NULL}, all numeric columns are used.}
 
 \item{method}{Correlation method: \code{"pearson"}, \code{"spearman"} or \code{"kendall"}.}
 

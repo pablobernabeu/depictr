@@ -8,6 +8,12 @@
 #' numeric variable by level; and two categorical variables as a filled bar
 #' chart of proportions.
 #'
+#' Dates, date-times and durations (`Date`, `POSIXct` and `difftime` columns)
+#' count as numeric. Against a numeric variable, they give a scatter plot with
+#' a trend, drawn by [scatter_trend()], and against a categorical one box plots
+#' of their values by level. A duration is drawn as a number in its own units,
+#' named in the default axis title, as in `stay (days)`.
+#'
 #' @param data A data frame.
 #' @param x,y The two variables (string or unquoted name).
 #' @param method Smoothing method for the numeric-numeric case (passed to
@@ -26,12 +32,22 @@ explore_bivariate <- function(data, x, y, method = "lm", palette = NULL,
                               title = NULL, x_lab = NULL, y_lab = NULL) {
   x <- resolve_var(data, rlang::enquo(x), "x")
   y <- resolve_var(data, rlang::enquo(y), "y")
-  x_lab <- x_lab %||% x
-  y_lab <- y_lab %||% y
+  x_lab <- x_lab %||% duration_title(data[[x]], x)
+  y_lab <- y_lab %||% duration_title(data[[y]], y)
 
-  x_num <- is.numeric(data[[x]])
-  y_num <- is.numeric(data[[y]])
+  # is.numeric() is FALSE for a date, so a date was taken for a category and
+  # drawn as one box per day.
+  x_num <- is_continuous(data[[x]])
+  y_num <- is_continuous(data[[y]])
   d <- data[!is.na(data[[x]]) & !is.na(data[[y]]), , drop = FALSE]
+  # ggplot2 picks no scale for a difftime and falls back to a continuous one
+  # with a message, so a duration is drawn as a plain number in its own units,
+  # which the axis title names.
+  for (v in unique(c(x, y))) {
+    if (inherits(d[[v]], "difftime")) {
+      d[[v]] <- as.double(d[[v]], units = units(d[[v]]))
+    }
+  }
 
   if (x_num && y_num) {
     return(scatter_trend(d, x, y, method = method, title = title,
@@ -75,4 +91,15 @@ explore_bivariate <- function(data, x, y, method = "lm", palette = NULL,
     ggplot2::labs(x = x_lab, y = paste("Proportion of", y_lab), title = title) +
     theme_depictr(grid = "y") +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 30, hjust = 1))
+}
+
+# Columns placed on a continuous axis: numbers, dates, date-times and
+# durations.
+is_continuous <- function(v) {
+  is.numeric(v) || inherits(v, c("Date", "POSIXt", "difftime"))
+}
+
+# The default axis title of a column, with the units of a duration.
+duration_title <- function(v, name) {
+  if (inherits(v, "difftime")) paste0(name, " (", units(v), ")") else name
 }

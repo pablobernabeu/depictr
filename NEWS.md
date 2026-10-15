@@ -346,6 +346,22 @@
   legend and the colours, and leaves out levels that no row uses. It ordered
   the groups by first appearance.
 
+* `summary_table()` and `explore_bivariate()` took a date for a category.
+  `summary_table()` gave a `Date`, `POSIXct` or `difftime` column one row per
+  distinct value, so 40 visits on 40 days filled 40 rows. Dates are now
+  summarised as a range instead of one row per day: a single `Range` row reads
+  `2024-01-01 to 2024-04-27` overall and in each group, with the time to the
+  minute or second where the column has one. A duration is summarised as mean
+  (SD) in its own units, which the statistic names, as in `Mean (SD), days`.
+  `explore_bivariate()` drew a date against a number as one box plot per day,
+  and against a category as bars with a colour for each day, both with a
+  warning that the colours had been interpolated past the eight of the
+  Okabe-Ito set. Dates, date-times and durations now count as numeric.
+  Against a numeric variable, they give the scatter plot with a trend of
+  `scatter_trend()`, and against a categorical one box plots of their values
+  by level. A duration is drawn as a number in its own units, named in the
+  default axis title. The Python package now does the same.
+
 * `timeseries_plot()` drew a moving average over an even window, such as
   `rolling = 12` for monthly data, half an observation early. Equal weights
   over twelve observations are centred between two of them, and the mean of
@@ -372,6 +388,11 @@
 * `vif_plot()` refuses a model with aliased coefficients, for which no VIF
   exists, and names the terms they belong to. It failed with an unrelated
   base-R error, "missing value where TRUE/FALSE needed".
+
+* `correlation_heatmap()` refuses a column in `cols` that it cannot correlate
+  and names it, in the words of `explore_pairs()`. A factor failed with an
+  error from `var()` that did not name the column, and a date with "'x' must
+  be numeric" from `cor()`. Logical columns are still correlated as 0 and 1.
 
 * `seasonal_plot()` refused every frequency that is not a whole number, such
   as the 365.25 / 7 of weekly data, with a message about `season_labels` that

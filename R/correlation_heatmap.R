@@ -7,8 +7,9 @@
 #' the correlation values.
 #'
 #' @param data A data frame.
-#' @param cols Optional character vector of columns to include. If `NULL`, all
-#'   numeric columns are used.
+#' @param cols Optional character vector of columns to include, each numeric or
+#'   logical. Any other column, such as a factor or a date, is an error that
+#'   names it. If `NULL`, all numeric columns are used.
 #' @param method Correlation method: `"pearson"`, `"spearman"` or `"kendall"`.
 #' @param use Missing-value handling passed to [stats::cor()].
 #' @param show_values Whether to annotate each cell with its correlation, drawn
@@ -51,6 +52,15 @@ correlation_heatmap <- function(data, cols = NULL, method = "pearson",
     cols <- names(data)[vapply(data, is.numeric, logical(1))]
   } else {
     check_columns(data, cols)
+    # cor() takes numbers and logicals only. A factor failed in var() with
+    # "Calling var(x) on a factor x is defunct", and a date in cor() itself.
+    correlatable <- vapply(data[cols], function(v) {
+      is.numeric(v) || is.logical(v)
+    }, logical(1))
+    if (!all(correlatable)) {
+      stop("correlation_heatmap() needs numeric columns; these are not: ",
+           paste(cols[!correlatable], collapse = ", "), ".", call. = FALSE)
+    }
   }
   if (length(palette) != 3) {
     stop("`palette` must have exactly three colours.", call. = FALSE)

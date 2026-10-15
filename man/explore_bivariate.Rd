@@ -38,6 +38,13 @@ with a fitted trend; a numeric and a categorical variable as box plots of the
 numeric variable by level; and two categorical variables as a filled bar
 chart of proportions.
 }
+\details{
+Dates, date-times and durations (\code{Date}, \code{POSIXct} and \code{difftime} columns)
+count as numeric. Against a numeric variable, they give a scatter plot with
+a trend, drawn by \code{\link[=scatter_trend]{scatter_trend()}}, and against a categorical one box plots
+of their values by level. A duration is drawn as a number in its own units,
+named in the default axis title, as in \code{stay (days)}.
+}
 \examples{
 explore_bivariate(crop_yield, fertiliser, yield)        # numeric ~ numeric
 explore_bivariate(lexical_decision, condition, RT)      # categorical ~ numeric

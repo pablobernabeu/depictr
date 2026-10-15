@@ -13,6 +13,13 @@
 #' row whenever it contains missing values; set `missing = FALSE` to suppress
 #' these.
 #'
+#' A date or date-time column (`Date`, `POSIXct`) gets a single `Range` row,
+#' written as `<earliest> to <latest>` in each column. The cells give the date
+#' alone when every time in the column falls at midnight, and the time to the
+#' minute, or to the second when any time has seconds. A duration (`difftime`)
+#' is summarised as mean (SD) in its own units, which the statistic names, as
+#' in `Mean (SD), days`.
+#'
 #' When `vars` is `NULL`, high-cardinality character/factor columns (those whose
 #' number of distinct levels approaches the number of rows, e.g. identifier
 #' columns) are skipped automatically, with a message, rather than being
@@ -110,7 +117,21 @@ summary_table <- function(data, vars = NULL, group = NULL, digits = 1,
 
   for (v in vars) {
     col <- data[[v]]
-    if (is.numeric(col)) {
+    if (inherits(col, c("Date", "POSIXt"))) {
+      # A date is not a level: expanded as one, it gave a row per day.
+      fmt <- date_cell_format(col)
+      cells <- vapply(groups, function(g) date_range_cell(g[[v]], fmt),
+                      character(1))
+      rows[[length(rows) + 1]] <- c(variable = v, statistic = "Range", cells)
+    } else if (inherits(col, "difftime")) {
+      unit <- units(col)
+      cells <- vapply(groups, function(g) {
+        num_fmt(as.double(g[[v]], units = unit))
+      }, character(1))
+      rows[[length(rows) + 1]] <- c(variable = v,
+                                    statistic = paste0("Mean (SD), ", unit),
+                                    cells)
+    } else if (is.numeric(col)) {
       cells <- vapply(groups, function(g) num_fmt(g[[v]]), character(1))
       rows[[length(rows) + 1]] <- c(variable = v, statistic = "Mean (SD)", cells)
     } else {
@@ -139,4 +160,26 @@ summary_table <- function(data, vars = NULL, group = NULL, digits = 1,
   dup <- duplicated(out$variable)
   out$variable[dup] <- ""
   out
+}
+
+# The format of the cells of a date or date-time column. It is chosen once for
+# the whole column, so that every cell of the row has the same precision: the
+# date alone when every time falls at midnight, minutes when no time has
+# seconds and seconds otherwise. The Python twin applies the same rule.
+date_cell_format <- function(col) {
+  if (inherits(col, "Date")) return("%Y-%m-%d")
+  # POSIXlt gives the clock time in the column's own time zone, the one the
+  # cells are printed in.
+  lt <- as.POSIXlt(col[!is.na(col)])
+  if (all(lt$hour == 0 & lt$min == 0 & lt$sec == 0)) return("%Y-%m-%d")
+  if (all(lt$sec == 0)) return("%Y-%m-%d %H:%M")
+  "%Y-%m-%d %H:%M:%S"
+}
+
+# One cell of a date row: the earliest and latest values present, or "--" when
+# there are none.
+date_range_cell <- function(v, fmt) {
+  v <- v[!is.na(v)]
+  if (!length(v)) return("--")
+  paste(format(min(v), format = fmt), "to", format(max(v), format = fmt))
 }
