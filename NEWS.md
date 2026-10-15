@@ -530,11 +530,15 @@
   versions, and it is the DOI that the CRAN page and the citation R generates
   for a CRAN package already gave, so the package no longer circulates under
   two. Zenodo still archives every GitHub release, and `CITATION.cff` lists both
-  identifiers. Its release date is now the day CRAN published 0.3.0, 2026-09-01,
-  where it gave a date that matched neither CRAN nor the GitHub release. The
-  CRAN DOI and the Zenodo DOI are shown as full links on the website and in the
-  README, and the sidebar of the home page shows the CRAN DOI once: the DOI
-  badge in the README no longer appears there a second time.
+  identifiers. The CRAN DOI and the Zenodo DOI are shown as full links on the
+  website and in the README, and the sidebar of the home page shows the CRAN DOI
+  once: the DOI badge in the README no longer appears there a second time.
+
+* `citation("depictr")` gives the author's ORCID iD, as DESCRIPTION and
+  `CITATION.cff` do. `CITATION.cff` dates 0.3.0 by its first public release,
+  2026-08-27, the day of the GitHub release that Zenodo archived, and records
+  CRAN's publication on 2026-09-01 beside it. It gave 2026-08-21, when 0.3.0
+  was not yet public on any channel.
 
 * `posterior_plot()` and `frequentist_bayesian_plot()` formatted a label for
   every posterior draw, which made a ten-parameter figure take seconds and a

@@ -8,7 +8,8 @@ citHeader("To cite depictr in publications, use:")
 bibentry(
   bibtype  = "Manual",
   title    = "{depictr}: A unified toolkit for visualising statistical models and data",
-  author   = person("Pablo", "Bernabeu"),
+  author   = person("Pablo", "Bernabeu",
+                    comment = c(ORCID = "0000-0003-1083-2460")),
   year     = "2026",
   note     = sprintf("R package version %s", meta$Version),
   doi      = "10.32614/CRAN.package.depictr",

@@ -9,8 +9,9 @@ authors:
     orcid: "https://orcid.org/0000-0003-1083-2460"
     email: pcbernabeu@gmail.com
 version: "0.3.0"
-# The date CRAN published 0.3.0.
-date-released: "2026-09-01"
+# 0.3.0 first became public on 2026-08-27, when the GitHub release appeared and
+# Zenodo archived it. CRAN published it on 2026-09-01.
+date-released: "2026-08-27"
 # The DOI CRAN assigned to the package on publication. It identifies the package
 # across all its versions, so the version above pins the release.
 doi: "10.32614/CRAN.package.depictr"
