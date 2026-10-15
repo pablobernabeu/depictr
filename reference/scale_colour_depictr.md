@@ -15,6 +15,7 @@ scale_colour_depictr(
   n = NULL,
   palette = NULL,
   na.value = depictr_opt("na_value"),
+  order = c("default", "contrast"),
   ...
 )
 
@@ -22,6 +23,7 @@ scale_color_depictr(
   n = NULL,
   palette = NULL,
   na.value = depictr_opt("na_value"),
+  order = c("default", "contrast"),
   ...
 )
 
@@ -29,6 +31,7 @@ scale_fill_depictr(
   n = NULL,
   palette = NULL,
   na.value = depictr_opt("na_value"),
+  order = c("default", "contrast"),
   ...
 )
 ```
@@ -57,6 +60,16 @@ scale_fill_depictr(
   Colour for `NA` levels. Defaults to the resolved `depictr.na_value`
   option (the muted grey `"grey80"` unless changed).
 
+- order:
+
+  `"default"`, or `"contrast"` to draw the groups in the contrast-first
+  order of
+  [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md),
+  with which two or three groups pass every colour row of
+  [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md).
+  More than four groups warn at draw time. It cannot be combined with
+  `palette`.
+
 - ...:
 
   Passed to
@@ -73,5 +86,13 @@ library(ggplot2)
 ggplot(crop_yield, aes(rainfall, yield, colour = treatment)) +
   geom_point() +
   scale_colour_depictr() +
+  theme_depictr()
+
+
+# The vermillion in the orange's place, at 3.87:1 against white
+ggplot(crop_yield, aes(rainfall, yield, colour = treatment,
+                       shape = treatment)) +
+  geom_point() +
+  scale_colour_depictr(order = "contrast") +
   theme_depictr()
 ```

@@ -89,7 +89,9 @@ panel as well as around it, and the contrast check covers the text
 around it alone. Each row reports the value it measured next to the
 threshold, so a verdict can be argued with. For a figure saved at its
 final width, give that width as both `width_cm` and `render_width_cm`,
-or neither.
+or neither, or let `save_plot(check = TRUE)` audit it at the width it
+saves. A journal that caps text size, as Nature does at 7 pt, can be
+held to its cap with `max_text_pt`.
 
 ``` r
 
@@ -117,6 +119,10 @@ above therefore fails `geometry_contrast`, as well as
 `redundant_encoding` and, at 8.9 cm, `text_size`. Opaque marks, the
 vermillion `#d55e00` in the orange’s place and a redundant shape or line
 type clear the two colour rows.
+`scale_colour_depictr(order = "contrast")` puts the vermillion there for
+one plot, and
+`depictr_options(palette = depictr_palette(order = "contrast"))` does so
+for every later one.
 
 ## A first plot
 

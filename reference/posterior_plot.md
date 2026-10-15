@@ -69,7 +69,8 @@ posterior_plot(
   to
   [`format_terms()`](https://pablobernabeu.github.io/depictr/reference/format_terms.md).
   For a `brms` fit, or a draws object holding `b_` parameters, the names
-  are given without the `b_` prefix.
+  are given without the `b_` prefix. An unnamed vector gives one label
+  per parameter, in the order the parameters appear in `draws`.
 
 - reference_line:
 

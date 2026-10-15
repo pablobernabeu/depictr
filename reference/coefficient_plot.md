@@ -17,13 +17,14 @@ coefficient_plot(
   interaction = c("times", "asterisk", "colon", "space"),
   point_colour = depictr_brand(),
   reference_colour = depictr_reference(),
-  reference_line = 0,
+  reference_line = if (exponentiate) 1 else 0,
   point_size = 2.2,
   line_size = 0.7,
   facet = FALSE,
   scales = c("fixed", "free"),
   standardise = FALSE,
   sd_multiple = 1,
+  exponentiate = FALSE,
   title = NULL,
   subtitle = NULL,
   x_lab = NULL
@@ -63,8 +64,10 @@ coefficient_plot(
   [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md)
   returns, after the intercept is dropped unless `intercept = TRUE`),
   whatever `order` is. A named vector mapping raw term names to labels,
-  such as `c(soil_ph = "Soil pH")`, is safer. If `NULL`, names are
-  tidied with
+  such as `c(soil_ph = "Soil pH")`, is safer. If `NULL`, the coefficient
+  of a factor level is labelled with its variable and level, inside
+  interaction terms too, so the contrast of enhanced with the reference
+  level reads `treatment: enhanced`. Other names are tidied with
   [`format_terms()`](https://pablobernabeu.github.io/depictr/reference/format_terms.md).
 
 - interaction:
@@ -80,8 +83,9 @@ coefficient_plot(
 
 - reference_line:
 
-  Position of a vertical reference line (e.g. `0` for differences, `1`
-  for odds/risk ratios). Use `NA` to omit it.
+  Position of a vertical reference line. Defaults to 0, or to 1 when
+  `exponentiate = TRUE`, where a ratio of 1 means no effect. Use `NA` to
+  omit it.
 
 - point_size, line_size:
 
@@ -129,6 +133,15 @@ coefficient_plot(
   2 for Gelman's (2008) convention, under which the coefficient of a
   continuous input is comparable to that of a balanced binary one.
 
+- exponentiate:
+
+  Whether to draw the exponentiated estimates and intervals on a log10
+  axis, which shows the coefficients of a logistic regression as odds
+  ratios and those of a Poisson or negative binomial model as rate
+  ratios. It applies after `standardise`, so a standardised slope
+  becomes a ratio per SD of its predictor. A data frame `x` must hold
+  estimates on the link scale. Defaults to `FALSE`.
+
 - title, subtitle, x_lab:
 
   Plot title, subtitle and x-axis label. `x_lab` defaults to "Estimate",
@@ -136,7 +149,13 @@ coefficient_plot(
   with `sd_multiple = 2`), followed by "(contrasts unscaled)" when a
   factor or binary term is drawn. The label names the convention on the
   figure itself, because only the predictors are rescaled here: a fully
-  standardised beta would rescale the outcome too.
+  standardised beta would rescale the outcome too. With
+  `exponentiate = TRUE`, "Estimate" gives way to the name of the ratio:
+  "Odds ratio" for a logit link, "Rate ratio" for a log link in a
+  Poisson, quasi-Poisson or negative binomial model, "Risk ratio" for a
+  binomial model with a log link and "exp(Estimate)" otherwise. The last
+  covers an `lm(log(y) ~ x)` slope, whose exponential is a ratio of
+  geometric means.
 
 ## Value
 
@@ -169,4 +188,10 @@ coefficient_plot(fit, intercept = TRUE, facet = TRUE)
 # Or scale the continuous slopes per SD of their predictors, leaving the
 # treatment contrast in the outcome's units:
 coefficient_plot(fit, standardise = TRUE)
+
+
+# Odds ratios from a logistic regression, on a log axis with the line at 1:
+gfit <- glm(accuracy ~ word_frequency + condition,
+            data = lexical_decision, family = binomial)
+coefficient_plot(gfit, exponentiate = TRUE)
 ```

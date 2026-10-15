@@ -6,6 +6,9 @@ with sensible defaults for figures in papers and reports: a moderate
 size, 300 dpi, and the output directory created if needed. The device is
 inferred from the file extension, and PDF, EPS and TIFF files are
 written to pass the technical checks journals run on submitted figures.
+With `check = TRUE`, the figure is also audited with
+[`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+at the width it is saved at.
 
 ## Usage
 
@@ -17,6 +20,7 @@ save_plot(
   height = 4.5,
   units = "in",
   dpi = 300,
+  check = FALSE,
   ...
 )
 ```
@@ -46,6 +50,19 @@ save_plot(
   layers, and whatever they overlap, at this resolution or at 600 dpi,
   whichever is higher.
 
+- check:
+
+  Whether to audit the figure with
+  [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  at the width it is saved at, given as both `width_cm` and
+  `render_width_cm`, so that the text sizes it reports are the printed
+  ones. A warning names each check the figure fails. Defaults to
+  `FALSE`. The audit runs before the file is written, so a plot it
+  cannot read is refused without saving. For other thresholds, such as a
+  journal's own text floor, call
+  [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  with the saved width as both widths.
+
 - ...:
 
   Passed to
@@ -56,7 +73,9 @@ save_plot(
 
 ## Value
 
-The `filename`, invisibly.
+The `filename`, invisibly. With `check = TRUE`, the audit report is
+attached to it as the attribute `"check"`, which `attr(, "check")`
+reads.
 
 ## Formats journals accept
 
@@ -140,4 +159,32 @@ save_plot(tmp, p)
 
 # A TIFF well within the 10 MB that PLOS allows.
 save_plot(file.path(tempdir(), "yield.tiff"), p)
+
+# Audited at the 8.9 cm column it is saved for, where its text prints at
+# the size it is drawn.
+saved <- save_plot(file.path(tempdir(), "yield-column.png"), p,
+                   width = 8.9, height = 6, units = "cm", check = TRUE)
+attr(saved, "check")
+#>                         check measured threshold        verdict
+#> 1         colour_separability       NA       5.0 not applicable
+#> 2  colour_separability_protan       NA       5.0 not applicable
+#> 3  colour_separability_deutan       NA       5.0 not applicable
+#> 4  colour_separability_tritan       NA       5.0 not applicable
+#> 5      greyscale_separability       NA       5.0 not applicable
+#> 6                   text_size     8.80       6.0           pass
+#> 7               text_contrast     8.45       4.5           pass
+#> 8           geometry_contrast       NA       3.0 not applicable
+#> 9          redundant_encoding       NA       1.0 not applicable
+#> 10       annotation_text_size       NA       6.0 not applicable
+#>                                                             detail
+#> 1     No two encoding colours: nothing is distinguished by colour.
+#> 2     No two encoding colours: nothing is distinguished by colour.
+#> 3     No two encoding colours: nothing is distinguished by colour.
+#> 4     No two encoding colours: nothing is distinguished by colour.
+#> 5     No two encoding colours: nothing is distinguished by colour.
+#> 6  Smallest text 8.80 pt, drawn at 8.90 cm and printed at 8.90 cm.
+#> 7              Lowest-contrast text #4d4d4d on #ffffff at 8.80 pt.
+#> 8     No two encoding colours: nothing is distinguished by colour.
+#> 9     No two encoding colours: nothing is distinguished by colour.
+#> 10                      The figure draws no text inside the panel.
 ```

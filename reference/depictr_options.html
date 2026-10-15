@@ -117,7 +117,8 @@ by <code>depictr_reference()</code>.</p></dd>
 <dd><p>An optional custom qualitative palette: a character vector of
 hex colours used by <code><a href="depictr_palette.html">depictr_palette()</a></code> (type <code>"qualitative"</code>) and the
 discrete scales in place of the built-in Okabe-Ito set. <code>NULL</code> restores the
-built-in palette.</p></dd>
+built-in palette. <code>depictr_palette(order = "contrast")</code> here draws every
+later plot in the contrast-first order (see <code><a href="depictr_palette.html">depictr_palette()</a></code>).</p></dd>
 
 
 <dt id="arg-na-value">na_value<a class="anchor" aria-label="anchor" href="#arg-na-value"></a></dt>
@@ -550,6 +551,12 @@ package default.</p>
 <span class="r-in"><span><span class="va">old</span> <span class="op">&lt;-</span> <span class="fu">depictr_options</span><span class="op">(</span>palette <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#1b9e77"</span>, <span class="st">"#d95f02"</span>, <span class="st">"#7570b3"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="depictr_palette.html">depictr_palette</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#1b9e77" "#d95f02" "#7570b3"</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">depictr_options</span>, <span class="va">old</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Or the built-in palette in its contrast-first order</span></span></span>
+<span class="r-in"><span><span class="va">old</span> <span class="op">&lt;-</span> <span class="fu">depictr_options</span><span class="op">(</span>palette <span class="op">=</span> <span class="fu"><a href="depictr_palette.html">depictr_palette</a></span><span class="op">(</span>order <span class="op">=</span> <span class="st">"contrast"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="depictr_palette.html">depictr_palette</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#005b96" "#d55e00" "#cc79a7"</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">depictr_options</span>, <span class="va">old</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>

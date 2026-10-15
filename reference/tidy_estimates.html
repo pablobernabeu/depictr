@@ -66,7 +66,7 @@ on its own.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tidy_estimates</span><span class="op">(</span><span class="va">x</span>, conf_level <span class="op">=</span> <span class="fl">0.95</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tidy_estimates</span><span class="op">(</span><span class="va">x</span>, conf_level <span class="op">=</span> <span class="fl">0.95</span>, exponentiate <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -79,6 +79,14 @@ on its own.</p>
 
 <dt id="arg-conf-level">conf_level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
 <dd><p>Confidence (or credible) level for the interval.</p></dd>
+
+
+<dt id="arg-exponentiate">exponentiate<a class="anchor" aria-label="anchor" href="#arg-exponentiate"></a></dt>
+<dd><p>Whether to exponentiate the estimates and interval
+limits, which turns log-odds into odds ratios and log rates into rate
+ratios. The <code>std.error</code> column stays on the link scale, as in
+<code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">broom::tidy()</a></code>. A data frame is read as estimates on the link scale.
+Defaults to <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -97,9 +105,16 @@ supports <code>"fixed"</code>.</p></dd>
     <p>Methods are provided for <code>lm</code>, <code>glm</code> and <code>merMod</code> (mixed models fitted with
 'lme4') objects, and for data frames. For any other model class the function
 falls back to <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">broom::tidy()</a></code> when the 'broom' package is installed.</p>
-<p>Confidence intervals are computed with the normal approximation
-(estimate +/- z * standard error) for <code>glm</code> and <code>merMod</code> objects, which is
-fast and dependency-free; <code>lm</code> objects use the exact t-based interval. Supply
+<p>Confidence intervals are Wald intervals, estimate +/- multiplier * standard
+error, with the multiplier the model's own tests use. An <code>lm</code> object gets
+the t interval of <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">stats::confint()</a></code>. A <code>glm</code> whose dispersion is estimated
+(Gaussian, Gamma, inverse Gaussian and quasi families) gets t on the
+residual degrees of freedom, since <code><a href="https://rdrr.io/r/stats/summary.glm.html" class="external-link">stats::summary.glm()</a></code> then tests with
+t. One whose dispersion is fixed (binomial, Poisson and <code><a href="https://rdrr.io/pkg/MASS/man/glm.nb.html" class="external-link">MASS::glm.nb()</a></code>)
+gets z. The choice is read from the column the summary reports, "t value"
+or "z value". At 12 residual degrees of freedom, the t interval is about
+11% wider than the z interval, and at 100 about 1% wider. A <code>merMod</code> fit
+gets z, since 'lme4' gives no degrees of freedom. Supply
 a data frame with your own intervals (for example profiled or posterior
 intervals) to override this.</p>
     </div>
@@ -113,6 +128,15 @@ intervals) to override this.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2          rainfall  0.004527229 0.0007284476  0.003090628 0.005963831</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3        fertiliser  0.010488592 0.0013233496  0.007878760 0.013098424</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4 treatmentenhanced  1.290135752 0.1189761405  1.055498001 1.524773503</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Odds ratios from a logistic regression:</span></span></span>
+<span class="r-in"><span><span class="va">gfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">accuracy</span> <span class="op">~</span> <span class="va">word_frequency</span> <span class="op">+</span> <span class="va">condition</span>,</span></span>
+<span class="r-in"><span>            data <span class="op">=</span> <span class="va">lexical_decision</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">tidy_estimates</span><span class="op">(</span><span class="va">gfit</span>, exponentiate <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 term  estimate std.error  conf.low conf.high</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1        (Intercept) 6.4237841 0.3895402 2.9937372 13.783776</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     word_frequency 1.3544310 0.1132865 1.0847440  1.691167</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 conditionunrelated 0.8622706 0.2726054 0.5053607  1.471247</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># A data frame of pre-computed estimates is standardised, not re-fitted:</span></span></span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>

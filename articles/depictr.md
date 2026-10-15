@@ -13,6 +13,13 @@ one theme, one palette and one set of label conventions.
 library(depictr)
 ```
 
+
+    Attaching package: 'depictr'
+
+    The following object is masked _by_ '.GlobalEnv':
+
+        simulate_figure
+
 ## Five datasets to explore
 
 The package ships with five reproducibly simulated datasets, each chosen
@@ -213,6 +220,28 @@ palette_safety()
     $threshold
     [1] 5
 
+[`simulate_figure()`](https://pablobernabeu.github.io/depictr/reference/simulate_figure.md)
+applies the same simulation to a whole figure. Every colour the figure
+draws goes through it, in the legend keys, the text and any colourbar as
+well as in the data. The result is a gtable that
+[`grid::grid.draw()`](https://rdrr.io/r/grid/grid.draw.html) draws and
+[`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
+saves. Here is the scatter plot from the start of this section as a
+reader with deuteranopia sees it:
+
+``` r
+
+by_treatment <- ggplot(crop_yield, aes(fertiliser, yield, colour = treatment)) +
+  geom_point(alpha = 0.7) +
+  scale_colour_depictr() +
+  theme_depictr()
+
+grid::grid.newpage()
+grid::grid.draw(simulate_figure(by_treatment, "deutan"))
+```
+
+![](depictr_files/figure-html/unnamed-chunk-13-1.png)
+
 ## Auditing the figure you are about to submit
 
 A safe palette is not a safe figure. Once a plot has been extended with
@@ -289,6 +318,19 @@ check_figure(mended)[, c("check", "measured", "threshold", "verdict")]
     9          redundant_encoding     1.00       1.0           pass
     10       annotation_text_size       NA       6.0 not applicable
 
+The vermillion need not be typed by hand.
+`scale_colour_depictr(order = "contrast")` draws the groups in the
+contrast-first order of
+[`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
+It leads with the brand blue, the vermillion and the reddish purple, the
+only three of the eight colours that clear every colour row together.
+The bluish green comes fourth, and with it four groups still keep 3:1
+against white.
+`depictr_options(palette = depictr_palette(order = "contrast"))` makes
+that order the default for every later plot. Under it, the second group
+takes the vermillion, which depictr also uses as its accent for single
+highlights.
+
 The audit also takes a stated output width, which is where most figure
 text quietly fails. Text is drawn in points, so a figure saved seven
 inches wide and then printed in an 8.9 cm column arrives at half the
@@ -314,6 +356,12 @@ PLOS and APA Style asked for at least 8 pt, Elsevier for 7 pt and Nature
 for 5 to 7 pt, and
 [`?check_figure`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
 links all four.
+
+Nature’s range has a ceiling as well as a floor, since no text but the
+panel labels may exceed 7 pt. Passing `max_text_pt = 7` holds a figure
+to it in a row of its own, `text_size_max`. `save_plot(check = TRUE)`
+runs the audit as it saves, at the width it saves at, and warns about
+each check the figure fails.
 
 One limitation belongs here, beside the claim it qualifies, since the
 package is the one making that claim. The eight-colour qualitative
@@ -389,7 +437,7 @@ old <- depictr_options(base_size = 13, accent = "#b3589a")
 coefficient_plot(fit, title = "Set once, applied everywhere")
 ```
 
-![](depictr_files/figure-html/unnamed-chunk-18-1.png)
+![](depictr_files/figure-html/unnamed-chunk-19-1.png)
 
 ``` r
 

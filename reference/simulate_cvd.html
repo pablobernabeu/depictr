@@ -85,9 +85,10 @@ defined on linear-light RGB, so a colour is decoded from sRGB to linear RGB
 
 <dt id="arg-severity">severity<a class="anchor" aria-label="anchor" href="#arg-severity"></a></dt>
 <dd><p>Severity in <code>[0, 1]</code>. Zero leaves the colours unchanged and
-one is the full deficiency. Intermediate values interpolate the transform
-towards the identity, an approximation to Machado et al.'s per-severity
-matrices.</p></dd>
+one is the full deficiency. Machado et al. publish a matrix for each tenth
+of severity, which is used as it stands at 0.1, 0.2 and so on. A severity
+between two tenths takes the linear interpolation of their matrices, as
+the authors suggest and as the colorspace package does.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -99,7 +100,8 @@ matrices.</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This is the simulator behind <code><a href="palette_preview.html">palette_preview()</a></code>'s <code>cvd</code> argument, behind
 <code><a href="palette_safety.html">palette_safety()</a></code>, and behind the colour-separability rows of
-<code><a href="check_figure.html">check_figure()</a></code>.</p>
+<code><a href="check_figure.html">check_figure()</a></code>. <code><a href="simulate_figure.html">simulate_figure()</a></code> applies it to every colour of a
+finished figure.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -117,7 +119,7 @@ matrices.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Half severity moves the colours only part of the way.</span></span></span>
 <span class="r-in"><span><span class="fu">simulate_cvd</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#005b96"</span>, <span class="st">"#e69f00"</span><span class="op">)</span>, <span class="st">"deutan"</span>, severity <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#1a5795" "#d8aa09"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#225695" "#d2ac04"</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

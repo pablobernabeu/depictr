@@ -125,7 +125,9 @@ outer width is used for the caption and the displayed interval mass.</p></dd>
 <dd><p>Optional named character vector renaming parameters, e.g.
 <code>c(conditionunrelated = "condition")</code>. Unmatched parameters fall back to
 <code><a href="format_terms.html">format_terms()</a></code>. For a <code>brms</code> fit, or a draws object holding <code>b_</code>
-parameters, the names are given without the <code>b_</code> prefix.</p></dd>
+parameters, the names are given without the <code>b_</code> prefix. An unnamed vector
+gives one label per parameter, in the order the parameters appear in
+<code>draws</code>.</p></dd>
 
 
 <dt id="arg-reference-line">reference_line<a class="anchor" aria-label="anchor" href="#arg-reference-line"></a></dt>

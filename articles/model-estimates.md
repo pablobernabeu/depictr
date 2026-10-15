@@ -48,16 +48,17 @@ coefficient_plot(
 
 ![](model-estimates_files/figure-html/coef-1.png)
 
-Coefficient names are tidied to the effect (variable) name automatically
-(`conditionunrelated` becomes `condition`, `word_frequency` becomes
-`word frequency`). Pass `labels` to override any of them. A slope per
-Zipf unit and a contrast between two conditions are in different units.
-`standardise = TRUE` multiplies the slope of each continuous predictor
-by that predictor’s standard deviation, so the word-frequency slope
-reads as the change in RT per SD. The two factor contrasts stay as
-differences in milliseconds between conditions. A contrast already
-compares two groups, and its per-SD value would depend on how evenly the
-trials happen to be split between them ([Gelman,
+Coefficient names are tidied automatically. A factor’s coefficient is
+labelled with its variable and the level compared with the reference, so
+`conditionunrelated` becomes `condition: unrelated`, and
+`word_frequency` becomes `word frequency`. Pass `labels` to override any
+of them. A slope per Zipf unit and a contrast between two conditions are
+in different units. `standardise = TRUE` multiplies the slope of each
+continuous predictor by that predictor’s standard deviation, so the
+word-frequency slope reads as the change in RT per SD. The two factor
+contrasts stay as differences in milliseconds between conditions. A
+contrast already compares two groups, and its per-SD value would depend
+on how evenly the trials happen to be split between them ([Gelman,
 2008](#ref-gelman2008)). An interaction is scaled through its inputs in
 the same way, and the axis label names the convention. Gelman recommends
 two SDs, which makes a continuous slope roughly comparable with a binary

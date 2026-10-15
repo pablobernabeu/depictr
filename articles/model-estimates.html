@@ -128,21 +128,23 @@ up.</p>
 <span>  title <span class="op">=</span> <span class="st">"Predictors of lexical-decision RT (ms)"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-estimates_files/figure-html/coef-1.png" class="r-plt" alt="" width="672"></p>
-<p>Coefficient names are tidied to the effect (variable) name
-automatically (<code>conditionunrelated</code> becomes
-<code>condition</code>, <code>word_frequency</code> becomes
-<code>word frequency</code>). Pass <code>labels</code> to override any
-of them. A slope per Zipf unit and a contrast between two conditions are
-in different units. <code>standardise = TRUE</code> multiplies the slope
-of each continuous predictor by that predictor’s standard deviation, so
-the word-frequency slope reads as the change in RT per SD. The two
-factor contrasts stay as differences in milliseconds between conditions.
-A contrast already compares two groups, and its per-SD value would
-depend on how evenly the trials happen to be split between them <span class="citation">(<a href="#ref-gelman2008">Gelman, 2008</a>)</span>. An
-interaction is scaled through its inputs in the same way, and the axis
-label names the convention. Gelman recommends two SDs, which makes a
-continuous slope roughly comparable with a binary contrast.
-<code>sd_multiple = 2</code> follows that convention:</p>
+<p>Coefficient names are tidied automatically. A factor’s coefficient is
+labelled with its variable and the level compared with the reference, so
+<code>conditionunrelated</code> becomes
+<code>condition: unrelated</code>, and <code>word_frequency</code>
+becomes <code>word frequency</code>. Pass <code>labels</code> to
+override any of them. A slope per Zipf unit and a contrast between two
+conditions are in different units. <code>standardise = TRUE</code>
+multiplies the slope of each continuous predictor by that predictor’s
+standard deviation, so the word-frequency slope reads as the change in
+RT per SD. The two factor contrasts stay as differences in milliseconds
+between conditions. A contrast already compares two groups, and its
+per-SD value would depend on how evenly the trials happen to be split
+between them <span class="citation">(<a href="#ref-gelman2008">Gelman,
+2008</a>)</span>. An interaction is scaled through its inputs in the
+same way, and the axis label names the convention. Gelman recommends two
+SDs, which makes a continuous slope roughly comparable with a binary
+contrast. <code>sd_multiple = 2</code> follows that convention:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/coefficient_plot.html">coefficient_plot</a></span><span class="op">(</span><span class="va">fit</span>, standardise <span class="op">=</span> <span class="cn">TRUE</span>, sd_multiple <span class="op">=</span> <span class="fl">2</span>, order <span class="op">=</span> <span class="st">"ascending"</span>,</span>
 <span>                 title <span class="op">=</span> <span class="st">"Predictors of RT, word frequency per 2 SD"</span><span class="op">)</span></span></code></pre></div>

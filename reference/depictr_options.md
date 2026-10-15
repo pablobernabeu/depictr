@@ -62,6 +62,9 @@ depictr_options(
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
   (type `"qualitative"`) and the discrete scales in place of the
   built-in Okabe-Ito set. `NULL` restores the built-in palette.
+  `depictr_palette(order = "contrast")` here draws every later plot in
+  the contrast-first order (see
+  [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)).
 
 - na_value:
 
@@ -496,5 +499,11 @@ do.call(depictr_options, old)
 old <- depictr_options(palette = c("#1b9e77", "#d95f02", "#7570b3"))
 depictr_palette(3)
 #> [1] "#1b9e77" "#d95f02" "#7570b3"
+do.call(depictr_options, old)
+
+# Or the built-in palette in its contrast-first order
+old <- depictr_options(palette = depictr_palette(order = "contrast"))
+depictr_palette(3)
+#> [1] "#005b96" "#d55e00" "#cc79a7"
 do.call(depictr_options, old)
 ```

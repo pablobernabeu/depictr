@@ -20,17 +20,18 @@ compare_models(
   labels = NULL,
   interaction = c("times", "asterisk", "colon", "space"),
   dodge_width = 0.6,
-  reference_line = 0,
+  reference_line = if (exponentiate) 1 else 0,
   palette = NULL,
   point_size = 2.2,
   line_size = 0.7,
   facet = FALSE,
   scales = c("fixed", "free"),
+  exponentiate = FALSE,
   legend_title = "Source",
   legend_ncol = 1,
   title = NULL,
   subtitle = NULL,
-  x_lab = "Estimate"
+  x_lab = NULL
 )
 ```
 
@@ -73,7 +74,11 @@ compare_models(
   returns, after the intercept is dropped unless `intercept = TRUE`.
   Terms drawn on one row, such as `stress` and brms's `b_stress`, take
   one label. A named vector mapping raw term names to labels, such as
-  `c(soil_ph = "Soil pH")`, is safer.
+  `c(soil_ph = "Soil pH")`, is safer. If `NULL`, the terms are labelled
+  as in
+  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
+  each factor level with its variable and level (`treatment: enhanced`),
+  from every fitted model among the sources.
 
 - interaction:
 
@@ -86,7 +91,8 @@ compare_models(
 
 - reference_line:
 
-  Position of a vertical reference line (`NA` to omit).
+  Position of a vertical reference line. Defaults to 0, or to 1 when
+  `exponentiate = TRUE`. Use `NA` to omit it.
 
 - palette:
 
@@ -111,13 +117,26 @@ compare_models(
   (one free-scaled panel per term). When `facet = TRUE` this is forced
   to `"free"`.
 
+- exponentiate:
+
+  Whether to draw every source's exponentiated estimates and intervals
+  on a log10 axis, as odds or rate ratios. Each model is exponentiated
+  by
+  [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md),
+  and a data frame among the sources must hold estimates on the link
+  scale, since it is exponentiated too. Defaults to `FALSE`.
+
 - legend_title, legend_ncol:
 
   Legend title and number of columns.
 
 - title, subtitle, x_lab:
 
-  Title, subtitle and x-axis label.
+  Title, subtitle and x-axis label. `x_lab` defaults to "Estimate". With
+  `exponentiate = TRUE` it defaults to the name of the ratio, as in
+  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
+  when the fitted models agree on it, and to "exp(Estimate)" when they
+  do not.
 
 ## Value
 
@@ -137,4 +156,12 @@ compare_models(`All fields` = m1, `Standard only` = m2,
 # Keep the intercept legible alongside the slopes:
 compare_models(`All fields` = m1, `Standard only` = m2,
                intercept = TRUE, facet = TRUE)
+
+
+# Odds ratios from two logistic regressions:
+g1 <- glm(accuracy ~ word_frequency + condition,
+          data = lexical_decision, family = binomial)
+g2 <- glm(accuracy ~ word_frequency + condition + modality,
+          data = lexical_decision, family = binomial)
+compare_models(Reduced = g1, Full = g2, exponentiate = TRUE)
 ```

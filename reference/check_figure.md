@@ -20,7 +20,8 @@ check_figure(
   render_width_cm = 17.78,
   min_delta_e = 5,
   min_text_pt = 6,
-  metric = c("ciede2000", "cie76")
+  metric = c("ciede2000", "cie76"),
+  max_text_pt = NULL
 )
 ```
 
@@ -66,12 +67,19 @@ check_figure(
   CIELAB that earlier versions measured. `"cie76"` is kept so that
   earlier results can be reproduced, and a later release will remove it.
 
+- max_text_pt:
+
+  The largest acceptable printed text size, in points, or `NULL`, the
+  default, for no ceiling. When given, a `text_size_max` row is appended
+  (see "What each check measures").
+
 ## Value
 
 A data frame with one row per check and columns `check`, `measured`,
 `threshold`, `verdict` (`"pass"`, `"fail"` or `"not applicable"`) and
-`detail`, a short note naming what produced the measurement. For a
-composite, the rows of each panel in turn, after a leading integer
+`detail`, a short note naming what produced the measurement. There are
+ten rows, and an eleventh, `text_size_max`, when `max_text_pt` is given.
+For a composite, the rows of each panel in turn, after a leading integer
 column `panel`.
 
 ## Details
@@ -79,7 +87,9 @@ column `panel`.
 Every row carries the value it measured next to the threshold it was
 measured against, so a verdict can be argued with rather than merely
 accepted. A check passes when the measured value is at least the
-threshold. A check that has nothing to measure, such as colour
+threshold. The one exception is `text_size_max`, a ceiling added when
+`max_text_pt` is given, which passes when the measured value is at most
+its threshold. A check that has nothing to measure, such as colour
 separability on a figure that encodes nothing by colour, reports `NA`
 and a verdict of `"not applicable"` instead of a free pass.
 
@@ -180,6 +190,11 @@ background. A label that a layer builds only when the figure is drawn,
 as ggrepel builds its repelled labels, is not yet in the built plot, so
 it is not measured either.
 
+`text_size_max` is reported only when `max_text_pt` is given, as the
+last row. It is the largest point size of all the text measured, around
+the panel and inside it, scaled as `text_size` is. It is the one row
+that passes at or below its threshold.
+
 ## Limitations of the default palette
 
 The eight-colour qualitative palette clears the colour-separability
@@ -202,7 +217,13 @@ on white whose colour tells two or more groups apart fails
 `geometry_contrast`, and drawing its marks translucent lowers the ratio
 further. Opaque marks, the vermillion (`#d55e00`, at 3.87:1) in the
 orange's place and a redundant shape clear that row and
-`redundant_encoding`, as the first example below shows.
+`redundant_encoding`, as the first example below shows. The
+contrast-first order of
+[`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
+puts the vermillion second and the reddish purple third, and
+[`scale_colour_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md)
+takes it as `order = "contrast"`. Up to three groups then pass every
+colour row, and four keep 3:1 against white.
 
 ## Auditing at the printed size
 
@@ -213,13 +234,19 @@ draws one given `width = 8.9, units = "cm"`, needs no scaling. Pass the
 saved width as both `width_cm` and `render_width_cm`, or leave both at
 their defaults. Given alone, `width_cm` audits the figure as though it
 had been drawn seven inches wide and then shrunk to fit.
+[`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
+with `check = TRUE` audits a figure at the width it saves it at, given
+as both.
 
 The default `min_text_pt` of 6 is lenient. As their guidelines stood on
 30 September 2026, PLOS asked for text of 8 to 12 pt and APA Style for 8
 to 14 pt. Elsevier asked for 7 pt as a rule of thumb, and Nature for 5
 to 7 pt, with panel labels at 8 pt. Pass the floor of the journal the
-figure is for as `min_text_pt`. The four pages are listed under
-References.
+figure is for as `min_text_pt`, and its ceiling, where it sets one, as
+`max_text_pt`. Nature's 7 pt applies to all text but the panel labels.
+The tags of a composite, where patchwork puts them, are not measured,
+but a panel label drawn as a panel's title or annotation is measured
+with the rest. The four pages are listed under References.
 
 ## Composites
 
@@ -376,6 +403,14 @@ check_figure(good, width_cm = 8.9, render_width_cm = 8.9)
 #> 8                       Lowest-contrast colour #d55e00 on #ffffff.
 #> 9                                       Colour is joined by shape.
 #> 10                      The figure draws no text inside the panel.
+
+# Nature allowed no text above 7 pt but the panel labels. The axis titles
+# here are 11 pt, so the ceiling row fails.
+subset(check_figure(good, max_text_pt = 7), check == "text_size_max")
+#>            check measured threshold verdict
+#> 11 text_size_max       11         7    fail
+#>                                                               detail
+#> 11 Largest text 11.00 pt, drawn at 17.78 cm and printed at 17.78 cm.
 
 # Each panel of a composite is audited, and a column says which panel each
 # row describes. At base size 5, the second panel's text is too small.

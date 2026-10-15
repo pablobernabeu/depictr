@@ -75,17 +75,18 @@ estimates before and after a transformation.</p>
 <span>  labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  interaction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"times"</span>, <span class="st">"asterisk"</span>, <span class="st">"colon"</span>, <span class="st">"space"</span><span class="op">)</span>,</span>
 <span>  dodge_width <span class="op">=</span> <span class="fl">0.6</span>,</span>
-<span>  reference_line <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  reference_line <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">exponentiate</span><span class="op">)</span> <span class="fl">1</span> <span class="kw">else</span> <span class="fl">0</span>,</span>
 <span>  palette <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  point_size <span class="op">=</span> <span class="fl">2.2</span>,</span>
 <span>  line_size <span class="op">=</span> <span class="fl">0.7</span>,</span>
 <span>  facet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fixed"</span>, <span class="st">"free"</span><span class="op">)</span>,</span>
+<span>  exponentiate <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  legend_title <span class="op">=</span> <span class="st">"Source"</span>,</span>
 <span>  legend_ncol <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  subtitle <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  x_lab <span class="op">=</span> <span class="st">"Estimate"</span></span>
+<span>  x_lab <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -128,7 +129,9 @@ appear across the sources, each source in the order <code><a href="tidy_estimate
 returns, after the intercept is dropped unless <code>intercept = TRUE</code>. Terms
 drawn on one row, such as <code>stress</code> and brms's <code>b_stress</code>, take one label.
 A named vector mapping raw term names to labels, such as
-<code>c(soil_ph = "Soil pH")</code>, is safer.</p></dd>
+<code>c(soil_ph = "Soil pH")</code>, is safer. If <code>NULL</code>, the terms are labelled as
+in <code><a href="coefficient_plot.html">coefficient_plot()</a></code>, each factor level with its variable and level
+(<code>treatment: enhanced</code>), from every fitted model among the sources.</p></dd>
 
 
 <dt id="arg-interaction">interaction<a class="anchor" aria-label="anchor" href="#arg-interaction"></a></dt>
@@ -140,7 +143,8 @@ A named vector mapping raw term names to labels, such as
 
 
 <dt id="arg-reference-line">reference_line<a class="anchor" aria-label="anchor" href="#arg-reference-line"></a></dt>
-<dd><p>Position of a vertical reference line (<code>NA</code> to omit).</p></dd>
+<dd><p>Position of a vertical reference line. Defaults to 0,
+or to 1 when <code>exponentiate = TRUE</code>. Use <code>NA</code> to omit it.</p></dd>
 
 
 <dt id="arg-palette">palette<a class="anchor" aria-label="anchor" href="#arg-palette"></a></dt>
@@ -165,12 +169,23 @@ and its single legend are preserved within the faceted layout. Defaults to
 forced to <code>"free"</code>.</p></dd>
 
 
+<dt id="arg-exponentiate">exponentiate<a class="anchor" aria-label="anchor" href="#arg-exponentiate"></a></dt>
+<dd><p>Whether to draw every source's exponentiated estimates
+and intervals on a log10 axis, as odds or rate ratios. Each model is
+exponentiated by <code><a href="tidy_estimates.html">tidy_estimates()</a></code>, and a data frame among the sources
+must hold estimates on the link scale, since it is exponentiated too.
+Defaults to <code>FALSE</code>.</p></dd>
+
+
 <dt id="arg-legend-title-legend-ncol">legend_title, legend_ncol<a class="anchor" aria-label="anchor" href="#arg-legend-title-legend-ncol"></a></dt>
 <dd><p>Legend title and number of columns.</p></dd>
 
 
 <dt id="arg-title-subtitle-x-lab">title, subtitle, x_lab<a class="anchor" aria-label="anchor" href="#arg-title-subtitle-x-lab"></a></dt>
-<dd><p>Title, subtitle and x-axis label.</p></dd>
+<dd><p>Title, subtitle and x-axis label. <code>x_lab</code>
+defaults to "Estimate". With <code>exponentiate = TRUE</code> it defaults to the name
+of the ratio, as in <code><a href="coefficient_plot.html">coefficient_plot()</a></code>, when the fitted models agree on
+it, and to "exp(Estimate)" when they do not.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -191,6 +206,14 @@ forced to <code>"free"</code>.</p></dd>
 <span class="r-in"><span><span class="fu">compare_models</span><span class="op">(</span>`All fields` <span class="op">=</span> <span class="va">m1</span>, `Standard only` <span class="op">=</span> <span class="va">m2</span>,</span></span>
 <span class="r-in"><span>               intercept <span class="op">=</span> <span class="cn">TRUE</span>, facet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="compare_models-2.png" alt="" width="672" height="432"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Odds ratios from two logistic regressions:</span></span></span>
+<span class="r-in"><span><span class="va">g1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">accuracy</span> <span class="op">~</span> <span class="va">word_frequency</span> <span class="op">+</span> <span class="va">condition</span>,</span></span>
+<span class="r-in"><span>          data <span class="op">=</span> <span class="va">lexical_decision</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">g2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">accuracy</span> <span class="op">~</span> <span class="va">word_frequency</span> <span class="op">+</span> <span class="va">condition</span> <span class="op">+</span> <span class="va">modality</span>,</span></span>
+<span class="r-in"><span>          data <span class="op">=</span> <span class="va">lexical_decision</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">compare_models</span><span class="op">(</span>Reduced <span class="op">=</span> <span class="va">g1</span>, Full <span class="op">=</span> <span class="va">g2</span>, exponentiate <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="compare_models-3.png" alt="" width="672" height="432"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

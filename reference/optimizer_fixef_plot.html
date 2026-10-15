@@ -105,9 +105,9 @@ intercept is always kept when <code>intercept = TRUE</code>).</p></dd>
 <dt id="arg-labels">labels<a class="anchor" aria-label="anchor" href="#arg-labels"></a></dt>
 <dd><p>Optional named character vector renaming the term panels, e.g.
 <code>c(conditionunrelated = "Unrelated priming")</code>. When <code>x</code> is a raw
-<code><a href="https://rdrr.io/pkg/lme4/man/allFit.html" class="external-link">lme4::allFit()</a></code> object, names are prettified to the effect (variable) name
-automatically (e.g. <code>conditionunrelated</code> to <code>condition</code>) and these labels
-override that default.</p></dd>
+<code><a href="https://rdrr.io/pkg/lme4/man/allFit.html" class="external-link">lme4::allFit()</a></code> object, a factor's coefficients are labelled with the
+variable and the level automatically (e.g. <code>conditionunrelated</code> becomes
+<code>condition: unrelated</code>) and these labels override that default.</p></dd>
 
 
 <dt id="arg-number-optimizers">number_optimizers<a class="anchor" aria-label="anchor" href="#arg-number-optimizers"></a></dt>

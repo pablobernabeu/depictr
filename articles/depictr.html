@@ -96,6 +96,11 @@ customising with the usual <code>+</code> syntax, and every plot shares
 one theme, one palette and one set of label conventions.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pablobernabeu.github.io/depictr/">depictr</a></span><span class="op">)</span></span></code></pre></div>
+<pre><code>
+Attaching package: 'depictr'</code></pre>
+<pre><code>The following object is masked _by_ '.GlobalEnv':
+
+    simulate_figure</code></pre>
 <div class="section level2">
 <h2 id="five-datasets-to-explore">Five datasets to explore<a class="anchor" aria-label="anchor" href="#five-datasets-to-explore"></a>
 </h2>
@@ -133,32 +138,32 @@ imbalanced classification.</li>
 <p>Begin with the data. <code><a href="../reference/explore_bivariate.html">explore_bivariate()</a></code> chooses a
 suitable plot for any pair of variables, here a scatter with a trend
 because both are numeric.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/explore_bivariate.html">explore_bivariate</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="va">fertiliser</span>, <span class="va">yield</span><span class="op">)</span></span></code></pre></div>
 <p><img src="depictr_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" alt="" width="672"></p>
 <p>Turn next to the model. After fitting it,
 <code><a href="../reference/coefficient_plot.html">coefficient_plot()</a></code> draws a forest plot of the
 estimates.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">rainfall</span> <span class="op">+</span> <span class="va">fertiliser</span> <span class="op">+</span> <span class="va">soil_ph</span> <span class="op">+</span> <span class="va">treatment</span>,</span>
 <span>          data <span class="op">=</span> <span class="va">crop_yield</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/coefficient_plot.html">coefficient_plot</a></span><span class="op">(</span><span class="va">fit</span>, order <span class="op">=</span> <span class="st">"descending"</span>, title <span class="op">=</span> <span class="st">"Drivers of crop yield"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="depictr_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="672"></p>
 <p>To see what the model implies, <code><a href="../reference/effects_plot.html">effects_plot()</a></code> traces the
 predicted response as one predictor varies.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/effects_plot.html">effects_plot</a></span><span class="op">(</span><span class="va">fit</span>, <span class="st">"fertiliser"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="depictr_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="672"></p>
 <p><code><a href="../reference/residual_diagnostics_plot.html">residual_diagnostics_plot()</a></code> gathers the usual checks of
 the fit into one panel.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/residual_diagnostics_plot.html">residual_diagnostics_plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <p><img src="depictr_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="672"></p>
 <p>For uncertainty, <code><a href="../reference/posterior_plot.html">posterior_plot()</a></code> summarises posterior
 or simulation draws as a distribution per parameter. These are the
 fixed-effect posterior draws from a Bayesian fit of the lexical-decision
 model, shipped with the package.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"lexdec_draws.rds"</span>,</span>
 <span>                             package <span class="op">=</span> <span class="st">"depictr"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/posterior_plot.html">posterior_plot</a></span><span class="op">(</span><span class="va">draws</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"conditionunrelated"</span>, <span class="st">"modalityauditory"</span>,</span>
@@ -177,7 +182,7 @@ which turns a model, or a data frame of pre-computed estimates, into one
 standard table. Because the plotting functions also accept that table,
 estimates from any source (Bayesian posteriors, bootstrap intervals, or
 figures taken from a paper) can be supplied directly.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidy_estimates.html">tidy_estimates</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <pre><code>               term     estimate    std.error     conf.low    conf.high
 1       (Intercept) -7.156372471 0.7307020339 -8.597465983 -5.715278960
@@ -191,7 +196,7 @@ figures taken from a paper) can be supplied directly.</p>
 </h2>
 <p><code><a href="../reference/theme_depictr.html">theme_depictr()</a></code>, <code><a href="../reference/depictr_palette.html">depictr_palette()</a></code> and
 <code><a href="../reference/scale_colour_depictr.html">scale_colour_depictr()</a></code> style your own plots too:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">fertiliser</span>, <span class="va">yield</span>, colour <span class="op">=</span> <span class="va">treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span></span>
@@ -201,20 +206,20 @@ figures taken from a paper) can be supplied directly.</p>
 <p><code><a href="../reference/depictr_palette.html">depictr_palette()</a></code> returns the underlying hex colours
 directly, ready to feed <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual()</a></code> or a
 base-graphics <code>col =</code> argument:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/depictr_palette.html">depictr_palette</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span></span></code></pre></div>
 <pre><code>[1] "#005b96" "#e69f00" "#009e73" "#d55e00"</code></pre>
 <p>The qualitative palette is based on the Okabe-Ito set <span class="citation">(<a href="#ref-okabe2008">Okabe &amp; Ito,
 2008</a>)</span>, which stays distinguishable under the common forms of
 colour-vision deficiency, and sequential and diverging variants are
 available too. Preview them with:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/palette_preview.html">palette_preview</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="depictr_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="672"></p>
 <p><code><a href="../reference/palette_preview.html">palette_preview()</a></code> can also <em>simulate</em> a
 colour-vision deficiency, so you can check a palette as a deuteranope
 (red-green) would see it:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/palette_preview.html">palette_preview</a></span><span class="op">(</span>cvd <span class="op">=</span> <span class="st">"deutan"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="depictr_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="672"></p>
 <p>The simulation is available on its own as
@@ -223,7 +228,7 @@ into a verdict: for normal vision and each deficiency at full severity
 it reports the smallest perceptual distance between any two colours in a
 palette, the CIEDE2000 colour difference <span class="citation">(<a href="#ref-sharma2005">Sharma et al., 2005</a>)</span>, so the
 accessibility claim comes with a number attached.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/palette_safety.html">palette_safety</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code>$min_delta_e
 [1] 6.43
@@ -243,6 +248,21 @@ $safe
 
 $threshold
 [1] 5</code></pre>
+<p><code><a href="../reference/simulate_figure.html">simulate_figure()</a></code> applies the same simulation to a whole
+figure. Every colour the figure draws goes through it, in the legend
+keys, the text and any colourbar as well as in the data. The result is a
+gtable that <code><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid::grid.draw()</a></code> draws and
+<code><a href="../reference/save_plot.html">save_plot()</a></code> saves. Here is the scatter plot from the start
+of this section as a reader with deuteranopia sees it:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">by_treatment</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">fertiliser</span>, <span class="va">yield</span>, colour <span class="op">=</span> <span class="va">treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/scale_colour_depictr.html">scale_colour_depictr</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_depictr.html">theme_depictr</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/grid.newpage.html" class="external-link">grid.newpage</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid.draw</a></span><span class="op">(</span><span class="fu"><a href="../reference/simulate_figure.html">simulate_figure</a></span><span class="op">(</span><span class="va">by_treatment</span>, <span class="st">"deutan"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="depictr_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="auditing-the-figure-you-are-about-to-submit">Auditing the figure you are about to submit<a class="anchor" aria-label="anchor" href="#auditing-the-figure-you-are-about-to-submit"></a>
@@ -253,7 +273,7 @@ distinguish groups by colour alone, the palette’s guarantee no longer
 describes what a reader will see. <code><a href="../reference/check_figure.html">check_figure()</a></code> reads a
 built plot and reports what it measured, next to the threshold it was
 measured against, so each verdict can be argued with.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">grouped</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">fertiliser</span>, <span class="va">yield</span>, colour <span class="op">=</span> <span class="va">treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/scale_colour_depictr.html">scale_colour_depictr</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -292,7 +312,7 @@ further when drawn translucent, as these points are.
 the two treatments apart. Mapping shape as well, letting the darker
 vermillion do the second colour’s work and drawing the points opaque
 clears both:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mended</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">fertiliser</span>, <span class="va">yield</span>, colour <span class="op">=</span> <span class="va">treatment</span>,</span>
 <span>                                 shape <span class="op">=</span> <span class="va">treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -311,11 +331,22 @@ clears both:</p>
 8           geometry_contrast     3.87       3.0           pass
 9          redundant_encoding     1.00       1.0           pass
 10       annotation_text_size       NA       6.0 not applicable</code></pre>
+<p>The vermillion need not be typed by hand.
+<code>scale_colour_depictr(order = "contrast")</code> draws the groups
+in the contrast-first order of <code><a href="../reference/depictr_palette.html">depictr_palette()</a></code>. It leads
+with the brand blue, the vermillion and the reddish purple, the only
+three of the eight colours that clear every colour row together. The
+bluish green comes fourth, and with it four groups still keep 3:1
+against white.
+<code>depictr_options(palette = depictr_palette(order = "contrast"))</code>
+makes that order the default for every later plot. Under it, the second
+group takes the vermillion, which depictr also uses as its accent for
+single highlights.</p>
 <p>The audit also takes a stated output width, which is where most
 figure text quietly fails. Text is drawn in points, so a figure saved
 seven inches wide and then printed in an 8.9 cm column arrives at half
 the size it looked on screen:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="fu"><a href="../reference/check_figure.html">check_figure</a></span><span class="op">(</span><span class="va">grouped</span>, width_cm <span class="op">=</span> <span class="fl">8.9</span><span class="op">)</span>, <span class="va">check</span> <span class="op">==</span> <span class="st">"text_size"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>      check measured threshold verdict
 6 text_size      4.4         6    fail
@@ -330,6 +361,11 @@ same floor. That floor defaults to 6 pt, which is lenient. As their
 guidelines stood on 30 September 2026, PLOS and APA Style asked for at
 least 8 pt, Elsevier for 7 pt and Nature for 5 to 7 pt, and
 <code><a href="../reference/check_figure.html">?check_figure</a></code> links all four.</p>
+<p>Nature’s range has a ceiling as well as a floor, since no text but
+the panel labels may exceed 7 pt. Passing <code>max_text_pt = 7</code>
+holds a figure to it in a row of its own, <code>text_size_max</code>.
+<code>save_plot(check = TRUE)</code> runs the audit as it saves, at the
+width it saves at, and warns about each check the figure fails.</p>
 <p>One limitation belongs here, beside the claim it qualifies, since the
 package is the one making that claim. The eight-colour qualitative
 palette clears every colour-vision check and fails the greyscale check:
@@ -340,7 +376,7 @@ The threshold stays where it is, the check reports the number, and the
 claim has been narrowed to match. A figure that may be printed in black
 and white wants fewer groups, a sequential palette, or a redundant shape
 or line type.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">eight</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>g <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">]</span><span class="op">)</span>, x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, y <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">)</span></span>
 <span><span class="va">p8</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">eight</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, colour <span class="op">=</span> <span class="va">g</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -363,7 +399,7 @@ al., 2020</a>)</span>.</p>
 brand and accent colours and a custom palette, so the same arguments
 need not travel with every call. Called with no arguments it reports the
 current settings:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/depictr_options.html">depictr_options</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code>$base_size
 [1] 11
@@ -387,11 +423,11 @@ $na_value
 [1] "grey80"</code></pre>
 <p>Supplying arguments sets them for every later plot and returns the
 previous values, so you can put the look back afterwards:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">old</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/depictr_options.html">depictr_options</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">13</span>, accent <span class="op">=</span> <span class="st">"#b3589a"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/coefficient_plot.html">coefficient_plot</a></span><span class="op">(</span><span class="va">fit</span>, title <span class="op">=</span> <span class="st">"Set once, applied everywhere"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="depictr_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" alt="" width="672"></p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<p><img src="depictr_files/figure-html/unnamed-chunk-19-1.png" class="r-plt" alt="" width="672"></p>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">depictr_options</span>, <span class="va">old</span><span class="op">)</span>   <span class="co"># restore the previous settings</span></span></code></pre></div>
 </div>
 <div class="section level2">

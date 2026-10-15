@@ -69,7 +69,11 @@ red-blue ramps.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">depictr_palette</span><span class="op">(</span>n <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"qualitative"</span>, <span class="st">"sequential"</span>, <span class="st">"diverging"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">depictr_palette</span><span class="op">(</span></span>
+<span>  n <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"qualitative"</span>, <span class="st">"sequential"</span>, <span class="st">"diverging"</span><span class="op">)</span>,</span>
+<span>  order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"default"</span>, <span class="st">"contrast"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -91,6 +95,12 @@ the sequential ramp when many groups are needed.</p></dd>
 <code>"sequential"</code> (ordered low-to-high) or <code>"diverging"</code> (a midpoint with two
 directions).</p></dd>
 
+
+<dt id="arg-order">order<a class="anchor" aria-label="anchor" href="#arg-order"></a></dt>
+<dd><p>The order of the built-in qualitative palette: <code>"default"</code>, or
+<code>"contrast"</code> for the contrast-first order described below. The ramps have
+an order of their own and refuse <code>"contrast"</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -110,17 +120,54 @@ more colours are requested than it provides. The sequential and diverging
 ramps are unaffected.</p>
     </div>
     <div class="section level2">
+    <h2 id="the-contrast-first-order">The contrast-first order<a class="anchor" aria-label="anchor" href="#the-contrast-first-order"></a></h2>
+
+
+<p>In the default order the second colour is the orange (<code>#e69f00</code>), at 2.25:1
+against white. Any figure on white whose colour tells two or more groups
+apart therefore fails the <code>geometry_contrast</code> row of <code><a href="check_figure.html">check_figure()</a></code>. No
+more than three of the eight colours pass every colour row of that audit
+together.</p>
+<p><code>order = "contrast"</code> puts those three first: the brand blue, the vermillion
+(<code>#d55e00</code>) and the reddish purple (<code>#cc79a7</code>), then the bluish green
+(<code>#009e73</code>) and the other four in their default order. Up to three groups
+then pass every colour row, contrast against white included. They stay at
+least 14.01 apart in CIEDE2000 under every vision type, 6.86 apart in
+lightness and 3.06:1 against white. Four groups keep 3:1 against white, but
+the bluish green and the vermillion are 3.31 apart in lightness, which fails
+<code>greyscale_separability</code>. Asking for more than four colours warns, since the
+fifth, the orange, falls below 3:1.</p>
+<p>Under this order, the second group is drawn in the vermillion. That is also
+the accent (<code><a href="depictr_options.html">depictr_options()</a></code>) that depictr uses for single highlights,
+such as the flagged points of <code><a href="outlier_plot.html">outlier_plot()</a></code> and the missing cells of
+<code><a href="missingness_map.html">missingness_map()</a></code>. The default order is unchanged.</p>
+<p>The order applies to the built-in palette alone. A palette set with
+<code>depictr_options(palette = )</code> is the user's own, so it is returned in the
+order it was set, with a warning. That is also how to make the order the
+default for every later plot:
+<code>depictr_options(palette = depictr_palette(order = "contrast"))</code>. The
+palette is then the user's own, so asking for more than four colours no
+longer warns. <code><a href="scale_colour_depictr.html">scale_colour_depictr()</a></code> and <code><a href="scale_colour_depictr.html">scale_fill_depictr()</a></code> take
+<code>order</code> for a single plot.</p>
+    </div>
+    <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Okabe M, Ito K (2008).
 “Color Universal Design (CUD): How to make figures and presentations that are friendly to colorblind people.”
 <a href="https://jfly.uni-koeln.de/color/" class="external-link">https://jfly.uni-koeln.de/color/</a>.
 Accessed 2026-06-14.</p>
+<p>World Wide Web Consortium (2023).
+“Web Content Accessibility Guidelines (WCAG) 2.2.”
+W3C Recommendation, <a href="https://www.w3.org/TR/WCAG22/" class="external-link">https://www.w3.org/TR/WCAG22/</a>.
+Accessed 2026-08-18.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">depictr_palette</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#005b96" "#e69f00" "#009e73"</span>
+<span class="r-in"><span><span class="fu">depictr_palette</span><span class="op">(</span><span class="fl">3</span>, order <span class="op">=</span> <span class="st">"contrast"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#005b96" "#d55e00" "#cc79a7"</span>
 <span class="r-in"><span><span class="fu">depictr_palette</span><span class="op">(</span><span class="fl">7</span>, type <span class="op">=</span> <span class="st">"sequential"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#E6EFF5" "#98BFDA" "#4A8FC0" "#2475AB" "#005B96" "#034678" "#08315A"</span>
 <span class="r-in"><span><span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/show_col.html" class="external-link">show_col</a></span><span class="op">(</span><span class="fu">depictr_palette</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>

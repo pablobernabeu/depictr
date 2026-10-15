@@ -12,7 +12,7 @@ but is useful on its own.
 ## Usage
 
 ``` r
-tidy_estimates(x, conf_level = 0.95, ...)
+tidy_estimates(x, conf_level = 0.95, exponentiate = FALSE, ...)
 ```
 
 ## Arguments
@@ -24,6 +24,15 @@ tidy_estimates(x, conf_level = 0.95, ...)
 - conf_level:
 
   Confidence (or credible) level for the interval.
+
+- exponentiate:
+
+  Whether to exponentiate the estimates and interval limits, which turns
+  log-odds into odds ratios and log rates into rate ratios. The
+  `std.error` column stays on the link scale, as in
+  [`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html). A
+  data frame is read as estimates on the link scale. Defaults to
+  `FALSE`.
 
 - ...:
 
@@ -45,11 +54,21 @@ function falls back to
 [`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html) when
 the 'broom' package is installed.
 
-Confidence intervals are computed with the normal approximation
-(estimate +/- z \* standard error) for `glm` and `merMod` objects, which
-is fast and dependency-free; `lm` objects use the exact t-based
-interval. Supply a data frame with your own intervals (for example
-profiled or posterior intervals) to override this.
+Confidence intervals are Wald intervals, estimate +/- multiplier \*
+standard error, with the multiplier the model's own tests use. An `lm`
+object gets the t interval of
+[`stats::confint()`](https://rdrr.io/r/stats/confint.html). A `glm`
+whose dispersion is estimated (Gaussian, Gamma, inverse Gaussian and
+quasi families) gets t on the residual degrees of freedom, since
+[`stats::summary.glm()`](https://rdrr.io/r/stats/summary.glm.html) then
+tests with t. One whose dispersion is fixed (binomial, Poisson and
+[`MASS::glm.nb()`](https://rdrr.io/pkg/MASS/man/glm.nb.html)) gets z.
+The choice is read from the column the summary reports, "t value" or "z
+value". At 12 residual degrees of freedom, the t interval is about 11%
+wider than the z interval, and at 100 about 1% wider. A `merMod` fit
+gets z, since 'lme4' gives no degrees of freedom. Supply a data frame
+with your own intervals (for example profiled or posterior intervals) to
+override this.
 
 ## Examples
 
@@ -61,6 +80,15 @@ tidy_estimates(fit)
 #> 2          rainfall  0.004527229 0.0007284476  0.003090628 0.005963831
 #> 3        fertiliser  0.010488592 0.0013233496  0.007878760 0.013098424
 #> 4 treatmentenhanced  1.290135752 0.1189761405  1.055498001 1.524773503
+
+# Odds ratios from a logistic regression:
+gfit <- glm(accuracy ~ word_frequency + condition,
+            data = lexical_decision, family = binomial)
+tidy_estimates(gfit, exponentiate = TRUE)
+#>                 term  estimate std.error  conf.low conf.high
+#> 1        (Intercept) 6.4237841 0.3895402 2.9937372 13.783776
+#> 2     word_frequency 1.3544310 0.1132865 1.0847440  1.691167
+#> 3 conditionunrelated 0.8622706 0.2726054 0.5053607  1.471247
 
 # A data frame of pre-computed estimates is standardised, not re-fitted:
 df <- data.frame(

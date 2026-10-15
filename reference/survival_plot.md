@@ -147,8 +147,13 @@ argument and off by default so existing behaviour is unchanged:
 
 - **Median-survival guides** (`median_line = TRUE`): dashed reference
   lines from the 0.5 survival level down to each group's median survival
-  time, with the median value labelled. Groups whose curve never reaches
-  0.5 (median not estimable) are skipped.
+  time, with the median value labelled. The median is the time at which
+  the curve falls below 0.5. Where the curve stays at 0.5 until a later
+  drop, or until its last time, the median is the midpoint of that
+  stretch, as in
+  [`survival::quantile.survfit()`](https://rdrr.io/pkg/survival/man/quantile.survfit.html).
+  Groups whose curve never reaches 0.5 (median not estimable) are
+  skipped.
 
 - **Log-rank test** (`logrank = TRUE`): for two or more groups, the
   chi-squared log-rank statistic and its p-value are added as a

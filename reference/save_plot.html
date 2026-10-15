@@ -3,11 +3,13 @@
 figures in papers and reports: a moderate size, 300 dpi, and the output
 directory created if needed. The device is inferred from the file extension,
 and PDF, EPS and TIFF files are written to pass the technical checks
-journals run on submitted figures."><meta property="og:description" content="A convenience wrapper around ggplot2::ggsave() with sensible defaults for
+journals run on submitted figures. With check = TRUE, the figure is also
+audited with check_figure() at the width it is saved at."><meta property="og:description" content="A convenience wrapper around ggplot2::ggsave() with sensible defaults for
 figures in papers and reports: a moderate size, 300 dpi, and the output
 directory created if needed. The device is inferred from the file extension,
 and PDF, EPS and TIFF files are written to pass the technical checks
-journals run on submitted figures."><meta property="og:image" content="https://pablobernabeu.github.io/depictr/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Spectral:ital,wght@0,500;0,600;1,400&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"></head><body>
+journals run on submitted figures. With check = TRUE, the figure is also
+audited with check_figure() at the width it is saved at."><meta property="og:image" content="https://pablobernabeu.github.io/depictr/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Spectral:ital,wght@0,500;0,600;1,400&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -61,7 +63,8 @@ journals run on submitted figures."><meta property="og:image" content="https://p
 figures in papers and reports: a moderate size, 300 dpi, and the output
 directory created if needed. The device is inferred from the file extension,
 and PDF, EPS and TIFF files are written to pass the technical checks
-journals run on submitted figures.</p>
+journals run on submitted figures. With <code>check = TRUE</code>, the figure is also
+audited with <code><a href="check_figure.html">check_figure()</a></code> at the width it is saved at.</p>
     </div>
 
     <div class="section level2">
@@ -73,6 +76,7 @@ journals run on submitted figures.</p>
 <span>  height <span class="op">=</span> <span class="fl">4.5</span>,</span>
 <span>  units <span class="op">=</span> <span class="st">"in"</span>,</span>
 <span>  dpi <span class="op">=</span> <span class="fl">300</span>,</span>
+<span>  check <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -104,6 +108,16 @@ layers, and whatever they overlap, at this resolution or at 600 dpi,
 whichever is higher.</p></dd>
 
 
+<dt id="arg-check">check<a class="anchor" aria-label="anchor" href="#arg-check"></a></dt>
+<dd><p>Whether to audit the figure with <code><a href="check_figure.html">check_figure()</a></code> at the width
+it is saved at, given as both <code>width_cm</code> and <code>render_width_cm</code>, so that the
+text sizes it reports are the printed ones. A warning names each check the
+figure fails. Defaults to <code>FALSE</code>. The audit runs before the file is
+written, so a plot it cannot read is refused without saving. For other
+thresholds, such as a journal's own text floor, call <code><a href="check_figure.html">check_figure()</a></code> with
+the saved width as both widths.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Passed to <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggplot2::ggsave()</a></code>, which passes what it does not use
 on to the device. A <code>device</code> or device argument given here overrides the
@@ -112,7 +126,8 @@ defaults described under "Formats journals accept".</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The <code>filename</code>, invisibly.</p>
+    <p>The <code>filename</code>, invisibly. With <code>check = TRUE</code>, the audit report is
+attached to it as the attribute <code>"check"</code>, which <code>attr(, "check")</code> reads.</p>
     </div>
     <div class="section level2">
     <h2 id="formats-journals-accept">Formats journals accept<a class="anchor" aria-label="anchor" href="#formats-journals-accept"></a></h2>
@@ -170,6 +185,34 @@ a TIFF at 1000 dpi, so pass <code>dpi = 1000</code> for one.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># A TIFF well within the 10 MB that PLOS allows.</span></span></span>
 <span class="r-in"><span><span class="fu">save_plot</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"yield.tiff"</span><span class="op">)</span>, <span class="va">p</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Audited at the 8.9 cm column it is saved for, where its text prints at</span></span></span>
+<span class="r-in"><span><span class="co"># the size it is drawn.</span></span></span>
+<span class="r-in"><span><span class="va">saved</span> <span class="op">&lt;-</span> <span class="fu">save_plot</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"yield-column.png"</span><span class="op">)</span>, <span class="va">p</span>,</span></span>
+<span class="r-in"><span>                   width <span class="op">=</span> <span class="fl">8.9</span>, height <span class="op">=</span> <span class="fl">6</span>, units <span class="op">=</span> <span class="st">"cm"</span>, check <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">saved</span>, <span class="st">"check"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         check measured threshold        verdict</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1         colour_separability       NA       5.0 not applicable</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  colour_separability_protan       NA       5.0 not applicable</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  colour_separability_deutan       NA       5.0 not applicable</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  colour_separability_tritan       NA       5.0 not applicable</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5      greyscale_separability       NA       5.0 not applicable</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                   text_size     8.80       6.0           pass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7               text_contrast     8.45       4.5           pass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8           geometry_contrast       NA       3.0 not applicable</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9          redundant_encoding       NA       1.0 not applicable</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10       annotation_text_size       NA       6.0 not applicable</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                             detail</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     No two encoding colours: nothing is distinguished by colour.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     No two encoding colours: nothing is distinguished by colour.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     No two encoding colours: nothing is distinguished by colour.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     No two encoding colours: nothing is distinguished by colour.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     No two encoding colours: nothing is distinguished by colour.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  Smallest text 8.80 pt, drawn at 8.90 cm and printed at 8.90 cm.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7              Lowest-contrast text #4d4d4d on #ffffff at 8.80 pt.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8     No two encoding colours: nothing is distinguished by colour.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9     No two encoding colours: nothing is distinguished by colour.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10                      The figure draws no text inside the panel.</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

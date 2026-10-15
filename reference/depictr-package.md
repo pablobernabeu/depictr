@@ -196,6 +196,10 @@ one colourblind-aware palette and one set of label conventions.
 - [`simulate_cvd()`](https://pablobernabeu.github.io/depictr/reference/simulate_cvd.md):
   simulate a colour-vision deficiency.
 
+- [`simulate_figure()`](https://pablobernabeu.github.io/depictr/reference/simulate_figure.md):
+  show a finished figure as a reader with a colour-vision deficiency
+  sees it.
+
 - [`format_terms()`](https://pablobernabeu.github.io/depictr/reference/format_terms.md):
   tidy raw coefficient names for display.
 

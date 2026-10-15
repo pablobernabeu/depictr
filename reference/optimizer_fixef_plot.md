@@ -54,10 +54,10 @@ optimizer_fixef_plot(
 
   Optional named character vector renaming the term panels, e.g.
   `c(conditionunrelated = "Unrelated priming")`. When `x` is a raw
-  [`lme4::allFit()`](https://rdrr.io/pkg/lme4/man/allFit.html) object,
-  names are prettified to the effect (variable) name automatically (e.g.
-  `conditionunrelated` to `condition`) and these labels override that
-  default.
+  [`lme4::allFit()`](https://rdrr.io/pkg/lme4/man/allFit.html) object, a
+  factor's coefficients are labelled with the variable and the level
+  automatically (e.g. `conditionunrelated` becomes
+  `condition: unrelated`) and these labels override that default.
 
 - number_optimizers:
 

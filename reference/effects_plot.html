@@ -140,7 +140,11 @@ so the line then shows the predictor's effect beyond the offset. The y-axis
 label ends in "at the mean offset".</p>
 <p>Predictions and standard errors come from <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">stats::predict()</a></code>; <code>glm</code>
 predictions are formed on the link scale and back-transformed, so a binomial
-model shows predicted probabilities. Mixed models fitted with
+model shows predicted probabilities. The band uses the multiplier of the
+model's own tests, as <code><a href="tidy_estimates.html">tidy_estimates()</a></code> does. An <code>lm</code>, and a <code>glm</code> whose
+dispersion is estimated, get t on the residual degrees of freedom, so a
+Gaussian <code>glm</code> draws the band of the same <code>lm</code>. Binomial and Poisson fits
+and mixed models get z. Mixed models fitted with
 <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lme4::lmer()</a></code>/<code><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">lme4::glmer()</a></code> are supported too: predictions use only the
 fixed effects (as <code>re.form = NA</code> does) and standard errors come from the
 fixed-effect design matrix and <code><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov()</a></code>. Works with <code>lm</code>, <code>glm</code> and

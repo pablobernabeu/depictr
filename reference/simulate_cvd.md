@@ -29,9 +29,10 @@ simulate_cvd(colours, deficiency, severity = 1)
 - severity:
 
   Severity in `[0, 1]`. Zero leaves the colours unchanged and one is the
-  full deficiency. Intermediate values interpolate the transform towards
-  the identity, an approximation to Machado et al.'s per-severity
-  matrices.
+  full deficiency. Machado et al. publish a matrix for each tenth of
+  severity, which is used as it stands at 0.1, 0.2 and so on. A severity
+  between two tenths takes the linear interpolation of their matrices,
+  as the authors suggest and as the colorspace package does.
 
 ## Value
 
@@ -46,6 +47,8 @@ This is the simulator behind
 [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md),
 and behind the colour-separability rows of
 [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md).
+[`simulate_figure()`](https://pablobernabeu.github.io/depictr/reference/simulate_figure.md)
+applies it to every colour of a finished figure.
 
 ## References
 
@@ -62,5 +65,5 @@ simulate_cvd(c("#005b96", "#e69f00"), "deutan")
 
 # Half severity moves the colours only part of the way.
 simulate_cvd(c("#005b96", "#e69f00"), "deutan", severity = 0.5)
-#> [1] "#1a5795" "#d8aa09"
+#> [1] "#225695" "#d2ac04"
 ```

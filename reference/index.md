@@ -157,6 +157,9 @@ composition and saving, and a one-figure model report.
   : Check that a palette stays distinguishable under each deficiency
 - [`simulate_cvd()`](https://pablobernabeu.github.io/depictr/reference/simulate_cvd.md)
   : Simulate how colours appear under a colour-vision deficiency
+- [`simulate_figure()`](https://pablobernabeu.github.io/depictr/reference/simulate_figure.md)
+  : Show a finished figure as a reader with a colour-vision deficiency
+  sees it
 - [`format_terms()`](https://pablobernabeu.github.io/depictr/reference/format_terms.md)
   : Tidy raw coefficient names for display
 - [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)

@@ -81,7 +81,8 @@ questions with numbers.</p>
 <span>  render_width_cm <span class="op">=</span> <span class="fl">17.78</span>,</span>
 <span>  min_delta_e <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  min_text_pt <span class="op">=</span> <span class="fl">6</span>,</span>
-<span>  metric <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ciede2000"</span>, <span class="st">"cie76"</span><span class="op">)</span></span>
+<span>  metric <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ciede2000"</span>, <span class="st">"cie76"</span><span class="op">)</span>,</span>
+<span>  max_text_pt <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -127,20 +128,29 @@ size").</p></dd>
 that earlier versions measured. <code>"cie76"</code> is kept so that earlier results
 can be reproduced, and a later release will remove it.</p></dd>
 
+
+<dt id="arg-max-text-pt">max_text_pt<a class="anchor" aria-label="anchor" href="#arg-max-text-pt"></a></dt>
+<dd><p>The largest acceptable printed text size, in points, or
+<code>NULL</code>, the default, for no ceiling. When given, a <code>text_size_max</code> row is
+appended (see "What each check measures").</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A data frame with one row per check and columns <code>check</code>, <code>measured</code>,
 <code>threshold</code>, <code>verdict</code> (<code>"pass"</code>, <code>"fail"</code> or <code>"not applicable"</code>) and
-<code>detail</code>, a short note naming what produced the measurement. For a
-composite, the rows of each panel in turn, after a leading integer column
-<code>panel</code>.</p>
+<code>detail</code>, a short note naming what produced the measurement. There are
+ten rows, and an eleventh, <code>text_size_max</code>, when <code>max_text_pt</code> is given.
+For a composite, the rows of each panel in turn, after a leading integer
+column <code>panel</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Every row carries the value it measured next to the threshold it was measured
 against, so a verdict can be argued with rather than merely accepted. A check
-passes when the measured value is at least the threshold. A check that has
+passes when the measured value is at least the threshold. The one exception
+is <code>text_size_max</code>, a ceiling added when <code>max_text_pt</code> is given, which
+passes when the measured value is at most its threshold. A check that has
 nothing to measure, such as colour separability on a figure that encodes
 nothing by colour, reports <code>NA</code> and a verdict of <code>"not applicable"</code> instead
 of a free pass.</p>
@@ -228,6 +238,10 @@ and labels. Its contrast is not measured, since it sits on the marks rather
 than on one background. A label that a layer builds only when the figure is
 drawn, as ggrepel builds its repelled labels, is not yet in the built plot,
 so it is not measured either.</p>
+<p><code>text_size_max</code> is reported only when <code>max_text_pt</code> is given, as the last
+row. It is the largest point size of all the text measured, around the
+panel and inside it, scaled as <code>text_size</code> is. It is the one row that
+passes at or below its threshold.</p>
     </div>
     <div class="section level2">
     <h2 id="limitations-of-the-default-palette">Limitations of the default palette<a class="anchor" aria-label="anchor" href="#limitations-of-the-default-palette"></a></h2>
@@ -250,7 +264,11 @@ at 2.25:1, the sky blue at 2.31:1, the grey at 2.85:1 and the yellow at
 colour tells two or more groups apart fails <code>geometry_contrast</code>, and drawing
 its marks translucent lowers the ratio further. Opaque marks, the vermillion
 (<code>#d55e00</code>, at 3.87:1) in the orange's place and a redundant shape clear
-that row and <code>redundant_encoding</code>, as the first example below shows.</p>
+that row and <code>redundant_encoding</code>, as the first example below shows. The
+contrast-first order of <code><a href="depictr_palette.html">depictr_palette()</a></code> puts the vermillion second and
+the reddish purple third, and <code><a href="scale_colour_depictr.html">scale_colour_depictr()</a></code> takes it as
+<code>order = "contrast"</code>. Up to three groups then pass every colour row, and
+four keep 3:1 against white.</p>
     </div>
     <div class="section level2">
     <h2 id="auditing-at-the-printed-size">Auditing at the printed size<a class="anchor" aria-label="anchor" href="#auditing-at-the-printed-size"></a></h2>
@@ -261,12 +279,17 @@ A figure drawn at the size it will be printed, as <code><a href="save_plot.html"
 given <code>width = 8.9, units = "cm"</code>, needs no scaling. Pass the saved width as
 both <code>width_cm</code> and <code>render_width_cm</code>, or leave both at their defaults.
 Given alone, <code>width_cm</code> audits the figure as though it had been drawn seven
-inches wide and then shrunk to fit.</p>
+inches wide and then shrunk to fit. <code><a href="save_plot.html">save_plot()</a></code> with <code>check = TRUE</code> audits
+a figure at the width it saves it at, given as both.</p>
 <p>The default <code>min_text_pt</code> of 6 is lenient. As their guidelines stood on 30
 September 2026, PLOS asked for text of 8 to 12 pt and APA Style for 8 to 14
 pt. Elsevier asked for 7 pt as a rule of thumb, and Nature for 5 to 7 pt,
 with panel labels at 8 pt. Pass the floor of the journal the figure is for
-as <code>min_text_pt</code>. The four pages are listed under References.</p>
+as <code>min_text_pt</code>, and its ceiling, where it sets one, as <code>max_text_pt</code>.
+Nature's 7 pt applies to all text but the panel labels. The tags of a
+composite, where patchwork puts them, are not measured, but a panel label
+drawn as a panel's title or annotation is measured with the rest. The four
+pages are listed under References.</p>
     </div>
     <div class="section level2">
     <h2 id="composites">Composites<a class="anchor" aria-label="anchor" href="#composites"></a></h2>
@@ -413,6 +436,14 @@ Accessed 2026-08-18.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8                       Lowest-contrast colour #d55e00 on #ffffff.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9                                       Colour is joined by shape.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10                      The figure draws no text inside the panel.</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Nature allowed no text above 7 pt but the panel labels. The axis titles</span></span></span>
+<span class="r-in"><span><span class="co"># here are 11 pt, so the ceiling row fails.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="fu">check_figure</span><span class="op">(</span><span class="va">good</span>, max_text_pt <span class="op">=</span> <span class="fl">7</span><span class="op">)</span>, <span class="va">check</span> <span class="op">==</span> <span class="st">"text_size_max"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            check measured threshold verdict</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 text_size_max       11         7    fail</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                               detail</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 Largest text 11.00 pt, drawn at 17.78 cm and printed at 17.78 cm.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Each panel of a composite is audited, and a column says which panel each</span></span></span>
 <span class="r-in"><span><span class="co"># row describes. At base size 5, the second panel's text is too small.</span></span></span>

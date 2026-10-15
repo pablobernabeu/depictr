@@ -98,7 +98,13 @@ y-axis label ends in "at the mean offset".
 Predictions and standard errors come from
 [`stats::predict()`](https://rdrr.io/r/stats/predict.html); `glm`
 predictions are formed on the link scale and back-transformed, so a
-binomial model shows predicted probabilities. Mixed models fitted with
+binomial model shows predicted probabilities. The band uses the
+multiplier of the model's own tests, as
+[`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md)
+does. An `lm`, and a `glm` whose dispersion is estimated, get t on the
+residual degrees of freedom, so a Gaussian `glm` draws the band of the
+same `lm`. Binomial and Poisson fits and mixed models get z. Mixed
+models fitted with
 [`lme4::lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html)/[`lme4::glmer()`](https://rdrr.io/pkg/lme4/man/glmer.html)
 are supported too: predictions use only the fixed effects (as
 `re.form = NA` does) and standard errors come from the fixed-effect

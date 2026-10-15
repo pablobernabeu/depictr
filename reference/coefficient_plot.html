@@ -69,13 +69,14 @@ a data frame of pre-computed estimates.</p>
 <span>  interaction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"times"</span>, <span class="st">"asterisk"</span>, <span class="st">"colon"</span>, <span class="st">"space"</span><span class="op">)</span>,</span>
 <span>  point_colour <span class="op">=</span> <span class="fu">depictr_brand</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  reference_colour <span class="op">=</span> <span class="fu">depictr_reference</span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  reference_line <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  reference_line <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">exponentiate</span><span class="op">)</span> <span class="fl">1</span> <span class="kw">else</span> <span class="fl">0</span>,</span>
 <span>  point_size <span class="op">=</span> <span class="fl">2.2</span>,</span>
 <span>  line_size <span class="op">=</span> <span class="fl">0.7</span>,</span>
 <span>  facet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fixed"</span>, <span class="st">"free"</span><span class="op">)</span>,</span>
 <span>  standardise <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  sd_multiple <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  exponentiate <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  subtitle <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  x_lab <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -114,8 +115,10 @@ other way up.</p></dd>
 one label per term in model order (the order <code><a href="tidy_estimates.html">tidy_estimates()</a></code> returns,
 after the intercept is dropped unless <code>intercept = TRUE</code>), whatever
 <code>order</code> is. A named vector mapping raw term names to labels, such as
-<code>c(soil_ph = "Soil pH")</code>, is safer. If <code>NULL</code>, names are tidied with
-<code><a href="format_terms.html">format_terms()</a></code>.</p></dd>
+<code>c(soil_ph = "Soil pH")</code>, is safer. If <code>NULL</code>, the coefficient of a
+factor level is labelled with its variable and level, inside interaction
+terms too, so the contrast of enhanced with the reference level reads
+<code>treatment: enhanced</code>. Other names are tidied with <code><a href="format_terms.html">format_terms()</a></code>.</p></dd>
 
 
 <dt id="arg-interaction">interaction<a class="anchor" aria-label="anchor" href="#arg-interaction"></a></dt>
@@ -129,8 +132,9 @@ reference line.</p></dd>
 
 
 <dt id="arg-reference-line">reference_line<a class="anchor" aria-label="anchor" href="#arg-reference-line"></a></dt>
-<dd><p>Position of a vertical reference line (e.g. <code>0</code> for
-differences, <code>1</code> for odds/risk ratios). Use <code>NA</code> to omit it.</p></dd>
+<dd><p>Position of a vertical reference line. Defaults to 0,
+or to 1 when <code>exponentiate = TRUE</code>, where a ratio of 1 means no effect.
+Use <code>NA</code> to omit it.</p></dd>
 
 
 <dt id="arg-point-size-line-size">point_size, line_size<a class="anchor" aria-label="anchor" href="#arg-point-size-line-size"></a></dt>
@@ -178,13 +182,27 @@ to 1. Use 2 for Gelman's (2008) convention, under which the coefficient
 of a continuous input is comparable to that of a balanced binary one.</p></dd>
 
 
+<dt id="arg-exponentiate">exponentiate<a class="anchor" aria-label="anchor" href="#arg-exponentiate"></a></dt>
+<dd><p>Whether to draw the exponentiated estimates and
+intervals on a log10 axis, which shows the coefficients of a logistic
+regression as odds ratios and those of a Poisson or negative binomial
+model as rate ratios. It applies after <code>standardise</code>, so a standardised
+slope becomes a ratio per SD of its predictor. A data frame <code>x</code> must hold
+estimates on the link scale. Defaults to <code>FALSE</code>.</p></dd>
+
+
 <dt id="arg-title-subtitle-x-lab">title, subtitle, x_lab<a class="anchor" aria-label="anchor" href="#arg-title-subtitle-x-lab"></a></dt>
 <dd><p>Plot title, subtitle and x-axis label. <code>x_lab</code>
 defaults to "Estimate", or, when <code>standardise</code>, "Estimate per SD of
 predictor" ("per 2 SD" with <code>sd_multiple = 2</code>), followed by "(contrasts
 unscaled)" when a factor or binary term is drawn. The label names the
 convention on the figure itself, because only the predictors are rescaled
-here: a fully standardised beta would rescale the outcome too.</p></dd>
+here: a fully standardised beta would rescale the outcome too. With
+<code>exponentiate = TRUE</code>, "Estimate" gives way to the name of the ratio:
+"Odds ratio" for a logit link, "Rate ratio" for a log link in a Poisson,
+quasi-Poisson or negative binomial model, "Risk ratio" for a binomial
+model with a log link and "exp(Estimate)" otherwise. The last covers an
+<code>lm(log(y) ~ x)</code> slope, whose exponential is a ratio of geometric means.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -220,6 +238,12 @@ here: a fully standardised beta would rescale the outcome too.</p></dd>
 <span class="r-in"><span><span class="co"># treatment contrast in the outcome's units:</span></span></span>
 <span class="r-in"><span><span class="fu">coefficient_plot</span><span class="op">(</span><span class="va">fit</span>, standardise <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="coefficient_plot-4.png" alt="" width="672" height="432"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Odds ratios from a logistic regression, on a log axis with the line at 1:</span></span></span>
+<span class="r-in"><span><span class="va">gfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">accuracy</span> <span class="op">~</span> <span class="va">word_frequency</span> <span class="op">+</span> <span class="va">condition</span>,</span></span>
+<span class="r-in"><span>            data <span class="op">=</span> <span class="va">lexical_decision</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">coefficient_plot</span><span class="op">(</span><span class="va">gfit</span>, exponentiate <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="coefficient_plot-5.png" alt="" width="672" height="432"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

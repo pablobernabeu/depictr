@@ -195,6 +195,21 @@
   longest follow-up was lost the same way. The breaks are now rounded to
   their step before the counts are taken.
 
+- The median-survival guides of
+  [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  mislabelled some medians. The survival estimate was compared with 0.5
+  without a tolerance, so a step that the arithmetic left a rounding
+  error above 0.5 was taken to stay above it. With times
+  `c(2, 3, 4, 8, 8, 10, 10, 11)` and status `c(1, 1, 1, 1, 0, 1, 0, 1)`,
+  the guide read ‘median 10’ where
+  [`survival::quantile.survfit()`](https://rdrr.io/pkg/survival/man/quantile.survfit.html)
+  gives 9. A curve that ended at 0.5 drew no guide. For a `survfit`
+  object, the midpoint of a curve that sat at 0.5 was taken with the
+  next row, which can be a censoring time at which the curve does not
+  move. The medians now follow the rule of `quantile.survfit()`,
+  including its tolerance and its midpoint for a curve that ends at 0.5,
+  whatever the input and whether or not survival is installed.
+
 - [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
   wrote files that fail the checks journals run on submitted figures. An
   EPS left out every translucent element, including all the points and
@@ -619,6 +634,17 @@
   measured with the panel. A spacer or a guide area takes no panel
   number, and a wrapped element, such as a grob or a table, is left out
   with a warning. Composite-level titles and tags are not measured.
+- `check_figure(max_text_pt =)` checks a ceiling as well as a floor, and
+  `save_plot(check = TRUE)` audits the figure at the width it is saved
+  at, so the text sizes are the printed ones. The ceiling adds a last
+  row, `text_size_max`, for the largest text at its printed size, around
+  the panel and inside it, and that row passes at or below its
+  threshold. Nature, for one, allowed no text above 7 pt but the panel
+  labels. Without `max_text_pt`, the report keeps its ten rows.
+  `save_plot(check = TRUE)` gives the saved width, converted to
+  centimetres from inches, millimetres or pixels, as both `width_cm` and
+  `render_width_cm`. It warns with each check the figure fails and
+  attaches the report to the file name it returns, as `attr(, "check")`.
 
 ### Metadata and documentation
 
@@ -667,6 +693,23 @@
   links on the website and in the README, and the sidebar of the home
   page shows the CRAN DOI once: the DOI badge in the README no longer
   appears there a second time.
+
+- [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
+  and
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  formatted a label for every posterior draw, which made a ten-parameter
+  figure take seconds and a full brms draws object minutes. Labels are
+  formatted once per parameter.
+  [`format_terms()`](https://pablobernabeu.github.io/depictr/reference/format_terms.md)
+  now strips the `b_` and `bs_` prefixes from a whole vector with one
+  regular expression. It split each term on its colons and took about 15
+  seconds for 40,000 labels, a job that now takes a fraction of a
+  second. An unnamed `labels` vector, one label per parameter in the
+  order of `draws`, now works in
+  [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md).
+  It failed with a message that counted the draws as terms. The two
+  bootstrap tests that took most of the test time are skipped on CRAN
+  and still run in continuous integration.
 
 ### Changed defaults
 
@@ -772,6 +815,122 @@
   lose the guarantee, and its nine colours now fail the check too.
   `metric = "cie76"` restores the old measure for this release, and the
   greyscale check is the lightness gap under either.
+
+- [`simulate_cvd()`](https://pablobernabeu.github.io/depictr/reference/simulate_cvd.md)
+  at partial severity now uses Machado et al.’s published matrices,
+  interpolated between the tabulated severities. Interpolating towards
+  normal vision missed them on the default palette by up to 11 units of
+  the 1976 Delta-E, or 6.2 in CIEDE2000. Full-severity results, and so
+  [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md),
+  [`palette_preview()`](https://pablobernabeu.github.io/depictr/reference/palette_preview.md)
+  and
+  [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md),
+  are unchanged. The authors tabulate a matrix for each tenth of
+  severity, and a severity between two tenths now takes the linear
+  interpolation of the two, as the colorspace package does, whose output
+  it matches. The old transform drew the full-severity matrix towards
+  the identity. Between severities 0.3 and 0.7, it moved the palette’s
+  colours too little under protan and deutan and too far under tritan,
+  so under a red-green deficiency they looked further apart than the
+  model predicts.
+
+- Confidence intervals for a `glm` whose dispersion is estimated (the
+  Gaussian, Gamma, inverse Gaussian and quasi families) now use the t
+  distribution on the residual degrees of freedom, matching the t tests
+  of [`summary.glm()`](https://rdrr.io/r/stats/summary.glm.html) and the
+  `lm` path. They used z and were about 10% too narrow at 12 residual
+  degrees of freedom, so a Gaussian `glm` disagreed with
+  [`lm()`](https://rdrr.io/r/stats/lm.html) on the same model. At 100
+  degrees of freedom, the two differ by about 1%. The choice is read
+  from the model’s own summary, so binomial, Poisson and
+  [`MASS::glm.nb()`](https://rdrr.io/pkg/MASS/man/glm.nb.html) fits keep
+  z, as do mixed models.
+  [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md),
+  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
+  [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md),
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  and
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
+  change with it, and so do the bands of
+  [`effects_plot()`](https://pablobernabeu.github.io/depictr/reference/effects_plot.md)
+  and
+  [`interaction_plot()`](https://pablobernabeu.github.io/depictr/reference/interaction_plot.md).
+  In the Python twin the intervals follow the fitted result’s `use_t`,
+  which gives the same t intervals.
+
+- The coefficient of a two-level factor is now labelled with its level,
+  `treatment: enhanced`, as the coefficients of factors with more levels
+  already were, so the row says which contrast it shows. It was labelled
+  `treatment`, which hid the direction of the contrast. Interaction rows
+  name their levels the same way, `rainfall × treatment: enhanced` where
+  they showed `rainfall × treatmentenhanced`. The labels change in
+  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
+  [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md),
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  and
+  [`optimizer_fixef_plot()`](https://pablobernabeu.github.io/depictr/reference/optimizer_fixef_plot.md).
+  [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md)
+  now takes them from every fitted model it is given, so a factor term
+  that only a later model holds is labelled too. A named `labels` vector
+  still sets any label, and
+  `labels = c(treatmentenhanced = "treatment")` restores the old one.
+  The Python twin now labels its terms by the same rules.
+
+### New features
+
+- `depictr_palette(order = "contrast")`, also accepted by
+  [`scale_colour_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md)
+  and
+  [`scale_fill_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md),
+  reorders the built-in palette so that up to three groups pass every
+  colour check of
+  [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md),
+  contrast against white included, and up to four keep 3:1. It leads
+  with the brand blue, the vermillion and the reddish purple, then the
+  bluish green. It warns past four colours. The ramps refuse it, and a
+  palette set with `depictr_options(palette = )` is returned as it was
+  set, with a warning.
+  `depictr_options(palette = depictr_palette(order = "contrast"))` makes
+  the order the default for every later plot. The default order is
+  unchanged, and the Python twin gives the same order.
+
+- [`simulate_figure()`](https://pablobernabeu.github.io/depictr/reference/simulate_figure.md)
+  shows a finished figure, legend and colourbar included, as a reader
+  with a colour-vision deficiency sees it. It builds the grob table of a
+  ggplot or a patchwork and passes every colour in it through
+  [`simulate_cvd()`](https://pablobernabeu.github.io/depictr/reference/simulate_cvd.md).
+  That covers the line and fill colours of each grob and the cells of
+  each raster, and each colour keeps its alpha. It returns a gtable,
+  which [`grid::grid.draw()`](https://rdrr.io/r/grid/grid.draw.html)
+  draws and
+  [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
+  saves. Recolouring the data before the plot is built would have left
+  the legend keys and colourbars in their original colours. The Python
+  twin’s
+  [`simulate_figure()`](https://pablobernabeu.github.io/depictr/reference/simulate_figure.md)
+  uses the same matrices on the pixels of the rendered figure.
+
+- `exponentiate = TRUE` in
+  [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md),
+  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)
+  and
+  [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md)
+  gives odds, rate or risk ratios, and the two plots draw them on a log
+  axis with the reference line at 1. The axis is labelled “Odds ratio”
+  for a logit link, “Rate ratio” for a log link in a Poisson,
+  quasi-Poisson or negative binomial model, “Risk ratio” for a binomial
+  model with a log link and “exp(Estimate)” otherwise.
+  [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md)
+  exponentiates the estimates and interval limits and leaves `std.error`
+  on the link scale, as
+  [`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html)
+  does. Its `glm` method used to swallow the argument and return
+  log-odds.
+  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)
+  exponentiates after `standardise`, so a standardised slope becomes a
+  ratio per SD of its predictor. A data frame of estimates is read on
+  the link scale. `reference_line` now defaults to 1 when exponentiating
+  and to 0 otherwise. The Python twin gains the same arguments.
 
 ## depictr 0.3.0
 
