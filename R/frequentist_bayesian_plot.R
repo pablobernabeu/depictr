@@ -222,7 +222,12 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
                                  pretty_coef_map(frequentist), interaction,
                                  !intercept && any(is_intercept))
   }
-  draws$label <- make_labels(draws$term, labels, interaction)
+  # Each Bayesian term is labelled once and its draws take the label by
+  # match(), since labelling every draw took seconds.
+  b_params <- unique(draws$term)
+  draws$label <- make_labels(b_params, labels, interaction)[
+    match(draws$term, b_params)
+  ]
   freq$label <- make_labels(freq$term, labels, interaction)
 
   if (!intercept) {

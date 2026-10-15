@@ -360,18 +360,13 @@ format_terms <- function(x,
                          wrap = NULL) {
   interaction <- match.arg(interaction)
   x <- as.character(x)
-  na <- is.na(x)
   if (strip_prefix) {
     # Strip the b_/bs_ Bayesian prefix from each interaction component, not just
-    # the leading token: split on the interaction separator, strip each piece,
-    # then rejoin. `stringr` propagates NA, so missing values stay missing.
-    x <- vapply(
-      strsplit(x, ":", fixed = TRUE),
-      function(parts) paste(stringr::str_replace(parts, "^b[s]?_", ""),
-                            collapse = ":"),
-      character(1)
-    )
-    x[na] <- NA_character_
+    # the leading token: a prefix counts at the start of the term or straight
+    # after a colon. One regular expression over the whole vector does this for
+    # every term at once, which matters for the per-draw tables of a posterior,
+    # and gsub() leaves NA as NA.
+    x <- gsub("(^|:)bs?_", "\\1", x)
   }
   if (tidy_intercept) {
     x <- stringr::str_replace(x, "^\\(Intercept\\)$", "Intercept")

@@ -45,7 +45,10 @@ test_that("the reported mean difference equals the raw difference of means", {
   expect_equal(diffs$diff[diffs$group == "enhanced"], md)
 })
 
+# The next two tests resample tens of thousands of times and take most of this
+# file's time, so CRAN skips them and continuous integration still runs them.
 test_that("bootstrap CI matches the boot package (percentile method)", {
+  skip_on_cran()
   skip_if_not_installed("boot")
   set.seed(42)
   treat <- rnorm(40, 10, 3)
@@ -71,6 +74,7 @@ test_that("bootstrap CI matches the boot package (percentile method)", {
 })
 
 test_that("bootstrap percentile CI has nominal coverage", {
+  skip_on_cran()
   set.seed(7)
   truth <- 2
   nsim <- 500

@@ -478,6 +478,17 @@
   README, and the sidebar of the home page shows the CRAN DOI once: the DOI
   badge in the README no longer appears there a second time.
 
+* `posterior_plot()` and `frequentist_bayesian_plot()` formatted a label for
+  every posterior draw, which made a ten-parameter figure take seconds and a
+  full brms draws object minutes. Labels are formatted once per parameter.
+  `format_terms()` now strips the `b_` and `bs_` prefixes from a whole vector
+  with one regular expression. It split each term on its colons and took about
+  15 seconds for 40,000 labels, a job that now takes a fraction of a second. An
+  unnamed `labels` vector, one label per parameter in the order of `draws`,
+  now works in `posterior_plot()`. It failed with a message that counted the
+  draws as terms. The two bootstrap tests that took most of the test time are
+  skipped on CRAN and still run in continuous integration.
+
 ## Changed defaults
 
 * The gap statistic's default search in `k_diagnostic()` and

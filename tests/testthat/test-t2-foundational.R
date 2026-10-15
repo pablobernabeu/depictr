@@ -56,6 +56,22 @@ test_that("format_terms() keeps NA as NA and strips prefixes per component", {
   expect_true(is.na(wrapped[1]))
 })
 
+test_that("format_terms() strips one prefix from the front of each component", {
+  # One regular expression over the whole vector strips the prefix. The split
+  # and rejoin of each term on its colons that it replaced gave the same labels
+  # for every term here.
+  x <- c("b_x", "bs_x", "b_b_x", "ab_x", "x_b_y", "bx", "b_", "b_x:b_y",
+         "b_x:bs_y:b_z", "x:b_y", ":b_x", "x::b_y", "", NA)
+  expect_identical(
+    format_terms(x, interaction = "colon"),
+    c("x", "x", "b x", "ab x", "x b y", "bx", "", "x:y", "x:y:z", "x:y",
+      ":x", "x::y", "", NA)
+  )
+  expect_identical(format_terms(x, strip_prefix = FALSE, interaction = "colon"),
+                   gsub("_", " ", x, fixed = TRUE))
+  expect_identical(format_terms(character(0)), character(0))
+})
+
 test_that("coefficient_plot() renders horizontal error bars without geom_errorbarh warning", {
   fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
   p <- coefficient_plot(fit)

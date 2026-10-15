@@ -727,6 +727,70 @@ test_that("draws holding only log densities are refused plainly", {
   }
 })
 
+# ---- labels formatted once per parameter -------------------------------------
+
+# Replaces format_terms() for the rest of the calling test with a copy that
+# records the longest vector it is asked to format, and returns a function that
+# reads the record. Counting what is formatted keeps the test free of the clock.
+record_format_terms <- function(env = parent.frame()) {
+  longest <- 0L
+  real <- format_terms
+  testthat::local_mocked_bindings(
+    format_terms = function(x, ...) {
+      longest <<- max(longest, length(x))
+      real(x, ...)
+    },
+    .env = env
+  )
+  function() longest
+}
+
+test_that("posterior_plot() formats each parameter's label once", {
+  # Regression: a label was formatted for every draw, so ten parameters of
+  # 4,000 draws took seconds and a brms draws object minutes.
+  draws <- sim_draws(n = 600)
+  longest <- record_format_terms()
+  p <- posterior_plot(draws, style = "interval")
+  expect_gt(longest(), 0)
+  expect_lte(longest(), ncol(draws))
+  expect_setequal(drawn_labels(p), names(draws))
+  # A named `labels` vector leaves the other parameters to format_terms().
+  p <- posterior_plot(draws, style = "interval",
+                      labels = c(normalish = "near normal"))
+  expect_lte(longest(), ncol(draws))
+  expect_setequal(drawn_labels(p), c("near normal", "skewed", "bimodal"))
+})
+
+test_that("posterior_plot() takes an unnamed label per parameter", {
+  # Labelling every draw made an unnamed vector fail with a count of draws:
+  # "`labels` has length 3 but there are 1800 terms to label."
+  draws <- sim_draws(n = 600)
+  p <- posterior_plot(draws, style = "interval", labels = c("A", "B", "C"))
+  summ <- p$layers[[which(geom_classes(p) == "GeomLinerange")[1]]]$data
+  expect_identical(as.character(summ$label), c("A", "B", "C"))
+  expect_identical(summ$term, names(draws))
+  expect_error(posterior_plot(draws, labels = c("A", "B")),
+               "^`labels` has length 2 but there are 3 terms to label\\.$")
+})
+
+test_that("frequentist_bayesian_plot() formats each term's label once", {
+  freq <- lm(life_satisfaction ~ stress + sleep_hours, data = wellbeing_survey)
+  draws <- quantile_draws(freq, n = 600)
+  longest <- record_format_terms()
+  p <- suppressMessages(frequentist_bayesian_plot(freq, draws))
+  expect_gt(longest(), 0)
+  expect_lte(longest(), ncol(draws))
+  expect_setequal(drawn_labels(p), c("Intercept", "stress", "sleep hours"))
+  # Every draw keeps its term's label. Without ggdist, the draws are summarised
+  # before they are drawn.
+  skip_if_not_installed("ggdist")
+  bayes <- Filter(function(l) nrow(l$data) == nrow(draws) * ncol(draws),
+                  p$layers)
+  expect_length(bayes, 1)
+  expect_equal(as.vector(table(as.character(bayes[[1]]$data$label))),
+               rep(nrow(draws), ncol(draws)))
+})
+
 test_that("an rstanarm fit keeps only its regression coefficients", {
   # rstanarm's as.matrix() also carries every group-level coefficient b[...]
   # and covariance element Sigma[...], which are not fixed effects. rstanarm

@@ -42,7 +42,9 @@
 #' @param labels Optional named character vector renaming parameters, e.g.
 #'   `c(conditionunrelated = "condition")`. Unmatched parameters fall back to
 #'   [format_terms()]. For a `brms` fit, or a draws object holding `b_`
-#'   parameters, the names are given without the `b_` prefix.
+#'   parameters, the names are given without the `b_` prefix. An unnamed vector
+#'   gives one label per parameter, in the order the parameters appear in
+#'   `draws`.
 #' @param reference_line Position of a vertical reference line, or `NULL`/`NA`
 #'   to omit it. There is no universally meaningful reference for every
 #'   parameter, so this defaults to `0` (the usual "no effect" line for
@@ -146,11 +148,15 @@ posterior_plot <- function(draws,
                pd = pd_val, stringsAsFactors = FALSE)
   }))
 
-  lab_of <- function(term) make_labels(term, labels, interaction)
-  param_labels <- lab_of(params)
+  # Each parameter is labelled once and its draws take the label by match():
+  # labelling the draw table row by row took seconds for ten parameters of
+  # 4,000 draws.
+  param_labels <- make_labels(params, labels, interaction)
   check_label_clash(params, param_labels)
   lvls <- rev(param_labels)
-  label_for <- function(term) factor(lab_of(term), levels = lvls)
+  label_for <- function(term) {
+    factor(param_labels[match(term, params)], levels = lvls)
+  }
   summ$label <- label_for(summ$term)
   long$label <- label_for(long$term)
 
