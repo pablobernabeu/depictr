@@ -144,6 +144,60 @@ test_that("the pretty-label merge does not trip the unused-key warning", {
   expect_no_warning(coefficient_plot(fit, labels = c(rainfall = "Rainfall")))
 })
 
+test_that("a factor's coefficient is labelled with its level, in interactions too", {
+  # Regression: a two-level factor was labelled by its variable alone, which
+  # hid the contrast the row shows, and an interaction row kept the level glued
+  # to the variable's name (treatmentenhanced). tests/test_data_theme_models.py
+  # pins the same labels in the Python twin.
+  times <- "\u00d7"
+  top_down <- function(p) rev(levels(p$data$label))
+  fit <- lm(yield ~ rainfall * treatment + fertiliser, data = crop_yield)
+  expect_equal(top_down(coefficient_plot(fit)),
+               c("rainfall", "treatment: enhanced", "fertiliser",
+                 paste("rainfall", times, "treatment: enhanced")))
+  # Sorted by estimate, the order is the same in both twins. patsy orders the
+  # model's own columns differently, so the Python twin pins this order.
+  expect_equal(top_down(coefficient_plot(fit, order = "ascending")),
+               c("treatment: enhanced", "fertiliser", "rainfall",
+                 paste("rainfall", times, "treatment: enhanced")))
+  expect_true("rainfall * treatment: enhanced" %in%
+                levels(coefficient_plot(fit, interaction = "asterisk")$data$label))
+
+  # A factor with three or more levels was already labelled this way.
+  wb <- lm(life_satisfaction ~ region + stress, data = wellbeing_survey)
+  expect_equal(top_down(coefficient_plot(wb)),
+               c("region: North", "region: South", "region: West", "stress"))
+
+  # Without a main effect, the interaction codes every level of the factor.
+  only <- lm(yield ~ treatment:rainfall, data = crop_yield)
+  expect_equal(top_down(coefficient_plot(only)),
+               paste(c("treatment: standard", "treatment: enhanced"), times,
+                     "rainfall"))
+
+  # A multi-column term that is not a factor keeps the labels it had.
+  pf <- lm(yield ~ poly(rainfall, 2), data = crop_yield)
+  expect_equal(top_down(coefficient_plot(pf)),
+               c("poly(rainfall, 2): 1", "poly(rainfall, 2): 2"))
+})
+
+test_that("compare_models() names the level in every source's terms", {
+  # The automatic labels came from the first source that had any, so a
+  # factor interaction that only a later model held kept its raw name. A
+  # brms-style table lines up with them through its b_ prefix.
+  times <- "\u00d7"
+  additive <- lm(yield ~ rainfall + treatment, data = crop_yield)
+  full <- lm(yield ~ rainfall * treatment, data = crop_yield)
+  p <- compare_models(Additive = additive, Interaction = full)
+  want <- c("rainfall", "treatment: enhanced",
+            paste("rainfall", times, "treatment: enhanced"))
+  expect_equal(rev(levels(p$data$label)), want)
+
+  bayes <- tidy_estimates(full)
+  bayes$term <- paste0("b_", sub("^\\(Intercept\\)$", "Intercept", bayes$term))
+  p <- compare_models(Frequentist = full, Bayesian = bayes)
+  expect_equal(rev(levels(p$data$label)), want)
+})
+
 test_that("compare_models() needs at least two sources", {
   fit <- lm(yield ~ rainfall, data = crop_yield)
   expect_error(compare_models(fit), "at least two")

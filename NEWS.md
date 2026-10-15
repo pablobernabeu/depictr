@@ -610,6 +610,19 @@
   and `interaction_plot()`. In the Python twin the intervals follow the
   fitted result's `use_t`, which gives the same t intervals.
 
+* The coefficient of a two-level factor is now labelled with its level,
+  `treatment: enhanced`, as the coefficients of factors with more levels
+  already were, so the row says which contrast it shows. It was labelled
+  `treatment`, which hid the direction of the contrast. Interaction rows name
+  their levels the same way, `rainfall × treatment: enhanced` where they showed
+  `rainfall × treatmentenhanced`. The labels change in `coefficient_plot()`,
+  `compare_models()`, `frequentist_bayesian_plot()` and
+  `optimizer_fixef_plot()`. `compare_models()` now takes them from every
+  fitted model it is given, so a factor term that only a later model holds is
+  labelled too. A named `labels` vector still sets any label, and
+  `labels = c(treatmentenhanced = "treatment")` restores the old one. The
+  Python twin now labels its terms by the same rules.
+
 ## New features
 
 * `depictr_palette(order = "contrast")`, also accepted by

@@ -27,7 +27,9 @@
 #'   returns, after the intercept is dropped unless `intercept = TRUE`. Terms
 #'   drawn on one row, such as `stress` and brms's `b_stress`, take one label.
 #'   A named vector mapping raw term names to labels, such as
-#'   `c(soil_ph = "Soil pH")`, is safer.
+#'   `c(soil_ph = "Soil pH")`, is safer. If `NULL`, the terms are labelled as
+#'   in [coefficient_plot()], each factor level with its variable and level
+#'   (`treatment: enhanced`), from every fitted model among the sources.
 #' @param interaction Passed to [format_terms()].
 #' @param dodge_width Vertical spacing between sources sharing a term.
 #' @param reference_line Position of a vertical reference line. Defaults to 0,
@@ -156,13 +158,10 @@ compare_models <- function(...,
   # duplicated factor levels. All ordering and grid-completion below therefore
   # works on `label`, not `term`.
   #
-  # Prettify factor coefficient names by default, taken from the first fitted
-  # model among the sources; user-supplied `labels` still take precedence.
-  auto <- NULL
-  for (s in sources) {
-    auto <- pretty_coef_map(s)
-    if (!is.null(auto)) break
-  }
+  # The default labels name each factor level, and they come from every fitted
+  # model among the sources, so a factor term that only a later model holds is
+  # labelled too. User-supplied `labels` take precedence over them.
+  auto <- pretty_coef_maps(sources, interaction)
   # An unnamed `labels` vector gives one label per term drawn, in the order the
   # terms first appear across the sources. The stacked table holds each term
   # once per source, so the vector is keyed by raw term name for the lookup

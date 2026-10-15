@@ -46,8 +46,10 @@ other way up.}
 one label per term in model order (the order \code{\link[=tidy_estimates]{tidy_estimates()}} returns,
 after the intercept is dropped unless \code{intercept = TRUE}), whatever
 \code{order} is. A named vector mapping raw term names to labels, such as
-\code{c(soil_ph = "Soil pH")}, is safer. If \code{NULL}, names are tidied with
-\code{\link[=format_terms]{format_terms()}}.}
+\code{c(soil_ph = "Soil pH")}, is safer. If \code{NULL}, the coefficient of a
+factor level is labelled with its variable and level, inside interaction
+terms too, so the contrast of enhanced with the reference level reads
+\code{treatment: enhanced}. Other names are tidied with \code{\link[=format_terms]{format_terms()}}.}
 
 \item{interaction}{Passed to \code{\link[=format_terms]{format_terms()}} to control how interaction
 terms are rendered (ignored when \code{labels} is supplied).}

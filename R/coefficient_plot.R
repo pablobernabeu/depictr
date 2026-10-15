@@ -21,8 +21,10 @@
 #'   one label per term in model order (the order [tidy_estimates()] returns,
 #'   after the intercept is dropped unless `intercept = TRUE`), whatever
 #'   `order` is. A named vector mapping raw term names to labels, such as
-#'   `c(soil_ph = "Soil pH")`, is safer. If `NULL`, names are tidied with
-#'   [format_terms()].
+#'   `c(soil_ph = "Soil pH")`, is safer. If `NULL`, the coefficient of a
+#'   factor level is labelled with its variable and level, inside interaction
+#'   terms too, so the contrast of enhanced with the reference level reads
+#'   `treatment: enhanced`. Other names are tidied with [format_terms()].
 #' @param interaction Passed to [format_terms()] to control how interaction
 #'   terms are rendered (ignored when `labels` is supplied).
 #' @param point_colour,reference_colour Colours for the estimates and the
@@ -154,10 +156,11 @@ coefficient_plot <- function(x,
       stem
     }
 
-  # Prettify coefficient names to the effect (variable) name by default
-  # (e.g. "conditionunrelated" -> "condition"); user `labels` take precedence.
+  # By default a factor's coefficient is labelled with its variable and level
+  # (e.g. "conditionunrelated" -> "condition: unrelated"). User `labels` take
+  # precedence.
   warn_unused_labels(est$term, labels)
-  labels <- merge_pretty_labels(labels, pretty_coef_map(x))
+  labels <- merge_pretty_labels(labels, pretty_coef_map(x, interaction))
 
   intercept_dropped <- FALSE
   if (!intercept) {
@@ -221,20 +224,28 @@ coefficient_plot <- function(x,
 
 # ---- internal helpers ------------------------------------------------------
 
-#' Build a raw-name -> readable-effect-name map for a model's factor terms
+#' Build a raw-name -> readable-label map for a model's factor columns
 #'
-#' Turns the design-matrix names that R produces for factor levels (e.g.
-#' `conditionunrelated`) into the readable *effect* (variable) name
-#' (`condition`). For a two-level factor the single coefficient is named by its
-#' variable alone; the contrast against the implicit reference level is
-#' understood, so the level is not repeated. A factor with several non-reference
-#' levels keeps the level too (`region: South`) so the rows stay distinct. Each
-#' entry is also keyed under a `b_` prefix so a brms summary term aligns with its
-#' frequentist counterpart. Continuous terms and interactions are left to
-#' [format_terms()] (which tidies them and shows underscores as spaces).
-#' Returns a named character vector, or `NULL` when `x` is not a supported model.
+#' Turns the design-matrix names that R produces for factor levels into
+#' labels that name the variable and the level: `conditionunrelated` becomes
+#' `condition: unrelated`. A two-level factor is labelled the same way as a
+#' factor with more levels. Its one coefficient is still the contrast between
+#' that level and the reference, and the level tells the reader which way round
+#' the contrast runs. An interaction column is labelled
+#' from its components: in `rainfall:treatmentenhanced` the second becomes
+#' `treatment: enhanced`, joined to `rainfall` by the separator that
+#' `interaction` names, as [format_terms()] joins them. A component is split
+#' into variable and level when its variable is a factor (logical and
+#' character inputs included, which `model.matrix()` codes the same way) or
+#' when its term spans several columns, as `poly()` does. A one-column term
+#' whose column name extends its label, such as `poly(x, 1)`, is labelled with
+#' the term alone, as before. Each entry is also keyed under a `b_` prefix so
+#' a brms summary term aligns with its frequentist counterpart. Columns with
+#' no such component are left to [format_terms()], which tidies them and shows
+#' underscores as spaces. Returns a named character vector, or `NULL` when `x`
+#' is not a supported model or has no factor columns.
 #' @noRd
-pretty_coef_map <- function(x) {
+pretty_coef_map <- function(x, interaction = "times") {
   if (!inherits(x, c("lm", "glm", "merMod", "lmerMod", "glmerMod",
                      "lmerModLmerTest"))) {
     return(NULL)
@@ -245,29 +256,43 @@ pretty_coef_map <- function(x) {
   assign <- attr(mm, "assign")
   cols <- colnames(mm)
   if (is.null(assign) || length(assign) != length(cols)) return(NULL)
-  nice <- function(s) gsub("_", " ", s, fixed = TRUE)
+  factors <- base::names(attr(mm, "contrasts"))
+  sep <- interaction_separator(interaction)
   out <- character(0)
   for (i in seq_along(cols)) {
     a <- assign[i]
     if (a < 1 || a > length(tl)) next                 # intercept / unknown
-    term <- tl[a]
-    if (grepl(":", term, fixed = TRUE)) next          # interactions: format_terms
-    col <- cols[i]
-    if (startsWith(col, term) && nchar(col) > nchar(term)) {
-      # Factor level column: name it by the variable alone for a two-level
-      # factor, or "variable: level" when several levels share the variable.
-      val <- if (sum(assign == a) == 1L) {
-        nice(term)
-      } else {
-        nice(paste0(term, ": ", substring(col, nchar(term) + 1L)))
-      }
-      out[col] <- val
-      out[paste0("b_", col)] <- val   # align a brms b_-prefixed summary term
-    }
-    # Continuous terms (col == term) are left to format_terms(), which also
-    # handles their b_-prefixed Bayesian counterparts, so the two still align.
+    # model.matrix() names an interaction column by joining one piece per
+    # variable with ":", in the order of the term label, so the pieces line
+    # up with the variables. A level that itself holds a colon breaks the
+    # alignment, and such a column is left to format_terms().
+    vars <- strsplit(tl[a], ":", fixed = TRUE)[[1]]
+    pieces <- strsplit(cols[i], ":", fixed = TRUE)[[1]]
+    if (length(pieces) != length(vars)) next
+    extends <- startsWith(pieces, vars) & nchar(pieces) > nchar(vars)
+    if (!any(extends)) next                           # continuous: format_terms
+    is_level <- extends & (vars %in% factors | sum(assign == a) > 1L)
+    pieces[is_level] <- paste0(
+      vars[is_level], ": ",
+      substring(pieces[is_level], nchar(vars[is_level]) + 1L)
+    )
+    pieces[extends & !is_level] <- vars[extends & !is_level]
+    val <- gsub("_", " ", paste(pieces, collapse = sep), fixed = TRUE)
+    out[cols[i]] <- val
+    out[paste0("b_", cols[i])] <- val   # align a brms b_-prefixed summary term
   }
+  # Continuous terms are left to format_terms(), which also handles their
+  # b_-prefixed Bayesian counterparts, so the two still align.
   if (length(out)) out else NULL
+}
+
+#' Merge the automatic label maps of several sources, the first one winning
+#' @noRd
+pretty_coef_maps <- function(sources, interaction = "times") {
+  maps <- lapply(sources, pretty_coef_map, interaction = interaction)
+  out <- NULL
+  for (m in maps) out <- merge_pretty_labels(out, m)
+  out
 }
 
 #' Merge an auto term-label map under any user-supplied labels (user wins)

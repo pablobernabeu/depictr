@@ -52,7 +52,9 @@ appear across the sources, each source in the order \code{\link[=tidy_estimates]
 returns, after the intercept is dropped unless \code{intercept = TRUE}. Terms
 drawn on one row, such as \code{stress} and brms's \code{b_stress}, take one label.
 A named vector mapping raw term names to labels, such as
-\code{c(soil_ph = "Soil pH")}, is safer.}
+\code{c(soil_ph = "Soil pH")}, is safer. If \code{NULL}, the terms are labelled as
+in \code{\link[=coefficient_plot]{coefficient_plot()}}, each factor level with its variable and level
+(\code{treatment: enhanced}), from every fitted model among the sources.}
 
 \item{interaction}{Passed to \code{\link[=format_terms]{format_terms()}}.}
 

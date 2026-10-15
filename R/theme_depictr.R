@@ -371,12 +371,7 @@ format_terms <- function(x,
   if (tidy_intercept) {
     x <- stringr::str_replace(x, "^\\(Intercept\\)$", "Intercept")
   }
-  sep <- switch(interaction,
-    times = " \u00d7 ",
-    asterisk = " * ",
-    colon = ":",
-    space = " "
-  )
+  sep <- interaction_separator(interaction)
   if (interaction != "colon") {
     x <- stringr::str_replace_all(x, ":", sep)
   }
@@ -393,4 +388,18 @@ format_terms <- function(x,
     x <- unname(x)
   }
   x
+}
+
+#' The text that joins the components of an interaction label
+#'
+#' Shared by [format_terms()] and the factor-level labels of
+#' `pretty_coef_map()`, so both write an interaction the same way.
+#' @noRd
+interaction_separator <- function(interaction) {
+  switch(interaction,
+    times = " \u00d7 ",
+    asterisk = " * ",
+    colon = ":",
+    space = " "
+  )
 }

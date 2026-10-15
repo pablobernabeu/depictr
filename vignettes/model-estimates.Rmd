@@ -88,9 +88,10 @@ coefficient_plot(
 )
 ```
 
-Coefficient names are tidied to the effect (variable) name automatically
-(`conditionunrelated` becomes `condition`, `word_frequency` becomes `word
-frequency`). Pass `labels` to override any of them. A slope per Zipf unit and a
+Coefficient names are tidied automatically. A factor's coefficient is labelled
+with its variable and the level compared with the reference, so
+`conditionunrelated` becomes `condition: unrelated`, and `word_frequency`
+becomes `word frequency`. Pass `labels` to override any of them. A slope per Zipf unit and a
 contrast between two conditions are in different units. `standardise = TRUE`
 multiplies the slope of each continuous predictor by that predictor's standard
 deviation, so the word-frequency slope reads as the change in RT per SD. The two

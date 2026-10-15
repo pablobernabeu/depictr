@@ -625,7 +625,8 @@ test_that("a brms::fixef() matrix takes the summary path", {
   expect_no_warning(p <- frequentist_bayesian_plot(fit, fx))
   expect_false("GeomSlabinterval" %in% geom_classes(p))
   expect_setequal(unique(as.character(p$data$label)),
-                  c("Intercept", "condition", "modality", "word frequency"))
+                  c("Intercept", "condition: unrelated", "modality: auditory",
+                    "word frequency"))
   # The Bayesian rows carry the fixef() estimates and quantiles.
   bayes <- p$data[p$data$source == "Bayesian analysis", ]
   wf <- bayes[bayes$label == "word frequency", ]

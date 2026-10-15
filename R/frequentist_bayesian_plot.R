@@ -125,13 +125,14 @@ frequentist_bayesian_plot <- function(frequentist,
   # The namesake behaviour: when the Bayesian side carries actual draws, render
   # the full posterior distribution and overlay the frequentist point + CI.
   if (has_draws(bayesian)) {
-    # Prettify coefficient names to the effect (variable) name by default, from
-    # the frequentist model (e.g. "conditionunrelated" -> "condition"); the same
-    # map applies to the frequentist estimates and the b_-stripped Bayesian draw
+    # The default labels name each factor level, read from the frequentist
+    # model (e.g. "conditionunrelated" -> "condition: unrelated"). The same map
+    # applies to the frequentist estimates and the b_-stripped Bayesian draw
     # names, and any user-supplied `labels` take precedence. The summary path
     # leaves this to compare_models(), which builds the same map itself and
     # must see the user's own `labels` to judge which keys match nothing.
-    labels <- merge_pretty_labels(labels, pretty_coef_map(frequentist))
+    labels <- merge_pretty_labels(labels,
+                                  pretty_coef_map(frequentist, interaction))
     return(fbp_distribution(
       frequentist = frequentist, bayesian = bayesian,
       conf_level = conf_level, labels = labels, interaction = interaction,
@@ -219,7 +220,8 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
     is_intercept <- term_names %in% c("(Intercept)", "Intercept", "b_Intercept")
     if (!intercept) term_names <- term_names[!is_intercept]
     labels <- key_labels_by_term(labels, term_names,
-                                 pretty_coef_map(frequentist), interaction,
+                                 pretty_coef_map(frequentist, interaction),
+                                 interaction,
                                  !intercept && any(is_intercept))
   }
   # Each Bayesian term is labelled once and its draws take the label by
