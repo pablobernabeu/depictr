@@ -259,3 +259,21 @@ test_that("threshold_plot() honours metric selection and marker options", {
 
   expect_no_warning(ggplot2::ggplot_build(threshold_plot(g)))
 })
+
+test_that("threshold_plot() draws each metric as a step that changes at a score", {
+  # The help page promised exact step functions, but geom_line() joined the
+  # distinct thresholds with slopes through values no threshold gives. A case
+  # is predicted positive when its score is at or above the threshold, so
+  # between two adjacent scores every metric keeps its value at the upper one.
+  # A "vh" step changes at each score and runs flat below it.
+  g <- make_glm(seed = 11)
+  a <- as.integer(g$y); s <- stats::fitted(g)
+  u <- sort(unique(s))
+  expect_equal(cm_metrics(a, s, (u[10] + u[11]) / 2), cm_metrics(a, s, u[11]))
+
+  p <- threshold_plot(g, mark = NULL)
+  layer <- p$layers[[length(p$layers)]]
+  expect_s3_class(layer$geom, "GeomStep")
+  expect_identical(layer$geom_params$direction, "vh")
+  expect_no_warning(ggplot2::ggplot_build(p))
+})

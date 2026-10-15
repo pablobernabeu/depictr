@@ -134,6 +134,20 @@ test_that("style = 'interval' draws the point + nested intervals only", {
   expect_true(sum(gc == "GeomPoint") == 2)
 })
 
+test_that("the intervals are central (equal-tailed) quantile intervals", {
+  # The help page now names the interval it draws. Each leaves the same share
+  # of the draws in either tail, which on the skewed parameter is not the
+  # narrowest interval of that mass.
+  d <- sim_draws()
+  p <- posterior_plot(d, style = "interval")
+  summ <- p$layers[[which(geom_classes(p) == "GeomLinerange")[1]]]$data
+  got <- unlist(summ[summ$term == "skewed",
+                     c("outer_lo", "inner_lo", "inner_hi", "outer_hi")])
+  expect_equal(unname(got),
+               stats::quantile(d$skewed, c(0.025, 0.17, 0.83, 0.975),
+                               names = FALSE))
+})
+
 test_that("the caption auto-reports the interval mass", {
   p <- posterior_plot(sim_draws(), style = "interval", widths = c(0.5, 0.9))
   expect_match(p$labels$caption, "50%")

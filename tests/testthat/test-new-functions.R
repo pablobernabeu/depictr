@@ -10,6 +10,28 @@ test_that("dumbbell_plot connects two groups per category", {
   expect_equal(nlevels(p$data$category), 4L)
 })
 
+test_that("dumbbell_plot(sort = 'none') keeps level order, else first appearance", {
+  # aggregate() sorted the categories, so "the data's own order" came out
+  # alphabetical: levels West, South, North, East gave East, North, South,
+  # West.
+  d <- data.frame(
+    region = rep(c("South", "West", "North", "East"), each = 2),
+    value = c(1, 2, 3, 5, 2, 2.5, 4, 4.5),
+    period = rep(c("before", "after"), 4)
+  )
+  d$region_f <- factor(d$region,
+                       levels = c("West", "Central", "South", "North", "East"))
+  p <- dumbbell_plot(d, region_f, value, period, sort = "none")
+  # A level no row uses has no dumbbell to draw.
+  expect_identical(levels(p$data$category), c("West", "South", "North", "East"))
+  p <- dumbbell_plot(d, region, value, period, sort = "none")
+  expect_identical(levels(p$data$category), c("South", "West", "North", "East"))
+  # Each category keeps its own two values.
+  seg <- p$data[match(c("South", "West", "North", "East"), p$data$category), ]
+  expect_identical(seg$x1, c(2, 5, 2.5, 4.5))
+  expect_identical(seg$x2, c(1, 3, 2, 4))
+})
+
 test_that("dumbbell_plot requires exactly two groups", {
   expect_error(
     dumbbell_plot(wellbeing_survey, region, life_satisfaction, education),

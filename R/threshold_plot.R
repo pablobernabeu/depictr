@@ -12,7 +12,8 @@
 #' At threshold \eqn{t} a case is predicted positive when its score is \eqn{\ge
 #' t}. The metrics are evaluated at every distinct score (the points at which the
 #' confusion matrix can change), so the curves are exact step functions rather
-#' than a coarse grid.
+#' than a coarse grid. Between two adjacent scores, each metric keeps its value
+#' at the upper one, so each step changes at a score and runs flat below it.
 #'
 #' @param x A binomial `glm`, or the vector of observed outcomes (0/1, logical
 #'   or a two-level factor with the positive class second).
@@ -106,8 +107,12 @@ threshold_plot <- function(x, score = NULL,
                                  colour = depictr_reference())
   }
 
+  # A line would join adjacent thresholds with slopes through values that no
+  # threshold gives. Every threshold between two adjacent scores predicts what
+  # the upper score predicts. geom_step() orders the points by threshold, and
+  # direction "vh" changes at each score and runs flat below it.
   p <- p +
-    ggplot2::geom_line(linewidth = 0.9, na.rm = TRUE) +
+    ggplot2::geom_step(direction = "vh", linewidth = 0.9, na.rm = TRUE) +
     scale_colour_depictr(name = NULL) +
     ggplot2::scale_y_continuous(limits = c(0, 1)) +
     ggplot2::labs(x = "Decision threshold", y = "Metric value", title = title) +

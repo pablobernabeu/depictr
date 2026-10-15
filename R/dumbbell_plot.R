@@ -19,7 +19,9 @@
 #'   each dumbbell (string or unquoted name).
 #' @param sort How to order the categories up the axis: `"gap"` (by the signed
 #'   difference between the two groups, the default), `"value"` (by the second
-#'   group's value), or `"none"` (the data's own order).
+#'   group's value), or `"none"` (the data's own order: the order of the levels
+#'   when `category` is a factor, and otherwise the order in which the
+#'   categories first appear).
 #' @param point_size Size of the end points.
 #' @param palette Length-2 colours for the two groups; defaults to
 #'   [depictr_palette()].
@@ -70,10 +72,17 @@ dumbbell_plot <- function(data, category, value, group,
   seg <- data.frame(category = cats, x1 = v1[cats], x2 = v2[cats],
                     stringsAsFactors = FALSE)
 
+  # aggregate() returns the categories sorted, so "none" restores the data's
+  # own order: a factor's levels, or else the order of first appearance.
+  own <- if (is.factor(d[[category]])) {
+    levels(d[[category]])
+  } else {
+    unique(as.character(d[[category]]))
+  }
   ord <- switch(sort,
     gap = order(seg$x2 - seg$x1),
     value = order(seg$x2),
-    none = seq_len(nrow(seg))
+    none = order(match(seg$category, own))
   )
   seg$category <- factor(seg$category, levels = seg$category[ord])
 

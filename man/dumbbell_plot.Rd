@@ -31,7 +31,9 @@ each dumbbell (string or unquoted name).}
 
 \item{sort}{How to order the categories up the axis: \code{"gap"} (by the signed
 difference between the two groups, the default), \code{"value"} (by the second
-group's value), or \code{"none"} (the data's own order).}
+group's value), or \code{"none"} (the data's own order: the order of the levels
+when \code{category} is a factor, and otherwise the order in which the
+categories first appear).}
 
 \item{point_size}{Size of the end points.}
 

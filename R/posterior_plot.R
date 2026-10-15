@@ -7,7 +7,9 @@
 #' a point-and-interval beneath it), an interval-only forest plot, a gradient
 #' interval or a dotplot. The full shape of the posterior is shown, so skew,
 #' multimodality and the relative mass on either side of a reference value are
-#' all visible, rather than a point and two limits alone.
+#' all visible, rather than a point and two limits alone. The intervals are
+#' central (equal-tailed) quantile intervals, which leave the same share of the
+#' draws in either tail.
 #'
 #' Draws may be supplied in many shapes: a fitted Bayesian model (`brms` or
 #' `rstanarm`), a `posterior` *draws* object, a wide data frame or matrix with
@@ -36,8 +38,9 @@
 #'   colour-graded interval) or `"dots"` (a quantile dotplot). Unknown values
 #'   and a missing 'ggdist' fall back to `"interval"`.
 #' @param point Central summary: `"median"` or `"mean"`.
-#' @param widths Two interval widths (inner and outer), as probabilities. The
-#'   outer width is used for the caption and the displayed interval mass.
+#' @param widths Two interval widths (inner and outer), as probabilities, each
+#'   drawn as a central (equal-tailed) quantile interval. The outer width is
+#'   used for the caption and the displayed interval mass.
 #' @param interaction Passed to [format_terms()] for the parameter labels.
 #' @param labels Optional named character vector renaming parameters, e.g.
 #'   `c(conditionunrelated = "condition")`. Unmatched parameters fall back to

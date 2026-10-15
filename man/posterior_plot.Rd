@@ -37,8 +37,9 @@ and a missing 'ggdist' fall back to \code{"interval"}.}
 
 \item{point}{Central summary: \code{"median"} or \code{"mean"}.}
 
-\item{widths}{Two interval widths (inner and outer), as probabilities. The
-outer width is used for the caption and the displayed interval mass.}
+\item{widths}{Two interval widths (inner and outer), as probabilities, each
+drawn as a central (equal-tailed) quantile interval. The outer width is
+used for the caption and the displayed interval mass.}
 
 \item{interaction}{Passed to \code{\link[=format_terms]{format_terms()}} for the parameter labels.}
 
@@ -91,7 +92,9 @@ Displays posterior (or, more generally, bootstrap or simulation) draws as a
 a point-and-interval beneath it), an interval-only forest plot, a gradient
 interval or a dotplot. The full shape of the posterior is shown, so skew,
 multimodality and the relative mass on either side of a reference value are
-all visible, rather than a point and two limits alone.
+all visible, rather than a point and two limits alone. The intervals are
+central (equal-tailed) quantile intervals, which leave the same share of the
+draws in either tail.
 }
 \details{
 Draws may be supplied in many shapes: a fitted Bayesian model (\code{brms} or

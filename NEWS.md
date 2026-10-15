@@ -374,6 +374,18 @@
   half an observation late, and the two packages now draw the same values. An
   odd window is unchanged.
 
+* `threshold_plot()` joined the metrics at adjacent scores with straight lines,
+  which passed through values that no threshold gives, while its help page
+  promised exact step functions. The curves are now drawn as steps. Every
+  threshold between two adjacent scores predicts what the upper score
+  predicts, so each step changes at a score and runs flat below it. The Python
+  package now evaluates the metrics at every distinct score too, and draws the
+  same steps.
+* `dumbbell_plot(sort = "none")` promised the data's own order but sorted the
+  categories alphabetically, so levels West, South, North and East gave East,
+  North, South and West. It now keeps the order of a factor's levels, and
+  otherwise the order in which the categories first appear.
+
 ## Degenerate input
 
 * `survival_plot()` truncated a non-integer status code, so `c(0, 0.5, 1)` was
@@ -539,6 +551,10 @@
   few places. Its README now lists the differences that change what a figure
   shows, many of them arguments the Python functions do not yet take, and a
   test there accounts for every argument of this package's functions.
+
+* The help page of `posterior_plot()` now says that its intervals are central
+  (equal-tailed) quantile intervals, which leave the same share of the draws in
+  either tail. It did not say which kind of interval it drew.
 
 ## Changed defaults
 

@@ -45,7 +45,8 @@ default) marks the Youden's J and maximum-F1 optimal thresholds.
 At threshold \eqn{t} a case is predicted positive when its score is \eqn{\ge
 t}. The metrics are evaluated at every distinct score (the points at which the
 confusion matrix can change), so the curves are exact step functions rather
-than a coarse grid.
+than a coarse grid. Between two adjacent scores, each metric keeps its value
+at the upper one, so each step changes at a score and runs flat below it.
 }
 \examples{
 gfit <- glm(accuracy ~ word_frequency + RT + condition,
