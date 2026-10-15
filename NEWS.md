@@ -535,6 +535,11 @@
   draws as terms. The two bootstrap tests that took most of the test time are
   skipped on CRAN and still run in continuous integration.
 
+* The README no longer says that the Python package differs from this one in a
+  few places. Its README now lists the differences that change what a figure
+  shows, many of them arguments the Python functions do not yet take, and a
+  test there accounts for every argument of this package's functions.
+
 ## Changed defaults
 
 * The gap statistic's default search in `k_diagnostic()` and
