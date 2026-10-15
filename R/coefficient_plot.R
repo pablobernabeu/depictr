@@ -27,8 +27,9 @@
 #'   terms are rendered (ignored when `labels` is supplied).
 #' @param point_colour,reference_colour Colours for the estimates and the
 #'   reference line.
-#' @param reference_line Position of a vertical reference line (e.g. `0` for
-#'   differences, `1` for odds/risk ratios). Use `NA` to omit it.
+#' @param reference_line Position of a vertical reference line. Defaults to 0,
+#'   or to 1 when `exponentiate = TRUE`, where a ratio of 1 means no effect.
+#'   Use `NA` to omit it.
 #' @param point_size,line_size Size of the points and interval lines.
 #' @param facet Whether to give each term its own panel with a free x-axis,
 #'   laid out one per row. This removes the squish that occurs when terms live
@@ -59,12 +60,23 @@
 #'   unit of the standardised scale spans when `standardise = TRUE`. Defaults
 #'   to 1. Use 2 for Gelman's (2008) convention, under which the coefficient
 #'   of a continuous input is comparable to that of a balanced binary one.
+#' @param exponentiate Whether to draw the exponentiated estimates and
+#'   intervals on a log10 axis, which shows the coefficients of a logistic
+#'   regression as odds ratios and those of a Poisson or negative binomial
+#'   model as rate ratios. It applies after `standardise`, so a standardised
+#'   slope becomes a ratio per SD of its predictor. A data frame `x` must hold
+#'   estimates on the link scale. Defaults to `FALSE`.
 #' @param title,subtitle,x_lab Plot title, subtitle and x-axis label. `x_lab`
 #'   defaults to "Estimate", or, when `standardise`, "Estimate per SD of
 #'   predictor" ("per 2 SD" with `sd_multiple = 2`), followed by "(contrasts
 #'   unscaled)" when a factor or binary term is drawn. The label names the
 #'   convention on the figure itself, because only the predictors are rescaled
-#'   here: a fully standardised beta would rescale the outcome too.
+#'   here: a fully standardised beta would rescale the outcome too. With
+#'   `exponentiate = TRUE`, "Estimate" gives way to the name of the ratio:
+#'   "Odds ratio" for a logit link, "Rate ratio" for a log link in a Poisson,
+#'   quasi-Poisson or negative binomial model, "Risk ratio" for a binomial
+#'   model with a log link and "exp(Estimate)" otherwise. The last covers an
+#'   `lm(log(y) ~ x)` slope, whose exponential is a ratio of geometric means.
 #'
 #' @references
 #' \insertRef{gelman2008}{depictr}
@@ -86,6 +98,11 @@
 #' # Or scale the continuous slopes per SD of their predictors, leaving the
 #' # treatment contrast in the outcome's units:
 #' coefficient_plot(fit, standardise = TRUE)
+#'
+#' # Odds ratios from a logistic regression, on a log axis with the line at 1:
+#' gfit <- glm(accuracy ~ word_frequency + condition,
+#'             data = lexical_decision, family = binomial)
+#' coefficient_plot(gfit, exponentiate = TRUE)
 coefficient_plot <- function(x,
                       conf_level = 0.95,
                       intercept = FALSE,
@@ -94,13 +111,14 @@ coefficient_plot <- function(x,
                       interaction = c("times", "asterisk", "colon", "space"),
                       point_colour = depictr_brand(),
                       reference_colour = depictr_reference(),
-                      reference_line = 0,
+                      reference_line = if (exponentiate) 1 else 0,
                       point_size = 2.2,
                       line_size = 0.7,
                       facet = FALSE,
                       scales = c("fixed", "free"),
                       standardise = FALSE,
                       sd_multiple = 1,
+                      exponentiate = FALSE,
                       title = NULL,
                       subtitle = NULL,
                       x_lab = NULL) {
@@ -113,6 +131,7 @@ coefficient_plot <- function(x,
       !is.finite(sd_multiple) || sd_multiple <= 0) {
     stop("`sd_multiple` must be a single positive number.", call. = FALSE)
   }
+  check_exponentiate(exponentiate)
 
   est <- tidy_estimates(x, conf_level = conf_level)
 
@@ -124,11 +143,15 @@ coefficient_plot <- function(x,
     est <- standardise_estimates(est, x, sd_multiple)
     contrasts_unscaled <- isTRUE(attr(est, "contrasts_unscaled"))
   }
+  # Exponentiated after standardising, so a standardised slope becomes a ratio
+  # per SD of its predictor.
+  est <- exponentiate_estimates(est, exponentiate)
+  stem <- if (exponentiate) ratio_label(x) else "Estimate"
   x_lab <- x_lab %||%
     if (standardise) {
-      standardised_axis_label(sd_multiple, contrasts_unscaled)
+      standardised_axis_label(sd_multiple, contrasts_unscaled, stem)
     } else {
-      "Estimate"
+      stem
     }
 
   # Prettify coefficient names to the effect (variable) name by default
@@ -185,6 +208,8 @@ coefficient_plot <- function(x,
     ggplot2::geom_point(size = point_size, colour = point_colour) +
     ggplot2::labs(x = x_lab, y = NULL, title = title, subtitle = subtitle) +
     theme_depictr(grid = "x")
+  # Ratios are symmetric on a log scale, where 0.5 and 2 sit equally far from 1.
+  if (exponentiate) p <- p + ggplot2::scale_x_log10()
 
   if (scales == "free") {
     p <- add_term_facets(p, reference_line = reference_line,
@@ -397,11 +422,45 @@ input_kind <- function(v) {
 #' Only the predictors are rescaled, so the label says per SD of predictor and
 #' never "standardised estimate", which conventionally means a fully
 #' standardised beta. It says so when contrasts were left in their own units.
+#' @param stem What is drawn: "Estimate", or the name of a ratio from
+#'   ratio_label().
 #' @noRd
-standardised_axis_label <- function(sd_multiple, contrasts_unscaled) {
+standardised_axis_label <- function(sd_multiple, contrasts_unscaled,
+                                    stem = "Estimate") {
   per <- if (sd_multiple == 1) "SD" else paste(format(sd_multiple), "SD")
-  paste0("Estimate per ", per, " of predictor",
+  paste0(stem, " per ", per, " of predictor",
          if (isTRUE(contrasts_unscaled)) " (contrasts unscaled)")
+}
+
+#' Name an exponentiated estimate by the model's family and link
+#'
+#' exp() of a logit coefficient is an odds ratio. exp() of a log-link
+#' coefficient is a rate ratio in a Poisson, quasi-Poisson or negative
+#' binomial model and a risk ratio in a binomial one. Anything else, a data
+#' frame or an identity link among them, is "exp(Estimate)": exp() of an
+#' lm(log(y) ~ x) slope, for one, is a ratio of geometric means. The family
+#' of a MASS::glm.nb() or lme4::glmer.nb() fit is named "Negative
+#' Binomial(theta)".
+#' @noRd
+ratio_label <- function(x) {
+  neutral <- "exp(Estimate)"
+  if (is.data.frame(x)) return(neutral)
+  fam <- tryCatch(stats::family(x), error = function(e) NULL)
+  family <- if (is.list(fam)) fam$family else NULL
+  link <- if (is.list(fam)) fam$link else NULL
+  if (!is.character(family) || !is.character(link) || length(family) != 1 ||
+      length(link) != 1) {
+    return(neutral)
+  }
+  if (link == "logit") return("Odds ratio")
+  if (link == "log") {
+    if (family %in% c("binomial", "quasibinomial")) return("Risk ratio")
+    if (family %in% c("poisson", "quasipoisson") ||
+        startsWith(family, "Negative Binomial")) {
+      return("Rate ratio")
+    }
+  }
+  neutral
 }
 
 #' Lay a forest plot out one term per row, each panel free-scaled

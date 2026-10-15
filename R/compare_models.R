@@ -30,7 +30,8 @@
 #'   `c(soil_ph = "Soil pH")`, is safer.
 #' @param interaction Passed to [format_terms()].
 #' @param dodge_width Vertical spacing between sources sharing a term.
-#' @param reference_line Position of a vertical reference line (`NA` to omit).
+#' @param reference_line Position of a vertical reference line. Defaults to 0,
+#'   or to 1 when `exponentiate = TRUE`. Use `NA` to omit it.
 #' @param palette Colours for the sources; defaults to [depictr_palette()].
 #' @param point_size,line_size Point and interval-line sizes.
 #' @param facet Whether to give each term its own panel with a free x-axis,
@@ -41,8 +42,16 @@
 #' @param scales Either `"fixed"` (the default, a single shared x-axis) or
 #'   `"free"` (one free-scaled panel per term). When `facet = TRUE` this is
 #'   forced to `"free"`.
+#' @param exponentiate Whether to draw every source's exponentiated estimates
+#'   and intervals on a log10 axis, as odds or rate ratios. Each model is
+#'   exponentiated by [tidy_estimates()], and a data frame among the sources
+#'   must hold estimates on the link scale, since it is exponentiated too.
+#'   Defaults to `FALSE`.
 #' @param legend_title,legend_ncol Legend title and number of columns.
-#' @param title,subtitle,x_lab Title, subtitle and x-axis label.
+#' @param title,subtitle,x_lab Title, subtitle and x-axis label. `x_lab`
+#'   defaults to "Estimate". With `exponentiate = TRUE` it defaults to the name
+#'   of the ratio, as in [coefficient_plot()], when the fitted models agree on
+#'   it, and to "exp(Estimate)" when they do not.
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export
@@ -56,6 +65,13 @@
 #' # Keep the intercept legible alongside the slopes:
 #' compare_models(`All fields` = m1, `Standard only` = m2,
 #'                intercept = TRUE, facet = TRUE)
+#'
+#' # Odds ratios from two logistic regressions:
+#' g1 <- glm(accuracy ~ word_frequency + condition,
+#'           data = lexical_decision, family = binomial)
+#' g2 <- glm(accuracy ~ word_frequency + condition + modality,
+#'           data = lexical_decision, family = binomial)
+#' compare_models(Reduced = g1, Full = g2, exponentiate = TRUE)
 compare_models <- function(...,
                                     names = NULL,
                                     conf_level = 0.95,
@@ -65,21 +81,23 @@ compare_models <- function(...,
                                     interaction = c("times", "asterisk",
                                                     "colon", "space"),
                                     dodge_width = 0.6,
-                                    reference_line = 0,
+                                    reference_line = if (exponentiate) 1 else 0,
                                     palette = NULL,
                                     point_size = 2.2,
                                     line_size = 0.7,
                                     facet = FALSE,
                                     scales = c("fixed", "free"),
+                                    exponentiate = FALSE,
                                     legend_title = "Source",
                                     legend_ncol = 1,
                                     title = NULL,
                                     subtitle = NULL,
-                                    x_lab = "Estimate") {
+                                    x_lab = NULL) {
   order <- match.arg(order)
   interaction <- match.arg(interaction)
   scales <- match.arg(scales)
   if (facet) scales <- "free"
+  check_exponentiate(exponentiate)
 
   sources <- list(...)
   if (length(sources) < 2) {
@@ -95,12 +113,22 @@ compare_models <- function(...,
   }
 
   tidied <- Map(function(s, nm) {
-    e <- tidy_estimates(s, conf_level = conf_level)
+    e <- tidy_estimates(s, conf_level = conf_level, exponentiate = exponentiate)
     e$source <- nm
     e
   }, sources, src_names)
   est <- do.call(rbind, tidied)
   rownames(est) <- NULL
+
+  # The ratio is named after the fitted models. Data frames carry no family,
+  # and models of different families share only the neutral name.
+  x_lab <- x_lab %||% if (exponentiate) {
+    named <- unique(vapply(Filter(Negate(is.data.frame), sources), ratio_label,
+                           character(1)))
+    if (length(named) == 1) named else "exp(Estimate)"
+  } else {
+    "Estimate"
+  }
 
   # Align the intercept across sources: frequentist models report "(Intercept)"
   # while Bayesian summaries often use "Intercept" or "b_Intercept". Collapsing
@@ -149,7 +177,10 @@ compare_models <- function(...,
 
   label_levels <- unique(est$label)
   if (order != "none") {
-    avg <- tapply(est$estimate, est$label, mean, na.rm = TRUE)
+    # Ratios are averaged on the log scale they are drawn on, which orders
+    # them by their geometric mean.
+    on_axis <- if (exponentiate) log(est$estimate) else est$estimate
+    avg <- tapply(on_axis, est$label, mean, na.rm = TRUE)
     label_levels <- base::names(sort(avg, decreasing = (order == "descending")))
   } else {
     label_levels <- rev(label_levels)
@@ -202,6 +233,7 @@ compare_models <- function(...,
     ) +
     ggplot2::labs(x = x_lab, y = NULL, title = title, subtitle = subtitle) +
     theme_depictr(grid = "x")
+  if (exponentiate) p <- p + ggplot2::scale_x_log10()
 
   if (scales == "free") {
     # One free-scaled panel per term keeps the source overlay and its single

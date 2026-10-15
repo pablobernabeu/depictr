@@ -4,12 +4,18 @@
 \alias{tidy_estimates}
 \title{Extract a tidy table of estimates}
 \usage{
-tidy_estimates(x, conf_level = 0.95, ...)
+tidy_estimates(x, conf_level = 0.95, exponentiate = FALSE, ...)
 }
 \arguments{
 \item{x}{A fitted model or a data frame of results.}
 
 \item{conf_level}{Confidence (or credible) level for the interval.}
+
+\item{exponentiate}{Whether to exponentiate the estimates and interval
+limits, which turns log-odds into odds ratios and log rates into rate
+ratios. The \code{std.error} column stays on the link scale, as in
+\code{\link[broom:tidy]{broom::tidy()}}. A data frame is read as estimates on the link scale.
+Defaults to \code{FALSE}.}
 
 \item{...}{Passed to methods (and to \code{\link[broom:tidy]{broom::tidy()}} in the fallback). The
 \code{merMod} method additionally accepts \code{effects}, which currently only
@@ -31,15 +37,27 @@ Methods are provided for \code{lm}, \code{glm} and \code{merMod} (mixed models f
 'lme4') objects, and for data frames. For any other model class the function
 falls back to \code{\link[broom:tidy]{broom::tidy()}} when the 'broom' package is installed.
 
-Confidence intervals are computed with the normal approximation
-(estimate +/- z * standard error) for \code{glm} and \code{merMod} objects, which is
-fast and dependency-free; \code{lm} objects use the exact t-based interval. Supply
+Confidence intervals are Wald intervals, estimate +/- multiplier * standard
+error, with the multiplier the model's own tests use. An \code{lm} object gets
+the t interval of \code{\link[stats:confint]{stats::confint()}}. A \code{glm} whose dispersion is estimated
+(Gaussian, Gamma, inverse Gaussian and quasi families) gets t on the
+residual degrees of freedom, since \code{\link[stats:summary.glm]{stats::summary.glm()}} then tests with
+t. One whose dispersion is fixed (binomial, Poisson and \code{MASS::glm.nb()})
+gets z. The choice is read from the column the summary reports, "t value"
+or "z value". At 12 residual degrees of freedom, the t interval is about
+11\% wider than the z interval, and at 100 about 1\% wider. A \code{merMod} fit
+gets z, since 'lme4' gives no degrees of freedom. Supply
 a data frame with your own intervals (for example profiled or posterior
 intervals) to override this.
 }
 \examples{
 fit <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
 tidy_estimates(fit)
+
+# Odds ratios from a logistic regression:
+gfit <- glm(accuracy ~ word_frequency + condition,
+            data = lexical_decision, family = binomial)
+tidy_estimates(gfit, exponentiate = TRUE)
 
 # A data frame of pre-computed estimates is standardised, not re-fitted:
 df <- data.frame(

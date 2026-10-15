@@ -69,7 +69,11 @@ label ends in "at the mean offset".
 
 Predictions and standard errors come from \code{\link[stats:predict]{stats::predict()}}; \code{glm}
 predictions are formed on the link scale and back-transformed, so a binomial
-model shows predicted probabilities. Mixed models fitted with
+model shows predicted probabilities. The band uses the multiplier of the
+model's own tests, as \code{\link[=tidy_estimates]{tidy_estimates()}} does. An \code{lm}, and a \code{glm} whose
+dispersion is estimated, get t on the residual degrees of freedom, so a
+Gaussian \code{glm} draws the band of the same \code{lm}. Binomial and Poisson fits
+and mixed models get z. Mixed models fitted with
 \code{\link[lme4:lmer]{lme4::lmer()}}/\code{\link[lme4:glmer]{lme4::glmer()}} are supported too: predictions use only the
 fixed effects (as \code{re.form = NA} does) and standard errors come from the
 fixed-effect design matrix and \code{vcov()}. Works with \code{lm}, \code{glm} and

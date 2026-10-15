@@ -13,13 +13,14 @@ coefficient_plot(
   interaction = c("times", "asterisk", "colon", "space"),
   point_colour = depictr_brand(),
   reference_colour = depictr_reference(),
-  reference_line = 0,
+  reference_line = if (exponentiate) 1 else 0,
   point_size = 2.2,
   line_size = 0.7,
   facet = FALSE,
   scales = c("fixed", "free"),
   standardise = FALSE,
   sd_multiple = 1,
+  exponentiate = FALSE,
   title = NULL,
   subtitle = NULL,
   x_lab = NULL
@@ -54,8 +55,9 @@ terms are rendered (ignored when \code{labels} is supplied).}
 \item{point_colour, reference_colour}{Colours for the estimates and the
 reference line.}
 
-\item{reference_line}{Position of a vertical reference line (e.g. \code{0} for
-differences, \code{1} for odds/risk ratios). Use \code{NA} to omit it.}
+\item{reference_line}{Position of a vertical reference line. Defaults to 0,
+or to 1 when \code{exponentiate = TRUE}, where a ratio of 1 means no effect.
+Use \code{NA} to omit it.}
 
 \item{point_size, line_size}{Size of the points and interval lines.}
 
@@ -92,12 +94,24 @@ unit of the standardised scale spans when \code{standardise = TRUE}. Defaults
 to 1. Use 2 for Gelman's (2008) convention, under which the coefficient
 of a continuous input is comparable to that of a balanced binary one.}
 
+\item{exponentiate}{Whether to draw the exponentiated estimates and
+intervals on a log10 axis, which shows the coefficients of a logistic
+regression as odds ratios and those of a Poisson or negative binomial
+model as rate ratios. It applies after \code{standardise}, so a standardised
+slope becomes a ratio per SD of its predictor. A data frame \code{x} must hold
+estimates on the link scale. Defaults to \code{FALSE}.}
+
 \item{title, subtitle, x_lab}{Plot title, subtitle and x-axis label. \code{x_lab}
 defaults to "Estimate", or, when \code{standardise}, "Estimate per SD of
 predictor" ("per 2 SD" with \code{sd_multiple = 2}), followed by "(contrasts
 unscaled)" when a factor or binary term is drawn. The label names the
 convention on the figure itself, because only the predictors are rescaled
-here: a fully standardised beta would rescale the outcome too.}
+here: a fully standardised beta would rescale the outcome too. With
+\code{exponentiate = TRUE}, "Estimate" gives way to the name of the ratio:
+"Odds ratio" for a logit link, "Rate ratio" for a log link in a Poisson,
+quasi-Poisson or negative binomial model, "Risk ratio" for a binomial
+model with a log link and "exp(Estimate)" otherwise. The last covers an
+\code{lm(log(y) ~ x)} slope, whose exponential is a ratio of geometric means.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
@@ -122,6 +136,11 @@ coefficient_plot(fit, intercept = TRUE, facet = TRUE)
 # Or scale the continuous slopes per SD of their predictors, leaving the
 # treatment contrast in the outcome's units:
 coefficient_plot(fit, standardise = TRUE)
+
+# Odds ratios from a logistic regression, on a log axis with the line at 1:
+gfit <- glm(accuracy ~ word_frequency + condition,
+            data = lexical_decision, family = binomial)
+coefficient_plot(gfit, exponentiate = TRUE)
 }
 \references{
 \insertRef{gelman2008}{depictr}

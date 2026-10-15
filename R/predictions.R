@@ -31,7 +31,11 @@
 #'
 #' Predictions and standard errors come from [stats::predict()]; `glm`
 #' predictions are formed on the link scale and back-transformed, so a binomial
-#' model shows predicted probabilities. Mixed models fitted with
+#' model shows predicted probabilities. The band uses the multiplier of the
+#' model's own tests, as [tidy_estimates()] does. An `lm`, and a `glm` whose
+#' dispersion is estimated, get t on the residual degrees of freedom, so a
+#' Gaussian `glm` draws the band of the same `lm`. Binomial and Poisson fits
+#' and mixed models get z. Mixed models fitted with
 #' [lme4::lmer()]/[lme4::glmer()] are supported too: predictions use only the
 #' fixed effects (as `re.form = NA` does) and standard errors come from the
 #' fixed-effect design matrix and `vcov()`. Works with `lm`, `glm` and
@@ -595,7 +599,10 @@ model_predict_grid <- function(model, vary, conf_level = 0.95,
     nd$upr <- inv(link_fit + z * se)
     attr(nd, "binomial") <- fam$family == "binomial"
   } else if (inherits(model, "glm")) {
-    z <- stats::qnorm(1 - alpha / 2)             # Wald interval on the link scale
+    # A Wald interval on the link scale, with t on the residual df where the
+    # model's summary tests with t (an estimated dispersion) and z otherwise,
+    # as tidy_estimates() does. A Gaussian glm then draws the band of lm().
+    mult <- glm_multiplier(model, conf_level)
     pr <- stats::predict(model, newdata = nd, type = "link", se.fit = TRUE)
     link_fit <- pr$fit
     if (!is.null(off_mean)) {
@@ -603,8 +610,8 @@ model_predict_grid <- function(model, vary, conf_level = 0.95,
     }
     inv <- stats::family(model)$linkinv
     nd$fit <- inv(link_fit)
-    nd$lwr <- inv(link_fit - z * pr$se.fit)
-    nd$upr <- inv(link_fit + z * pr$se.fit)
+    nd$lwr <- inv(link_fit - mult * pr$se.fit)
+    nd$upr <- inv(link_fit + mult * pr$se.fit)
     attr(nd, "binomial") <- stats::family(model)$family == "binomial"
   } else {
     pr <- stats::predict(model, newdata = nd, se.fit = TRUE)

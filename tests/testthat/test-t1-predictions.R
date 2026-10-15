@@ -52,6 +52,32 @@ test_that("glm prediction bands use a Wald (z) interval on the link scale", {
   expect_true(all(d$lwr >= 0 & d$upr <= 1))
 })
 
+test_that("glm bands take t where the model estimates its dispersion", {
+  # Regression: the glm branch used z for every family, so a Gaussian glm drew
+  # a band about 10% narrower than lm() on the same model at 12 residual df.
+  # summary.glm() tests these families with t, and the band now follows it.
+  small <- crop_yield[1:15, ]
+  form <- yield ~ rainfall + fertiliser + treatment
+  gfit <- glm(form, data = small, family = gaussian)
+  lfit <- lm(form, data = small)
+  pg <- effects_plot(gfit, "fertiliser")
+  pl <- effects_plot(lfit, "fertiliser")
+  expect_equal(pg$data$lwr, pl$data$lwr, tolerance = 1e-8)
+  expect_equal(pg$data$upr, pl$data$upr, tolerance = 1e-8)
+  ref <- predict(lfit, newdata = pg$data[c("rainfall", "fertiliser", "treatment")],
+                 interval = "confidence")
+  expect_equal(pg$data$upr, unname(ref[, "upr"]), tolerance = 1e-8)
+
+  # A Gamma fit with a log link: t on the link scale, then back-transformed.
+  gam <- glm(form, data = small, family = Gamma(link = "log"))
+  p <- interaction_plot(gam, "fertiliser", "treatment")
+  nd <- p$data[c("rainfall", "fertiliser", "treatment")]
+  pr <- predict(gam, newdata = nd, type = "link", se.fit = TRUE)
+  tq <- qt(0.975, df.residual(gam))
+  expect_equal(p$data$lwr, unname(exp(pr$fit - tq * pr$se.fit)), tolerance = 1e-8)
+  expect_equal(p$data$upr, unname(exp(pr$fit + tq * pr$se.fit)), tolerance = 1e-8)
+})
+
 test_that("effects_plot() works for lmer (merMod) numeric and factor predictors", {
   skip_if_not_installed("lme4")
   m <- lme4::lmer(RT ~ word_frequency + condition + (1 | participant),

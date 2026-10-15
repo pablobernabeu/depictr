@@ -425,3 +425,152 @@ test_that("model_report() leaves the treatment contrast unscaled by default", {
   expect_equal(coef_panel$labels$title,
                "Coefficients (per SD of continuous predictors)")
 })
+
+# Odds, rate and risk ratios --------------------------------------------------
+
+# The x position of each vertical reference line a plot draws.
+vline_positions <- function(p) {
+  vl <- Filter(function(l) inherits(l$geom, "GeomVline"), p$layers)
+  unname(unlist(lapply(vl, function(l) {
+    if (is.null(l$aes_params$xintercept)) l$data$xintercept
+    else l$aes_params$xintercept
+  })))
+}
+
+# The name of the x scale's transformation, "identity" when none is set.
+x_transformation <- function(p) {
+  sc <- p$scales$get_scales("x")
+  if (is.null(sc)) return("identity")
+  tr <- if (is.function(sc$get_transformation)) sc$get_transformation() else sc$trans
+  tr$name
+}
+
+test_that("coefficient_plot(exponentiate = TRUE) draws odds ratios on a log axis", {
+  bfit <- glm(accuracy ~ word_frequency + condition, data = lexical_decision,
+              family = binomial)
+  p <- coefficient_plot(bfit, exponentiate = TRUE)
+  b <- stats::coef(bfit)[-1]
+  link <- tidy_estimates(bfit)[-1, ]
+  got <- std_by_term(p)
+  expect_equal(got[names(b)], exp(b))
+  expect_equal(std_by_term(p, "conf.low")[link$term], exp(link$conf.low),
+               ignore_attr = TRUE)
+  expect_equal(vline_positions(p), 1)
+  expect_equal(p$labels$x, "Odds ratio")
+  expect_equal(x_transformation(p), "log-10")
+  expect_no_warning(ggplot2::ggplot_build(p))
+
+  # Without it, nothing changes: link scale, line at 0, linear axis.
+  p0 <- coefficient_plot(bfit)
+  expect_equal(vline_positions(p0), 0)
+  expect_equal(p0$labels$x, "Estimate")
+  expect_equal(x_transformation(p0), "identity")
+
+  # An explicit reference line and axis label still win, and NA omits the line.
+  expect_equal(vline_positions(coefficient_plot(bfit, exponentiate = TRUE,
+                                                reference_line = 2)), 2)
+  expect_null(vline_positions(coefficient_plot(bfit, exponentiate = TRUE,
+                                               reference_line = NA)))
+  expect_equal(coefficient_plot(bfit, exponentiate = TRUE,
+                                x_lab = "OR")$labels$x, "OR")
+
+  # The faceted layout draws the line at 1 in the panels whose interval
+  # brackets it.
+  pf <- coefficient_plot(bfit, exponentiate = TRUE, facet = TRUE)
+  expect_true(all(vline_positions(pf) == 1))
+  expect_equal(x_transformation(pf), "log-10")
+})
+
+test_that("the ratio is named by the family and link", {
+  set.seed(9)
+  d <- data.frame(x = rnorm(200), arm = factor(rep(c("a", "b"), 100)))
+  d$count <- rpois(200, exp(0.5 + 0.3 * d$x))
+  d$event <- rbinom(200, 1, 0.2 * exp(0.2 * d$x) / max(exp(0.2 * d$x)))
+  label_of <- function(fit) coefficient_plot(fit, exponentiate = TRUE)$labels$x
+  expect_equal(label_of(glm(count ~ x + arm, data = d, family = poisson)),
+               "Rate ratio")
+  expect_equal(label_of(glm(count ~ x + arm, data = d, family = quasipoisson)),
+               "Rate ratio")
+  expect_equal(label_of(glm(event ~ x + arm, data = d,
+                            family = quasibinomial)), "Odds ratio")
+  rr <- suppressWarnings(glm(event ~ x, data = d, family = binomial(link = "log"),
+                             start = c(log(0.1), 0)))
+  expect_equal(label_of(rr), "Risk ratio")
+  expect_equal(label_of(glm(event ~ x, data = d,
+                            family = binomial(link = "probit"))),
+               "exp(Estimate)")
+  # exp() of an lm(log(y) ~ x) slope is a ratio of geometric means, so an
+  # identity link is not refused.
+  expect_equal(label_of(lm(log(yield) ~ rainfall, data = crop_yield)),
+               "exp(Estimate)")
+  df <- data.frame(term = c("a", "b"), estimate = c(0.2, -0.4),
+                   conf.low = c(0.1, -0.6), conf.high = c(0.3, -0.2))
+  pd <- coefficient_plot(df, exponentiate = TRUE)
+  expect_equal(pd$labels$x, "exp(Estimate)")
+  expect_equal(pd$data$estimate[match(c("a", "b"), pd$data$term)],
+               exp(c(0.2, -0.4)))
+
+  skip_if_not_installed("MASS")
+  d$nb <- MASS::rnegbin(200, exp(0.5 + 0.3 * d$x), theta = 2)
+  expect_equal(label_of(MASS::glm.nb(nb ~ x, data = d)), "Rate ratio")
+})
+
+test_that("exponentiate applies after standardise", {
+  bfit <- glm(accuracy ~ word_frequency + condition, data = lexical_decision,
+              family = binomial)
+  p <- coefficient_plot(bfit, standardise = TRUE, exponentiate = TRUE)
+  b <- stats::coef(bfit)
+  got <- std_by_term(p)
+  expect_equal(got[["word_frequency"]],
+               exp(b[["word_frequency"]] *
+                     stats::sd(lexical_decision$word_frequency)))
+  expect_equal(got[["conditionunrelated"]], exp(b[["conditionunrelated"]]))
+  expect_equal(p$labels$x,
+               "Odds ratio per SD of predictor (contrasts unscaled)")
+})
+
+test_that("exponentiate must be TRUE or FALSE", {
+  fit <- lm(yield ~ rainfall, data = crop_yield)
+  for (bad in list(NA, c(TRUE, FALSE), "yes", 1)) {
+    expect_error(coefficient_plot(fit, exponentiate = bad),
+                 "`exponentiate` must be TRUE or FALSE", fixed = TRUE)
+    expect_error(compare_models(fit, fit, exponentiate = bad),
+                 "`exponentiate` must be TRUE or FALSE", fixed = TRUE)
+  }
+})
+
+test_that("compare_models(exponentiate = TRUE) exponentiates every source", {
+  m1 <- glm(accuracy ~ word_frequency + condition, data = lexical_decision,
+            family = binomial)
+  m2 <- glm(accuracy ~ word_frequency + condition + modality,
+            data = lexical_decision, family = binomial)
+  # A data-frame source is read on the link scale, as the models are.
+  m3 <- data.frame(term = "word_frequency", estimate = 0.3, conf.low = 0.1,
+                   conf.high = 0.5)
+  p <- compare_models(A = m1, B = m2, C = m3, exponentiate = TRUE)
+  got <- p$data[!is.na(p$data$estimate), ]
+  a_wf <- got$estimate[got$source == "A" & got$term == "word_frequency"]
+  expect_equal(a_wf, exp(stats::coef(m1)[["word_frequency"]]))
+  b_mod <- got$conf.high[got$source == "B" & got$term == "modalityauditory"]
+  expect_equal(b_mod, exp(tidy_estimates(m2)$conf.high[4]))
+  expect_equal(got$estimate[got$source == "C"], exp(0.3))
+  expect_equal(vline_positions(p), 1)
+  expect_equal(p$labels$x, "Odds ratio")
+  expect_equal(x_transformation(p), "log-10")
+  expect_no_warning(ggplot2::ggplot_build(p))
+
+  # Defaults unchanged without it.
+  p0 <- compare_models(A = m1, B = m2)
+  expect_equal(vline_positions(p0), 0)
+  expect_equal(p0$labels$x, "Estimate")
+
+  # Sources of different families fall back to the neutral label.
+  set.seed(9)
+  d <- data.frame(x = rnorm(100))
+  d$count <- rpois(100, exp(0.5 + 0.3 * d$x))
+  d$event <- rbinom(100, 1, 0.4)
+  mixed <- compare_models(Count = glm(count ~ x, data = d, family = poisson),
+                          Event = glm(event ~ x, data = d, family = binomial),
+                          exponentiate = TRUE)
+  expect_equal(mixed$labels$x, "exp(Estimate)")
+})

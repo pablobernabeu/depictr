@@ -13,17 +13,18 @@ compare_models(
   labels = NULL,
   interaction = c("times", "asterisk", "colon", "space"),
   dodge_width = 0.6,
-  reference_line = 0,
+  reference_line = if (exponentiate) 1 else 0,
   palette = NULL,
   point_size = 2.2,
   line_size = 0.7,
   facet = FALSE,
   scales = c("fixed", "free"),
+  exponentiate = FALSE,
   legend_title = "Source",
   legend_ncol = 1,
   title = NULL,
   subtitle = NULL,
-  x_lab = "Estimate"
+  x_lab = NULL
 )
 }
 \arguments{
@@ -57,7 +58,8 @@ A named vector mapping raw term names to labels, such as
 
 \item{dodge_width}{Vertical spacing between sources sharing a term.}
 
-\item{reference_line}{Position of a vertical reference line (\code{NA} to omit).}
+\item{reference_line}{Position of a vertical reference line. Defaults to 0,
+or to 1 when \code{exponentiate = TRUE}. Use \code{NA} to omit it.}
 
 \item{palette}{Colours for the sources; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
@@ -73,9 +75,18 @@ and its single legend are preserved within the faceted layout. Defaults to
 \code{"free"} (one free-scaled panel per term). When \code{facet = TRUE} this is
 forced to \code{"free"}.}
 
+\item{exponentiate}{Whether to draw every source's exponentiated estimates
+and intervals on a log10 axis, as odds or rate ratios. Each model is
+exponentiated by \code{\link[=tidy_estimates]{tidy_estimates()}}, and a data frame among the sources
+must hold estimates on the link scale, since it is exponentiated too.
+Defaults to \code{FALSE}.}
+
 \item{legend_title, legend_ncol}{Legend title and number of columns.}
 
-\item{title, subtitle, x_lab}{Title, subtitle and x-axis label.}
+\item{title, subtitle, x_lab}{Title, subtitle and x-axis label. \code{x_lab}
+defaults to "Estimate". With \code{exponentiate = TRUE} it defaults to the name
+of the ratio, as in \code{\link[=coefficient_plot]{coefficient_plot()}}, when the fitted models agree on
+it, and to "exp(Estimate)" when they do not.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
@@ -97,4 +108,11 @@ compare_models(`All fields` = m1, `Standard only` = m2,
 # Keep the intercept legible alongside the slopes:
 compare_models(`All fields` = m1, `Standard only` = m2,
                intercept = TRUE, facet = TRUE)
+
+# Odds ratios from two logistic regressions:
+g1 <- glm(accuracy ~ word_frequency + condition,
+          data = lexical_decision, family = binomial)
+g2 <- glm(accuracy ~ word_frequency + condition + modality,
+          data = lexical_decision, family = binomial)
+compare_models(Reduced = g1, Full = g2, exponentiate = TRUE)
 }

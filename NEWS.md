@@ -586,6 +586,19 @@
   under tritan, so under a red-green deficiency they looked further apart than
   the model predicts.
 
+* Confidence intervals for a `glm` whose dispersion is estimated (the
+  Gaussian, Gamma, inverse Gaussian and quasi families) now use the t
+  distribution on the residual degrees of freedom, matching the t tests of
+  `summary.glm()` and the `lm` path. They used z and were about 10% too narrow
+  at 12 residual degrees of freedom, so a Gaussian `glm` disagreed with `lm()`
+  on the same model. At 100 degrees of freedom, the two differ by about 1%.
+  The choice is read from the model's own summary, so binomial, Poisson and
+  `MASS::glm.nb()` fits keep z, as do mixed models. `tidy_estimates()`,
+  `coefficient_plot()`, `compare_models()`, `frequentist_bayesian_plot()` and
+  `model_report()` change with it, and so do the bands of `effects_plot()`
+  and `interaction_plot()`. In the Python twin the intervals follow the
+  fitted result's `use_t`, which gives the same t intervals.
+
 ## New features
 
 * `depictr_palette(order = "contrast")`, also accepted by
@@ -608,6 +621,20 @@
   before the plot is built would have left the legend keys and colourbars in
   their original colours. The Python twin's `simulate_figure()` uses the same
   matrices on the pixels of the rendered figure.
+
+* `exponentiate = TRUE` in `tidy_estimates()`, `coefficient_plot()` and
+  `compare_models()` gives odds, rate or risk ratios, and the two plots draw
+  them on a log axis with the reference line at 1. The axis is labelled "Odds
+  ratio" for a logit link, "Rate ratio" for a log link in a Poisson,
+  quasi-Poisson or negative binomial model, "Risk ratio" for a binomial model
+  with a log link and "exp(Estimate)" otherwise. `tidy_estimates()`
+  exponentiates the estimates and interval limits and leaves `std.error` on
+  the link scale, as `broom::tidy()` does. Its `glm` method used to swallow
+  the argument and return log-odds. `coefficient_plot()` exponentiates after
+  `standardise`, so a standardised slope becomes a ratio per SD of its
+  predictor. A data frame of estimates is read on the link scale.
+  `reference_line` now defaults to 1 when exponentiating and to 0 otherwise.
+  The Python twin gains the same arguments.
 
 # depictr 0.3.0
 
