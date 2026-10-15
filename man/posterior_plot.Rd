@@ -32,8 +32,9 @@ Details).}
 
 \item{style}{One of \code{"halfeye"} (density slab + interval, the default),
 \code{"interval"} (point and two nested intervals, no slab), \code{"gradient"} (a
-colour-graded interval) or \code{"dots"} (a quantile dotplot). Unknown values
-and a missing 'ggdist' fall back to \code{"interval"}.}
+colour-graded interval) or \code{"dots"} (a quantile dotplot). Any other value
+is an error. When 'ggdist' is missing, every style falls back to
+\code{"interval"}.}
 
 \item{point}{Central summary: \code{"median"} or \code{"mean"}.}
 

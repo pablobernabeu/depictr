@@ -59,7 +59,5 @@ silhouette_plot(crop_yield, cl,
                 cols = c("rainfall", "fertiliser", "soil_ph", "yield"))
 }
 \references{
-Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the interpretation
-and validation of cluster analysis. \emph{Journal of Computational and Applied
-Mathematics}, 20, 53-65. \doi{10.1016/0377-0427(87)90125-7}
+\insertRef{rousseeuw1987}{depictr}
 }

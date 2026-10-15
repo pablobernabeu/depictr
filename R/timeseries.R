@@ -301,8 +301,7 @@ acf_plot <- function(x, lag_max = NULL, type = c("correlation", "partial"),
 #'   lets the pattern change faster. Ignored for the classical method.
 #' @param confidence Whether to draw a confidence ribbon around the trend
 #'   component. The band is a normal-approximation interval based on the
-#'   remainder's standard deviation (see Details). `FALSE` reproduces the
-#'   previous behaviour exactly.
+#'   remainder's standard deviation (see Details).
 #' @param level Coverage of the trend confidence ribbon (a single number
 #'   strictly between 0 and 1).
 #' @param title Plot title.

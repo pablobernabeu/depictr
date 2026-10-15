@@ -9,15 +9,16 @@
 #'
 #' @param data A data frame.
 #' @param cols Numeric columns to include, which cannot include `group`. If
-#'   `NULL`, every numeric column other than `group` is used (up to
-#'   `max_cols`).
+#'   `NULL`, every numeric column other than `group` is used, so a frame with
+#'   more than `max_cols` of them needs `cols` to choose among them.
 #' @param group Optional grouping variable mapped to colour, with each level in
 #'   the same colour in every panel. A numeric code counts as a group, but a
 #'   numeric column with more than 20 distinct values is refused as continuous.
 #'   Rows with a missing group are dropped with a message, and levels without
 #'   rows are left out of the plot and its palette.
-#' @param max_cols Safety cap on the number of variables (a k-by-k matrix grows
-#'   quickly).
+#' @param max_cols The largest number of variables accepted, since a k-by-k
+#'   matrix grows quickly. More columns than this is an error, so the matrix
+#'   never leaves a variable out without saying so.
 #' @param point_alpha Point transparency in the scatter panels.
 #' @param method Correlation method for the upper-triangle coefficients, passed
 #'   to [stats::cor()]: `"pearson"`, `"spearman"` or `"kendall"`. A pair whose

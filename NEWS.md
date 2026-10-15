@@ -571,6 +571,25 @@
   are names, packages, abbreviations and terms of art, and join the word list,
   which also drops eleven entries the documentation no longer uses.
 
+* The references of `estimation_plot()`, `silhouette_plot()`, `k_diagnostic()`
+  and `vif_plot()` come from `inst/REFERENCES.bib`, as every other citation in
+  the package does. They were written out by hand on each page.
+  `vignette("multivariate-and-survival")` now cites Rousseeuw (1987) and
+  Tibshirani et al. (2001) from the same file, so both appear in its list of
+  references, where it sent the reader to `?k_diagnostic` for them.
+
+* Several help pages described behaviour the code does not have. The page of
+  `explore_pairs()` read as though columns beyond `max_cols` were trimmed, which
+  is what the Python twin does. Here they are an error naming the count, and
+  the page now says so. `posterior_plot()` said that an unknown `style` fell
+  back to `"interval"`, while it is an error. Only a missing 'ggdist' falls
+  back. `depictr_palette()` said that `n = NULL` returns the full qualitative
+  palette, also for the sequential and diverging types, which return seven
+  colours. `depictr_options()` and `theme_depictr()` named `depictr_brand()`,
+  `depictr_accent()` and `depictr_reference()` as accessors, but the package
+  does not export them. The pages now describe the three colours by their use.
+  Six pages also drop remarks about how a function used to behave.
+
 ## Changed defaults
 
 * The gap statistic's default search in `k_diagnostic()` and

@@ -30,9 +30,7 @@
 #'   `"avg_width"`. The table's `cluster` and `neighbor` columns carry the
 #'   assignments passed in `clusters`, as does each band label.
 #' @references
-#' Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the interpretation
-#' and validation of cluster analysis. *Journal of Computational and Applied
-#' Mathematics*, 20, 53-65. \doi{10.1016/0377-0427(87)90125-7}
+#' \insertRef{rousseeuw1987}{depictr}
 #' @export
 #' @examples
 #' cl <- kmeans(scale(crop_yield[c("rainfall", "fertiliser", "soil_ph",
@@ -166,14 +164,9 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
 #'   with one row per `k`), `attr(p, "suggested")` (the chosen `k`) and
 #'   `attr(p, "method")`.
 #' @references
-#' Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the interpretation
-#' and validation of cluster analysis. *Journal of Computational and Applied
-#' Mathematics*, 20, 53-65. \doi{10.1016/0377-0427(87)90125-7}
+#' \insertRef{rousseeuw1987}{depictr}
 #'
-#' Tibshirani, R., Walther, G., & Hastie, T. (2001). Estimating the number of
-#' clusters in a data set via the gap statistic. *Journal of the Royal
-#' Statistical Society: Series B*, 63(2), 411-423.
-#' \doi{10.1111/1467-9868.00293}
+#' \insertRef{tibshirani2001}{depictr}
 #' @export
 #' @examples
 #' p <- k_diagnostic(crop_yield, k_range = 2:6,

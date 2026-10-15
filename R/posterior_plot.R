@@ -35,8 +35,9 @@
 #'   Details).
 #' @param style One of `"halfeye"` (density slab + interval, the default),
 #'   `"interval"` (point and two nested intervals, no slab), `"gradient"` (a
-#'   colour-graded interval) or `"dots"` (a quantile dotplot). Unknown values
-#'   and a missing 'ggdist' fall back to `"interval"`.
+#'   colour-graded interval) or `"dots"` (a quantile dotplot). Any other value
+#'   is an error. When 'ggdist' is missing, every style falls back to
+#'   `"interval"`.
 #' @param point Central summary: `"median"` or `"mean"`.
 #' @param widths Two interval widths (inner and outer), as probabilities, each
 #'   drawn as a central (equal-tailed) quantile interval. The outer width is

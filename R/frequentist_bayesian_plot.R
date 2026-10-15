@@ -7,10 +7,7 @@
 #' brand blue for the frequentist estimates and orange for the Bayesian ones,
 #' whether the Bayesian side is drawn from draws or from summaries.
 #'
-#' This is the modernised successor to the original `frequentist_bayesian_plot()`
-#' gist, which built on `brms::mcmc_plot()` to show the full Bayesian posterior
-#' with the frequentist estimate overlaid. That namesake behaviour is restored
-#' here: when `bayesian` carries posterior *draws* (a `brms`/`rstanarm` fit, a
+#' When `bayesian` carries posterior *draws* (a `brms`/`rstanarm` fit, a
 #' `posterior` draws object, a draws matrix, or a long/wide draws data frame),
 #' the full posterior *distribution* is drawn per term (a 'ggdist' half-eye)
 #' and the frequentist point and confidence interval is overlaid at the same
@@ -48,8 +45,7 @@
 #'   single number strictly between 0 and 1.
 #' @param labels,interaction,intercept See [compare_models()]. On both paths,
 #'   an unnamed `labels` vector takes the frequentist terms first, then any
-#'   that only the Bayesian input holds. `intercept` defaults to `TRUE` here,
-#'   matching the original behaviour.
+#'   that only the Bayesian input holds. `intercept` defaults to `TRUE` here.
 #' @param facet,scales Layout controls. Because a Bayesian model almost always
 #'   carries a large intercept alongside small slopes, the comparison defaults
 #'   to a faceted, free-scaled layout (`facet = TRUE`): each term gets its own

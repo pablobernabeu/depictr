@@ -93,9 +93,8 @@ dendrogram_plot(region_means[-1], k = 2, title = "Regions clustered")
 
 Choosing `k` should not be guesswork. `k_diagnostic()` evaluates a
 cluster-quality criterion across a range of `k` and suggests a value, using the
-average silhouette width (the default, after Rousseeuw, 1987), the
-within-sum-of-squares elbow or the gap statistic (Tibshirani, Walther & Hastie,
-2001). See `?k_diagnostic` for the references.
+average silhouette width [the default, after @rousseeuw1987], the
+within-sum-of-squares elbow or the gap statistic [@tibshirani2001].
 
 ```{r, fig.height = 3.5}
 kd <- k_diagnostic(crop_yield, k_range = 2:6, cols = num,

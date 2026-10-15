@@ -108,7 +108,7 @@ names the objects that keep their own).
 
 For publication-ready figures the plot offers the three annotations that
 define a "survminer-style" Kaplan-Meier display, each behind its own
-argument and off by default so existing behaviour is unchanged:
+argument and off by default:
 \itemize{
 \item \strong{Number-at-risk table} (\code{risk_table = TRUE}): a small panel composed
 beneath the curves with 'patchwork', giving the number of subjects still at

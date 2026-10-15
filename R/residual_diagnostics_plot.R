@@ -15,9 +15,8 @@
 #' specified model regardless of the response family. In a Gaussian or Gamma
 #' model, prior weights enter these residuals as they enter the fit, through
 #' each observation's variance. The scale-location and
-#' leverage panels are unchanged. For an `lm` the behaviour is identical to
-#' before. Set `glm_panels = FALSE` to force the classic `lm`-style panels for a
-#' `glm` as well.
+#' leverage panels are unchanged. Set `glm_panels = FALSE` to force the classic
+#' `lm`-style panels for a `glm` as well.
 #'
 #' @param model A fitted `lm` or `glm` model.
 #' @param which Character vector choosing which panels to show, any of

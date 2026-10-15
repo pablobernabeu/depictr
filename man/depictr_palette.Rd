@@ -11,10 +11,13 @@ depictr_palette(
 )
 }
 \arguments{
-\item{n}{Number of colours to return. If \code{NULL} (the default) the full
-qualitative palette is returned. For the qualitative palette an \code{n} larger
-than the available base colours is interpolated; the sequential and
-diverging palettes are ramps and accept any \code{n}. Interpolating the built-in
+\item{n}{Number of colours to return. If \code{NULL} (the default), the
+qualitative palette returns all of its base colours, the eight Okabe-Ito
+colours unless \code{options(depictr.palette = )} supplies another set, and
+the sequential and diverging ramps return seven. For the qualitative
+palette an \code{n} larger than the available base colours is interpolated;
+the sequential and diverging palettes are ramps and accept any \code{n}.
+Interpolating the built-in
 qualitative palette beyond its eight base colours loses the
 colour-vision-deficiency guarantee and warns, so facet the groups or use
 the sequential ramp when many groups are needed.}
