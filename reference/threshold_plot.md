@@ -59,7 +59,9 @@ object. The Youden and max-F1 thresholds are stored in
 At threshold \\t\\ a case is predicted positive when its score is \\\ge
 t\\. The metrics are evaluated at every distinct score (the points at
 which the confusion matrix can change), so the curves are exact step
-functions rather than a coarse grid.
+functions rather than a coarse grid. Between two adjacent scores, each
+metric keeps its value at the upper one, so each step changes at a score
+and runs flat below it.
 
 ## Examples
 

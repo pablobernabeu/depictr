@@ -54,7 +54,8 @@ roc_curve_plot(
 
 - conf_level:
 
-  Confidence level for the bootstrap band.
+  Confidence level for the bootstrap band, a single number strictly
+  between 0 and 1.
 
 - youden:
 

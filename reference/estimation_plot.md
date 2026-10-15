@@ -53,7 +53,8 @@ estimation_plot(
 - conf_level:
 
   Confidence level for both the group intervals (t-based) and the
-  bootstrap difference intervals.
+  bootstrap difference intervals, a single number strictly between 0 and
+  1.
 
 - n_boot:
 

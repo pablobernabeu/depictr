@@ -24,7 +24,8 @@ power_curve_plot(
   group = NULL,
   lower = NULL,
   upper = NULL,
-  y_lab = NULL
+  y_lab = NULL,
+  solved = NULL
 )
 ```
 
@@ -84,7 +85,7 @@ power_curve_plot(
   Each level is drawn as its own line, in its own colour and line type.
   By default, an `effect`, `param` or `term` column with more than one
   level is used, with a message. Rows that share a sample size with no
-  such column are an error, because joining them would draw a zig-zag.
+  such column are an error, because joining them would draw a zigzag.
 
 - lower, upper:
 
@@ -95,6 +96,16 @@ power_curve_plot(
 
   Y-axis label. By default, "Power" when the power column is one of the
   names listed under `x`, and the column's name otherwise.
+
+- solved:
+
+  A sample size solved from the curve, with its confidence interval: a
+  list with numeric `value`, `lo` and `hi`, as pilotr's `target_n()` and
+  `solve_curve()` return, or a one-row data frame with the same columns.
+  Other fields are ignored. The solved value is drawn as a dashed
+  vertical line and its interval as a grey band behind the curve. An
+  interval that reaches past the swept sizes widens the x-axis to show
+  it.
 
 ## Value
 
@@ -109,7 +120,9 @@ The tables pilotr returns are read as they are: `power_curve_mixed()`
 gives `n_subject`, `effect`, `power`, `power_lo` and `power_hi`, and
 `precision_curve()` gives `n_subject`, `param` and the decision
 probabilities `p_meaningful` and `p_equivalent` with their own `_lo` and
-`_hi` bounds, which `power` can name.
+`_hi` bounds, which `power` can name. The sample size that pilotr's
+`target_n()` solves from such a curve, and its interval, can be marked
+on the plot with `solved`.
 
 ## Examples
 
@@ -133,4 +146,9 @@ curves <- data.frame(
   power_hi = c(0.41, 0.19, 0.67, 0.30, 0.85, 0.43, 0.94, 0.55)
 )
 power_curve_plot(curves, group = "effect", x_lab = "Participants")
+
+
+# The sample size at which pc reaches 80% power, with its interval, in the
+# form pilotr's target_n() returns. The values here are illustrative.
+power_curve_plot(pc, solved = list(value = 51, lo = 44, hi = 60))
 ```

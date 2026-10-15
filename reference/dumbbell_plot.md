@@ -48,7 +48,9 @@ dumbbell_plot(
 
   How to order the categories up the axis: `"gap"` (by the signed
   difference between the two groups, the default), `"value"` (by the
-  second group's value), or `"none"` (the data's own order).
+  second group's value), or `"none"` (the data's own order: the order of
+  the levels when `category` is a factor, and otherwise the order in
+  which the categories first appear).
 
 - point_size:
 

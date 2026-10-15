@@ -108,6 +108,14 @@ chart of proportions.</p>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot</a> object.</p>
     </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Dates, date-times and durations (<code>Date</code>, <code>POSIXct</code> and <code>difftime</code> columns)
+count as numeric. Against a numeric variable, they give a scatter plot with
+a trend, drawn by <code><a href="scatter_trend.html">scatter_trend()</a></code>, and against a categorical one box plots
+of their values by level. A duration is drawn as a number in its own units,
+named in the default axis title, as in <code>stay (days)</code>.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

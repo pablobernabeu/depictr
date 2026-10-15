@@ -41,7 +41,7 @@ coefficient_plot(
 
   Confidence/credible level, passed to
   [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md)
-  when `x` is a model.
+  when `x` is a model: a single number strictly between 0 and 1.
 
 - intercept:
 

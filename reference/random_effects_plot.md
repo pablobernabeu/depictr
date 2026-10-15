@@ -36,7 +36,8 @@ random_effects_plot(
 
 - conf_level:
 
-  Confidence level when intervals are derived from standard errors.
+  Confidence level when intervals are derived from standard errors, a
+  single number strictly between 0 and 1.
 
 - sort:
 

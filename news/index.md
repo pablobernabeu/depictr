@@ -348,7 +348,7 @@
 - [`power_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/power_curve_plot.md)
   reads power tables with several curves, one per effect or design, and
   draws one line each, told apart by colour and line type. It joined
-  them into a single zig-zag before. An `effect`, `param` or `term`
+  them into a single zigzag before. An `effect`, `param` or `term`
   column with more than one level separates the curves, with a message
   naming the columns used, and rows that share a sample size with no
   such column are now an error. It recognises `n_subject` and
@@ -507,6 +507,29 @@
   the colours, and leaves out levels that no row uses. It ordered the
   groups by first appearance.
 
+- [`summary_table()`](https://pablobernabeu.github.io/depictr/reference/summary_table.md)
+  and
+  [`explore_bivariate()`](https://pablobernabeu.github.io/depictr/reference/explore_bivariate.md)
+  took a date for a category.
+  [`summary_table()`](https://pablobernabeu.github.io/depictr/reference/summary_table.md)
+  gave a `Date`, `POSIXct` or `difftime` column one row per distinct
+  value, so 40 visits on 40 days filled 40 rows. Dates are now
+  summarised as a range instead of one row per day: a single `Range` row
+  reads `2024-01-01 to 2024-04-27` overall and in each group, with the
+  time to the minute or second where the column has one. A duration is
+  summarised as mean (SD) in its own units, which the statistic names,
+  as in `Mean (SD), days`.
+  [`explore_bivariate()`](https://pablobernabeu.github.io/depictr/reference/explore_bivariate.md)
+  drew a date against a number as one box plot per day, and against a
+  category as bars with a colour for each day, both with a warning that
+  the colours had been interpolated past the eight of the Okabe-Ito set.
+  Dates, date-times and durations now count as numeric. Against a
+  numeric variable, they give the scatter plot with a trend of
+  [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md),
+  and against a categorical one box plots of their values by level. A
+  duration is drawn as a number in its own units, named in the default
+  axis title. The Python package now does the same.
+
 - [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
   drew a moving average over an even window, such as `rolling = 12` for
   monthly data, half an observation early. Equal weights over twelve
@@ -520,6 +543,21 @@
   needs a series one observation longer than itself. The Python package
   drew the same average half an observation late, and the two packages
   now draw the same values. An odd window is unchanged.
+
+- [`threshold_plot()`](https://pablobernabeu.github.io/depictr/reference/threshold_plot.md)
+  joined the metrics at adjacent scores with straight lines, which
+  passed through values that no threshold gives, while its help page
+  promised exact step functions. The curves are now drawn as steps.
+  Every threshold between two adjacent scores predicts what the upper
+  score predicts, so each step changes at a score and runs flat below
+  it. The Python package now evaluates the metrics at every distinct
+  score too, and draws the same steps.
+
+- `dumbbell_plot(sort = "none")` promised the data’s own order but
+  sorted the categories alphabetically, so levels West, South, North and
+  East gave East, North, South and West. It now keeps the order of a
+  factor’s levels, and otherwise the order in which the categories first
+  appear.
 
 ### Degenerate input
 
@@ -540,6 +578,16 @@
   and names the terms they belong to. It failed with an unrelated base-R
   error, “missing value where TRUE/FALSE needed”.
 
+- [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md)
+  refuses a column in `cols` that it cannot correlate and names it, in
+  the words of
+  [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md).
+  A factor failed with an error from
+  [`var()`](https://rdrr.io/r/stats/cor.html) that did not name the
+  column, and a date with “‘x’ must be numeric” from
+  [`cor()`](https://rdrr.io/r/stats/cor.html). Logical columns are still
+  correlated as 0 and 1.
+
 - [`seasonal_plot()`](https://pablobernabeu.github.io/depictr/reference/seasonal_plot.md)
   refused every frequency that is not a whole number, such as the 365.25
   / 7 of weekly data, with a message about `season_labels` that no
@@ -549,6 +597,35 @@
   seasons, counted from the first observation as
   [`stl()`](https://rdrr.io/r/stats/stl.html) counts them, and a message
   says so.
+
+- A `conf_level` given as a percentage, such as 95, gave missing
+  intervals, with at most a `NaNs produced` warning, in
+  [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md),
+  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
+  [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md),
+  [`effects_plot()`](https://pablobernabeu.github.io/depictr/reference/effects_plot.md),
+  [`interaction_plot()`](https://pablobernabeu.github.io/depictr/reference/interaction_plot.md),
+  [`group_comparison_plot()`](https://pablobernabeu.github.io/depictr/reference/group_comparison_plot.md),
+  [`calibration_plot()`](https://pablobernabeu.github.io/depictr/reference/calibration_plot.md)
+  and
+  [`random_effects_plot()`](https://pablobernabeu.github.io/depictr/reference/random_effects_plot.md).
+  [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md),
+  [`roc_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/roc_curve_plot.md)
+  and
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  failed with `'probs' outside [0,1]`. A level of 0 or 1, which no
+  interval can have, was accepted too. Every function that takes a
+  `conf_level` now refuses a value outside (0, 1). The message is the
+  one
+  [`acf_plot()`](https://pablobernabeu.github.io/depictr/reference/acf_plot.md)
+  gave: “`conf_level` must be a single number strictly between 0 and 1.”
+  [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  and
+  [`calibration_plot()`](https://pablobernabeu.github.io/depictr/reference/calibration_plot.md)
+  still take `NA` to leave the limits out. The other functions refuse
+  it, where it gave missing intervals, and
+  [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  refuses `NaN`, which it read as `NA`.
 
 ### Auditing a finished figure
 
@@ -687,12 +764,16 @@
   and it is the DOI that the CRAN page and the citation R generates for
   a CRAN package already gave, so the package no longer circulates under
   two. Zenodo still archives every GitHub release, and `CITATION.cff`
-  lists both identifiers. Its release date is now the day CRAN published
-  0.3.0, 2026-09-01, where it gave a date that matched neither CRAN nor
-  the GitHub release. The CRAN DOI and the Zenodo DOI are shown as full
-  links on the website and in the README, and the sidebar of the home
-  page shows the CRAN DOI once: the DOI badge in the README no longer
-  appears there a second time.
+  lists both identifiers. The CRAN DOI and the Zenodo DOI are shown as
+  full links on the website and in the README, and the sidebar of the
+  home page shows the CRAN DOI once: the DOI badge in the README no
+  longer appears there a second time.
+
+- `citation("depictr")` gives the author’s ORCID iD, as DESCRIPTION and
+  `CITATION.cff` do. `CITATION.cff` dates 0.3.0 by its first public
+  release, 2026-08-27, the day of the GitHub release that Zenodo
+  archived, and records CRAN’s publication on 2026-09-01 beside it. It
+  gave 2026-08-21, when 0.3.0 was not yet public on any channel.
 
 - [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
   and
@@ -710,6 +791,31 @@
   It failed with a message that counted the draws as terms. The two
   bootstrap tests that took most of the test time are skipped on CRAN
   and still run in continuous integration.
+
+- The README no longer says that the Python package differs from this
+  one in a few places. Its README now lists the differences that change
+  what a figure shows, many of them arguments the Python functions do
+  not yet take, and a test there accounts for every argument of this
+  package’s functions.
+
+- The help page of
+  [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
+  now says that its intervals are central (equal-tailed) quantile
+  intervals, which leave the same share of the draws in either tail. It
+  did not say which kind of interval it drew.
+
+- A new spelling test checks DESCRIPTION, the help pages, the vignettes
+  and `NEWS.md` against the British English dictionary and
+  `inst/WORDLIST`, and spelling joins Suggests. The package had a word
+  list but no test that read it. The test fails a check run with
+  `NOT_CRAN` set, as in `devtools::check()` and on GitHub Actions, at
+  any word found in neither, and CRAN and a plain `R CMD check` skip it.
+  Of the 65 words the test first stopped at, one was an American
+  spelling, now “afterwards”. Six came from a hyphenated word, a web
+  address and two possessives, and their passages are reworded. The
+  other 58 are names, packages, abbreviations and terms of art, and join
+  the word list, which also drops eleven entries the documentation no
+  longer uses.
 
 ### Changed defaults
 
@@ -932,6 +1038,12 @@
   the link scale. `reference_line` now defaults to 1 when exponentiating
   and to 0 otherwise. The Python twin gains the same arguments.
 
+- [`power_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/power_curve_plot.md)
+  gains `solved`, which marks a solved sample size and its interval,
+  such as the result of pilotr’s `target_n()`. The value is drawn as a
+  dashed vertical line and the interval as a grey band behind the curve.
+  The Python twin gains the same argument.
+
 ## depictr 0.3.0
 
 CRAN release: 2026-09-01
@@ -996,7 +1108,7 @@ CRAN release: 2026-09-01
 - `random_effects_plot(sort = TRUE)` froze every facet in the first
   facet’s order. With more than one term the level factor was shared
   across panels, so only the first panel came out sorted and the rest
-  zig-zagged. Each facet now orders its own levels, with the plain level
+  zigzagged. Each facet now orders its own levels, with the plain level
   names kept on the axis.
 - A user-supplied `title` in
   [`power_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/power_curve_plot.md)
@@ -1535,6 +1647,6 @@ out of, and generalises, three earlier plotting functions
   [`qq_plot()`](https://pablobernabeu.github.io/depictr/reference/qq_plot.md)
   and
   [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md))
-  restore the caller’s random number generator state afterward, so
+  restore the caller’s random number generator state afterwards, so
   passing one for reproducibility has no side effect on your own
   subsequent random draws.

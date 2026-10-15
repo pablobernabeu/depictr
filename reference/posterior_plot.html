@@ -4,12 +4,16 @@ distribution per parameter, in the style of a half-eye (a density slab with
 a point-and-interval beneath it), an interval-only forest plot, a gradient
 interval or a dotplot. The full shape of the posterior is shown, so skew,
 multimodality and the relative mass on either side of a reference value are
-all visible, rather than a point and two limits alone."><meta property="og:description" content="Displays posterior (or, more generally, bootstrap or simulation) draws as a
+all visible, rather than a point and two limits alone. The intervals are
+central (equal-tailed) quantile intervals, which leave the same share of the
+draws in either tail."><meta property="og:description" content="Displays posterior (or, more generally, bootstrap or simulation) draws as a
 distribution per parameter, in the style of a half-eye (a density slab with
 a point-and-interval beneath it), an interval-only forest plot, a gradient
 interval or a dotplot. The full shape of the posterior is shown, so skew,
 multimodality and the relative mass on either side of a reference value are
-all visible, rather than a point and two limits alone."><meta property="og:image" content="https://pablobernabeu.github.io/depictr/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Spectral:ital,wght@0,500;0,600;1,400&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"></head><body>
+all visible, rather than a point and two limits alone. The intervals are
+central (equal-tailed) quantile intervals, which leave the same share of the
+draws in either tail."><meta property="og:image" content="https://pablobernabeu.github.io/depictr/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Spectral:ital,wght@0,500;0,600;1,400&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -64,7 +68,9 @@ all visible, rather than a point and two limits alone."><meta property="og:image
 a point-and-interval beneath it), an interval-only forest plot, a gradient
 interval or a dotplot. The full shape of the posterior is shown, so skew,
 multimodality and the relative mass on either side of a reference value are
-all visible, rather than a point and two limits alone.</p>
+all visible, rather than a point and two limits alone. The intervals are
+central (equal-tailed) quantile intervals, which leave the same share of the
+draws in either tail.</p>
     </div>
 
     <div class="section level2">
@@ -113,8 +119,9 @@ and a missing 'ggdist' fall back to <code>"interval"</code>.</p></dd>
 
 
 <dt id="arg-widths">widths<a class="anchor" aria-label="anchor" href="#arg-widths"></a></dt>
-<dd><p>Two interval widths (inner and outer), as probabilities. The
-outer width is used for the caption and the displayed interval mass.</p></dd>
+<dd><p>Two interval widths (inner and outer), as probabilities, each
+drawn as a central (equal-tailed) quantile interval. The outer width is
+used for the caption and the displayed interval mass.</p></dd>
 
 
 <dt id="arg-interaction">interaction<a class="anchor" aria-label="anchor" href="#arg-interaction"></a></dt>

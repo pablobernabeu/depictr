@@ -14,8 +14,9 @@ This is the R half of a sibling pair. [The Python
 package](https://pablobernabeu.github.io/depictr-py/) of the same name
 covers most of the same workflow on top of
 [plotnine](https://plotnine.org). Its README lists the handful of
-functions that have yet to be ported and the few places where the two
-differ.
+functions that have yet to be ported and the differences that change
+what a figure shows, many of them arguments the Python functions do not
+yet take.
 
 ## Gallery
 

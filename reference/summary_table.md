@@ -66,6 +66,13 @@ and per group. By default each variable is also followed by a
 `Missing, n (%)` row whenever it contains missing values; set
 `missing = FALSE` to suppress these.
 
+A date or date-time column (`Date`, `POSIXct`) gets a single `Range`
+row, written as `<earliest> to <latest>` in each column. The cells give
+the date alone when every time in the column falls at midnight, and the
+time to the minute, or to the second when any time has seconds. A
+duration (`difftime`) is summarised as mean (SD) in its own units, which
+the statistic names, as in `Mean (SD), days`.
+
 When `vars` is `NULL`, high-cardinality character/factor columns (those
 whose number of distinct levels approaches the number of rows, e.g.
 identifier columns) are skipped automatically, with a message, rather

@@ -50,7 +50,8 @@ compare_models(
 
 - conf_level:
 
-  Confidence/credible level for models.
+  Confidence/credible level for models, a single number strictly between
+  0 and 1.
 
 - intercept:
 

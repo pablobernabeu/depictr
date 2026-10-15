@@ -6,7 +6,8 @@ slab with a point-and-interval beneath it), an interval-only forest
 plot, a gradient interval or a dotplot. The full shape of the posterior
 is shown, so skew, multimodality and the relative mass on either side of
 a reference value are all visible, rather than a point and two limits
-alone.
+alone. The intervals are central (equal-tailed) quantile intervals,
+which leave the same share of the draws in either tail.
 
 ## Usage
 
@@ -53,8 +54,9 @@ posterior_plot(
 
 - widths:
 
-  Two interval widths (inner and outer), as probabilities. The outer
-  width is used for the caption and the displayed interval mass.
+  Two interval widths (inner and outer), as probabilities, each drawn as
+  a central (equal-tailed) quantile interval. The outer width is used
+  for the caption and the displayed interval mass.
 
 - interaction:
 

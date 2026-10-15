@@ -82,8 +82,9 @@ the correlation values.</p>
 
 
 <dt id="arg-cols">cols<a class="anchor" aria-label="anchor" href="#arg-cols"></a></dt>
-<dd><p>Optional character vector of columns to include. If <code>NULL</code>, all
-numeric columns are used.</p></dd>
+<dd><p>Optional character vector of columns to include, each numeric or
+logical. Any other column, such as a factor or a date, is an error that
+names it. If <code>NULL</code>, all numeric columns are used.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>

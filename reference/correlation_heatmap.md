@@ -28,8 +28,9 @@ correlation_heatmap(
 
 - cols:
 
-  Optional character vector of columns to include. If `NULL`, all
-  numeric columns are used.
+  Optional character vector of columns to include, each numeric or
+  logical. Any other column, such as a factor or a date, is an error
+  that names it. If `NULL`, all numeric columns are used.
 
 - method:
 

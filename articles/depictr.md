@@ -390,10 +390,10 @@ subset(check_figure(p8), check == "greyscale_separability")
                                                   detail
     5 Closest pair #56b4e9 and #e69f00 in CIE lightness.
 
-The audit does not measure a continuous colour or fill scale, such as a
-heatmap’s: its colour rows abstain and say why. A ramp is read by its
-lightness, so prefer one whose lightness runs evenly from end to end,
-such as viridis or depictr’s sequential and diverging ramps, over a
+The audit does not measure a continuous colour or fill scale, such as
+that of a heatmap: its colour rows abstain and say why. A ramp is read
+by its lightness, so prefer one whose lightness runs evenly from end to
+end, such as viridis or depictr’s sequential and diverging ramps, over a
 rainbow ([Crameri et al., 2020](#ref-crameri2020)).
 
 Set the look once for a whole script with

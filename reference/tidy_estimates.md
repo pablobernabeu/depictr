@@ -23,7 +23,8 @@ tidy_estimates(x, conf_level = 0.95, exponentiate = FALSE, ...)
 
 - conf_level:
 
-  Confidence (or credible) level for the interval.
+  Confidence (or credible) level for the interval, a single number
+  strictly between 0 and 1.
 
 - exponentiate:
 

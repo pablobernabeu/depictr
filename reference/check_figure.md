@@ -130,14 +130,15 @@ among themselves, and so are the fill colours, and the row reports the
 closest pair from either set. An outline is therefore never compared
 with its own fill, nor a group with itself as another layer draws it.
 
-A continuous colour or fill scale, such as a heatmap's, is a smooth ramp
-rather than a set of codes, and none of the colour rows audits it. When
-nothing else in the figure encodes by colour, each of them abstains with
-a `detail` that says so. Whether a ramp reads in order, to a reader with
-a colour-vision deficiency and in greyscale as well, depends on how
-evenly its lightness changes, which the audit does not measure. Prefer a
-perceptually ordered map, such as viridis or depictr's sequential and
-diverging ramps, over a rainbow (Crameri et al., 2020).
+A continuous colour or fill scale, such as that of a heatmap, is a
+smooth ramp rather than a set of codes, and none of the colour rows
+audits it. When nothing else in the figure encodes by colour, each of
+them abstains with a `detail` that says so. Whether a ramp reads in
+order, to a reader with a colour-vision deficiency and in greyscale as
+well, depends on how evenly its lightness changes, which the audit does
+not measure. Prefer a perceptually ordered map, such as viridis or
+depictr's sequential and diverging ramps, over a rainbow (Crameri et
+al., 2020).
 
 `greyscale_separability` is the smallest difference in CIE lightness
 between those same colours, which is what survives printing in black and

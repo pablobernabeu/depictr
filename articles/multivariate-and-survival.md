@@ -158,7 +158,8 @@ agrees with the gap statistic: k-means returns clusters whether or not
 the data contains any, and the silhouette is one way of asking which
 case you are in.
 
-The same diagnostics apply to the wellbeing survey’s numeric profile:
+The same diagnostics apply to the numeric profile of the wellbeing
+survey:
 
 ``` r
 

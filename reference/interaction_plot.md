@@ -48,7 +48,8 @@ interaction_plot(
 
 - conf_level:
 
-  Confidence level for the bands/intervals.
+  Confidence level for the bands/intervals, a single number strictly
+  between 0 and 1.
 
 - n:
 

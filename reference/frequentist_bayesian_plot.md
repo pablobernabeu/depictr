@@ -46,7 +46,8 @@ frequentist_bayesian_plot(
 
   Level of the intervals the function computes: the confidence intervals
   of a frequentist model and, when `bayesian` holds draws, the outer
-  credible interval of each posterior (see Details).
+  credible interval of each posterior (see Details). A single number
+  strictly between 0 and 1.
 
 - labels, interaction, intercept:
 

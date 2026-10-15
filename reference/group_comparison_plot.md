@@ -46,7 +46,8 @@ group_comparison_plot(
 
 - conf_level:
 
-  Confidence level for the intervals (t-based).
+  Confidence level for the intervals (t-based), a single number strictly
+  between 0 and 1.
 
 - show_points:
 

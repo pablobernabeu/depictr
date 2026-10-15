@@ -123,6 +123,12 @@ a trailing <code>Missing</code> column. The first row reports <code>N</code>.</p
 per group. By default each variable is also followed by a <code>Missing, n (%)</code>
 row whenever it contains missing values; set <code>missing = FALSE</code> to suppress
 these.</p>
+<p>A date or date-time column (<code>Date</code>, <code>POSIXct</code>) gets a single <code>Range</code> row,
+written as <code>&lt;earliest&gt; to &lt;latest&gt;</code> in each column. The cells give the date
+alone when every time in the column falls at midnight, and the time to the
+minute, or to the second when any time has seconds. A duration (<code>difftime</code>)
+is summarised as mean (SD) in its own units, which the statistic names, as
+in <code>Mean (SD), days</code>.</p>
 <p>When <code>vars</code> is <code>NULL</code>, high-cardinality character/factor columns (those whose
 number of distinct levels approaches the number of rows, e.g. identifier
 columns) are skipped automatically, with a message, rather than being

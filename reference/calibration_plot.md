@@ -46,8 +46,9 @@ calibration_plot(
 - conf_level:
 
   Confidence level for the per-bin Wilson interval on the observed
-  proportion. Use `NA` to omit the intervals. Intervals are only drawn
-  in the single-model case to keep the overlay legible.
+  proportion, a single number strictly between 0 and 1. Use `NA` to omit
+  the intervals. Intervals are only drawn in the single-model case to
+  keep the overlay legible.
 
 - title:
 

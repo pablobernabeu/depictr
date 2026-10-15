@@ -51,6 +51,16 @@ explore_bivariate(
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
 object.
 
+## Details
+
+Dates, date-times and durations (`Date`, `POSIXct` and `difftime`
+columns) count as numeric. Against a numeric variable, they give a
+scatter plot with a trend, drawn by
+[`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md),
+and against a categorical one box plots of their values by level. A
+duration is drawn as a number in its own units, named in the default
+axis title, as in `stay (days)`.
+
 ## Examples
 
 ``` r
