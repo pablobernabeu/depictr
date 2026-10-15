@@ -250,7 +250,7 @@
 
 * `power_curve_plot()` reads power tables with several curves, one per effect
   or design, and draws one line each, told apart by colour and line type. It
-  joined them into a single zig-zag before. An `effect`, `param` or `term`
+  joined them into a single zigzag before. An `effect`, `param` or `term`
   column with more than one level separates the curves, with a message naming
   the columns used, and rows that share a sample size with no such column are
   now an error. It recognises `n_subject` and `<power>_lo`/`<power>_hi` columns
@@ -560,6 +560,17 @@
   (equal-tailed) quantile intervals, which leave the same share of the draws in
   either tail. It did not say which kind of interval it drew.
 
+* A new spelling test checks DESCRIPTION, the help pages, the vignettes and
+  `NEWS.md` against the British English dictionary and `inst/WORDLIST`, and
+  spelling joins Suggests. The package had a word list but no test that read
+  it. The test fails a check run with `NOT_CRAN` set, as in `devtools::check()`
+  and on GitHub Actions, at any word found in neither, and CRAN and a plain
+  `R CMD check` skip it. Of the 65 words the test first stopped at, one was an
+  American spelling, now "afterwards". Six came from a hyphenated word, a web
+  address and two possessives, and their passages are reworded. The other 58
+  are names, packages, abbreviations and terms of art, and join the word list,
+  which also drops eleven entries the documentation no longer uses.
+
 ## Changed defaults
 
 * The gap statistic's default search in `k_diagnostic()` and
@@ -766,7 +777,7 @@
   by the group aesthetic, with the colour assignment unchanged.
 * `random_effects_plot(sort = TRUE)` froze every facet in the first facet's
   order. With more than one term the level factor was shared across panels, so
-  only the first panel came out sorted and the rest zig-zagged. Each facet now
+  only the first panel came out sorted and the rest zigzagged. Each facet now
   orders its own levels, with the plain level names kept on the axis.
 * A user-supplied `title` in `power_curve_plot()` is no longer run through
   `format_terms()`, which turned a colon into a multiplication sign and blanked
@@ -1122,5 +1133,5 @@ three earlier plotting functions (`frequentist_bayesian_plot`,
   knit without a Bayesian or mixed-model toolchain.
 * Functions with an optional `seed` (`cluster_plot()`, `qq_plot()` and
   `residual_diagnostics_plot()`) restore the caller's random number generator
-  state afterward, so passing one for reproducibility has no side effect on
+  state afterwards, so passing one for reproducibility has no side effect on
   your own subsequent random draws.

@@ -55,7 +55,7 @@ unquoted names. By default, they are found among the names listed under
 unquoted name. Each level is drawn as its own line, in its own colour and
 line type. By default, an \code{effect}, \code{param} or \code{term} column with more than
 one level is used, with a message. Rows that share a sample size with no
-such column are an error, because joining them would draw a zig-zag.}
+such column are an error, because joining them would draw a zigzag.}
 
 \item{lower, upper}{Columns holding the lower and upper confidence limits.
 Name both or neither. By default, they are found among the names listed
