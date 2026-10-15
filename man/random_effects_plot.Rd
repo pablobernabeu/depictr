@@ -27,7 +27,7 @@ drawn in a single panel labelled "Random effect", and otherwise each term
 has a panel labelled "factor: term".}
 
 \item{conf_level}{Confidence level when intervals are derived from standard
-errors.}
+errors, a single number strictly between 0 and 1.}
 
 \item{sort}{Whether to order the levels by their estimate.}
 

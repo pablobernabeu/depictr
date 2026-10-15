@@ -9,7 +9,8 @@ tidy_estimates(x, conf_level = 0.95, exponentiate = FALSE, ...)
 \arguments{
 \item{x}{A fitted model or a data frame of results.}
 
-\item{conf_level}{Confidence (or credible) level for the interval.}
+\item{conf_level}{Confidence (or credible) level for the interval, a single
+number strictly between 0 and 1.}
 
 \item{exponentiate}{Whether to exponentiate the estimates and interval
 limits, which turns log-odds into odds ratios and log rates into rate

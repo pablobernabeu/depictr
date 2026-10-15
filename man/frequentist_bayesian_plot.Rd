@@ -32,7 +32,8 @@ matrix such as \code{brms::fixef()} returns.}
 
 \item{conf_level}{Level of the intervals the function computes: the
 confidence intervals of a frequentist model and, when \code{bayesian} holds
-draws, the outer credible interval of each posterior (see Details).}
+draws, the outer credible interval of each posterior (see Details). A
+single number strictly between 0 and 1.}
 
 \item{labels, interaction, intercept}{See \code{\link[=compare_models]{compare_models()}}. On both paths,
 an unnamed \code{labels} vector takes the frequentist terms first, then any

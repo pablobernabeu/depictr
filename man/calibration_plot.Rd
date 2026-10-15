@@ -26,8 +26,9 @@ probabilities (or a list of them for the multi-model case).}
 depictr brand blue. Ignored when several models are overlaid.}
 
 \item{conf_level}{Confidence level for the per-bin Wilson interval on the
-observed proportion. Use \code{NA} to omit the intervals. Intervals are only
-drawn in the single-model case to keep the overlay legible.}
+observed proportion, a single number strictly between 0 and 1. Use \code{NA} to
+omit the intervals. Intervals are only drawn in the single-model case to
+keep the overlay legible.}
 
 \item{title}{Plot title.}
 }

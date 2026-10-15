@@ -57,6 +57,31 @@ check_columns <- function(data, cols, arg = "data") {
   invisible(TRUE)
 }
 
+#' Refuse a confidence level outside (0, 1)
+#'
+#' A level given as a percentage, such as 95, has no normal or t quantile, so
+#' the intervals came out NaN, and a level of 0 or 1 drew a zero-width or an
+#' unbounded interval. Every function that takes a `conf_level` calls this
+#' first, so that each refuses the same values with the same message, the one
+#' acf_plot() gave.
+#' @param conf_level The level to check.
+#' @param allow_na Whether a single `NA` is accepted, for the functions in
+#'   which it leaves the limits out.
+#' @noRd
+check_conf_level <- function(conf_level, allow_na = FALSE) {
+  if (is.numeric(conf_level) && length(conf_level) == 1L &&
+      is.finite(conf_level) && conf_level > 0 && conf_level < 1) {
+    return(invisible(conf_level))
+  }
+  # NA, logical or numeric, but not NaN, which is no request to omit anything.
+  if (allow_na && (is.logical(conf_level) || is.numeric(conf_level)) &&
+      length(conf_level) == 1L && is.na(conf_level) && !is.nan(conf_level)) {
+    return(invisible(conf_level))
+  }
+  stop("`conf_level` must be a single number strictly between 0 and 1",
+       if (allow_na) ", or NA to leave the limits out", ".", call. = FALSE)
+}
+
 #' Test which of `cols` are (near-)constant
 #'
 #' A column with no variance has no correlation and cannot be scaled to unit

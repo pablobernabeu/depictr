@@ -26,7 +26,8 @@
 #' intervals) to override this.
 #'
 #' @param x A fitted model or a data frame of results.
-#' @param conf_level Confidence (or credible) level for the interval.
+#' @param conf_level Confidence (or credible) level for the interval, a single
+#'   number strictly between 0 and 1.
 #' @param exponentiate Whether to exponentiate the estimates and interval
 #'   limits, which turns log-odds into odds ratios and log rates into rate
 #'   ratios. The `std.error` column stays on the link scale, as in
@@ -58,6 +59,7 @@
 #' )
 #' tidy_estimates(df)
 tidy_estimates <- function(x, conf_level = 0.95, exponentiate = FALSE, ...) {
+  check_conf_level(conf_level)
   UseMethod("tidy_estimates")
 }
 

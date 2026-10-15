@@ -18,7 +18,7 @@
 #'   drawn in a single panel labelled "Random effect", and otherwise each term
 #'   has a panel labelled "factor: term".
 #' @param conf_level Confidence level when intervals are derived from standard
-#'   errors.
+#'   errors, a single number strictly between 0 and 1.
 #' @param sort Whether to order the levels by their estimate.
 #' @param point_colour Colour for the points and intervals.
 #' @param title,x_lab Plot title and value-axis label.
@@ -43,6 +43,7 @@
 random_effects_plot <- function(x, conf_level = 0.95, sort = TRUE,
                                 point_colour = depictr_brand(),
                                 title = NULL, x_lab = "Random effect") {
+  check_conf_level(conf_level)
   re <- if (is.data.frame(x)) ranef_from_df(x, conf_level) else
     ranef_from_model(x, conf_level)
 

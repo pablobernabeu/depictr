@@ -125,12 +125,7 @@ survival_plot <- function(time, status = NULL, group = NULL, conf_level = 0.95,
   # A level outside (0, 1), such as 95 meant as a percentage, has no normal
   # quantile, and km_limits() would carry the origin's limits of 1 through the
   # whole curve.
-  if (length(conf_level) != 1L ||
-      (!is.na(conf_level) &&
-       (!is.numeric(conf_level) || conf_level <= 0 || conf_level >= 1))) {
-    stop("`conf_level` must be a single number strictly between 0 and 1, ",
-         "or NA to leave the limits out.", call. = FALSE)
-  }
+  check_conf_level(conf_level, allow_na = TRUE)
   km <- km_input(time, status, group, conf_level, conf_type)
   has_ci <- !is.na(conf_level) && all(c("lower", "upper") %in% names(km$curve))
   groups <- unique(km$curve$group)

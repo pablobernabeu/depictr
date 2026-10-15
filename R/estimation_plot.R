@@ -38,7 +38,8 @@
 #'   in the upper panel and has an empty column in the lower panel, where the
 #'   dashed line marks a difference of zero.
 #' @param conf_level Confidence level for both the group intervals (t-based) and
-#'   the bootstrap difference intervals.
+#'   the bootstrap difference intervals, a single number strictly between 0
+#'   and 1.
 #' @param n_boot Number of bootstrap resamples for the difference intervals.
 #' @param effsize Standardised effect size annotated beside each difference:
 #'   `"hedges_g"` (the default, small-sample corrected), `"cohens_d"`, or
@@ -90,6 +91,7 @@ estimation_plot <- function(data, y, group, reference = NULL,
   y <- resolve_var(data, rlang::enquo(y), "y")
   group <- resolve_var(data, rlang::enquo(group), "group")
   effsize <- match.arg(effsize)
+  check_conf_level(conf_level)
   if (!is.numeric(data[[y]])) stop("`y` must be numeric.", call. = FALSE)
   if (!is.numeric(n_boot) || length(n_boot) != 1 || n_boot < 1) {
     stop("`n_boot` must be a single positive number.", call. = FALSE)

@@ -30,7 +30,8 @@ counts as a group, but a numeric column with more than 20 distinct values
 is refused as continuous. Rows with a missing group are dropped with a
 message, and levels without rows are left out of the plot and its palette.}
 
-\item{conf_level}{Confidence level for the intervals (t-based).}
+\item{conf_level}{Confidence level for the intervals (t-based), a single
+number strictly between 0 and 1.}
 
 \item{show_points}{Whether to draw the raw data behind the means.}
 

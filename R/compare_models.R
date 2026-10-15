@@ -13,7 +13,8 @@
 #'   `compare_models(Frequentist = m1, Bayesian = m2)`).
 #' @param names Optional character vector of source labels, overriding the
 #'   names of `...`.
-#' @param conf_level Confidence/credible level for models.
+#' @param conf_level Confidence/credible level for models, a single number
+#'   strictly between 0 and 1.
 #' @param intercept Whether to keep the intercept term. Defaults to `FALSE`.
 #' @param order Order of the terms, by their average estimate across sources.
 #'   `"ascending"` puts the smallest estimate at the bottom and the largest at
@@ -95,6 +96,7 @@ compare_models <- function(...,
                                     title = NULL,
                                     subtitle = NULL,
                                     x_lab = NULL) {
+  check_conf_level(conf_level)
   order <- match.arg(order)
   interaction <- match.arg(interaction)
   scales <- match.arg(scales)

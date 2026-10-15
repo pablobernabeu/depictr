@@ -46,7 +46,8 @@
 #'   model's formula, or a model-frame name such as `"log(rainfall)"`, which
 #'   stands for the one variable it transforms. A term built from several
 #'   variables, such as `"I(rainfall * fertiliser)"`, is refused.
-#' @param conf_level Confidence level for the interval.
+#' @param conf_level Confidence level for the interval, a single number strictly
+#'   between 0 and 1.
 #' @param n Number of points across the range of a numeric predictor.
 #' @param rug Whether to add a rug of the observed predictor values (numeric predictors).
 #' @param colour Colour for the line/points and band. Defaults to the depictr
@@ -66,6 +67,7 @@
 effects_plot <- function(model, predictor, conf_level = 0.95, n = 100,
                          rug = TRUE, colour = depictr_brand(),
                          title = NULL, x_lab = NULL, y_lab = NULL) {
+  check_conf_level(conf_level)
   raw <- model_raw_data(model)
   predictor <- resolve_predictor(predictor, raw, "predictor")
   is_factor <- predictor %in% raw$categorical
@@ -119,7 +121,8 @@ effects_plot <- function(model, predictor, conf_level = 0.95, n = 100,
 #' @param moderator_values For a numeric moderator, the values to show, on the
 #'   variable's own scale. Defaults to the 10th, 50th and 90th percentiles in
 #'   the estimation sample.
-#' @param conf_level Confidence level for the bands/intervals.
+#' @param conf_level Confidence level for the bands/intervals, a single number
+#'   strictly between 0 and 1.
 #' @param n Number of points across the range of a numeric focal predictor.
 #' @param band Whether to draw confidence bands (numeric focal predictor).
 #' @param palette Colours for the moderator; defaults to [depictr_palette()].
@@ -134,6 +137,7 @@ interaction_plot <- function(model, predictor, moderator,
                              moderator_values = NULL, conf_level = 0.95,
                              n = 80, band = TRUE, palette = NULL,
                              title = NULL, x_lab = NULL, y_lab = NULL) {
+  check_conf_level(conf_level)
   raw <- model_raw_data(model)
   predictor <- resolve_predictor(predictor, raw, "predictor")
   moderator <- resolve_predictor(moderator, raw, "moderator")

@@ -44,7 +44,8 @@
 #'   matrix such as `brms::fixef()` returns.
 #' @param conf_level Level of the intervals the function computes: the
 #'   confidence intervals of a frequentist model and, when `bayesian` holds
-#'   draws, the outer credible interval of each posterior (see Details).
+#'   draws, the outer credible interval of each posterior (see Details). A
+#'   single number strictly between 0 and 1.
 #' @param labels,interaction,intercept See [compare_models()]. On both paths,
 #'   an unnamed `labels` vector takes the frequentist terms first, then any
 #'   that only the Bayesian input holds. `intercept` defaults to `TRUE` here,
@@ -107,6 +108,7 @@ frequentist_bayesian_plot <- function(frequentist,
                                       x_lab = "Estimate",
                                       caption = NULL,
                                       ...) {
+  check_conf_level(conf_level)
   interaction <- match.arg(interaction)
   # `facet` is the primary control; `scales` is honoured only when supplied
   # explicitly, so `facet = FALSE` stays meaningful despite the "free" default.

@@ -24,7 +24,8 @@ model's formula, or a model-frame name such as \code{"log(rainfall)"}, which
 stands for the one variable it transforms. A term built from several
 variables, such as \code{"I(rainfall * fertiliser)"}, is refused.}
 
-\item{conf_level}{Confidence level for the interval.}
+\item{conf_level}{Confidence level for the interval, a single number strictly
+between 0 and 1.}
 
 \item{n}{Number of points across the range of a numeric predictor.}
 

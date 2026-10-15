@@ -32,7 +32,8 @@ variable.}
 variable's own scale. Defaults to the 10th, 50th and 90th percentiles in
 the estimation sample.}
 
-\item{conf_level}{Confidence level for the bands/intervals.}
+\item{conf_level}{Confidence level for the bands/intervals, a single number
+strictly between 0 and 1.}
 
 \item{n}{Number of points across the range of a numeric focal predictor.}
 

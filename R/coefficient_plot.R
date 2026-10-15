@@ -8,7 +8,7 @@
 #'
 #' @param x A fitted model or a tidy data frame of estimates.
 #' @param conf_level Confidence/credible level, passed to [tidy_estimates()]
-#'   when `x` is a model.
+#'   when `x` is a model: a single number strictly between 0 and 1.
 #' @param intercept Whether to keep the intercept term. Defaults to `FALSE`,
 #'   since the intercept is seldom of interest on a forest plot and its scale
 #'   often overwhelms the other terms.
@@ -124,6 +124,7 @@ coefficient_plot <- function(x,
                       title = NULL,
                       subtitle = NULL,
                       x_lab = NULL) {
+  check_conf_level(conf_level)
   order <- match.arg(order)
   interaction <- match.arg(interaction)
   scales <- match.arg(scales)

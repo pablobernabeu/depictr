@@ -23,7 +23,8 @@
 #' @param ci Bootstrap confidence band for a single ROC curve and its AUC.
 #'   `FALSE` (default) draws none; `TRUE` uses 2000 resamples; a positive integer
 #'   sets the number of resamples. Ignored when several models are overlaid.
-#' @param conf_level Confidence level for the bootstrap band.
+#' @param conf_level Confidence level for the bootstrap band, a single number
+#'   strictly between 0 and 1.
 #' @param youden Logical; if `TRUE`, mark the Youden's J operating point (the
 #'   threshold maximising sensitivity + specificity - 1) on each curve.
 #' @param legend_inside When `TRUE` (and several models are overlaid), draw the
@@ -57,6 +58,7 @@
 roc_curve_plot <- function(x, score = NULL, colour = depictr_brand(),
                            ci = FALSE, conf_level = 0.95, youden = FALSE,
                            legend_inside = FALSE, title = NULL) {
+  check_conf_level(conf_level)
   models <- as_model_list(x, score)
   multi <- attr(models, "multi")
 
@@ -184,8 +186,9 @@ roc_curve_plot <- function(x, score = NULL, colour = depictr_brand(),
 #' @param colour Point/line colour for the single-model case. Defaults to the
 #'   depictr brand blue. Ignored when several models are overlaid.
 #' @param conf_level Confidence level for the per-bin Wilson interval on the
-#'   observed proportion. Use `NA` to omit the intervals. Intervals are only
-#'   drawn in the single-model case to keep the overlay legible.
+#'   observed proportion, a single number strictly between 0 and 1. Use `NA` to
+#'   omit the intervals. Intervals are only drawn in the single-model case to
+#'   keep the overlay legible.
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -199,6 +202,7 @@ roc_curve_plot <- function(x, score = NULL, colour = depictr_brand(),
 calibration_plot <- function(x, score = NULL, bins = 10,
                              colour = depictr_brand(), conf_level = 0.95,
                              title = NULL) {
+  check_conf_level(conf_level, allow_na = TRUE)
   models <- as_model_list(x, score)
   multi <- attr(models, "multi")
 

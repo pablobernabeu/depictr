@@ -137,7 +137,8 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
 #'   counts as a group, but a numeric column with more than 20 distinct values
 #'   is refused as continuous. Rows with a missing group are dropped with a
 #'   message, and levels without rows are left out of the plot and its palette.
-#' @param conf_level Confidence level for the intervals (t-based).
+#' @param conf_level Confidence level for the intervals (t-based), a single
+#'   number strictly between 0 and 1.
 #' @param show_points Whether to draw the raw data behind the means.
 #' @param point_alpha Transparency of the raw points.
 #' @param differences If `TRUE`, append a lower panel showing the pairwise mean
@@ -169,6 +170,7 @@ group_comparison_plot <- function(data, y, group, conf_level = 0.95,
                                   x_lab = NULL, y_lab = NULL) {
   y <- resolve_var(data, rlang::enquo(y), "y")
   group <- resolve_var(data, rlang::enquo(group), "group")
+  check_conf_level(conf_level)
   if (!is.numeric(data[[y]])) stop("`y` must be numeric.", call. = FALSE)
 
   prep <- prepare_group(data[!is.na(data[[y]]), , drop = FALSE], group,

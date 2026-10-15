@@ -30,7 +30,7 @@ coefficient_plot(
 \item{x}{A fitted model or a tidy data frame of estimates.}
 
 \item{conf_level}{Confidence/credible level, passed to \code{\link[=tidy_estimates]{tidy_estimates()}}
-when \code{x} is a model.}
+when \code{x} is a model: a single number strictly between 0 and 1.}
 
 \item{intercept}{Whether to keep the intercept term. Defaults to \code{FALSE},
 since the intercept is seldom of interest on a forest plot and its scale

@@ -35,7 +35,8 @@ Name the arguments to label the sources (e.g.
 \item{names}{Optional character vector of source labels, overriding the
 names of \code{...}.}
 
-\item{conf_level}{Confidence/credible level for models.}
+\item{conf_level}{Confidence/credible level for models, a single number
+strictly between 0 and 1.}
 
 \item{intercept}{Whether to keep the intercept term. Defaults to \code{FALSE}.}
 

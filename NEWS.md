@@ -379,6 +379,20 @@
   a frequency is now rounded down to whole seasons, counted from the first
   observation as `stl()` counts them, and a message says so.
 
+* A `conf_level` given as a percentage, such as 95, gave missing intervals,
+  with at most a `NaNs produced` warning, in `tidy_estimates()`,
+  `coefficient_plot()`, `compare_models()`, `effects_plot()`,
+  `interaction_plot()`, `group_comparison_plot()`, `calibration_plot()` and
+  `random_effects_plot()`. `estimation_plot()`, `roc_curve_plot()` and
+  `frequentist_bayesian_plot()` failed with `'probs' outside [0,1]`. A level of
+  0 or 1, which no interval can have, was accepted too. Every function that
+  takes a `conf_level` now refuses a value outside (0, 1). The message is the
+  one `acf_plot()` gave: "`conf_level` must be a single number strictly
+  between 0 and 1." `survival_plot()` and `calibration_plot()` still take `NA`
+  to leave the limits out. The other functions refuse it, where it gave
+  missing intervals, and `survival_plot()` refuses `NaN`, which it read as
+  `NA`.
+
 ## Auditing a finished figure
 
 * `check_figure()` measured all text against the plot background, so text on a

@@ -238,11 +238,7 @@ acf_plot <- function(x, lag_max = NULL, type = c("correlation", "partial"),
                      conf_level = 0.95, title = NULL, x_lab = "Lag",
                      y_lab = NULL) {
   type <- match.arg(type)
-  if (!is.numeric(conf_level) || length(conf_level) != 1 ||
-      !is.finite(conf_level) || conf_level <= 0 || conf_level >= 1) {
-    stop("`conf_level` must be a single number strictly between 0 and 1.",
-         call. = FALSE)
-  }
+  check_conf_level(conf_level)
   x <- as_one_series(x)
   v <- as.numeric(x)
   # Keep the series in place (do not drop interior NAs, which would concatenate

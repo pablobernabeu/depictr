@@ -32,7 +32,8 @@ brand blue. Ignored when several models are overlaid (the colourblind-aware
 \code{FALSE} (default) draws none; \code{TRUE} uses 2000 resamples; a positive integer
 sets the number of resamples. Ignored when several models are overlaid.}
 
-\item{conf_level}{Confidence level for the bootstrap band.}
+\item{conf_level}{Confidence level for the bootstrap band, a single number
+strictly between 0 and 1.}
 
 \item{youden}{Logical; if \code{TRUE}, mark the Youden's J operating point (the
 threshold maximising sensitivity + specificity - 1) on each curve.}

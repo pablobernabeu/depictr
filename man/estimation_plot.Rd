@@ -33,7 +33,8 @@ in the upper panel and has an empty column in the lower panel, where the
 dashed line marks a difference of zero.}
 
 \item{conf_level}{Confidence level for both the group intervals (t-based) and
-the bootstrap difference intervals.}
+the bootstrap difference intervals, a single number strictly between 0
+and 1.}
 
 \item{n_boot}{Number of bootstrap resamples for the difference intervals.}
 
