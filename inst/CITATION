@@ -5,18 +5,22 @@ citHeader("To cite depictr in publications, use:")
 # copy installed from CRAN that has no CITATION file. The DOI names the package
 # across all its versions, so the version in the note identifies the release
 # cited. Zenodo also archives every GitHub release (see the About article).
+# CRAN is the publisher: it distributes the package and registered the DOI.
+# Every reference the package family gives names it alike, in full.
 bibentry(
   bibtype  = "Manual",
   title    = "{depictr}: A unified toolkit for visualising statistical models and data",
   author   = person("Pablo", "Bernabeu",
                     comment = c(ORCID = "0000-0003-1083-2460")),
   year     = "2026",
+  publisher = "Comprehensive R Archive Network (CRAN)",
   note     = sprintf("R package version %s", meta$Version),
   doi      = "10.32614/CRAN.package.depictr",
   url      = "https://CRAN.R-project.org/package=depictr",
   textVersion = paste0(
     "Bernabeu, P. (2026). depictr: A unified toolkit for visualising ",
     "statistical models and data. R package version ", meta$Version, ". ",
+    "Comprehensive R Archive Network (CRAN). ",
     "https://doi.org/10.32614/CRAN.package.depictr"
   )
 )

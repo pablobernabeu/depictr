@@ -35,6 +35,17 @@ _pkgdown.yml, mkdocs.yml, inst/CITATION and docs/*.bib files:
    Zenodo's own badge, with "DOI <doi>" as its alt text. Its Citation section
    gives the DOIs of what it describes as full links, and a README.Rmd and the
    README.md knitted from it agree.
+6. A reference that gives CRAN as the source of what it cites names it in full,
+   alike everywhere: "Comprehensive R Archive Network (CRAN)". That is the whole
+   of a BibTeX or bibentry publisher, institution or organization field that
+   names CRAN; in the text of a reference it stands just before the link, as
+   "... R package version 0.4.0. Comprehensive R Archive Network (CRAN).
+   <https://doi.org/...>"; and the full name never appears without the
+   abbreviation after it. A reference to a CRAN DOI (10.32614/CRAN.package.<pkg>)
+   gives that source, so inst/CITATION's bibentry and text version, the About
+   page's reference and BibTeX entry, and a README's quoted reference all name
+   it. NEWS.md and CHANGELOG.md are exempt, since they record what earlier
+   versions said.
 
 With --site DIR (a built pkgdown site, whose package is DIR/.. unless --package
 says otherwise), it checks the built home page instead: that pkgdown's markup
@@ -57,6 +68,11 @@ from pathlib import Path
 
 HIDE_RULE = 'aside .dev-status li:has(> a[href^="https://doi.org/"])'
 SIZE_RULE = 'aside .citation p:has(> a[href^="https://doi.org/"])'
+CRAN_NAME = "Comprehensive R Archive Network (CRAN)"
+# A DOI link in a reference's text: an autolink, a Markdown link or an <a> element.
+CRAN_DOI_LINK = r"(?:<a\s[^>]*>|\[|<)?https://doi\.org/10\.32614/CRAN\.package\."
+# What marks a paragraph as a reference, not a sentence that mentions the DOI.
+REFERENCE_MARK = r"R package version|\[(?:R package|Computer software)\]|\(Version "
 
 
 def sidebar_link(pkg):
@@ -81,6 +97,46 @@ def section(text, heading="## Citation"):
 
 def norm(s):
     return re.sub(r"\s+", " ", s).strip()
+
+
+def check_cran_name(rel, text, prose, plain, report):
+    """Rule 6: a reference names CRAN as CRAN_NAME, and one citing a CRAN DOI names it."""
+    # A field, in a .bib, a bibentry() or a BibTeX entry built in an About page's code.
+    for m in re.finditer(r"\b(publisher|institution|organization)\s*=\s*(\{+|\")(.*?)(\}+|\")", text):
+        value = m.group(3).strip()
+        if re.search(r"\bCRAN\b|R Archive Network", value) and value != CRAN_NAME:
+            report(rel, text, m.start(), f"{m.group(1)} '{value}': write {CRAN_NAME}")
+    # The bare abbreviation as a reference's source, just before its link.
+    for m in re.finditer(r"(?<![\w(])CRAN\.(?=[ \t]*\n?[ \t>]*(?:<a\s|<|\[)?https?://)", prose):
+        report(rel, prose, m.start(), f"a reference names its source in full: write '{CRAN_NAME}.'")
+    for m in re.finditer(r"(?i)\bComprehensive\s+R\s+Archive\s+Network\b(?!\s+\(CRAN\))", prose):
+        report(rel, prose, m.start(), f"give the abbreviation after the name: {CRAN_NAME}")
+    if plain:
+        # inst/CITATION: R concatenates the text version from string literals, so
+        # they are joined before the source is looked for in front of the link.
+        joined = "".join(re.findall(r'"((?:[^"\\]|\\.)*)"', text))
+        if "https://doi.org/10.32614/CRAN.package." in joined and \
+                not re.search(re.escape(CRAN_NAME) + r"\.\s*https://doi\.org/10\.32614/CRAN\.package\.", joined):
+            report(rel, text, text.find("textVersion"),
+                   f"the text version names its source before the DOI: '... {CRAN_NAME}. https://doi.org/...'")
+    elif re.search(REFERENCE_MARK, text):
+        # A paragraph that is a reference (it carries a version or a bracketed
+        # description) and links a CRAN DOI gives the source just before the link.
+        for para in re.finditer(r"(?:[^\n]|\n(?![ \t]*\n))+", prose):
+            body = para.group(0)
+            if re.search(REFERENCE_MARK, body) and re.search(CRAN_DOI_LINK, body):
+                flat = norm(re.sub(r"(?m)^[ \t]*>[ \t]?", "", body))
+                if not re.search(re.escape(CRAN_NAME) + r"\.\s*" + CRAN_DOI_LINK, flat):
+                    report(rel, prose, para.start(),
+                           f"a reference to a CRAN DOI names its source before the link: '{CRAN_NAME}.'")
+    # A BibTeX entry that gives a CRAN DOI gives CRAN, in full, as its publisher.
+    if re.search(r"\bdoi\s*=\s*\{10\.32614/CRAN\.package\.", text) and \
+            not re.search(r"\bpublisher\s*=\s*\{" + re.escape(CRAN_NAME) + r"\}", text):
+        report(rel, text, re.search(r"\bdoi\s*=\s*\{10\.32614/CRAN", text).start(),
+               f"a BibTeX entry with a CRAN DOI gives publisher = {{{CRAN_NAME}}}")
+    if plain and re.search(r'\bdoi\s*=\s*"10\.32614/CRAN\.package\.', text) and \
+            not re.search(r'\bpublisher\s*=\s*"' + re.escape(CRAN_NAME) + '"', text):
+        report(rel, text, text.find("bibentry"), f'the bibentry gives publisher = "{CRAN_NAME}"')
 
 
 def check_repository(root):
@@ -144,6 +200,8 @@ def check_repository(root):
                 report(rel, prose, m.start(), "a reference ends with the DOI, with no full stop after it")
 
         path = Path(rel)
+        if path.name not in ("NEWS.md", "CHANGELOG.md"):
+            check_cran_name(rel, text, prose, plain, report)
         # The package's own BibTeX entry, on an About page or in a shipped .bib, names
         # the registry page in url. Code that fills the DOI in ({doi}) is caught too.
         if path.name in ("about.md", "about.Rmd") or path.suffix == ".bib":
