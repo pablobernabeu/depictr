@@ -5,7 +5,8 @@
 If you use depictr in published work, please cite it.
 
 > Bernabeu, P. (2026). depictr: A unified toolkit for visualising
-> statistical models and data. R package version 0.3.0.
+> statistical models and data. R package version 0.3.0. Comprehensive R
+> Archive Network (CRAN).
 > <https://doi.org/10.32614/CRAN.package.depictr>
 
 ```
@@ -13,6 +14,7 @@ If you use depictr in published work, please cite it.
   title  = {{depictr}: A unified toolkit for visualising statistical models and data},
   author = {Pablo Bernabeu},
   year   = {2026},
+  publisher = {Comprehensive R Archive Network (CRAN)},
   note   = {R package version 0.3.0},
   doi    = {10.32614/CRAN.package.depictr},
   url    = {https://CRAN.R-project.org/package=depictr},
@@ -20,7 +22,7 @@ If you use depictr in published work, please cite it.
 ```
 
 Copy BibTeX [Download
-.bib](data:application/x-bibtex;charset=utf-8,%40Manual%7Bdepictr%2C%0A%20%20title%20%20%3D%20%7B%7Bdepictr%7D%3A%20A%20unified%20toolkit%20for%20visualising%20statistical%20models%20and%20data%7D%2C%0A%20%20author%20%3D%20%7BPablo%20Bernabeu%7D%2C%0A%20%20year%20%20%20%3D%20%7B2026%7D%2C%0A%20%20note%20%20%20%3D%20%7BR%20package%20version%200.3.0%7D%2C%0A%20%20doi%20%20%20%20%3D%20%7B10.32614%2FCRAN.package.depictr%7D%2C%0A%20%20url%20%20%20%20%3D%20%7Bhttps%3A%2F%2FCRAN.R-project.org%2Fpackage%3Ddepictr%7D%2C%0A%7D)
+.bib](data:application/x-bibtex;charset=utf-8,%40Manual%7Bdepictr%2C%0A%20%20title%20%20%3D%20%7B%7Bdepictr%7D%3A%20A%20unified%20toolkit%20for%20visualising%20statistical%20models%20and%20data%7D%2C%0A%20%20author%20%3D%20%7BPablo%20Bernabeu%7D%2C%0A%20%20year%20%20%20%3D%20%7B2026%7D%2C%0A%20%20publisher%20%3D%20%7BComprehensive%20R%20Archive%20Network%20%28CRAN%29%7D%2C%0A%20%20note%20%20%20%3D%20%7BR%20package%20version%200.3.0%7D%2C%0A%20%20doi%20%20%20%20%3D%20%7B10.32614%2FCRAN.package.depictr%7D%2C%0A%20%20url%20%20%20%20%3D%20%7Bhttps%3A%2F%2FCRAN.R-project.org%2Fpackage%3Ddepictr%7D%2C%0A%7D)
 
 R users can also retrieve this citation directly with
 `citation("depictr")`.

@@ -769,6 +769,13 @@
   home page shows the CRAN DOI once: the DOI badge in the README no
   longer appears there a second time.
 
+- `citation("depictr")` and the About page name the package’s publisher,
+  in full: “Comprehensive R Archive Network (CRAN)” stands before the
+  DOI in the reference, and the BibTeX entry gives it as `publisher`.
+  The reference named no publisher before. Every reference across the
+  package family and the author’s website now names CRAN in the same
+  words.
+
 - `citation("depictr")` gives the author’s ORCID iD, as DESCRIPTION and
   `CITATION.cff` do. `CITATION.cff` dates 0.3.0 by its first public
   release, 2026-08-27, the day of the GitHub release that Zenodo
