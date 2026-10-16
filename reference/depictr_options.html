@@ -5,15 +5,21 @@ shared look of every plot once, at the top of a script or in your
 options are honoured by theme_depictr() (base size, base family and the
 brand colour used for titles), by depictr_palette() and the
 scale_colour_depictr() family (an optional custom qualitative palette), and
-by the colour accessors depictr_brand(), depictr_accent() and
-depictr_reference()."><meta property="og:description" content="depictr reads a small set of global options so that you can configure the
+by every plotting function that draws a single series, a highlighted element
+or a reference line. Those functions list depictr_brand(),
+depictr_accent() or depictr_reference() as the default of a colour
+argument. The three are internal and are not called directly: each reads its
+option when the plotting function runs, so the colours are set here."><meta property="og:description" content="depictr reads a small set of global options so that you can configure the
 shared look of every plot once, at the top of a script or in your
 .Rprofile, instead of passing the same arguments to each function. The
 options are honoured by theme_depictr() (base size, base family and the
 brand colour used for titles), by depictr_palette() and the
 scale_colour_depictr() family (an optional custom qualitative palette), and
-by the colour accessors depictr_brand(), depictr_accent() and
-depictr_reference()."><meta property="og:image" content="https://pablobernabeu.github.io/depictr/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Spectral:ital,wght@0,500;0,600;1,400&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"></head><body>
+by every plotting function that draws a single series, a highlighted element
+or a reference line. Those functions list depictr_brand(),
+depictr_accent() or depictr_reference() as the default of a colour
+argument. The three are internal and are not called directly: each reads its
+option when the plotting function runs, so the colours are set here."><meta property="og:image" content="https://pablobernabeu.github.io/depictr/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Spectral:ital,wght@0,500;0,600;1,400&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -69,8 +75,11 @@ shared look of every plot once, at the top of a script or in your
 options are honoured by <code><a href="theme_depictr.html">theme_depictr()</a></code> (base size, base family and the
 brand colour used for titles), by <code><a href="depictr_palette.html">depictr_palette()</a></code> and the
 <code><a href="scale_colour_depictr.html">scale_colour_depictr()</a></code> family (an optional custom qualitative palette), and
-by the colour accessors <code>depictr_brand()</code>, <code>depictr_accent()</code> and
-<code>depictr_reference()</code>.</p>
+by every plotting function that draws a single series, a highlighted element
+or a reference line. Those functions list <code>depictr_brand()</code>,
+<code>depictr_accent()</code> or <code>depictr_reference()</code> as the default of a colour
+argument. The three are internal and are not called directly: each reads its
+option when the plotting function runs, so the colours are set here.</p>
     </div>
 
     <div class="section level2">
@@ -101,16 +110,16 @@ by the colour accessors <code>depictr_brand()</code>, <code>depictr_accent()</co
 <dt id="arg-brand">brand<a class="anchor" aria-label="anchor" href="#arg-brand"></a></dt>
 <dd><p>The depictr brand colour, used for plot titles and single-series
 geoms. It coincides with the default palette's first colour but does not
-alter a palette; use <code>palette</code> for that. Returned by <code>depictr_brand()</code>.</p></dd>
+alter a palette; use <code>palette</code> for that.</p></dd>
 
 
 <dt id="arg-accent">accent<a class="anchor" aria-label="anchor" href="#arg-accent"></a></dt>
-<dd><p>A secondary highlight colour. Returned by <code>depictr_accent()</code>.</p></dd>
+<dd><p>A secondary highlight colour, for the one element a figure
+draws attention to.</p></dd>
 
 
 <dt id="arg-reference">reference<a class="anchor" aria-label="anchor" href="#arg-reference"></a></dt>
-<dd><p>The colour used for reference / annotation lines. Returned
-by <code>depictr_reference()</code>.</p></dd>
+<dd><p>The colour used for reference / annotation lines.</p></dd>
 
 
 <dt id="arg-palette">palette<a class="anchor" aria-label="anchor" href="#arg-palette"></a></dt>

@@ -62,8 +62,7 @@ decompose_plot(
 
   Whether to draw a confidence ribbon around the trend component. The
   band is a normal-approximation interval based on the remainder's
-  standard deviation (see Details). `FALSE` reproduces the previous
-  behaviour exactly.
+  standard deviation (see Details).
 
 - level:
 

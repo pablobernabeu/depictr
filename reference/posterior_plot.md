@@ -45,8 +45,9 @@ posterior_plot(
 
   One of `"halfeye"` (density slab + interval, the default),
   `"interval"` (point and two nested intervals, no slab), `"gradient"`
-  (a colour-graded interval) or `"dots"` (a quantile dotplot). Unknown
-  values and a missing 'ggdist' fall back to `"interval"`.
+  (a colour-graded interval) or `"dots"` (a quantile dotplot). Any other
+  value is an error. When 'ggdist' is missing, every style falls back to
+  `"interval"`.
 
 - point:
 

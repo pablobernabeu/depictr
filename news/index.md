@@ -817,6 +817,41 @@
   the word list, which also drops eleven entries the documentation no
   longer uses.
 
+- The references of
+  [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md),
+  [`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md),
+  [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
+  and
+  [`vif_plot()`](https://pablobernabeu.github.io/depictr/reference/vif_plot.md)
+  come from `inst/REFERENCES.bib`, as every other citation in the
+  package does. They were written out by hand on each page.
+  [`vignette("multivariate-and-survival")`](https://pablobernabeu.github.io/depictr/articles/multivariate-and-survival.md)
+  now cites Rousseeuw (1987) and Tibshirani et al. (2001) from the same
+  file, so both appear in its list of references, where it sent the
+  reader to
+  [`?k_diagnostic`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
+  for them.
+
+- Several help pages described behaviour the code does not have. The
+  page of
+  [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md)
+  read as though columns beyond `max_cols` were trimmed, which is what
+  the Python twin does. Here they are an error naming the count, and the
+  page now says so.
+  [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
+  said that an unknown `style` fell back to `"interval"`, while it is an
+  error. Only a missing ‘ggdist’ falls back.
+  [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
+  said that `n = NULL` returns the full qualitative palette, also for
+  the sequential and diverging types, which return seven colours.
+  [`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md)
+  and
+  [`theme_depictr()`](https://pablobernabeu.github.io/depictr/reference/theme_depictr.md)
+  named `depictr_brand()`, `depictr_accent()` and `depictr_reference()`
+  as accessors, but the package does not export them. The pages now
+  describe the three colours by their use. Six pages also drop remarks
+  about how a function used to behave.
+
 ### Changed defaults
 
 - The gap statistic’s default search in

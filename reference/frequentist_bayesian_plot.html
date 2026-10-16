@@ -107,8 +107,7 @@ single number strictly between 0 and 1.</p></dd>
 <dt id="arg-labels-interaction-intercept">labels, interaction, intercept<a class="anchor" aria-label="anchor" href="#arg-labels-interaction-intercept"></a></dt>
 <dd><p>See <code><a href="compare_models.html">compare_models()</a></code>. On both paths,
 an unnamed <code>labels</code> vector takes the frequentist terms first, then any
-that only the Bayesian input holds. <code>intercept</code> defaults to <code>TRUE</code> here,
-matching the original behaviour.</p></dd>
+that only the Bayesian input holds. <code>intercept</code> defaults to <code>TRUE</code> here.</p></dd>
 
 
 <dt id="arg-facet-scales">facet, scales<a class="anchor" aria-label="anchor" href="#arg-facet-scales"></a></dt>
@@ -151,10 +150,7 @@ path (ignored on the distribution path).</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>This is the modernised successor to the original <code>frequentist_bayesian_plot()</code>
-gist, which built on <code>brms::mcmc_plot()</code> to show the full Bayesian posterior
-with the frequentist estimate overlaid. That namesake behaviour is restored
-here: when <code>bayesian</code> carries posterior <em>draws</em> (a <code>brms</code>/<code>rstanarm</code> fit, a
+    <p>When <code>bayesian</code> carries posterior <em>draws</em> (a <code>brms</code>/<code>rstanarm</code> fit, a
 <code>posterior</code> draws object, a draws matrix, or a long/wide draws data frame),
 the full posterior <em>distribution</em> is drawn per term (a 'ggdist' half-eye)
 and the frequentist point and confidence interval is overlaid at the same

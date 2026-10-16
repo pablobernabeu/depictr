@@ -110,8 +110,9 @@ Details).</p></dd>
 <dt id="arg-style">style<a class="anchor" aria-label="anchor" href="#arg-style"></a></dt>
 <dd><p>One of <code>"halfeye"</code> (density slab + interval, the default),
 <code>"interval"</code> (point and two nested intervals, no slab), <code>"gradient"</code> (a
-colour-graded interval) or <code>"dots"</code> (a quantile dotplot). Unknown values
-and a missing 'ggdist' fall back to <code>"interval"</code>.</p></dd>
+colour-graded interval) or <code>"dots"</code> (a quantile dotplot). Any other value
+is an error. When 'ggdist' is missing, every style falls back to
+<code>"interval"</code>.</p></dd>
 
 
 <dt id="arg-point">point<a class="anchor" aria-label="anchor" href="#arg-point"></a></dt>

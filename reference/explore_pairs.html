@@ -85,8 +85,8 @@ Built with 'patchwork', so it shares the package theme and palette.</p>
 
 <dt id="arg-cols">cols<a class="anchor" aria-label="anchor" href="#arg-cols"></a></dt>
 <dd><p>Numeric columns to include, which cannot include <code>group</code>. If
-<code>NULL</code>, every numeric column other than <code>group</code> is used (up to
-<code>max_cols</code>).</p></dd>
+<code>NULL</code>, every numeric column other than <code>group</code> is used, so a frame with
+more than <code>max_cols</code> of them needs <code>cols</code> to choose among them.</p></dd>
 
 
 <dt id="arg-group">group<a class="anchor" aria-label="anchor" href="#arg-group"></a></dt>
@@ -98,8 +98,9 @@ rows are left out of the plot and its palette.</p></dd>
 
 
 <dt id="arg-max-cols">max_cols<a class="anchor" aria-label="anchor" href="#arg-max-cols"></a></dt>
-<dd><p>Safety cap on the number of variables (a k-by-k matrix grows
-quickly).</p></dd>
+<dd><p>The largest number of variables accepted, since a k-by-k
+matrix grows quickly. More columns than this is an error, so the matrix
+never leaves a variable out without saying so.</p></dd>
 
 
 <dt id="arg-point-alpha">point_alpha<a class="anchor" aria-label="anchor" href="#arg-point-alpha"></a></dt>

@@ -55,7 +55,7 @@ frequentist_bayesian_plot(
   [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md).
   On both paths, an unnamed `labels` vector takes the frequentist terms
   first, then any that only the Bayesian input holds. `intercept`
-  defaults to `TRUE` here, matching the original behaviour.
+  defaults to `TRUE` here.
 
 - facet, scales:
 
@@ -97,16 +97,12 @@ object.
 
 ## Details
 
-This is the modernised successor to the original
-`frequentist_bayesian_plot()` gist, which built on `brms::mcmc_plot()`
-to show the full Bayesian posterior with the frequentist estimate
-overlaid. That namesake behaviour is restored here: when `bayesian`
-carries posterior *draws* (a `brms`/`rstanarm` fit, a `posterior` draws
-object, a draws matrix, or a long/wide draws data frame), the full
-posterior *distribution* is drawn per term (a 'ggdist' half-eye) and the
-frequentist point and confidence interval is overlaid at the same
-position. When `bayesian` is only a table of posterior *summaries*, the
-function shows the familiar two-source forest plot via
+When `bayesian` carries posterior *draws* (a `brms`/`rstanarm` fit, a
+`posterior` draws object, a draws matrix, or a long/wide draws data
+frame), the full posterior *distribution* is drawn per term (a 'ggdist'
+half-eye) and the frequentist point and confidence interval is overlaid
+at the same position. When `bayesian` is only a table of posterior
+*summaries*, the function shows the familiar two-source forest plot via
 [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md).
 It reads tidy columns (`term`, `estimate`, `conf.low`, `conf.high`), the
 `Estimate`, `Q2.5` and `Q97.5` of the matrix `brms::fixef()` returns,

@@ -76,10 +76,8 @@ Choosing `k` should not be guesswork.
 [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
 evaluates a cluster-quality criterion across a range of `k` and suggests
 a value, using the average silhouette width (the default, after
-Rousseeuw, 1987), the within-sum-of-squares elbow or the gap statistic
-(Tibshirani, Walther & Hastie, 2001). See
-[`?k_diagnostic`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
-for the references.
+[Rousseeuw, 1987](#ref-rousseeuw1987)), the within-sum-of-squares elbow
+or the gap statistic ([Tibshirani et al., 2001](#ref-tibshirani2001)).
 
 ``` r
 
@@ -231,3 +229,13 @@ Kaplan, E. L., & Meier, P. (1958). Nonparametric estimation from
 incomplete observations. *Journal of the American Statistical
 Association*, *53*(282), 457–481.
 <https://doi.org/10.1080/01621459.1958.10501452>
+
+Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the
+interpretation and validation of cluster analysis. *Journal of
+Computational and Applied Mathematics*, *20*, 53–65.
+<https://doi.org/10.1016/0377-0427(87)90125-7>
+
+Tibshirani, R., Walther, G., & Hastie, T. (2001). Estimating the number
+of clusters in a data set via the gap statistic. *Journal of the Royal
+Statistical Society: Series B (Statistical Methodology)*, *63*(2),
+411–423. <https://doi.org/10.1111/1467-9868.00293>

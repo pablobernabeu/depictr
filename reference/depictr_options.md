@@ -9,9 +9,12 @@ options are honoured by
 [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
 and the
 [`scale_colour_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md)
-family (an optional custom qualitative palette), and by the colour
-accessors `depictr_brand()`, `depictr_accent()` and
-`depictr_reference()`.
+family (an optional custom qualitative palette), and by every plotting
+function that draws a single series, a highlighted element or a
+reference line. Those functions list `depictr_brand()`,
+`depictr_accent()` or `depictr_reference()` as the default of a colour
+argument. The three are internal and are not called directly: each reads
+its option when the plotting function runs, so the colours are set here.
 
 ## Usage
 
@@ -43,17 +46,16 @@ depictr_options(
 
   The depictr brand colour, used for plot titles and single-series
   geoms. It coincides with the default palette's first colour but does
-  not alter a palette; use `palette` for that. Returned by
-  `depictr_brand()`.
+  not alter a palette; use `palette` for that.
 
 - accent:
 
-  A secondary highlight colour. Returned by `depictr_accent()`.
+  A secondary highlight colour, for the one element a figure draws
+  attention to.
 
 - reference:
 
-  The colour used for reference / annotation lines. Returned by
-  `depictr_reference()`.
+  The colour used for reference / annotation lines.
 
 - palette:
 

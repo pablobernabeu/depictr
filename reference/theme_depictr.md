@@ -39,8 +39,9 @@ The default `base_size` and `base_family` come from the global options
 `depictr.base_size` and `depictr.base_family` (see
 [`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md)),
 so the package-wide font size can be set once; passing the arguments
-explicitly overrides them. The title colour is the resolved
-`depictr_brand()`, which in turn honours `options(depictr.brand = )`.
+explicitly overrides them. The title is drawn in the brand colour, the
+one `options(depictr.brand = )` sets and the other functions'
+`depictr_brand()` defaults stand for.
 
 ## Examples
 

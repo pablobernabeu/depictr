@@ -63,8 +63,8 @@ group_comparison_plot(
   difference(s) against a reference group, each with a bootstrap
   confidence interval, turning the plot into a full estimation plot via
   [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md).
-  The return value is then a 'patchwork' object. Defaults to `FALSE`
-  (the plain group-means plot, fully backward-compatible).
+  The return value is then a 'patchwork' object. Defaults to `FALSE`,
+  the plain group-means plot.
 
 - reference:
 

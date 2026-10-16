@@ -30,7 +30,8 @@ explore_pairs(
 - cols:
 
   Numeric columns to include, which cannot include `group`. If `NULL`,
-  every numeric column other than `group` is used (up to `max_cols`).
+  every numeric column other than `group` is used, so a frame with more
+  than `max_cols` of them needs `cols` to choose among them.
 
 - group:
 
@@ -42,7 +43,9 @@ explore_pairs(
 
 - max_cols:
 
-  Safety cap on the number of variables (a k-by-k matrix grows quickly).
+  The largest number of variables accepted, since a k-by-k matrix grows
+  quickly. More columns than this is an error, so the matrix never
+  leaves a variable out without saying so.
 
 - point_alpha:
 

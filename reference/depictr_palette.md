@@ -21,13 +21,16 @@ depictr_palette(
 
 - n:
 
-  Number of colours to return. If `NULL` (the default) the full
-  qualitative palette is returned. For the qualitative palette an `n`
-  larger than the available base colours is interpolated; the sequential
-  and diverging palettes are ramps and accept any `n`. Interpolating the
-  built-in qualitative palette beyond its eight base colours loses the
-  colour-vision-deficiency guarantee and warns, so facet the groups or
-  use the sequential ramp when many groups are needed.
+  Number of colours to return. If `NULL` (the default), the qualitative
+  palette returns all of its base colours, the eight Okabe-Ito colours
+  unless `options(depictr.palette = )` supplies another set, and the
+  sequential and diverging ramps return seven. For the qualitative
+  palette an `n` larger than the available base colours is interpolated;
+  the sequential and diverging palettes are ramps and accept any `n`.
+  Interpolating the built-in qualitative palette beyond its eight base
+  colours loses the colour-vision-deficiency guarantee and warns, so
+  facet the groups or use the sequential ramp when many groups are
+  needed.
 
 - type:
 

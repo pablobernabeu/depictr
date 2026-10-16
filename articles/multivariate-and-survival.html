@@ -140,10 +140,9 @@ can cut it into <code>k</code> groups.</p>
 <p>Choosing <code>k</code> should not be guesswork.
 <code><a href="../reference/k_diagnostic.html">k_diagnostic()</a></code> evaluates a cluster-quality criterion across
 a range of <code>k</code> and suggests a value, using the average
-silhouette width (the default, after Rousseeuw, 1987), the
-within-sum-of-squares elbow or the gap statistic (Tibshirani, Walther
-&amp; Hastie, 2001). See <code><a href="../reference/k_diagnostic.html">?k_diagnostic</a></code> for the
-references.</p>
+silhouette width <span class="citation">(the default, after <a href="#ref-rousseeuw1987">Rousseeuw, 1987</a>)</span>, the
+within-sum-of-squares elbow or the gap statistic <span class="citation">(<a href="#ref-tibshirani2001">Tibshirani et al.,
+2001</a>)</span>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">kd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/k_diagnostic.html">k_diagnostic</a></span><span class="op">(</span><span class="va">crop_yield</span>, k_range <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">6</span>, cols <span class="op">=</span> <span class="va">num</span>,</span>
 <span>                   method <span class="op">=</span> <span class="st">"silhouette"</span><span class="op">)</span></span>
@@ -285,6 +284,17 @@ pp. 1–26). His Majesty’s Stationery Office.
 Kaplan, E. L., &amp; Meier, P. (1958). Nonparametric estimation from
 incomplete observations. <em>Journal of the American Statistical
 Association</em>, <em>53</em>(282), 457–481. <a href="https://doi.org/10.1080/01621459.1958.10501452" class="external-link">https://doi.org/10.1080/01621459.1958.10501452</a>
+</div>
+<div id="ref-rousseeuw1987" class="csl-entry">
+Rousseeuw, P. J. (1987). Silhouettes: <span>A</span> graphical aid to
+the interpretation and validation of cluster analysis. <em>Journal of
+Computational and Applied Mathematics</em>, <em>20</em>, 53–65. <a href="https://doi.org/10.1016/0377-0427(87)90125-7" class="external-link">https://doi.org/10.1016/0377-0427(87)90125-7</a>
+</div>
+<div id="ref-tibshirani2001" class="csl-entry">
+Tibshirani, R., Walther, G., &amp; Hastie, T. (2001). Estimating the
+number of clusters in a data set via the gap statistic. <em>Journal of
+the Royal Statistical Society: Series B (Statistical Methodology)</em>,
+<em>63</em>(2), 411–423. <a href="https://doi.org/10.1111/1467-9868.00293" class="external-link">https://doi.org/10.1111/1467-9868.00293</a>
 </div>
 </div>
 </div>

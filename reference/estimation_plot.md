@@ -122,23 +122,27 @@ interval; a warning is issued in both cases.
 
 ## References
 
-Cumming, G. (2012). *Understanding the new statistics: Effect sizes,
-confidence intervals, and meta-analysis*. Routledge.
+Cumming G (2012). *Understanding the new statistics: Effect sizes,
+confidence intervals, and meta-analysis*. Routledge, New York, NY. ISBN
+978-0-415-87968-2.
 
-Gardner, M. J., & Altman, D. G. (1986). Confidence intervals rather than
-P values: Estimation rather than hypothesis testing. *BMJ*, 292(6522),
-746-750.
+Gardner MJ, Altman DG (1986). “Confidence intervals rather than P
+values: Estimation rather than hypothesis testing.” *BMJ*,
+**292**(6522), 746–750.
 [doi:10.1136/bmj.292.6522.746](https://doi.org/10.1136/bmj.292.6522.746)
+.
 
-Hedges, L. V. (1981). Distribution theory for Glass's estimator of
-effect size and related estimators. *Journal of Educational Statistics*,
-6(2), 107-128.
+Hedges LV (1981). “Distribution theory for Glass's estimator of effect
+size and related estimators.” *Journal of Educational Statistics*,
+**6**(2), 107–128.
 [doi:10.3102/10769986006002107](https://doi.org/10.3102/10769986006002107)
+.
 
-Ho, J., Tumkaya, T., Aryal, S., Choi, H., & Claridge-Chang, A. (2019).
-Moving beyond P values: Data analysis with estimation graphics. *Nature
-Methods*, 16(7), 565-566.
+Ho J, Tumkaya T, Aryal S, Choi H, Claridge-Chang A (2019). “Moving
+beyond P values: Data analysis with estimation graphics.” *Nature
+Methods*, **16**(7), 565–566.
 [doi:10.1038/s41592-019-0470-3](https://doi.org/10.1038/s41592-019-0470-3)
+.
 
 ## Examples
 
