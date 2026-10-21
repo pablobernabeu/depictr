@@ -10,9 +10,11 @@
 #' Each fixed effect occupies its own panel, with its own y-axis. The function
 #' also accepts a plain data frame, so it can be used without 'lme4'.
 #'
-#' @param x Either the object returned by [lme4::allFit()], or a data frame with
-#'   one row per optimiser-by-term combination (columns such as `optimizer`,
-#'   `term` and `value`/`estimate`).
+#' @param x The object returned by [lme4::allFit()], its `summary()` or a data
+#'   frame with one row per optimiser-by-term combination: an optimiser column
+#'   (`optimizer`, `Optimizer` or `optimiser`), a term column (`term`,
+#'   `fixed_effect`, `parameter` or `Var2`) and a value column (`value`,
+#'   `estimate` or `Estimate`).
 #' @param intercept Whether to keep the intercept panel. Defaults to `TRUE`.
 #' @param select_terms Optional character vector of terms to display (the
 #'   intercept is always kept when `intercept = TRUE`).
@@ -234,9 +236,11 @@ facet_y_limits <- function(df) {
 
 #' Format fixed-effect axis breaks so repeated labels stay distinct
 #'
-#' Chooses the number of significant digits from the spread of the breaks, so a
-#' tight cluster of nearly-equal values still gets distinguishable tick labels
-#' instead of the same rounded number repeated down the axis.
+#' Chooses the number of decimal places from the spread (range) of the finite
+#' breaks, `ceiling(-log10(spread)) + 2` kept between zero and eight, so a tight
+#' cluster of nearly-equal values still gets distinguishable tick labels instead
+#' of the same rounded number repeated down the axis. Breaks with no spread get
+#' four significant digits.
 #' @noRd
 format_fixef_breaks <- function(breaks) {
   b <- breaks[is.finite(breaks)]

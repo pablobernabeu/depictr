@@ -129,16 +129,21 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
 #' Computes a cluster-quality diagnostic across a range of `k` and draws the
 #' diagnostic curve, with the suggested `k` highlighted. Three criteria are
 #' available: the average silhouette width (maximised), the total within-cluster
-#' sum of squares "elbow" (the point of maximum curvature), and the gap statistic
-#' (the smallest `k` whose gap is within one standard error of the next, using
-#' the Tibshirani et al. heuristic).
+#' sum of squares "elbow" (the candidate farthest from the straight line joining
+#' the first and last points of the curve), and the gap statistic (the smallest
+#' `k` whose gap is within one standard error of the next, using the Tibshirani
+#' et al. heuristic).
 #'
 #' Only the gap statistic can conclude that the data hold no clusters, by
 #' suggesting `k = 1`, and only when the search starts at 1, as it does by
-#' default. The elbow is the candidate farthest from the straight line joining
-#' the first and last points of the curve, so it is never the first or last
-#' candidate. A range therefore has to extend one step beyond any `k` the elbow
-#' should be able to choose.
+#' default. Both ends of the curve lie on the line the elbow is measured from,
+#' so among three or more candidates the elbow is never the last, and it is the
+#' first only when the curve is a straight line. A range therefore has to
+#' extend one step beyond any `k` the elbow should be able to choose.
+#'
+#' The k-means fits take random starts, and the gap statistic draws `B` uniform
+#' reference data sets, all from the session's random-number stream, so call
+#' `set.seed()` first for a reproducible suggestion.
 #'
 #' @param data A data frame or numeric matrix.
 #' @param k_range Integer vector of candidate cluster counts to evaluate. The
@@ -437,9 +442,10 @@ base_silhouette <- function(clusters, dist) {
 #' Pick the elbow of a within-SS curve by maximum distance to the chord
 #'
 #' Connects the first and last (k, wss) points with a straight line and returns
-#' the k whose point is farthest below that chord, a common, parameter-free
-#' "elbow" heuristic (the Kneedle idea). Both endpoints lie on the chord, so
-#' with three or more candidates neither can be returned.
+#' the k whose point is farthest from that chord, on either side, a common,
+#' parameter-free "elbow" heuristic (the Kneedle idea). Both endpoints lie on
+#' the chord, so with three or more candidates neither can be returned unless
+#' every point lies on the chord, when the first is.
 #' @noRd
 elbow_k <- function(k, wss) {
   if (length(k) < 3) return(k[which.max(-diff(c(wss, wss[length(wss)])))])

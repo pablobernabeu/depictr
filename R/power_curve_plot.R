@@ -332,9 +332,8 @@ pick_col <- function(df, cands) {
 #'
 #' 'simr' stores the title as e.g. `"Power for predictor 'word_frequency'"`,
 #' where the predictor name is wrapped in single quotes (or back-ticks when it
-#' is a non-syntactic name). The previous regex left the leading quote behind,
-#' so the title rendered as `'word_frequency`. This strips the boilerplate and
-#' any surrounding quoting on both sides.
+#' is a non-syntactic name). This strips the boilerplate and any surrounding
+#' quoting on both sides, so the title does not render as `'word_frequency`.
 #' @noRd
 clean_predictor_name <- function(text) {
   if (is.null(text) || !length(text)) return(NULL)

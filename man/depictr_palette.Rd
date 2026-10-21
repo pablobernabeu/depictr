@@ -68,14 +68,14 @@ together.
 then pass every colour row, contrast against white included. They stay at
 least 14.01 apart in CIEDE2000 under every vision type, 6.86 apart in
 lightness and 3.06:1 against white. Four groups keep 3:1 against white, but
-the bluish green and the vermillion are 3.31 apart in lightness, which fails
-\code{greyscale_separability}. Asking for more than four colours warns, since the
-fifth, the orange, falls below 3:1.
+the bluish green and the reddish purple are 3.31 apart in lightness, which
+fails \code{greyscale_separability}. Asking for more than four colours warns,
+since the fifth, the orange, falls below 3:1.
 
 Under this order, the second group is drawn in the vermillion. That is also
 the accent (\code{\link[=depictr_options]{depictr_options()}}) that depictr uses for single highlights,
 such as the flagged points of \code{\link[=outlier_plot]{outlier_plot()}} and the missing cells of
-\code{\link[=missingness_map]{missingness_map()}}. The default order is unchanged.
+\code{\link[=missingness_map]{missingness_map()}}.
 
 The order applies to the built-in palette alone. A palette set with
 \code{depictr_options(palette = )} is the user's own, so it is returned in the

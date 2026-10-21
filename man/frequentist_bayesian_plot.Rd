@@ -81,6 +81,15 @@ It reads tidy columns (\code{term}, \code{estimate}, \code{conf.low}, \code{conf
 \code{Estimate}, \code{Q2.5} and \code{Q97.5} of the matrix \code{brms::fixef()} returns, and the
 \verb{l-95\% CI} and \verb{u-95\% CI} of \code{summary(fit)$fixed}.
 
+A data frame counts as draws when it holds a sampler index column (\code{.chain},
+\code{.iteration} or \code{.draw}), when it is long, with a parameter column
+(\code{parameter}, \code{term}, \code{.variable} or \code{variable}) and a value column
+(\code{value}, \code{.value} or \code{draw}) but no summary column such as \code{estimate} or
+\code{conf.low}, or when it is wide, with at least 50 rows and no summary column.
+Any other data frame is read as summaries. The half-eyes need the 'ggdist'
+package. Without it, each posterior is drawn as its median and \code{conf_level}
+interval, with a message.
+
 Terms are aligned by their canonical display label, so the \code{brms}-style \code{b_}
 prefix is reconciled automatically against the frequentist term names. Draws
 are read as in \code{\link[=posterior_plot]{posterior_plot()}}, so a draws object holding \code{b_} parameters

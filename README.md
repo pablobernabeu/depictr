@@ -171,7 +171,8 @@ depictr draws on a number of plotting and modelling packages, so scheduled
 GitHub Actions keep it healthy between releases. A daily job checks the package
 and its full test suite against both the current and the development versions of
 its dependencies, and a weekly job checks every URL in the documentation. On top
-of those, `R CMD check` runs on every push across Linux, macOS and Windows.
+of those, `R CMD check` runs across Linux, macOS and Windows on every push to
+`main` and on every pull request into it.
 
 ## Citation
 
@@ -189,7 +190,7 @@ single bibliography at [`inst/REFERENCES.bib`](https://github.com/pablobernabeu/
 ## Licence
 
 MIT (c) Pablo Bernabeu. See the
-[licence](https://github.com/pablobernabeu/depictr/blob/main/LICENSE).
+[licence](https://github.com/pablobernabeu/depictr/blob/main/LICENSE.md).
 
 ## Contributing
 

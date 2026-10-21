@@ -52,17 +52,22 @@ with one row per \code{k}), \code{attr(p, "suggested")} (the chosen \code{k}) an
 Computes a cluster-quality diagnostic across a range of \code{k} and draws the
 diagnostic curve, with the suggested \code{k} highlighted. Three criteria are
 available: the average silhouette width (maximised), the total within-cluster
-sum of squares "elbow" (the point of maximum curvature), and the gap statistic
-(the smallest \code{k} whose gap is within one standard error of the next, using
-the Tibshirani et al. heuristic).
+sum of squares "elbow" (the candidate farthest from the straight line joining
+the first and last points of the curve), and the gap statistic (the smallest
+\code{k} whose gap is within one standard error of the next, using the Tibshirani
+et al. heuristic).
 }
 \details{
 Only the gap statistic can conclude that the data hold no clusters, by
 suggesting \code{k = 1}, and only when the search starts at 1, as it does by
-default. The elbow is the candidate farthest from the straight line joining
-the first and last points of the curve, so it is never the first or last
-candidate. A range therefore has to extend one step beyond any \code{k} the elbow
-should be able to choose.
+default. Both ends of the curve lie on the line the elbow is measured from,
+so among three or more candidates the elbow is never the last, and it is the
+first only when the curve is a straight line. A range therefore has to
+extend one step beyond any \code{k} the elbow should be able to choose.
+
+The k-means fits take random starts, and the gap statistic draws \code{B} uniform
+reference data sets, all from the session's random-number stream, so call
+\code{set.seed()} first for a reproducible suggestion.
 }
 \examples{
 p <- k_diagnostic(crop_yield, k_range = 2:6,

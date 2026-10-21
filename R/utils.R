@@ -60,10 +60,10 @@ check_columns <- function(data, cols, arg = "data") {
 #' Refuse a confidence level outside (0, 1)
 #'
 #' A level given as a percentage, such as 95, has no normal or t quantile, so
-#' the intervals came out NaN, and a level of 0 or 1 drew a zero-width or an
-#' unbounded interval. Every function that takes a `conf_level` calls this
-#' first, so that each refuses the same values with the same message, the one
-#' acf_plot() gave.
+#' the intervals would come out NaN, and a level of 0 or 1 would draw a
+#' zero-width or an unbounded interval. Every exported function that takes a
+#' `conf_level` calls this, so that each refuses the same values with the same
+#' message.
 #' @param conf_level The level to check.
 #' @param allow_na Whether a single `NA` is accepted, for the functions in
 #'   which it leaves the limits out.
@@ -184,7 +184,7 @@ prepare_group <- function(data, group, palette = NULL) {
 #' A named palette is the user's way to pin a colour to a level across figures,
 #' so it is kept as given. An unnamed one is taken in level order, as ggplot2's
 #' manual scale takes it, over the levels in use. One with fewer colours than
-#' there are levels is left for the manual scale to report, as before.
+#' there are levels is left for the manual scale to report.
 #' @param levels The levels of the group.
 #' @param palette The user's palette, or `NULL` for [depictr_palette()].
 #' @noRd

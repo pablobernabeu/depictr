@@ -530,9 +530,10 @@
   versions, and it is the DOI that the CRAN page and the citation R generates
   for a CRAN package already gave, so the package no longer circulates under
   two. Zenodo still archives every GitHub release, and `CITATION.cff` lists both
-  identifiers. The CRAN DOI and the Zenodo DOI are shown as full links on the
-  website and in the README, and the sidebar of the home page shows the CRAN DOI
-  once: the DOI badge in the README no longer appears there a second time.
+  identifiers. The CRAN DOI is shown as a full link in the README and on the
+  website, and the Zenodo concept DOI as one on the About page. The sidebar of
+  the home page shows the CRAN DOI once: the DOI badge in the README no longer
+  appears there a second time.
 
 * `citation("depictr")` and the About page name the package's publisher, in
   full: "Comprehensive R Archive Network (CRAN)" stands before the DOI in the
@@ -595,6 +596,66 @@
   `depictr_accent()` and `depictr_reference()` as accessors, but the package
   does not export them. The pages now describe the three colours by their use.
   Six pages also drop remarks about how a function used to behave.
+
+* More help pages described behaviour the code does not have.
+  `depictr_palette()` named the bluish green and the vermillion as the pair 3.31
+  apart in lightness among the first four colours of the contrast-first order,
+  where that pair is the bluish green and the reddish purple. The page of
+  `cluster_plot()` said that `seed = NULL` leaves the random-number state
+  untouched, while k-means then draws from it. A seed, when given, is used for
+  that call alone, and the caller's state is restored. `coefficient_plot()` said
+  that `interaction` is ignored whenever `labels` is supplied, but it still
+  formats every term that a named vector leaves out. `missingness_map()` said
+  that its missing-cell colour comes from `depictr_palette()`, where it is the
+  accent set with `depictr_options()`. `k_diagnostic()` described its elbow as
+  the point of maximum curvature, as well as the point farthest from the chord,
+  which is the one it picks. `dumbbell_plot()` said that the default sort puts
+  the shortest dumbbell at the top, which holds only when every difference is
+  negative. `survival_plot()` said that `survival::survdiff()` computes the
+  log-rank test whenever 'survival' is installed, but a `survfit` object always
+  takes the base-R test. The example of `vif_plot()` that was to show a
+  generalised VIF used a two-level factor, which has an ordinary one, and now
+  uses a four-level factor. `binned_residual_plot()`, `palette_safety()`,
+  `check_figure()` and `depictr_palette()` also drop remarks about earlier
+  versions.
+
+* Other help pages left out what a user needs. `tidy_estimates()` now lists the
+  columns it reads from a data frame and says that missing limits are filled in
+  as z intervals at `conf_level`, which `coefficient_plot()` passes on for a
+  data frame too. `posterior_plot()` names the columns that make a data frame
+  long, and `frequentist_bayesian_plot()` says when a data frame counts as draws
+  and what it draws without 'ggdist'. `optimizer_fixef_plot()` accepts the
+  `summary()` of an `lme4::allFit()` object, as its page now says.
+  `estimation_plot()` names the columns of its `"differences"` attribute,
+  `roc_curve_plot()` documents its `"auc_ci"` and `"youden"` attributes and
+  `pr_curve_plot()` its `"max_f1"`. `model_fit_table()` says that `df` counts
+  the estimated parameters and which residuals `RMSE` is computed from.
+  `random_effects_plot()` says that it leaves the level names off the axis when
+  there are more than 30, and how to bring them back.
+  `palette_preview(type = "all")` says that it draws no hex labels,
+  `simulate_cvd()` that it drops alpha and `group_comparison_plot()` that
+  `x_lab` is not drawn with `differences = TRUE`. `k_diagnostic()` and the
+  bootstrap band of `roc_curve_plot()` draw from the session's random-number
+  stream, and their pages now say to call `set.seed()` first.
+
+* Two more help pages, three vignettes and the README described behaviour the
+  code does not have. `vignette("exploring-data")` said that column names can be
+  given quoted or unquoted, but `summary_table()` takes its `vars` and `group`
+  as strings, as its page now says, and an argument that names several columns,
+  such as `cols`, takes a character vector. The vignette also said that the
+  model-estimate plots take `standardise`, which only `coefficient_plot()` does,
+  and that every depictr function returns a ggplot, which holds only for the
+  plotting functions. `threshold_plot()` and
+  `vignette("diagnostics-and-uncertainty")` said that the maximum-F1 threshold
+  is marked with a dashed line, where it is dotted, and the vignette said that
+  power stays at 99% beyond 24 participants, while it is 98% at 60.
+  `vignette("multivariate-and-survival")` promised a median guide for each arm
+  and called the treatment arm's median clearly longer, but that arm's curve
+  stays above 0.5, so its median is not reached and it gets no guide. The
+  vignette now attributes the silhouette bands to Kaufman and Rousseeuw (1990),
+  which it cites, rather than to Rousseeuw alone. The README said that
+  `R CMD check` runs on every push, where it runs on pushes to `main` and on
+  pull requests into it.
 
 ## Changed defaults
 
@@ -704,7 +765,8 @@
   `coefficient_plot()`, `compare_models()`, `frequentist_bayesian_plot()` and
   `model_report()` change with it, and so do the bands of `effects_plot()`
   and `interaction_plot()`. In the Python twin the intervals follow the
-  fitted result's `use_t`, which gives the same t intervals.
+  fitted result's `use_t`. A GLM whose dispersion is estimated gets the same t
+  intervals when it is fitted with `use_t=True`, and z intervals by default.
 
 * The coefficient of a two-level factor is now labelled with its level,
   `treatment: enhanced`, as the coefficients of factors with more levels

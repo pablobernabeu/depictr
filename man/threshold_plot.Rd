@@ -23,9 +23,9 @@ probabilities.}
 \code{"specificity"}, \code{"precision"} and \code{"f1"}. (\code{"recall"} is accepted as an
 alias for \code{"sensitivity"}.)}
 
-\item{mark}{Which optimal operating points to mark with a dashed vertical
-line: any subset of \code{"youden"} (max sensitivity + specificity - 1) and
-\code{"f1"} (max F1). Use \code{character(0)} or \code{NULL} to mark none.}
+\item{mark}{Which optimal operating points to mark with a vertical line: any
+subset of \code{"youden"} (max sensitivity + specificity - 1), drawn dashed, and
+\code{"f1"} (max F1), drawn dotted. Use \code{character(0)} or \code{NULL} to mark none.}
 
 \item{title}{Plot title.}
 }

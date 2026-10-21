@@ -17,6 +17,15 @@
 #' `Estimate`, `Q2.5` and `Q97.5` of the matrix `brms::fixef()` returns, and the
 #' `l-95% CI` and `u-95% CI` of `summary(fit)$fixed`.
 #'
+#' A data frame counts as draws when it holds a sampler index column (`.chain`,
+#' `.iteration` or `.draw`), when it is long, with a parameter column
+#' (`parameter`, `term`, `.variable` or `variable`) and a value column
+#' (`value`, `.value` or `draw`) but no summary column such as `estimate` or
+#' `conf.low`, or when it is wide, with at least 50 rows and no summary column.
+#' Any other data frame is read as summaries. The half-eyes need the 'ggdist'
+#' package. Without it, each posterior is drawn as its median and `conf_level`
+#' interval, with a message.
+#'
 #' Terms are aligned by their canonical display label, so the `brms`-style `b_`
 #' prefix is reconciled automatically against the frequentist term names. Draws
 #' are read as in [posterior_plot()], so a draws object holding `b_` parameters
@@ -186,8 +195,8 @@ frequentist_bayesian_plot <- function(frequentist,
 #' frequentist estimate and confidence interval at the same y position, the
 #' half-eyes in orange and the overlay in brand blue. Terms are matched by
 #' canonical label so `b_`-prefixed Bayesian names line up with the frequentist
-#' ones, and only the matched terms are drawn. Falls back to point + interval
-#' slabs when 'ggdist' is unavailable.
+#' ones, and only the matched terms are drawn. When 'ggdist' is unavailable,
+#' each posterior is drawn as its median and one `conf_level` interval instead.
 #' @noRd
 fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
                              interaction, intercept, freq_label, bayes_label,
@@ -210,9 +219,11 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
   freq <- tidy_estimates(frequentist, conf_level = conf_level)
 
   # An unnamed `labels` vector is read as compare_models() reads it on the
-  # summary path: one label per term drawn, the frequentist terms first, after
-  # the intercept rule. The draws hold one row per sample, so the vector is
-  # keyed by term name before either side is labelled.
+  # summary path: one label per distinct default label, the frequentist terms
+  # first, after the intercept rule. Terms that only one side holds, such as a
+  # posterior's sigma, are counted too, although they are dropped below. The
+  # draws hold one row per sample, so the vector is keyed by term name before
+  # either side is labelled.
   if (!is.null(labels) && is.null(names(labels))) {
     term_names <- unique(c(freq$term, draws$term))
     is_intercept <- term_names %in% c("(Intercept)", "Intercept", "b_Intercept")
@@ -223,7 +234,7 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
                                  !intercept && any(is_intercept))
   }
   # Each Bayesian term is labelled once and its draws take the label by
-  # match(), since labelling every draw took seconds.
+  # match(), since labelling every draw would be slow.
   b_params <- unique(draws$term)
   draws$label <- make_labels(b_params, labels, interaction)[
     match(draws$term, b_params)
@@ -365,8 +376,8 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
                   caption = caption) +
     theme_depictr(grid = "x")
 
-  # Free-scaled, one-term-per-row layout (the flagship default): a large
-  # intercept no longer squishes the slopes. The reference line is drawn only in
+  # Free-scaled, one-term-per-row layout (the default), so a large intercept
+  # does not squish the slopes. The reference line is drawn only in
   # panels whose span (the posterior's conf_level interval unioned with the
   # frequentist CI) brackets it, so a far-from-zero panel is not stretched back
   # to the line.
@@ -421,7 +432,7 @@ fbp_distribution <- function(frequentist, bayesian, conf_level, labels,
 #' `NULL` asks for the automatic caption, one sentence per source, and `NA`
 #' omits it. Anything else is used as given. Each sentence takes a line of its
 #' own: ggplot2 does not wrap a caption, and on one line the posterior's
-#' sentence ran past the left edge of a figure seven inches wide.
+#' sentence runs past the left edge of a figure seven inches wide.
 #' @noRd
 fbp_caption <- function(caption, frequentist_text, bayesian_text) {
   if (is.null(caption)) {

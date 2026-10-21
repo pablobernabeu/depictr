@@ -25,10 +25,11 @@
 #' @param point_size Size of the end points.
 #' @param palette Length-2 colours for the two groups; defaults to
 #'   [depictr_palette()].
-#' @param legend_inside When `TRUE`, draw the two-group legend inside the panel
-#'   (in the top-right corner, which the default gap sort with the shortest
-#'   dumbbell on top usually leaves clear) over a translucent background,
-#'   instead of in a right-hand margin. Defaults to `FALSE`.
+#' @param legend_inside When `TRUE`, draw the two-group legend inside the
+#'   panel, in the top-right corner, over a translucent background, instead of
+#'   in a right-hand margin. Check that it covers no dumbbell: the default gap
+#'   sort puts the category with the largest signed difference (the second
+#'   level of `group` minus the first) at the top. Defaults to `FALSE`.
 #' @param title,x_lab,y_lab Plot title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -109,9 +110,8 @@ dumbbell_plot <- function(data, category, value, group,
     ggplot2::labs(x = x_lab %||% value, y = y_lab %||% category,
                   title = title) +
     theme_depictr(grid = "x")
-  # With the default gap sort the shortest dumbbell sits at the top, so the
-  # top-right corner is usually clear: when asked, place the two-group legend
-  # there over a semi-transparent background instead of in a right-hand margin.
+  # When asked, place the two-group legend in the top-right corner over a
+  # semi-transparent background instead of in a right-hand margin.
   if (legend_inside) p <- p + legend_inside_theme(c(0.98, 0.98), c(1, 1))
   p
 }

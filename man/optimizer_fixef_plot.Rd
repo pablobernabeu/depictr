@@ -20,9 +20,11 @@ optimizer_fixef_plot(
 )
 }
 \arguments{
-\item{x}{Either the object returned by \code{\link[lme4:allFit]{lme4::allFit()}}, or a data frame with
-one row per optimiser-by-term combination (columns such as \code{optimizer},
-\code{term} and \code{value}/\code{estimate}).}
+\item{x}{The object returned by \code{\link[lme4:allFit]{lme4::allFit()}}, its \code{summary()} or a data
+frame with one row per optimiser-by-term combination: an optimiser column
+(\code{optimizer}, \code{Optimizer} or \code{optimiser}), a term column (\code{term},
+\code{fixed_effect}, \code{parameter} or \code{Var2}) and a value column (\code{value},
+\code{estimate} or \code{Estimate}).}
 
 \item{intercept}{Whether to keep the intercept panel. Defaults to \code{TRUE}.}
 

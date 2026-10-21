@@ -63,7 +63,11 @@ suggest a single cluster.}
 \item{title}{Plot title.}
 
 \item{seed}{Optional integer seed for reproducible k-means (ignored when
-\code{clusters} is supplied). Default \code{NULL} leaves the RNG state untouched.}
+\code{clusters} is supplied). It applies to this call alone, and the caller's
+random-number state is restored afterwards. The default, \code{NULL}, takes the
+random starts of \code{\link[stats:kmeans]{stats::kmeans()}}, and any random draws of a \code{suggest_k}
+diagnostic, from the session's random-number stream, so call \code{set.seed()}
+first for a reproducible result.}
 
 \item{nstart}{Number of random starts for \code{\link[stats:kmeans]{stats::kmeans()}}.}
 

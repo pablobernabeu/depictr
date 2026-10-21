@@ -40,10 +40,11 @@ categories first appear).}
 \item{palette}{Length-2 colours for the two groups; defaults to
 \code{\link[=depictr_palette]{depictr_palette()}}.}
 
-\item{legend_inside}{When \code{TRUE}, draw the two-group legend inside the panel
-(in the top-right corner, which the default gap sort with the shortest
-dumbbell on top usually leaves clear) over a translucent background,
-instead of in a right-hand margin. Defaults to \code{FALSE}.}
+\item{legend_inside}{When \code{TRUE}, draw the two-group legend inside the
+panel, in the top-right corner, over a translucent background, instead of
+in a right-hand margin. Check that it covers no dumbbell: the default gap
+sort puts the category with the largest signed difference (the second
+level of \code{group} minus the first) at the top. Defaults to \code{FALSE}.}
 
 \item{title, x_lab, y_lab}{Plot title and axis labels.}
 }

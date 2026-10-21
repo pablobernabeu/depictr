@@ -51,14 +51,14 @@
 #' then pass every colour row, contrast against white included. They stay at
 #' least 14.01 apart in CIEDE2000 under every vision type, 6.86 apart in
 #' lightness and 3.06:1 against white. Four groups keep 3:1 against white, but
-#' the bluish green and the vermillion are 3.31 apart in lightness, which fails
-#' `greyscale_separability`. Asking for more than four colours warns, since the
-#' fifth, the orange, falls below 3:1.
+#' the bluish green and the reddish purple are 3.31 apart in lightness, which
+#' fails `greyscale_separability`. Asking for more than four colours warns,
+#' since the fifth, the orange, falls below 3:1.
 #'
 #' Under this order, the second group is drawn in the vermillion. That is also
 #' the accent ([depictr_options()]) that depictr uses for single highlights,
 #' such as the flagged points of [outlier_plot()] and the missing cells of
-#' [missingness_map()]. The default order is unchanged.
+#' [missingness_map()].
 #'
 #' The order applies to the built-in palette alone. A palette set with
 #' `depictr_options(palette = )` is the user's own, so it is returned in the
@@ -311,7 +311,10 @@ theme_depictr <- function(base_size = depictr_opt("base_size"),
 #' gains chart (concave, above the diagonal), a lift chart (decays to the
 #' baseline on the right), an ECDF (saturates before the right edge), a survival
 #' curve (monotone-decreasing) or a unimodal density, over a semi-transparent
-#' background, so the figure needs no right-hand margin. `position` and
+#' background, so the figure needs no right-hand margin. A missingness map
+#' sorted most- to least-missing adds it in the top-right corner, over its most
+#' complete columns, and so does dumbbell_plot(), whose rows do not always
+#' leave that corner empty. `position` and
 #' `justification` are the ggplot2 `legend.position.inside` and
 #' `legend.justification` coordinates of the anchored corner (npc, 0-1).
 #' @noRd

@@ -2,34 +2,42 @@
 // Meridian — the shared documentation brand for Pablo Bernabeu's packages (depictr accent: blue + coral).
 //
 // An editorial, academic-press identity layered on top of pkgdown's Bootstrap 5
-// scaffolding: a deep-navy ink, a teal primary, a warm amber accent and a warm
+// scaffolding: a deep-navy ink, a blue primary, a coral accent and a warm
 // paper background, with a Spectral / Inter / JetBrains Mono type system. The
-// data-figure palette (viridis) is deliberately left alone.
+// figures take their colours from depictr's own palettes (see ?depictr_palette),
+// and this file touches those colours only to invert the README's gallery
+// figures in dark mode (the `figures/README-` rule below).
 //
 // This file is additive. It sets brand tokens as CSS custom properties, maps
 // them onto Bootstrap's own --bs-* variables so the existing components inherit
 // them, and restyles a few surfaces (navbar, hero, cards, footer). It does not
-// remove or rename any pkgdown structure. The twin mkdocs site carries the same
-// tokens in docs/stylesheets/brand.css.
+// remove or rename any pkgdown structure. The mkdocs twin, depictr-py's site,
+// carries the same tokens in its docs/stylesheets/brand.css.
 //
-// Per-package accent: override --brand-primary / --brand-primary-ink below (for
-// example depictr's blue) to retune the family without touching the layout.
+// Per-package accent: the token names are the family's (--brand-teal,
+// --brand-amber and their variants), but here they hold depictr's blue and
+// coral. Retuning for another package leaves the layout alone and changes the
+// accent, ink and border tokens in :root, the dark-mode surface block, the
+// --bs-link-color-rgb triples in both mode blocks, the rgba() literals that
+// restate a token (tints, borders and shadows), the syntax colours (function
+// calls, keywords and constants) and the bslib primary in _pkgdown.yml, which
+// sets Bootstrap's own --bs-primary.
 // ---------------------------------------------------------------------------
 
 :root {
-  // Core palette (sampled from the hex logos: navy ground, teal edge, warm accent)
+  // Core palette (after the hex logo: navy edge, blue face, coral accent)
   --brand-ink:          #0E2A44;  // deep navy — navbar, footer, dark ground
   --brand-ink-raised:   #15395B;  // raised navy surface
-  --brand-teal:         #1F6FA8;  // brand teal — borders, edges, dark-mode links
-  --brand-primary:      #005B96;  // accessible deep teal — links, buttons (light)
+  --brand-teal:         #1F6FA8;  // mid blue — rules, borders, scrollbars
+  --brand-primary:      #005B96;  // accessible deep blue — links, buttons (light)
   --brand-primary-ink:  #00456F;  // pressed
-  --brand-teal-light:   #6FB4E0;  // teal for dark backgrounds
-  --brand-amber:        #EF6C6C;  // warm accent — the App link, hover, rules
+  --brand-teal-light:   #6FB4E0;  // light blue for dark backgrounds
+  --brand-amber:        #EF6C6C;  // coral accent — the App link, reference-group markers, blockquote rule
   --brand-amber-light:  #F6928F;
-  --brand-amber-dark:   #B23A3A;  // AA-contrast amber for link hover on light paper
+  --brand-amber-dark:   #B23A3A;  // AA-contrast coral for link hover on light paper
   --brand-paper:        #FBFAF6;  // warm off-white page
   --brand-card:         #FFFFFF;
-  --brand-border:       #E4E6EA;  // warm hairline
+  --brand-border:       #E4E6EA;  // cool grey hairline
   --brand-body:         #1D2A32;  // ink body text
   --brand-muted:        #5A6771;
 
@@ -105,7 +113,7 @@ h2 {
 }
 h3 { font-size: 1.25rem; margin-top: 1.8rem; }
 
-// The parenthetical language tag in the hero title, e.g. "scopusflow (R)"
+// The parenthetical language tag in the hero title, e.g. "depictr (R)"
 .template-home .page-header h1 small,
 .template-home .page-header h1 .language-tag {
   font-family: var(--bs-body-font-family);
@@ -151,7 +159,7 @@ h3 { font-size: 1.25rem; margin-top: 1.8rem; }
 }
 
 // ---------------------------------------------------------------------------
-// Navbar — always the deep-navy ink band with a teal underline, in both modes
+// Navbar — always the deep-navy ink band with a blue underline, in both modes
 // ---------------------------------------------------------------------------
 .navbar {
   background-color: var(--brand-ink) !important;
@@ -169,7 +177,7 @@ h3 { font-size: 1.25rem; margin-top: 1.8rem; }
 .navbar .nav-link:focus,
 .navbar .nav-link.active { color: #fff; }
 
-// Accent the App link (it carries the fa-play icon) in warm amber
+// Accent the App link (it carries the fa-play icon) in coral
 .navbar .nav-item:has(.fa-play) .nav-link,
 .navbar .nav-link:has(.fa-play) {
   color: var(--brand-amber);
@@ -188,7 +196,7 @@ h3 { font-size: 1.25rem; margin-top: 1.8rem; }
 // The icons in the navbar — the App link's play triangle, the GitHub mark, the
 // light switch — take their colour from the link that carries them. Pinned to a
 // fixed white, as they were, each icon ignored every state its own label
-// answered: the play triangle stayed white beside an amber label, and neither
+// answered: the play triangle stayed white beside a coral label, and neither
 // the GitHub mark nor the light switch brightened under the pointer or under
 // keyboard focus.
 .navbar .navbar-nav .nav-link .fa { color: inherit; }
@@ -206,17 +214,15 @@ h3 { font-size: 1.25rem; margin-top: 1.8rem; }
 }
 
 // The search box sits inside the navy band in both modes, so it is dressed for
-// that ground rather than left to Bootstrap's form colours. Setting only its
-// text colour, as this file used to, left the field on `.form-control`'s own
-// ground, and that ground follows the page: navy in dark mode but warm paper in
-// light. In light mode the result was white text on near-white paper, about
-// 1.03:1, so the grey placeholder showed but whatever you typed was invisible.
-// Ground, border, placeholder, focus ring and the browser's own clear button
-// are now set together, so the field reads the same either way.
+// that ground rather than left to Bootstrap's form colours. `.form-control`'s
+// own ground follows the page, navy in dark mode but warm paper in light, so
+// white text set on its own would vanish on the light ground. Ground, border,
+// placeholder, focus ring and the browser's own clear button are set together,
+// so the field reads the same either way.
 .navbar #search-input {
   background-color: rgba(255, 255, 255, .12);
   // .40 rather than a fainter hairline: composited over the navy band that
-  // lands at about 3.7:1, the ratio WCAG asks of the visible boundary of a
+  // lands at about 3.6:1, the ratio WCAG asks of the visible boundary of a
   // form control, whereas the field's own ground sits at only 1.5:1 against
   // the band and cannot carry the edge on its own.
   border-color: rgba(255, 255, 255, .40);
@@ -260,8 +266,8 @@ h3 { font-size: 1.25rem; margin-top: 1.8rem; }
 .navbar-nav .dropdown-menu { border-color: var(--bs-border-color); }
 // The released-version chip beside the wordmark carries Bootstrap's
 // `.text-muted`, whose grey is tuned for the paper page. The navbar is navy in
-// both modes, so in light mode the chip fell to 2.8:1 against it. The soft white
-// the search placeholder uses reads at 7:1 on this ground either way. The
+// both modes, so in light mode that grey would sit at 2.5:1 against it. The soft
+// white the search placeholder uses reads at 6.5:1 on this ground either way. The
 // `!important` answers Bootstrap's own, which the utility class carries.
 .navbar .nav-text,
 .navbar .text-muted { color: rgba(255, 255, 255, .62) !important; }
@@ -290,10 +296,9 @@ h3 { font-size: 1.25rem; margin-top: 1.8rem; }
 
 // The lead paragraph (first paragraph after the title) set larger and calmer,
 // which is how the mkdocs twin sets its tagline. pkgdown 2.x wraps the whole
-// README in a `div.section.level1`, so neither of the first two selectors
-// reaches that paragraph any more and the lead had quietly gone back to body
-// text; the third reaches through the wrapper. The first two are kept for the
-// older builds that put the paragraph directly in the column.
+// README in a `div.section.level1`, which only the third selector reaches
+// through. The first two serve builds that put the paragraph directly in the
+// column.
 .template-home main > .row > .col-md-9 > p:first-of-type,
 .template-home :is(.contents, main) > p:first-of-type,
 .template-home :is(.contents, main) > .section.level1 > p:first-of-type {
@@ -531,7 +536,7 @@ pre:not(.sourceCode) code,
 }
 
 // ---------------------------------------------------------------------------
-// Blockquotes / callouts (the Elsevier trademark disclaimer etc.)
+// Blockquotes / callouts (the citation on the About page, for example)
 // ---------------------------------------------------------------------------
 blockquote {
   border-left: 3px solid var(--brand-amber);
@@ -588,10 +593,10 @@ table.table caption {
   font-weight: 600;
   border-bottom: none;
 }
-// --brand-ink is the page itself on the dark theme, so the header band measured
-// 1.08:1 against it and vanished; with the bottom border switched off just above
-// there was then nothing at all between the column titles and the first row of
-// data. The raised navy gives the band back and the accent draws the boundary.
+// --brand-ink is close to the page itself on the dark theme (about 1.2:1), so
+// the header band would all but vanish, and with the bottom border switched off
+// just above, nothing would divide the column titles from the first row of data.
+// The raised navy gives the band back and the accent draws the boundary.
 [data-bs-theme="dark"] :is(.contents, main) table thead th,
 [data-bs-theme="dark"] table.table thead th {
   background: var(--brand-ink-raised);
@@ -600,7 +605,7 @@ table.table caption {
 :is(.contents, main) table td code, :is(.contents, main) table th code { white-space: nowrap; }
 // A header cell is the one place in the prose where inline code sits on the navy
 // ink rather than on the paper, so it cannot keep the deep accent it wears
-// everywhere else: on the band that measures about 1.7:1. White on a faint tint
+// everywhere else: on the band that measures about 1.3:1. White on a faint tint
 // keeps it reading as a code chip. Note the `code` is a child of the `th`, so a
 // descendant form such as `th :not(pre) > code` would match nothing.
 :is(.contents, main) table thead th code,
@@ -613,12 +618,13 @@ table.table thead th code {
 // paragraph).
 :is(.contents, main) p > img:only-child { margin-bottom: .7rem; }
 
-// The home hero comes from README.Rmd rather than from a knitr chunk pkgdown
-// post-processes, so it never receives the `r-plt` class that pkgdown's own
-// dark-mode figure rule keys on, and it would otherwise stay a white slab
-// against the navy page. Apply the same transform here so it inverts with
-// every other figure on the site. Scoped by src, since the transparent hex
-// logo and the remote shields.io badges must be left alone.
+// The README's gallery figures are static PNGs (man/figures/README-*.png)
+// embedded in the hand-written README.md, not the output of a knitr chunk
+// pkgdown post-processes, so they never receive the `r-plt` class that
+// pkgdown's own dark-mode figure rule keys on, and they would otherwise stay
+// white slabs against the navy page. Apply the same transform here so they
+// invert with every other figure on the site. Scoped by src, since the
+// transparent hex logo and the remote badges must be left alone.
 [data-bs-theme="dark"] .template-home img[src*="figures/README-"] {
   filter: invert(100%) hue-rotate(180deg);
 }
@@ -635,14 +641,16 @@ table.table thead th code {
 }
 a { text-underline-offset: .15em; }
 // Content links: underline on hover so the highlight is unmistakable in both
-// modes, on top of the amber hover colour set through --bs-link-hover-color.
+// modes, on top of the coral hover colour set through --bs-link-hover-color.
 //
 // Buttons and heading anchors are excluded. A button already answers the
 // pointer by filling in, and an underline inside one reads as a mistake;
 // Bootstrap says as much with `.btn { text-decoration: none }`, but that sits
-// at specificity (0,1,0) and this selector at (0,2,1) outranked it, so the
-// About page's Copy and Download .bib controls grew an underline under the
-// pointer. A heading anchor holds no text to underline.
+// at specificity (0,1,0), and without the exclusions this hover rule
+// (`:is(.contents, main) a:hover`, at (0,2,1)) would outrank it, so a link
+// styled as a button, such as the About page's Download .bib control, would
+// grow an underline under the pointer. A heading anchor holds no text to
+// underline.
 :is(.contents, main) a:hover:not(.btn):not(.anchor),
 :is(#pkgdown-sidebar, aside) a:hover:not(.btn):not(.anchor) { text-decoration: underline; }
 
@@ -654,9 +662,9 @@ a { text-underline-offset: .15em; }
 :is(#pkgdown-sidebar, aside) a.btn:hover,
 .btn:hover, .btn:focus, .btn:active { text-decoration: none; }
 
-// Outline buttons (About page's Copy and Download .bib controls) take their
-// colour from --bs-primary, too dark on the navy dark-mode page; use the light
-// teal so the control stays legible.
+// Outline buttons (the About page's Download .bib control) take their colour
+// from --bs-primary, too dark on the navy dark-mode page; use the light blue so
+// the control stays legible.
 [data-bs-theme="dark"] .btn-outline-primary {
   --bs-btn-color: var(--brand-teal-light);
   --bs-btn-border-color: var(--brand-teal-light);
@@ -674,10 +682,10 @@ footer {
   // escaping pkgdown's centred container, and the two footer sentences
   // read as left-aligned rows.
   display: block;
-  // 100vw counts the scrollbar, so the band came out fifteen pixels wider than
-  // the viewport and hung seven past each edge. extra.js measures the scrollbar
+  // 100vw counts the scrollbar, so a band that wide would hang past each side
+  // of the page by half the scrollbar's width. extra.js measures the scrollbar
   // and publishes it as --scrollbar-width, which takes those pixels back; where
-  // the script has not run the fallback is the old 100vw, so the band is never
+  // the script has not run, the fallback is plain 100vw, so the band is never
   // narrower than the window.
   width: calc(100vw - var(--scrollbar-width, 0px));
   margin-left: calc(50% - (100vw - var(--scrollbar-width, 0px)) / 2);
@@ -687,13 +695,13 @@ footer {
   color: rgba(255, 255, 255, .78);
 }
 
-// A backstop, not the fix. The footer used to overshoot by the scrollbar width
-// and this clipped it, at the cost of eight pixels of phantom horizontal scroll
-// on every page and of a clip that hid anything else that overflowed — which is
-// how a clipped search panel and a badge running out of its column both went
-// unnoticed. The band is measured properly now; this stays only so that a page
-// content never grows a horizontal scrollbar, wide code blocks and tables having
-// their own.
+// A backstop, so that page content never grows a horizontal scrollbar, wide
+// code blocks and tables having their own. Where extra.js has not run, the band
+// above is a full 100vw and hangs past each side of the page by half the
+// scrollbar's width, and this clips it. The cost is that anything else
+// overflowing the page is clipped rather than scrollable, which is why the
+// search panel and the sidebar badges above are held inside the page
+// explicitly.
 body { overflow-x: hidden; }
 
 // pkgdown's own stylesheet floats the two blocks side by side; both read
@@ -806,10 +814,16 @@ table.table::-webkit-scrollbar-corner { background: transparent; }
 // only works if the first line of each entry is the one at the left margin.
 // That is the APA convention and it is what a reader of this field expects.
 //
-// Two shapes are covered: a vignette's own `## References` section, where the
-// entries are the paragraphs following that heading, and the standalone
-// References article, whose entries are wrapped in a `.references` div because
-// there is no heading to anchor to.
+// Two shapes are covered. On a help page, pkgdown writes the References
+// section (roxygen @references, filled here mostly by Rdpack's \insertRef) as
+// one paragraph per entry after an `h2#references`, which the first selector
+// reaches. The second, `.references p`, serves a standalone References article
+// whose entries are paragraphs wrapped in a `.references` div, and depictr has
+// no such article. The vignettes' lists are built by citeproc (`bibliography:`
+// and `csl: apa.csl`) as `div.csl-entry` blocks inside
+// `div#refs.references.hanging-indent`, with no paragraphs, so neither selector
+// reaches them, and pkgdown's own `.hanging-indent div.csl-entry` rule hangs
+// those instead.
 :is(.contents, main) {
   h2#references ~ p,
   .references p {

@@ -120,11 +120,11 @@ rownames(lexical_decision) <- NULL
 # 2. wellbeing_survey
 #    A simulated cross-sectional wellbeing survey with realistic missingness,
 #    for descriptive, correlation, regression and missing-data examples.
-#    life_satisfaction now responds meaningfully to log-income (a real
-#    coefficient) and to age (a mild plateau/U-shape), in addition to stress,
-#    sleep and exercise. education is an ORDERED factor. Income is missing more
-#    often at higher stress (MAR), which now matters because income predicts
-#    the outcome.
+#    life_satisfaction responds meaningfully to log-income (a real
+#    coefficient) and to age (a mild inverted U, peaking in mid-life), in
+#    addition to stress, sleep and exercise. education is an ORDERED factor.
+#    Income is missing more often at higher stress (MAR), which matters because
+#    income predicts the outcome.
 # ---------------------------------------------------------------------------
 
 set.seed(11)
@@ -154,15 +154,15 @@ exercise_days <- stats::rpois(n, lambda = pmax(0.5, 3 - 0.3 * (stress - 4)))
 exercise_days[exercise_days > 7] <- 7L
 
 # Meaningful effects: a real log-income coefficient (~+0.45 per natural-log
-# unit, i.e. ~+0.31 per doubling of income) and a mild age plateau peaking in
-# mid-life. Stress, sleep and exercise keep their effects.
+# unit, i.e. ~+0.31 per doubling of income) and a mild inverted-U age effect
+# peaking in mid-life, alongside the effects of stress, sleep and exercise.
 log_income_c <- log(income) - mean(log(income))
 age_c        <- age - 45
 life_satisfaction <- round(pmin(pmax(
   4.2 - 0.40 * (stress - 4) + 0.22 * (sleep_hours - 7) +
     0.13 * exercise_days +
     0.45 * log_income_c +
-    0.010 * age_c - 0.0011 * age_c^2 +     # mild inverted-U, peak ~ mid-40s
+    0.010 * age_c - 0.0011 * age_c^2 +     # mild inverted-U, peak ~ age 50
     stats::rnorm(n, 0, 0.7), 1), 7), 1)
 
 wellbeing_survey <- data.frame(
@@ -178,7 +178,7 @@ wellbeing_survey <- data.frame(
   stringsAsFactors = FALSE
 )
 
-# Inject missingness: income missing more often at higher stress (MAR) - now
+# Inject missingness: income missing more often at higher stress (MAR) -
 # informative because income drives life_satisfaction - plus a few values
 # missing completely at random elsewhere.
 p_income_na <- stats::plogis(-2.5 + 0.4 * (wellbeing_survey$stress - 4))
@@ -191,10 +191,10 @@ wellbeing_survey$life_satisfaction[sample(n, 7)] <- NA
 # 3. crop_yield
 #    A simulated agronomy field trial: yield as a function of rainfall,
 #    fertiliser, soil pH and a management treatment. For regression,
-#    coefficient and scatter-trend examples. The data-generating process now
+#    coefficient and scatter-trend examples. The data-generating process
 #    contains a GENUINE fertiliser x treatment interaction: fertiliser pays off
-#    far more under the enhanced treatment, so interaction_plot() shows real
-#    crossing slopes rather than noise. Main effects are retained.
+#    far more under the enhanced treatment, so interaction_plot() shows real,
+#    diverging slopes rather than noise. Main effects are retained.
 # ---------------------------------------------------------------------------
 
 set.seed(303)
@@ -286,7 +286,7 @@ clinical_trial <- data.frame(
 
 # ---------------------------------------------------------------------------
 # 4b. monthly_sales
-#    A simulated seasonal monthly time series in tidy (date, series, value)
+#    A simulated seasonal monthly time series in tidy (date, series, sales)
 #    form, with two product lines. Each series has a linear trend, a clear
 #    12-month seasonal cycle and noise, so the multi-group timeseries_plot()
 #    path runs on first-party data and decompose_plot()/acf_plot() reveal

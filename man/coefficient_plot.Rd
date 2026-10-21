@@ -29,8 +29,9 @@ coefficient_plot(
 \arguments{
 \item{x}{A fitted model or a tidy data frame of estimates.}
 
-\item{conf_level}{Confidence/credible level, passed to \code{\link[=tidy_estimates]{tidy_estimates()}}
-when \code{x} is a model: a single number strictly between 0 and 1.}
+\item{conf_level}{Confidence/credible level, passed to \code{\link[=tidy_estimates]{tidy_estimates()}},
+which uses it for a model and for the limits it fills in from the standard
+errors of a data frame: a single number strictly between 0 and 1.}
 
 \item{intercept}{Whether to keep the intercept term. Defaults to \code{FALSE},
 since the intercept is seldom of interest on a forest plot and its scale
@@ -52,7 +53,9 @@ terms too, so the contrast of enhanced with the reference level reads
 \code{treatment: enhanced}. Other names are tidied with \code{\link[=format_terms]{format_terms()}}.}
 
 \item{interaction}{Passed to \code{\link[=format_terms]{format_terms()}} to control how interaction
-terms are rendered (ignored when \code{labels} is supplied).}
+terms are rendered, in the automatic labels and for any term a named
+\code{labels} vector leaves out. It is ignored when \code{labels} is an unnamed
+vector.}
 
 \item{point_colour, reference_colour}{Colours for the estimates and the
 reference line.}

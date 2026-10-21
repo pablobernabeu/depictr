@@ -23,6 +23,14 @@ devtools::test()       # run the test suite
 devtools::check()      # a full R CMD check
 ```
 
+`man/` and `NAMESPACE` are generated with the roxygen2 version recorded in
+DESCRIPTION under `Config/roxygen2/version`. The NAMESPACE check in CI installs
+the roxygen2 version pinned in `.github/workflows/R-CMD-check.yaml` and fails
+when DESCRIPTION records another, which a newer roxygen2 would write there.
+Document with that version, for example `pak::pak("roxygen2@8.0.0")` when
+DESCRIPTION records 8.0.0. Moving to a newer roxygen2 means updating that pin in
+the same change.
+
 ## Conventions
 
 Every plotting function returns a ggplot2 object (or a patchwork for composite

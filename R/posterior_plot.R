@@ -13,8 +13,12 @@
 #'
 #' Draws may be supplied in many shapes: a fitted Bayesian model (`brms` or
 #' `rstanarm`), a `posterior` *draws* object, a wide data frame or matrix with
-#' one column of draws per parameter, or a long data frame (a parameter column
-#' and a value column). For fitted models only the fixed-effect (population)
+#' one column of draws per parameter, or a long data frame with a parameter
+#' column named `parameter`, `term`, `.variable` or `variable` and a value
+#' column named `value`, `.value`, `draw` or `estimate`. In a wide data frame,
+#' the numeric columns `.chain`, `.iteration`, `.draw`, `draw`, `chain`,
+#' `iteration` and `.row` are read as sampler indices and left out. For fitted
+#' models only the fixed-effect (population)
 #' parameters are kept, with the `brms` `b_` prefix stripped. A draws object
 #' that holds `b_` parameters, as `posterior::as_draws_df()` returns for a
 #' `brms` fit, is read the same way, with a message naming the variables it
@@ -126,9 +130,8 @@ posterior_plot <- function(draws,
     reference_line[1]
   }
 
-  # Normalise every supported input to one long draws table. A plain long/wide
-  # data frame still flows through the original draws_to_long() so its existing
-  # tests and behaviour are preserved exactly.
+  # Normalise every supported input to one long draws table (see
+  # normalise_posterior_draws()).
   long <- normalise_posterior_draws(draws)
   # Dropping the log densities, or draws that are all NA, can leave nothing.
   if (!nrow(long)) stop("No parameters left to plot.", call. = FALSE)
@@ -137,8 +140,9 @@ posterior_plot <- function(draws,
   warn_unused_labels(params, labels)
   point_fun <- if (point == "median") stats::median else mean
 
-  # Per-parameter summaries (used for the interval style, the slab point, the
-  # caption and the probability-of-direction labels).
+  # Per-parameter summaries (used for the interval style and its no-ggdist
+  # fallback, the probability-of-direction labels and the per-panel reference
+  # lines of the free layout).
   summ <- do.call(rbind, lapply(params, function(p) {
     v <- long$.value[long$term == p]
     inner <- stats::quantile(v, c((1 - widths[1]) / 2, 1 - (1 - widths[1]) / 2),
@@ -152,9 +156,9 @@ posterior_plot <- function(draws,
                pd = pd_val, stringsAsFactors = FALSE)
   }))
 
-  # Each parameter is labelled once and its draws take the label by match():
-  # labelling the draw table row by row took seconds for ten parameters of
-  # 4,000 draws.
+  # Each parameter is labelled once and its draws take the label by match(),
+  # since labelling the draw table row by row would take seconds for ten
+  # parameters of 4,000 draws.
   param_labels <- make_labels(params, labels, interaction)
   check_label_clash(params, param_labels)
   lvls <- rev(param_labels)
@@ -299,7 +303,7 @@ posterior_interval_layers <- function(summ, colour) {
   )
 }
 
-#' Probability-of-direction text, placed at the right edge of each row
+#' Probability-of-direction text, just right of each row's outer interval
 #' @noRd
 posterior_pd_layer <- function(summ) {
   summ$pd_label <- ifelse(is.na(summ$pd), NA_character_,
@@ -318,7 +322,8 @@ posterior_pd_layer <- function(summ) {
 #' Probability of direction relative to a reference
 #'
 #' The posterior probability that the parameter lies on its majority side of
-#' `ref`: `max(P(value > ref), P(value < ref))`, a value in \[0.5, 1\].
+#' `ref`: `max(P(value > ref), P(value <= ref))`, a value in \[0.5, 1\]. A draw
+#' equal to `ref` counts as below it.
 #' @noRd
 prob_direction <- function(v, ref = 0) {
   v <- v[!is.na(v)]
@@ -329,11 +334,11 @@ prob_direction <- function(v, ref = 0) {
 
 #' Normalise the `draws` argument of posterior_plot() to a long table
 #'
-#' A plain long/wide data frame uses the original `draws_to_long()` path so its
-#' established behaviour and tests are untouched; richer Bayesian inputs (fits,
-#' draws objects, matrices) route through `extract_draws()`. A `draws_df` is a
-#' data frame too, and is claimed first because the plain path would keep every
-#' variable of a brms posterior.
+#' A plain long or wide data frame is read by `draws_to_long()`, and its log
+#' densities are then dropped with a message. Fits, draws objects and matrices
+#' route through `extract_draws()`. A `draws_df` is a data frame too, but it
+#' takes the `extract_draws()` route, because `draws_to_long()` would keep
+#' every variable of a brms posterior.
 #' @noRd
 normalise_posterior_draws <- function(draws) {
   if (is.data.frame(draws) && !inherits(draws, "draws")) {

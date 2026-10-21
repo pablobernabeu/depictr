@@ -33,7 +33,7 @@ minus fitted on the response scale, the Gelman-Hill default) or
 \item{band}{Where the standard errors come from. The default, \code{"model"},
 takes them from the variance the fitted model implies for each residual.
 \code{"empirical"} takes them from the spread of the residuals in each bin, as
-in depictr 0.3.0 and \code{arm::binnedplot()}.}
+\code{arm::binnedplot()} does.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object. The per-bin summary (mean fitted value,
@@ -69,9 +69,9 @@ variance, so a residual varies slightly less than this and the band errs on
 the wide side. Observations with zero prior weight take no part in the fit
 and are left out of the bins.
 
-\code{band = "empirical"} draws the band of depictr 0.3.0 and earlier, the one
-\code{arm::binnedplot()} draws: twice the standard deviation of the residuals in
-the bin, divided by \eqn{\sqrt{n_b}}. It collapses wherever the outcomes in
+\code{band = "empirical"} draws the band that \code{arm::binnedplot()} draws: twice
+the standard deviation of the residuals in the bin, divided by
+\eqn{\sqrt{n_b}}. It collapses wherever the outcomes in
 a bin are all alike. The residuals in a logistic model's bin without events
 all lie just below zero, so its band nearly vanishes and the bin is flagged.
 Where events are rare, such bins are what the model expects. The example
@@ -83,7 +83,7 @@ gfit <- glm(adverse_event ~ biomarker + age + arm,
             data = clinical_trial, family = binomial)
 binned_residual_plot(gfit)
 
-# The band of depictr 0.3.0, which flags the bins that hold no events:
+# The band arm::binnedplot() draws, which flags the bins that hold no events:
 binned_residual_plot(gfit, band = "empirical")
 }
 \references{

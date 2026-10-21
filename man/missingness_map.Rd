@@ -24,8 +24,9 @@ missingness_map(
 \item{show_pct}{Whether to append the percentage missing to each variable label.}
 
 \item{colours}{Length-2 vector: colours for present and missing cells.
-Defaults to a muted grey for present cells and the colourblind-safe
-\code{\link[=depictr_palette]{depictr_palette()}} accent for missing cells.}
+Defaults to a muted grey (\code{"grey85"}) for present cells and, for missing
+cells, the accent colour set with \code{accent} in \code{\link[=depictr_options]{depictr_options()}}, the
+colourblind-safe vermillion \verb{#d55e00} unless changed.}
 
 \item{legend_inside}{When \code{TRUE} (and \code{sort = TRUE}), draw the legend inside
 the panel, in the top-right (where the most-complete columns put a solid

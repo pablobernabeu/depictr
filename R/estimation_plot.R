@@ -54,8 +54,13 @@
 #'   (difference) panels, passed to [patchwork::plot_layout()].
 #'
 #' @return A 'patchwork' object (printable like a [ggplot2::ggplot]). The
-#'   computed differences and their bootstrap intervals are attached as the
-#'   `"differences"` attribute (a data frame).
+#'   `"differences"` attribute holds a data frame with one row per group other
+#'   than the reference and the columns `group`, `reference`, `diff` (the
+#'   group's mean minus the reference's), `lower` and `upper` (the bootstrap
+#'   interval at `conf_level`), `cohens_d` and `hedges_g`. The interval limits
+#'   and the effect sizes are `NA` where either group has fewer than two
+#'   observations, and the effect sizes are also `NA` when the pooled standard
+#'   deviation is zero.
 #' @references
 #' \insertRef{cumming2012}{depictr}
 #'
@@ -255,8 +260,8 @@ estimation_plot <- function(data, y, group, reference = NULL,
   }
 
   # patchwork's `/` operator exists only once patchwork is loaded, so stacking
-  # with it failed in a fresh session. Calling wrap_plots() through `::` loads
-  # patchwork first.
+  # with it would fail in a fresh session. Calling wrap_plots() through `::`
+  # loads patchwork first.
   combined <- patchwork::wrap_plots(top, bottom, ncol = 1, heights = heights)
   attr(combined, "differences") <- diffs
   combined

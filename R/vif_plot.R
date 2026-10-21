@@ -55,8 +55,10 @@
 #' d$soil_moisture <- 0.05 * d$rainfall + rnorm(nrow(d), sd = 2)
 #' vif_plot(lm(yield ~ rainfall + soil_moisture + fertiliser, data = d))
 #'
-#' # Multi-level factors get a single generalised VIF per term
-#' fit2 <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
+#' # A factor with more than two levels gets a single generalised VIF per term,
+#' # and the axis switches to GVIF^(1/(2 df))
+#' fit2 <- lm(life_satisfaction ~ stress + sleep_hours + region,
+#'            data = wellbeing_survey)
 #' vif_plot(fit2)
 vif_plot <- function(model, threshold = 5,
                      palette = depictr_palette(2), title = NULL) {

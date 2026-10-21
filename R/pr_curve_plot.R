@@ -23,7 +23,10 @@
 #'
 #' @return A [ggplot2::ggplot] object. The average precision is stored in
 #'   `attr(plot, "average_precision")` (a named vector when several models are
-#'   supplied).
+#'   supplied). With `f1 = TRUE`, the maximum-F1 point is stored in
+#'   `attr(plot, "max_f1")`: a list of `threshold`, `recall`, `precision` and
+#'   `f1`, or a list of such lists named by model when several models are
+#'   supplied.
 #' @export
 #' @examples
 #' # The clinical-trial adverse event is rare (about 10% positive), which is

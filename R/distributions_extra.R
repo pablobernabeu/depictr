@@ -152,7 +152,9 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
 #' @param n_boot Number of bootstrap resamples for the difference intervals when
 #'   `differences = TRUE`. Ignored otherwise.
 #' @param palette Colours for the groups; defaults to [depictr_palette()].
-#' @param title,x_lab,y_lab Title and axis labels.
+#' @param title,x_lab,y_lab Title and axis labels. `x_lab` is not drawn when
+#'   `differences = TRUE`, since the estimation plot names its groups on the
+#'   axis alone.
 #'
 #' @return A [ggplot2::ggplot] object, or a 'patchwork' object when
 #'   `differences = TRUE`.

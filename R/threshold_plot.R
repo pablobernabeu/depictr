@@ -22,9 +22,9 @@
 #' @param metrics Which metrics to draw: any subset of `"sensitivity"`,
 #'   `"specificity"`, `"precision"` and `"f1"`. (`"recall"` is accepted as an
 #'   alias for `"sensitivity"`.)
-#' @param mark Which optimal operating points to mark with a dashed vertical
-#'   line: any subset of `"youden"` (max sensitivity + specificity - 1) and
-#'   `"f1"` (max F1). Use `character(0)` or `NULL` to mark none.
+#' @param mark Which optimal operating points to mark with a vertical line: any
+#'   subset of `"youden"` (max sensitivity + specificity - 1), drawn dashed, and
+#'   `"f1"` (max F1), drawn dotted. Use `character(0)` or `NULL` to mark none.
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object. The Youden and max-F1 thresholds are

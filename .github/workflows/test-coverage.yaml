@@ -1,6 +1,6 @@
-# Reports test coverage on each push and pull request, writing the percentage to
-# the run summary. It uses no external service (no Codecov), so it needs no token
-# and adds no badge that could rot.
+# Reports test coverage on each push to main and each pull request, writing the
+# percentage to the run summary. It uses no external service (no Codecov), so it
+# needs no token and adds no badge that could rot.
 on:
   push:
     branches: [main, master]

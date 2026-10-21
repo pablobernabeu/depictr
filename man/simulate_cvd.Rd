@@ -20,8 +20,9 @@ between two tenths takes the linear interpolation of their matrices, as
 the authors suggest and as the colorspace package does.}
 }
 \value{
-A character vector of lower-case hex colours, the same length as
-\code{colours}.
+A character vector of opaque, lower-case six-digit hex colours, the
+same length as \code{colours}. Any alpha is dropped, whereas
+\code{\link[=simulate_figure]{simulate_figure()}} keeps it.
 }
 \description{
 Maps each colour to the colour a reader with a given form and severity of

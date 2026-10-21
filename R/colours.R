@@ -1,14 +1,19 @@
 # Internal colour accessors --------------------------------------------------
 #
-# Single source of truth for the named brand colours used across depictr.
-# Plotting functions should call these accessors instead of repeating hex
-# literals, so the palette can be changed in exactly one place. The full
-# categorical palette lives in `depictr_palette()` (see theme_depictr.R); these
-# helpers name the three colours that recur on their own outside that palette.
+# The named colours used across depictr: brand, accent and reference.
+# Plotting functions call these accessors instead of repeating hex literals.
+# The full categorical palette lives in `depictr_palette()` (see
+# theme_depictr.R); these helpers name the three colours that recur on their
+# own outside that palette.
 #
-# Each accessor falls back to the matching global option (set via
-# `depictr_options()`), and only then to the package default, so users can
-# recolour the whole package by setting `options(depictr.brand = )` etc. once.
+# Each accessor reads the matching global option (set via
+# `depictr_options()`), and only then the package default in options.R, so
+# `options(depictr.brand = )` and its siblings recolour every plot that uses
+# them. The brand option leaves the palettes alone: the built-in qualitative
+# set and the sequential and diverging ramps of `depictr_palette()`, like
+# seasonal_plot()'s cycle_palette(), write the brand blue as a literal of
+# their own, and `options(depictr.palette = )` replaces the qualitative set
+# only.
 
 #' depictr brand blue
 #'
@@ -261,8 +266,9 @@ depictr_reference <- function() depictr_opt("reference")
 #'   between two tenths takes the linear interpolation of their matrices, as
 #'   the authors suggest and as the colorspace package does.
 #'
-#' @return A character vector of lower-case hex colours, the same length as
-#'   `colours`.
+#' @return A character vector of opaque, lower-case six-digit hex colours, the
+#'   same length as `colours`. Any alpha is dropped, whereas
+#'   [simulate_figure()] keeps it.
 #' @references
 #' \insertRef{machado2009}{depictr}
 #' @export
@@ -552,16 +558,15 @@ simulate_figure <- function(plot, deficiency, severity = 1) {
 #' For normal vision and each deficiency at full severity, the palette's colours
 #' are converted to CIELAB and the smallest colour difference between any two
 #' of them is found. The difference is CIEDE2000 (Sharma, Wu & Dalal, 2005)
-#' unless `metric` asks for the older measure. The lower this minimum, the
+#' unless `metric` asks for CIE76. The lower this minimum, the
 #' more likely two categories are to be confused. A palette counts as safe when
 #' the minimum across all four conditions is at least `threshold`.
 #'
-#' Earlier versions measured the Euclidean distance in CIELAB, known as CIE76,
-#' which overstates the difference between saturated colours: the blues
-#' `#005b96` and `#0060a8` are 8.20 apart by CIE76 and 2.69 by CIEDE2000.
-#' ggplot2's default palette of five colours passed the check under CIE76,
-#' although under deuteranopia its sky blue and its pink come within 2.74 of
-#' each other in CIEDE2000.
+#' The Euclidean distance in CIELAB, known as CIE76, overstates the difference
+#' between saturated colours: the blues `#005b96` and `#0060a8` are 8.20 apart
+#' by CIE76 and 2.69 by CIEDE2000. ggplot2's default palette of five colours
+#' passes the check under CIE76, although under deuteranopia its sky blue and
+#' its pink come within 2.74 of each other in CIEDE2000.
 #'
 #' The default `threshold` of 5 is calibrated against the reference
 #' colourblind-safe palette: the Okabe-Ito set's tightest pair (reddish purple
@@ -582,9 +587,9 @@ simulate_figure <- function(plot, deficiency, severity = 1) {
 #' @param threshold The smallest acceptable colour difference, on the scale of
 #'   `metric`.
 #' @param metric The colour difference to measure: `"ciede2000"`, the default,
-#'   or `"cie76"`, the Euclidean distance in CIELAB that earlier versions
-#'   measured. `"cie76"` is kept so that earlier results can be reproduced, and
-#'   a later release will remove it.
+#'   or `"cie76"`, the Euclidean distance in CIELAB. `"cie76"` is kept so that
+#'   results computed with it can be reproduced, and a later release will remove
+#'   it.
 #'
 #' @return A list with `min_delta_e` (the worst case across conditions),
 #'   `by_condition` (a named numeric vector, one minimum colour difference for
@@ -604,7 +609,7 @@ simulate_figure <- function(plot, deficiency, severity = 1) {
 #' # Two colours a hair apart are flagged.
 #' palette_safety(c("#005b96", "#015c97"))
 #'
-#' # ggplot2's default palette of five colours, which passed under CIE76.
+#' # ggplot2's default palette of five colours, which passes under CIE76.
 #' hue5 <- c("#F8766D", "#A3A500", "#00BF7D", "#00B0F6", "#E76BF3")
 #' palette_safety(hue5)$safe
 #' palette_safety(hue5, metric = "cie76")$safe

@@ -7,7 +7,8 @@
 tidy_estimates(x, conf_level = 0.95, exponentiate = FALSE, ...)
 }
 \arguments{
-\item{x}{A fitted model or a data frame of results.}
+\item{x}{A fitted model or a data frame of results (see Details for the
+columns read).}
 
 \item{conf_level}{Confidence (or credible) level for the interval, a single
 number strictly between 0 and 1.}
@@ -50,6 +51,19 @@ or "z value". At 12 residual degrees of freedom, the t interval is about
 gets z, since 'lme4' gives no degrees of freedom. Supply
 a data frame with your own intervals (for example profiled or posterior
 intervals) to override this.
+
+A data frame is read by column name, taking for each quantity the first of
+these names that it holds. The term comes from \code{term}, \code{parameter},
+\code{Parameter}, \code{predictor}, \code{variable}, \code{fixed_effect} or \code{rowname}, otherwise
+from the row names. The estimate comes from \code{estimate}, \code{Estimate},
+\code{frequentist_estimate}, \code{coef}, \code{mean} or \code{value}, and a data frame without
+one is refused. The standard error comes from \code{std.error}, \verb{Std. Error},
+\code{std_error}, \code{SE} or \code{se}. The limits come from \code{conf.low}, \code{CI_2.5},
+\verb{2.5 \%}, \code{lower}, \code{ci_low}, \code{Q2.5}, \code{lwr} or \verb{l-95\% CI} and from
+\code{conf.high}, \code{CI_97.5}, \verb{97.5 \%}, \code{upper}, \code{ci_high}, \code{Q97.5}, \code{upr} or
+\verb{u-95\% CI}. A row that holds both limits keeps them as they stand. A row
+that lacks either limit but has a standard error gets both from it, as a z
+interval at \code{conf_level}. Other columns are dropped.
 }
 \examples{
 fit <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
