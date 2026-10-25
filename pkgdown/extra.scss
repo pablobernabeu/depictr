@@ -32,7 +32,7 @@
   --brand-primary:      #005B96;  // accessible deep blue — links, buttons (light)
   --brand-primary-ink:  #00456F;  // pressed
   --brand-teal-light:   #6FB4E0;  // light blue for dark backgrounds
-  --brand-amber:        #EF6C6C;  // coral accent — the App link, reference-group markers, blockquote rule
+  --brand-amber:        #EF6C6C;  // coral accent — an App link, reference-group markers, blockquote rule
   --brand-amber-light:  #F6928F;
   --brand-amber-dark:   #B23A3A;  // AA-contrast coral for link hover on light paper
   --brand-paper:        #FBFAF6;  // warm off-white page
@@ -177,28 +177,28 @@ h3 { font-size: 1.25rem; margin-top: 1.8rem; }
 .navbar .nav-link:focus,
 .navbar .nav-link.active { color: #fff; }
 
-// Accent the App link (it carries the fa-play icon) in coral
+// Accent an App link (a navbar item carrying the fa-play icon) in coral. This
+// rule and the two after it serve the family's sites that have an App link.
+// depictr's navbar has none, so here they match nothing.
 .navbar .nav-item:has(.fa-play) .nav-link,
 .navbar .nav-link:has(.fa-play) {
   color: var(--brand-amber);
   font-weight: 600;
 }
 // Focus as well as hover. The base rule above outweighs the navbar's shared
-// `.nav-link:focus` colour, so without naming focus here the App link was the
-// one navbar item that gave a keyboard user no answer at all.
+// `.nav-link:focus` colour, so without naming focus here an App link would keep
+// its colour under keyboard focus.
 .navbar .nav-item:has(.fa-play) .nav-link:hover,
 .navbar .nav-item:has(.fa-play) .nav-link:focus,
 .navbar .nav-link:has(.fa-play):hover,
 .navbar .nav-link:has(.fa-play):focus { color: var(--brand-amber-light); }
-// Give the App link room to breathe before the search box that follows it.
+// Leave space between an App link and the search box that follows it.
 .navbar .navbar-nav .nav-item:has(.fa-play) { margin-right: .9rem; }
 
-// The icons in the navbar — the App link's play triangle, the GitHub mark, the
-// light switch — take their colour from the link that carries them. Pinned to a
-// fixed white, as they were, each icon ignored every state its own label
-// answered: the play triangle stayed white beside a coral label, and neither
-// the GitHub mark nor the light switch brightened under the pointer or under
-// keyboard focus.
+// The icons in the navbar take their colour from the link that carries them, so
+// each brightens with its label under the pointer and under keyboard focus.
+// Here they are the GitHub mark and the light switch. On the family's sites
+// with an App link, its play triangle also takes its label's accent colour.
 .navbar .navbar-nav .nav-link .fa { color: inherit; }
 
 // Bootstrap swaps the browser's focus outline for a soft glow in the theme

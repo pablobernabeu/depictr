@@ -568,11 +568,12 @@ simulate_figure <- function(plot, deficiency, severity = 1) {
 #' passes the check under CIE76, although under deuteranopia its sky blue and
 #' its pink come within 2.74 of each other in CIEDE2000.
 #'
-#' The default `threshold` of 5 is calibrated against the reference
-#' colourblind-safe palette: the Okabe-Ito set's tightest pair (reddish purple
-#' against grey) sits at 6.43 under full deuteranopia, so the cut must lie
-#' below that to pass the recommended palette, while still flagging colours
-#' that become near-identical under a deficiency. The difference includes
+#' The default `threshold` of 5 is calibrated against the built-in palette of
+#' [depictr_palette()], which is based on the Okabe-Ito set with the brand blue
+#' and a grey in place of its blue and black. That palette's tightest pair
+#' (reddish purple against grey) sits at 6.43 under full deuteranopia, so the
+#' cut must lie below that to pass the built-in palette, while still flagging
+#' colours that become near-identical under a deficiency. The difference includes
 #' lightness, which survives colour-vision deficiency, so two colours that share
 #' a hue but differ in lightness are correctly treated as distinguishable. Full
 #' severity is the worst case; most colour-vision deficiency is milder.

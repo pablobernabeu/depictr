@@ -30,7 +30,7 @@ A grouped density (the default palette is a colourblind-safe set based on
 Okabe-Ito) and Kaplan-Meier survival curves with confidence bands and a
 number-at-risk table, each from a single function call:
 
-![Grouped density of response times by priming condition, in the Okabe-Ito palette](man/figures/README-distribution.png)
+![Grouped density of response times by priming condition, in the default palette](man/figures/README-distribution.png)
 
 ![Kaplan-Meier survival curves by treatment arm, with confidence bands, censoring marks, a log-rank test and a number-at-risk table](man/figures/README-survival.png)
 
@@ -67,10 +67,10 @@ vignettes run on base `lm`/`glm` and the bundled data alone.
 
 ## Measured accessibility
 
-The default palette is the Okabe-Ito set, and that choice is checked. The package
-ships a simulator of colour-vision deficiency based on the model of Machado,
-Oliveira and Fernandes (2009), and `palette_safety()` measures how far apart the
-palette's colours stay under each deficiency.
+The default palette is based on the Okabe-Ito set, and that choice is checked.
+The package ships a simulator of colour-vision deficiency based on the model of
+Machado, Oliveira and Fernandes (2009), and `palette_safety()` measures how far
+apart the palette's colours stay under each deficiency.
 
 A safe palette is not a safe figure, though, so `check_figure()` audits the plot
 you are about to submit. It measures how separable the encoding colours are under

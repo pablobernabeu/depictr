@@ -356,7 +356,7 @@
   `explore_bivariate()` drew a date against a number as one box plot per day,
   and against a category as bars with a colour for each day, both with a
   warning that the colours had been interpolated past the eight of the
-  Okabe-Ito set. Dates, date-times and durations now count as numeric.
+  built-in palette. Dates, date-times and durations now count as numeric.
   Against a numeric variable, they give the scatter plot with a trend of
   `scatter_trend()`, and against a categorical one box plots of their values
   by level. A duration is drawn as a number in its own units, named in the
@@ -657,6 +657,16 @@
   `R CMD check` runs on every push, where it runs on pushes to `main` and on
   pull requests into it.
 
+* The README and the help pages of `depictr_palette()`, `depictr_options()` and
+  `palette_safety()` called the built-in qualitative palette the Okabe-Ito set.
+  It is based on that set and keeps six of its eight colours, with the brand
+  blue and a grey in place of its blue and black, as the page of
+  `depictr_palette()` now says. The page of `palette_safety()` credited the
+  Okabe-Ito set with the pair that the default `threshold` of 5 is calibrated
+  against, the reddish purple and the grey, 6.43 apart under full
+  deuteranopia. That set has no grey, and the page now gives the pair to the
+  built-in palette.
+
 ## Changed defaults
 
 * The gap statistic's default search in `k_diagnostic()` and
@@ -735,7 +745,7 @@
   distance it replaces overstates differences between saturated colours:
   ggplot2's default five-colour palette was certified safe under
   deuteranopia, though two of its colours become almost identical, 2.74 apart
-  in CIEDE2000. The threshold stays at 5, and the Okabe-Ito palette's closest
+  in CIEDE2000. The threshold stays at 5, and the built-in palette's closest
   pair now measures 6.43, where it measured 7.4. `depictr_palette(9)` already
   warned that interpolated colours lose the guarantee, and its nine colours
   now fail the check too. `metric = "cie76"` restores the old measure for this

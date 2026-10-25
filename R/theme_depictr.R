@@ -5,18 +5,20 @@
 #' Colourblind-aware palettes shared by every depictr plot. The qualitative
 #' palette is based on the Okabe-Ito set (Okabe & Ito, 2008), a widely
 #' recommended categorical palette that stays distinguishable under the common
-#' forms of colour-vision deficiency, with the depictr brand blue leading. The
-#' sequential and diverging palettes are perceptually ordered single-hue and
-#' red-blue ramps.
+#' forms of colour-vision deficiency. It keeps six of that set's eight colours.
+#' The depictr brand blue (`#005b96`) takes the place of its blue (`#0072b2`)
+#' and leads the palette, and a grey (`#999999`) takes the place of its black.
+#' The sequential and diverging palettes are perceptually ordered single-hue
+#' and red-blue ramps.
 #'
-#' The guarantee belongs to the eight Okabe-Ito colours themselves, not to any
+#' The guarantee belongs to the eight built-in colours themselves, not to any
 #' number of colours: past eight the qualitative palette has to interpolate
 #' between them, and the interpolated colours sit close enough together to fail
 #' the package's own colour-distance check. That case warns rather than handing
 #' back colours under a guarantee it cannot keep.
 #'
 #' @param n Number of colours to return. If `NULL` (the default), the
-#'   qualitative palette returns all of its base colours, the eight Okabe-Ito
+#'   qualitative palette returns all of its base colours, the eight built-in
 #'   colours unless `options(depictr.palette = )` supplies another set, and
 #'   the sequential and diverging ramps return seven. For the qualitative
 #'   palette an `n` larger than the available base colours is interpolated;
@@ -34,7 +36,7 @@
 #'
 #' @details The qualitative palette can be overridden globally with
 #'   `options(depictr.palette = )` (see [depictr_options()]); when set, that
-#'   custom palette replaces the built-in Okabe-Ito set and is interpolated when
+#'   custom palette replaces the eight built-in colours and is interpolated when
 #'   more colours are requested than it provides. The sequential and diverging
 #'   ramps are unaffected.
 #'
@@ -106,8 +108,8 @@ depictr_palette <- function(n = NULL, type = c("qualitative", "sequential",
   }
 
   # Qualitative: a user-supplied palette (option) overrides the built-in
-  # Okabe-Ito set (led by the depictr brand blue); the option falls back to the
-  # package default.
+  # set (based on Okabe-Ito and led by the depictr brand blue); the option falls
+  # back to the package default.
   base <- depictr_opt("palette")
   builtin <- is.null(base)
   if (builtin) {
