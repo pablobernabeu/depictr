@@ -23,6 +23,16 @@
   independent axes. The caption now writes a round number of resamples in full,
   as 100,000 where it printed 1e+05.
 
+* `group_comparison_plot(differences = TRUE)` coloured the groups differently
+  from the plain plot whenever `reference` was not the first level.
+  `estimation_plot()` draws the reference first and took the palette in that
+  order, so with reference South, East took North's colour, North took South's
+  and South took East's. `estimation_plot()` now matches a named `palette` to
+  the levels by name, as the other grouped plots do, and
+  `group_comparison_plot()` passes it one named by level, so each group keeps
+  its colour with or without the difference panel. An unnamed `palette` passed
+  to `estimation_plot()` is still taken in the order the groups are drawn.
+
 * `coefficient_plot()` attached an unnamed `labels` vector to the wrong
   coefficients. The labels were assigned after the terms had been reversed or
   sorted for display, so in `lm(yield ~ rainfall + fertiliser + soil_ph)` soil pH

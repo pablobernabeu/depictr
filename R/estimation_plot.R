@@ -315,10 +315,17 @@ effsize_diff <- function(treat, ref) {
 }
 
 #' Named colour vector for groups, from a palette or [depictr_palette()]
+#'
+#' A named palette, such as the one group_comparison_plot() passes on from
+#' prepare_group(), is matched to the groups by name, so that each
+#' level keeps its colour whatever the reference. An unnamed one is taken in
+#' the order of `groups`.
 #' @noRd
 group_colours <- function(groups, palette = NULL) {
   if (is.null(palette)) {
     cols <- depictr_palette(length(groups))
+  } else if (!is.null(names(palette))) {
+    cols <- palette[groups]
   } else {
     cols <- rep_len(palette, length(groups))
   }
