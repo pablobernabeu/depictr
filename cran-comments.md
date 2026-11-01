@@ -37,25 +37,27 @@ skip everywhere because they read repository files that R CMD check cannot
 reach: CITATION.cff in two of them and the R sources in the other two. Five
 more skip on macOS, where the cairo device cannot be loaded.
 
-The same run installed the minimum versions that DESCRIPTION declares (ggplot2
-3.5.2, with patchwork 1.3.0 and with the newest patchwork) on R oldrel-3 under
-ubuntu-latest. There the test suite passed, and every example ran without a
-warning.
+Two more jobs of the same run installed the declared minimum versions of the
+imported ggplot2 (3.5.2) and patchwork (1.3.0, and in the second job the newest
+patchwork) on R 4.3.3 (oldrel-3) under ubuntu-latest. In both, the test suite
+passed and every example ran without a warning.
 
 ## Notes
 
 * The modelling back-ends that some functions can take (lme4, lmerTest, broom,
-  simr, survival, ggdist, posterior, cluster and boot) are in Suggests and used
+  simr, survival, ggdist, posterior and cluster) are in Suggests and used
   conditionally, so the package installs and checks without them.
 * ragg is in Suggests for save_plot(). When ragg is installed, ggsave() writes
   a TIFF with it, and otherwise with grDevices::tiff().
-* MASS, callr, colorspace and spelling are used by the tests only, and each
-  test that needs one of them skips when it is absent. MASS supplies the
-  negative binomial fits that some tests check. colorspace is an independent
-  implementation of the Machado colour-vision transforms, against which the
-  package's own transforms are compared. callr runs one test in a fresh R
-  session. That test and tests/spelling.R skip on CRAN. testthat and withr run
-  the tests, and knitr and rmarkdown build the vignettes.
+* MASS, boot, callr, colorspace and spelling are used by the tests only, and
+  each test that needs one of them skips when it is absent. MASS supplies the
+  negative binomial fits that some tests check. boot is the reference against
+  which the package's bootstrap intervals are compared. colorspace is an
+  independent implementation of the Machado colour-vision transforms, against
+  which the package's own transforms are compared. callr runs one test in a
+  fresh R session. The boot and callr tests and tests/spelling.R skip on CRAN.
+  testthat and withr run the tests, and knitr and rmarkdown build the
+  vignettes.
 * Example variants that draw several multi-panel figures are wrapped in
   `\donttest{}`. In the runs above, R CMD check timed one example at more than
   five seconds: save_plot() on Windows with R-devel, at 6.5 seconds elapsed and
