@@ -99,8 +99,9 @@
   where a rounding error could label the wrong time, a `survfit` curve flat at
   0.5 could take its midpoint from a censoring time and a curve that ends at
   0.5 got no guide.
-* The confidence band of `survival_plot()` reaches the last event of a curve
-  that falls to zero, where it stopped one event early.
+* Unless `time` is a `survfit` object, the confidence band of `survival_plot()`
+  reaches the last event of a curve that falls to zero, where it stopped one
+  event early.
 * `k_diagnostic()` and `cluster_plot()` default to `k_range = NULL`, which
   searches `1:8` for the gap and elbow criteria. The old `2:8` let the gap
   statistic find clusters in pure noise and kept the elbow from suggesting two.
@@ -171,6 +172,10 @@
   `labels` vector as one label per term, in the order the terms first appear,
   where they took one label per row of the stacked estimates or per posterior
   draw, and refuse a vector of the old length.
+* For a `posterior` draws object that holds `b_` parameters,
+  `frequentist_bayesian_plot()` and `posterior_plot()` take `labels` keys
+  without the prefix, so a key such as `b_rainfall` written for 0.3.0 no longer
+  matches.
 * `survival_plot()` refuses a factor, character or non-integer `status`, which
   it read by its level codes, as missing or truncated to an integer.
 * `survival_plot()` refuses a `status` coded 0/1 in some groups and 1/2 in
@@ -184,9 +189,7 @@
 * `frequentist_bayesian_plot()` with draws refuses inputs that share no terms
   and two terms of either input that would share a label, and
   `posterior_plot()` refuses a `brms::fixef()` matrix and two parameters that
-  would share a label. For a draws object that holds `b_` parameters, a
-  `labels` key omits the prefix, so a key such as `b_rainfall` written for
-  0.3.0 no longer matches.
+  would share a label.
 * `explore_distribution()`, `ecdf_plot()`, `raincloud_plot()`,
   `group_comparison_plot()`, `explore_categorical()`, `explore_pairs()`,
   `ridgeline_plot()` and `outlier_plot()` refuse a numeric `group` with more
@@ -194,9 +197,8 @@
   when called, where it returned a plot that failed when drawn.
 * `scatter_trend()`, `explore_distribution()`, `ecdf_plot()`,
   `raincloud_plot()`, `explore_categorical()` and `outlier_plot()` refuse a
-  `group` missing for every row when called, where they drew it, as an empty
-  panel in `explore_distribution()` and `ecdf_plot()`, or returned a plot that
-  failed when drawn.
+  `group` missing for every row when called, where they drew it or returned a
+  plot that failed when drawn.
 * `power_curve_plot()` refuses rows of one curve that share a sample size,
   where it joined them into a zigzag line.
 * `acf_plot()`, `decompose_plot()`, `seasonal_plot()` and `ts_forecast()`
@@ -211,14 +213,16 @@
 
 ### Changed output
 
-* `coefficient_plot()`, `compare_models()`, `frequentist_bayesian_plot()` and
-  `optimizer_fixef_plot()` label the coefficient of a two-level factor or a
-  logical input with its level, as in `treatment: enhanced`, where they showed
-  `treatment`, and name the variable and level of every factor in an
-  interaction row, as in `rainfall × treatment: enhanced`, where they showed
-  `rainfall × treatmentenhanced`. `compare_models()` labels a factor that only
-  a later model holds. `labels = c(treatmentenhanced = "treatment")` restores
-  an old label.
+* `coefficient_plot()`, `compare_models()`, `frequentist_bayesian_plot()`,
+  `optimizer_fixef_plot()` and the coefficient panel of `model_report()` label
+  a two-level factor or logical input with its level, as in
+  `treatment: enhanced`, where they showed `treatment`. Except in
+  `model_report()`, `labels = c(treatmentenhanced = "treatment")` restores an
+  old label.
+* In an interaction row, the same functions name the variable and level of
+  every factor, as in `rainfall × treatment: enhanced`, where they showed
+  `rainfall × treatmentenhanced`. `compare_models()` also labels a factor that
+  only a later model holds.
 * `compare_models(x_lab = NULL)`, and `frequentist_bayesian_plot(x_lab = NULL)`
   with summaries, draw the default axis title, 'Estimate' or the ratio's name,
   where they drew none. Adding `ggplot2::labs(x = NULL)` removes it.
