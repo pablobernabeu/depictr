@@ -1,847 +1,458 @@
 # depictr (development version)
 
-## Figures that misreported the data
+## Upgrading from the previous release
 
-* `estimation_plot()`, and `group_comparison_plot(differences = TRUE)` which
-  calls it, failed in a fresh R session with "Can't find method for generic
-  `/(e1, e2)`", or with "non-numeric argument to binary operator" under
-  ggplot2 3.5. The two panels were stacked with patchwork's `/` operator, which
-  exists only once patchwork has been loaded, and nothing in depictr loaded it.
-  The panels are now composed with `patchwork::wrap_plots()`, and depictr
-  imports patchwork, so `library(depictr)` loads it.
+### Changed results
 
-* `estimation_plot()` drew the differences out of line with the groups they
-  belong to. The lower panel had one column fewer than the upper and spread its
-  columns across the full width, so with reference North, the East difference
-  sat beneath North, and with two groups, the single difference sat midway
-  between them. Every group now keeps its column in both panels, and the
-  reference's column in the lower panel is left empty.
-  `group_comparison_plot(differences = TRUE)` is fixed with it. The function is
-  also described for what it draws, a Cumming estimation plot with the
-  differences stacked beneath the data. The claim that zero lines up with the
-  reference group's mean has been removed, since the stacked panels have
-  independent axes. The caption now writes a round number of resamples in full,
-  as 100,000 where it printed 1e+05.
+* Confidence intervals for a `glm` whose dispersion is estimated (Gaussian,
+  Gamma, inverse Gaussian and quasi families) use the t distribution, as
+  `summary.glm()` does, where they used z and were too narrow. They widen
+  wherever depictr reports or draws them.
+* `coefficient_plot(standardise = TRUE)`, and so `model_report()`, scales
+  continuous inputs by their standard deviation and an interaction through its
+  continuous inputs, leaving factor, logical and two-valued inputs unscaled
+  (Gelman, 2008), where it scaled every model-matrix column, so a contrast
+  depended on group balance.
+* `coefficient_plot(standardise = TRUE)` leaves `poly()`, `ns()` and other
+  matrix terms unscaled, with a message, and warns about an interaction of
+  continuous inputs that are not all centred. The axis and panel titles say
+  which inputs were scaled.
+* `coefficient_plot()` reads an unnamed `labels` vector in model order,
+  whatever `order` is, where it matched the vector to the terms as reversed or
+  sorted for display, so a vector written for 0.3.0 can put labels on other
+  terms. Named labels are unaffected.
+* `model_fit_table()` and the `model_report()` subtitle give every `glm` the
+  deviance R², where they applied McFadden's ratio to every family and could
+  refit the null model on other rows. Binary logistic values change only where
+  that refit went wrong.
+* `model_fit_table()` takes the AIC, BIC and log-likelihood of an
+  `lme4::lmer()` REML fit from a maximum-likelihood refit, with a message,
+  where it reported REML criteria, which cannot be compared between models with
+  different fixed effects.
+* `vif_plot()` computes VIFs from the coefficients' covariance, as `car::vif()`
+  does, where it ignored the fit's weights. Values change for a weighted `lm`,
+  a binomial or Poisson `glm` and any other `glm` that weights its observations
+  unequally. A model without an intercept changes too, with a warning.
+* `tidy_estimates()` exponentiates the estimates and limits of an `lm`, a
+  `glm`, an lme4 fit and a data frame when given `exponentiate = TRUE`, where
+  it ignored the argument for these and returned the link scale.
+* `effects_plot()`, `interaction_plot()` and `model_report()` build the
+  prediction grid from the raw variables, so `predict()` re-applies every
+  transformation, where a transformed term beside its raw variable gave a flat
+  effect line or coincident interaction lines.
+* `calibration_plot()` and the Q-Q panel of `residual_diagnostics_plot()` pair
+  each outcome of a `glm` fitted with `na.action = na.exclude` with its own
+  fitted value, where they paired it with another row's.
+* `residual_diagnostics_plot()` and `influence_plot()` leave out the rows that
+  `na.action = na.exclude` excludes, for an `lm` as for a `glm`, without the
+  warning they gave, and the 2p/n leverage line of `influence_plot()` no longer
+  counts them.
+* The Q-Q panel of `residual_diagnostics_plot()` scales the quantile residuals
+  of a weighted Gaussian or Gamma model by its prior weights, which it ignored,
+  and leaves out observations with zero prior weight.
+* `binned_residual_plot()` and the binned panel of `residual_diagnostics_plot()`
+  draw the band from the fitted model, where the empirical band was too narrow
+  in bins without events, and leave out observations with zero prior weight.
+  `binned_residual_plot(band = "empirical")`, though not the panel, restores
+  the old band.
+* `model_report()` draws binned-residual and quantile-residual panels for a
+  `glm`, as `residual_diagnostics_plot()` does, where it drew normal-theory
+  panels that flag a correct logistic model. `glm_panels = FALSE` restores the
+  old panels, and `seed` fixes the randomised residuals.
+* `frequentist_bayesian_plot()` and `posterior_plot()` keep only the `b_`
+  parameters of a `posterior` draws object that has them, as one made from a
+  brms fit does, with a message, where `frequentist_bayesian_plot()` drew the
+  group-level effects as parameters and pooled `b_Intercept` with `Intercept`.
+* `frequentist_bayesian_plot()` and `posterior_plot()` leave out the
+  group-level effects of a `stanreg` fit and the log densities `lp__` and
+  `lprior` of any draws, which they drew as parameters.
+* `frequentist_bayesian_plot()` with draws plots only the terms both inputs
+  share, with a message naming those it drops, where `sigma` and terms without
+  a posterior took rows of their own, and sets the outer posterior interval by
+  `conf_level`, where it stayed at 95%.
+* `frequentist_bayesian_plot()` reads a `brms::fixef()` matrix as a summary,
+  where it drew the matrix's four columns as parameters.
+* `survival_plot()` draws log-log confidence limits by default (Borgan &
+  Liestøl, 1990), where it drew untransformed Greenwood limits. Unless `time`
+  is a `survfit` object, `conf_type = "plain"` restores them, apart from the
+  last step of a curve that falls to zero. `conf_type = "log"` gives the
+  default of `survival::survfit()`.
+* `survival_plot()` recomputes a `survfit` object's limits at `conf_level` and
+  `conf_type`, where it copied the object's own and ignored `conf_level`.
+  `conf_type = "log"` restores the limits of an object made with the defaults
+  of `survfit()`.
+* `survival_plot()` draws limits for a `survfit` object made with
+  `conf.type = "none"`, where it drew none. `conf_level = NA` leaves them out.
+  An object without standard errors, or with Peto or modified lower limits,
+  keeps its own and warns when they differ from those asked for.
+* `survival_plot()` reads the `status` coding once over all observations, where
+  it read each group separately and so drew a group whose subjects are all
+  censored under the 1/2 coding falling to zero. That group's curve now stays
+  at one.
+* `survival_plot()` honours `group` and `status`, as a column name or a vector,
+  when `time` is a data frame, where it read them only from conventionally
+  named columns and could pool the groups.
+* The number-at-risk table of `survival_plot()` counts a subject followed up to
+  exactly a break and keeps a last break equal to the longest follow-up, both
+  of which a floating-point error in the default breaks left out.
+* The median guides of `survival_plot()` follow `survival::quantile.survfit()`,
+  where a rounding error could label the wrong time, a `survfit` curve flat at
+  0.5 could take its midpoint from a censoring time and a curve that ends at
+  0.5 got no guide.
+* The confidence band of `survival_plot()` reaches the last event of a curve
+  that falls to zero, where it stopped one event early.
+* `k_diagnostic()` and `cluster_plot()` default to `k_range = NULL`, which
+  searches `1:8` for the gap and elbow criteria. The old `2:8` let the gap
+  statistic find clusters in pure noise and kept the elbow from suggesting two.
+  `k_range = 2:8` restores it.
+* `silhouette_plot()` keeps the cluster labels it is given in its bands and in
+  its `"silhouette"` table, whose `cluster` and `neighbor` columns are factors
+  of them, where it recoded them to 1, 2, 3 and so on and gave `neighbor` as
+  integer codes.
+* `ts_forecast()` and the forecast overlay of `timeseries_plot()` forecast the
+  seasonally adjusted series with a random walk with drift, as
+  `forecast::stlf(method = "rwdrift", s.window = "periodic")` does, where they
+  extrapolated the last cycle's trend with intervals far too narrow. The
+  overlay caption names the method.
+* `timeseries_plot()` continues a forecast along the history's own axis,
+  numeric or `Date`, where it restarted near the start of the axis, and sorts
+  an unsorted `time` before forecasting.
+* `timeseries_plot()` centres the moving average of an even `rolling` window,
+  as a 2×12 average for `rolling = 12` (Hyndman & Athanasopoulos, 2021), where
+  the average was drawn half an observation early. Odd windows are unchanged.
+* `timeseries_plot()` draws one line per column of a multivariate `ts` or a
+  matrix, where it joined the columns into one series.
+* `summary_table()` summarises a date or date-time column as one `Range` row
+  and a duration as mean (SD) in a unit that the statistic names, where it gave
+  one row per distinct value.
+* `palette_safety()` and `check_figure()` measure colour separability with
+  CIEDE2000 (Sharma, Wu & Dalal, 2005), where the 1976 distance overstated the
+  differences between saturated colours, so distances and some verdicts change.
+  `metric = "cie76"` restores the old measure.
+* `simulate_cvd()` at partial severity interpolates between the published
+  matrices of Machado et al. (2009), where it drew the full-severity matrix
+  towards the identity, so its colours between severities 0 and 1 change. Full
+  severity is unchanged.
+* `check_figure()` measures each text against its own background, holds large
+  text to 3:1 and measures a translucent plot or panel background as the colour
+  it shows, where it measured all text against the plot background at 4.5:1.
+* `check_figure()` composites translucent colours over their background with
+  the alpha each geom applies, where it measured them as opaque, and compares
+  colours and fill colours each among themselves, where it pooled them, so
+  verdicts can change in either direction.
+* `check_figure()` counts a colour or fill split across layers, one value per
+  layer, as a colour encoding, where it reported none, and counts shape and
+  line type split that way towards `redundant_encoding`.
+* `check_figure()` adds a tenth row, `annotation_text_size`, which holds the
+  text inside the panel, such as annotations, `geom_text()` labels and the cell
+  values of depictr's plots, to the size floor, so a figure that passed can
+  fail.
 
-* `group_comparison_plot(differences = TRUE)` coloured the groups differently
-  from the plain plot whenever `reference` was not the first level.
-  `estimation_plot()` draws the reference first and took the palette in that
-  order, so with reference South, East took North's colour, North took South's
-  and South took East's. `estimation_plot()` now matches a named `palette` to
-  the levels by name, as the other grouped plots do, and
-  `group_comparison_plot()` passes it one named by level, so each group keeps
-  its colour with or without the difference panel. An unnamed `palette` passed
-  to `estimation_plot()` is still taken in the order the groups are drawn.
+### Changed interface
 
-* `coefficient_plot()` attached an unnamed `labels` vector to the wrong
-  coefficients. The labels were assigned after the terms had been reversed or
-  sorted for display, so in `lm(yield ~ rainfall + fertiliser + soil_ph)` soil pH
-  was labelled 'Rainfall'. An unnamed vector is now bound to the terms in model
-  order before any reordering. `compare_models()` and
-  `frequentist_bayesian_plot()` counted one row per term and source, or one per
-  posterior draw, and so refused a vector with one label per term. Both now
-  accept one, read with the terms in the order they first appear. Named labels
-  are unchanged and remain the safer form. The documentation of `order` now says
-  which end the largest estimate lands at.
+* depictr requires ggplot2 3.5.2 or later, where it declared 3.5.0, with which
+  the current patchwork cannot load, and suggests lme4 1.1-19 or later.
+* `coefficient_plot()`, `timeseries_plot()` and `decompose_plot()` take new
+  arguments before `title`, `palette` and `confidence` respectively, so those
+  arguments and the ones after them must be passed by name.
+* `tidy_estimates()`, `save_plot()`, `frequentist_bayesian_plot()`,
+  `scale_colour_depictr()` and `scale_fill_depictr()` take a new argument
+  before `...`, so an argument meant for `...` must be passed by name.
+* A `conf_level` outside (0, 1), such as 95, is refused by every function that
+  takes one, where a level of 0 or 1 gave the model estimates zero-width or
+  unbounded intervals, 95 gave missing intervals or an error and
+  `roc_curve_plot()` without `ci` ignored the level. Without `ci`,
+  `roc_curve_plot()` also refuses `NULL`, which it ignored.
+* Every function that takes a `conf_level`, except `survival_plot()` and
+  `calibration_plot()`, refuses `NA`, where most gave missing intervals. Those
+  two still take it to leave the limits out, and both refuse `NaN`, which they
+  read as `NA`.
+* `compare_models()` and `frequentist_bayesian_plot()` read an unnamed
+  `labels` vector as one label per term, in the order the terms first appear,
+  where they took one label per row of the stacked estimates or per posterior
+  draw, and refuse a vector of the old length.
+* `survival_plot()` refuses a factor, character or non-integer `status`, which
+  it read by its level codes, as missing or truncated to an integer.
+* `survival_plot()` refuses a `status` coded 0/1 in some groups and 1/2 in
+  others, which it read group by group.
+* `survival_plot()` refuses a `group` or `status` name that matches no column
+  of a data frame `time`, which it ignored.
+* `effects_plot()`, `interaction_plot()` and `model_report()` refuse a formula
+  term computed from statistics of its rows, such as `I(x - mean(x))`, which
+  shifted the line, a formula that reads columns with `$` and a transformed
+  term whose data the call cannot supply.
+* `frequentist_bayesian_plot()` with draws refuses inputs that share no terms
+  and two terms of either input that would share a label, and
+  `posterior_plot()` refuses a `brms::fixef()` matrix and two parameters that
+  would share a label. For a draws object that holds `b_` parameters, a
+  `labels` key omits the prefix, so a key such as `b_rainfall` written for
+  0.3.0 no longer matches.
+* `explore_distribution()`, `ecdf_plot()`, `raincloud_plot()`,
+  `group_comparison_plot()`, `explore_categorical()`, `explore_pairs()`,
+  `ridgeline_plot()` and `outlier_plot()` refuse a numeric `group` with more
+  than 20 distinct values, which they drew, and `scatter_trend()` refuses one
+  when called, where it returned a plot that failed when drawn.
+* `scatter_trend()`, `explore_distribution()`, `ecdf_plot()`,
+  `raincloud_plot()`, `explore_categorical()` and `outlier_plot()` refuse a
+  `group` missing for every row when called, where they drew it, as an empty
+  panel in `explore_distribution()` and `ecdf_plot()`, or returned a plot that
+  failed when drawn.
+* `power_curve_plot()` refuses rows of one curve that share a sample size,
+  where it joined them into a zigzag line.
+* `acf_plot()`, `decompose_plot()`, `seasonal_plot()` and `ts_forecast()`
+  refuse a series of more than one column, and `timeseries_plot()` refuses a
+  `forecast` for one, where they joined the columns into one series.
+* `timeseries_plot()` refuses an even `rolling` window as long as the shortest
+  series, since the centred average spans one observation more than the
+  window.
+* `pca_plot()` refuses a misspelt `group` column, a `group` vector of the wrong
+  length and a column name passed with a `prcomp` object, which it read as one
+  level or padded with `NA`.
 
-* `model_fit_table()` and the `model_report()` subtitle misreported R² for `glm`
-  models. McFadden's ratio was applied to every family, so a Gaussian `glm`
-  could report a negative value and a quasi-likelihood family reported `NA`.
-  The null model was refitted with `update()`. That used more rows than the
-  model when a predictor had missing values, dropped an offset written in the
-  formula, put an intercept in the null of a model fitted without one and gave
-  `NA` for a model fitted inside a function. Every `glm`, including
-  quasi-likelihood and negative binomial fits, now reports the deviance R²,
-  1 - D/D0, computed from the deviances the fit already holds. It equals the
-  ordinary R² for a Gaussian model with the identity link and McFadden's R²
-  for binary logistic regression, so a binary logistic value changes only
-  where the old refit went wrong. Values for Poisson, grouped binomial, Gamma
-  and other models change by definition. The `model_report()` subtitle now
-  calls it the deviance R², where it said pseudo-R².
-* For mixed models fitted by REML with `lme4::lmer()`, `model_fit_table()` now
-  takes AIC, BIC and the log-likelihood from a maximum-likelihood refit and
-  says so in a message. REML criteria cannot be compared between models with
-  different fixed effects, which is the comparison the model-estimates
-  vignette makes. If a refit fails, a warning says so and that model's
-  criteria are `NA`. The `R2` column stays `NA` for mixed models, as the help
-  page now documents.
+### Changed output
 
-* A `glm` fitted with `na.action = na.exclude` broke the classification and
-  diagnostic plots. Its fitted values are padded with `NA` to the length of the
-  data while its response is not, and the plots paired the two. The ROC,
-  precision-recall, threshold, gain and lift plots and the confusion matrix
-  failed, and `calibration_plot()` silently dropped bins and drew the rest with
-  other rows' outcomes. In the Q-Q panel of `residual_diagnostics_plot()`, the
-  quantile residuals set each response against another row's fitted value, and
-  for a Gaussian model they were all `NA`, so the panel was empty. All of them
-  now use the model's own unpadded components. `residual_diagnostics_plot()` and
-  `influence_plot()` also leave the excluded rows out of their frames, for an
-  `lm` as for a `glm`. They no longer warn about removing those rows, and the
-  2p/n leverage line of `influence_plot()` no longer counts them.
-* The quantile residuals in the Q-Q panel of `residual_diagnostics_plot()`
-  ignored prior weights in Gaussian and Gamma models. Every observation was given
-  the same scale, so a correctly specified weighted model showed spurious
-  departures from the line. The weights now scale each observation's variance,
-  as they do in the fit.
-
-* A brms posterior passed as a `posterior` draws object was read as a plain
-  table. `frequentist_bayesian_plot()` silently pooled `b_Intercept` with
-  `Intercept`, the intercept brms reports for centred predictors, into one
-  slab. It also drew the sampler's log density and every random effect as
-  parameters. `posterior_plot()` stopped with an error about duplicated factor
-  levels. Draws objects now keep their population-level (`b_`) parameters,
-  named without the prefix as for a brms fit, with a message naming what was
-  dropped. A `labels` key for one of them is written without the prefix too.
-  In both functions, two parameters whose draws would share a label are now an
-  error, and `lp__` and `lprior` are never drawn as parameters, whatever form
-  the draws take. For a `stanreg` fit, the group-level `b[...]` and
-  `Sigma[...]` draws are no longer read as fixed effects either.
-* When `bayesian` holds draws, `frequentist_bayesian_plot()` now draws only the
-  terms both inputs share, and a message names any it dropped. A `sigma` in the
-  posterior, or a frequentist term with no posterior, no longer takes a row of
-  its own. Inputs that share no terms are an error.
-* A `brms::fixef()` matrix was read as draws, so it came out as four
-  'parameters' named after its columns. `frequentist_bayesian_plot()` now takes
-  the summary path for it, and `posterior_plot()`, which needs draws, refuses
-  it. The summary path also no longer warns about label keys you never
-  supplied.
-* `conf_level` in `frequentist_bayesian_plot()` set the level of the
-  frequentist intervals only. With draws, the half-eyes stayed at 66% and 95%,
-  so `conf_level = 0.8` drew 80% confidence intervals beside 95% credible ones,
-  and nothing on the figure named either level. The level now sets the outer
-  posterior interval too. The interval drawn when ggdist is not installed
-  follows it, and so does the span that decides which faceted panels draw the
-  reference line. The 66% inner interval is kept while `conf_level`
-  exceeds 0.66, so that it stays the narrower of the two. A caption now names
-  the level of each source's intervals on either path, and the new `caption`
-  argument replaces it or, with `NA`, omits it. A table of estimates keeps the
-  intervals it holds, and the caption says that they are as supplied.
-* The two paths of `frequentist_bayesian_plot()` no longer swap the sources'
-  colours. With draws, the Bayesian half-eyes were brand blue and the
-  frequentist overlay orange, the reverse of the forest plot drawn from
-  summaries and of the Python package. The frequentist estimates are now brand
-  blue and the Bayesian ones orange on both paths.
-
-* `survival_plot()` read the `status` coding separately in each group. Under the
-  `survival::Surv()` 1/2 convention, a group whose subjects were all censored
-  (all `1`) fits the 0/1 convention as well, so it was read as a group in which
-  every subject had the event, and its curve fell to zero. Codings that mixed
-  the two conventions across groups were accepted silently. The coding is now
-  read once, over all observations.
-* `survival_plot()` silently misread a factor `status`. The factor was coerced
-  to its level codes and read under the 1/2 convention, so whichever level sorted
-  first was taken as censored, whatever it meant. A character `status` became
-  `NA` throughout, with only a coercion warning, and drew a flat curve at one.
-  Both are now refused with an error that says to recode the indicator first.
-* `survival_plot()` ignored its `group` and `status` arguments when `time` was a
-  data frame. It read both from conventionally named columns only (`group`,
-  `strata` or `arm`, and `status` or `event`), so
-  `survival_plot(df, group = "treatment")` drew a single pooled curve with no
-  legend, log-rank test or risk-table rows. A column name or a vector with one
-  entry per row is now honoured for both, and takes precedence over the
-  conventionally named column. A name that matches no column is an error.
-* The number-at-risk table of `survival_plot()` could miscount at its default
-  breaks. `pretty()` returns multiples of a binary floating-point step, so with
-  follow-up up to 1.2 the break labelled 0.6 was 0.6000000000000001, and a
-  subject followed up to exactly 0.6 was left out of the count there. A last
-  break equal to the longest follow-up was lost the same way. The breaks are
-  now rounded to their step before the counts are taken.
-* The median-survival guides of `survival_plot()` mislabelled some medians.
-  The survival estimate was compared with 0.5 without a tolerance, so a step
-  that the arithmetic left a rounding error above 0.5 was taken to stay above
-  it. With times `c(2, 3, 4, 8, 8, 10, 10, 11)` and status
-  `c(1, 1, 1, 1, 0, 1, 0, 1)`, the guide read 'median 10' where
-  `survival::quantile.survfit()` gives 9. A curve that ended at 0.5 drew no
-  guide. For a `survfit` object, the midpoint of a curve that sat at 0.5 was
-  taken with the next row, which can be a censoring time at which the curve
-  does not move. The medians now follow the rule of `quantile.survfit()`,
-  including its tolerance and its midpoint for a curve that ends at 0.5,
-  whatever the input and whether or not survival is installed.
-
-* `save_plot()` wrote files that fail the checks journals run on submitted
-  figures. An EPS left out every translucent element, including all the points
-  and the confidence band of the first `scatter_trend()` example, with only a
-  terse device warning to show for it, and it named its fonts without embedding
-  them. A PDF did not embed its fonts either. A TIFF was uncompressed: 8.1 MiB
-  at the default 7 by 4.5 inches, and more than the 10 MB PLOS allows at the
-  largest figure size it accepts. A transparent background, such as
-  `theme_void()` leaves, could also give the TIFF the alpha channel PLOS
-  refuses. PDF and EPS files now go through the cairo devices, which embed the
-  fonts. An EPS rasterises its translucent layers, and whatever they overlap,
-  at 600 dpi or more, with a message when it does. A TIFF is now LZW-compressed
-  and drawn on white unless `bg` is given. On a Mac without ragg, it is drawn
-  by the cairo TIFF device, because the default quartz one ignores compression.
-  A `device` or device argument passed to `save_plot()` still wins. Without
-  cairo, the old devices are used, with a message or a warning saying what the
-  file lacks. R for macOS from CRAN loads cairo only where XQuartz is
-  installed, so on a Mac without it a PDF or EPS is written this way, and a
-  TIFF is left uncompressed unless ragg is installed.
-
-* `effects_plot()`, `interaction_plot()` and `model_report()` failed on any
-  model with a transformed term (`log()`, `poly()`, `ns()`, `scale()`,
-  `factor()`, `I()`) or an offset. Where a transformed term sat beside its raw
-  variable, they drew a flat effect line or coincident interaction lines
-  without complaint. The prediction grid is now built from the raw variables,
-  so `predict()` re-applies every transformation, and offsets are held at their
-  sample mean on the link scale, as the y-axis label now says. A model-frame
-  name such as `"log(rainfall)"` stands for the variable it transforms, and the
-  x-axis shows that variable.
-* The raw values behind a transformed term come from the data named in the
-  model's call. A model fitted to workspace vectors without `data =` is
-  therefore refused, where it could silently plot its fitted values against the
-  grid, and so is a data frame that has changed since the fit or a formula that
-  reads one with `$`. A term computed from statistics of its rows, such as
-  `I(x - mean(x))`, is refused as well, since `predict()` would compute it
-  afresh over the grid. Beside its raw variable, such a term used to shift the
-  line without complaint.
-
-* `model_report()` judged every `glm` by normal-theory panels. A correctly
-  specified logistic model, simulated with 400 observations, put about a third
-  of its standardised deviance residuals outside the Q-Q band, the picture of
-  a broken model. A `glm` now
-  gets the binned-residual and quantile-residual panels that
-  `residual_diagnostics_plot()` already used, and `model_report()` gains the
-  same `glm_panels` and `seed` arguments. `glm_panels = FALSE` restores the
-  old panels. The help page of `qq_plot()` now says that the standardised
-  deviance residuals of a non-Gaussian `glm` are not expected to be normal.
-
-* `ts_forecast()`, and the forecast overlay of `timeseries_plot()`, drew
-  prediction intervals far too narrow. In rolling-origin backtests on eight
-  classic series, the nominal 95% band covered about 60% of one-step-ahead
-  outcomes. The documentation credited its square-root widening to seasonal
-  naive forecasting, whose variance does not grow that way. Forecasts now come
-  from a random walk with drift on the STL-seasonally-adjusted series, with the
-  last seasonal cycle added back, which reproduces
-  `forecast::stlf(method = "rwdrift", s.window = "periodic")`. A new `lambda`
-  argument in both functions applies a Box-Cox (or log) transformation for a
-  seasonal swing that grows with the level, and a caption on the overlay names
-  the interval and the method. A series of exactly two cycles now gets the
-  package's own message, and `decompose_plot()` gains `s_window`. The
-  vignette's claim that STL lets the seasonal component evolve held only for a
-  window this release exposes for the first time.
-* `timeseries_plot()` drew the forecast of a numeric `x` in the wrong place.
-  The forecaster counted time in cycles from 1, while the history sits at the
-  observation index or at the supplied `time`. The overlay therefore jumped
-  back towards the start of the axis, and on a `Date` axis it landed in the
-  year 4. The forecast now continues the history's own axis, one typical step
-  at a time. An unsorted `time` is also put in order before forecasting, as it
-  already was for the moving average.
-
-* `pca_plot()` now fixes the aspect ratio, so the angles drawn between the
-  loading arrows are their angles in loading space whatever the size of the
-  device. The panel's height and width follow the ranges of its axes, so a
-  figure of another shape gains blank space around the panel. The arrows and
-  their labels are drawn in a neutral dark grey (`grey20`) in place of the
-  accent, which is also the palette's fourth colour and so tied the variables
-  to the fourth group. A misspelt `group` column, a column name passed with a
-  `prcomp` object and a `group` vector of the wrong length are now errors. The
-  first put one point in a level named after the misspelling and the rest in
-  `NA`. The second put every point in one level named after the column, and
-  the third was padded with `NA` or recycled in silence. `group` also takes an
-  unquoted column name, as elsewhere in the package. A `prcomp` object fitted
-  with `retx = FALSE` has no scores to draw, and it is now refused with a
-  message that says so.
-* `silhouette_plot()` recoded the cluster labels it was given to 1, 2, 3 and
-  so on, so a clustering labelled `"low"`, `"mid"` and `"high"`, or coded 2, 5
-  and 9, came back with other names in the band labels and in the attached
-  `"silhouette"` table. The labels passed in are now kept, and the table's
-  `neighbor` column is a factor of them.
-
-* `random_effects_plot()` failed for any model with more than one
-  random-effect term per grouping factor fitted without a correlation,
-  `(1 + x || g)` for instance. The same error, "incorrect number of
-  dimensions", stopped split terms such as `(1 | g) + (0 + x | g)` and their
-  `glmer()` equivalents. It now reads lme4's conditional standard deviations
-  for every model shape. For a correlated model, they equal the square roots of
-  the diagonal it used before, so those intervals are unchanged. lme4 is now
-  suggested at version 1.1-19 or later. Conditional variances for several
-  terms per factor arrived in lme4 1.1-18, and 1.1-19 revised the data-frame
-  method that reads them.
-
-* `power_curve_plot()` reads power tables with several curves, one per effect
-  or design, and draws one line each, told apart by colour and line type. It
-  joined them into a single zigzag before. An `effect`, `param` or `term`
-  column with more than one level separates the curves, with a message naming
-  the columns used, and rows that share a sample size with no such column are
-  now an error. It recognises `n_subject` and `<power>_lo`/`<power>_hi` columns
-  such as pilotr's, so the output of pilotr's `power_curve_mixed()` plots as it
-  is, with its band. It gains `n`, `power`, `group`, `lower`, `upper` and
-  `y_lab`, appended after the existing arguments so that positional calls keep
-  working. The y-axis title is "Power" for the usual power columns and the
-  column's name otherwise, so a decision probability such as pilotr's
-  `p_meaningful` is not labelled as power.
-
-* The grouped plots each treated a grouping variable in their own way. A
-  numeric code, such as a block numbered 1 and 2, failed in `scatter_trend()`
-  with "Continuous value supplied to a discrete scale", and
-  `explore_distribution()` and `ecdf_plot()` drew it as one ungrouped curve. A
-  level with no rows, as `subset()` leaves in a factor, took a colour in the
-  correlation panel of `explore_pairs()` but not in its scatter panels, so the
-  levels after it changed colour from one panel to the next.
-  `group_comparison_plot()` and `raincloud_plot()` warned that such a level had
-  too few observations and kept an empty place for it on the axis, which
-  `group_comparison_plot()` moved to the end. Missing groups made
-  `raincloud_plot()` fail, were drawn as a grey group of their own by
-  `scatter_trend()`, `outlier_plot()` and `explore_pairs()`, and vanished
-  without a word elsewhere. `scatter_trend()`, `explore_distribution()`,
-  `ecdf_plot()`, `raincloud_plot()`, `group_comparison_plot()`,
-  `explore_categorical()`, `explore_pairs()`, `ridgeline_plot()` and
-  `outlier_plot()` now share one rule. The group becomes a factor, so a numeric
-  code is a group, but a numeric column with more than 20 distinct values is
-  refused as continuous, as `explore_categorical()` already refused such an
-  `x`. Rows with a missing group are dropped with a message, as
-  `survival_plot()` drops them, and levels left without rows take no colour,
-  legend key or place on an axis. Colours are matched to the levels by name, so
-  a level keeps its colour in every layer and panel, and a group too sparse for
-  a ridge no longer shifts the colours of the ridges after it. An unnamed
-  `palette` is assigned to the levels in use in their order, and a named one
-  still pins a colour to each level. `explore_categorical()` now orders its
-  groups by level, where it sorted them alphabetically, so they take the same
-  colours as in the Python package. `explore_pairs()` leaves a numeric `group`
-  out of its default columns and stops with a clear error when `cols` names
-  it. With the default palette, the warning that more than eight groups lose
-  the colour-vision guarantee now comes once, when the plot is made, where it
-  came each time the plot was drawn.
-
+* `coefficient_plot()`, `compare_models()`, `frequentist_bayesian_plot()` and
+  `optimizer_fixef_plot()` label the coefficient of a two-level factor or a
+  logical input with its level, as in `treatment: enhanced`, where they showed
+  `treatment`, and name the variable and level of every factor in an
+  interaction row, as in `rainfall × treatment: enhanced`, where they showed
+  `rainfall × treatmentenhanced`. `compare_models()` labels a factor that only
+  a later model holds. `labels = c(treatmentenhanced = "treatment")` restores
+  an old label.
+* `compare_models(x_lab = NULL)`, and `frequentist_bayesian_plot(x_lab = NULL)`
+  with summaries, draw the default axis title, 'Estimate' or the ratio's name,
+  where they drew none. Adding `ggplot2::labs(x = NULL)` removes it.
+* The `model_report()` subtitle of a `glm` calls its R² 'deviance R²', where it
+  said 'pseudo-R²'.
+* `estimation_plot()` and `group_comparison_plot(differences = TRUE)` give
+  every group a column in the difference panel, the reference's first and
+  empty, so each difference sits in its own group's column, where the
+  difference panel had one column fewer than the groups and spread across the
+  full width.
+* The caption of `estimation_plot()` and
+  `group_comparison_plot(differences = TRUE)` writes a round number of
+  resamples in full, as 100,000, where it printed 1e+05.
+* `group_comparison_plot(differences = TRUE)` keeps each group's colour
+  whatever the `reference`, where the colours moved between groups, and
+  `estimation_plot()` matches a named `palette` to the levels by name.
+* `frequentist_bayesian_plot()` draws the frequentist estimates in brand blue
+  and the Bayesian ones in orange on both paths, where the draws path swapped
+  them, and adds a caption naming each source's interval level.
+  `caption = NA` omits it.
+* `save_plot()` writes PDF, EPS and PostScript files with the cairo devices,
+  which embed the fonts, and a TIFF LZW-compressed on white unless `bg` is
+  given, where the files failed journals' checks. `device = "pdf"`, `"eps"`,
+  `"ps"` or `"tiff"` restores ggplot2's devices.
+* `save_plot()` rasterises the translucent layers of an EPS or PostScript file
+  at 600 dpi or more, with a message, where it left them out.
+* Without cairo, as on a Mac without XQuartz, `save_plot()` writes a PDF, EPS
+  or PostScript file with a message or warning saying what the file lacks, and
+  a Mac with neither XQuartz nor ragg writes the TIFF uncompressed, with a
+  warning.
+* `seasonal_plot(style = "season")` draws its cycle lines from a ramp that
+  starts at `#4a8fc0`, at 3.51:1 against white, where the earliest cycles were
+  close to invisible.
+  `palette = depictr_palette(n, type = "sequential")`, with `n` the number of
+  cycles, restores the old ramp.
 * `palette_preview()`, `confusion_matrix_plot()` and `correlation_heatmap()`
-  drew some labels below the 4.5:1 contrast that WCAG asks of text. The first
-  two switched from white to dark grey text at a relative luminance of 0.4,
-  although the two colours tie near 0.2. Four of the eight default swatches
-  therefore had white labels at 2.85 to 3.87:1, and counts on mid-blue cells of
-  a confusion matrix fell as low as 2.3:1. `correlation_heatmap()` drew white
-  labels whenever |r| exceeded 0.6, which left the r = -0.70 of
-  `wellbeing_survey` at 3.6:1, and its `n/a` sat in grey40 on a grey85 cell at
-  4.1:1. Each label is now black or white, whichever has the higher contrast
-  against its tile as drawn, which is at least 4.58:1 on any colour. The tile
-  colours are read as the fill scale draws them, interpolated in the Lab colour
-  space, where the confusion matrix used an RGB approximation.
-
-* `vif_plot()` computed the VIFs of a weighted `lm` or a `glm` from the
-  correlations of the design matrix, which leave out the weights of the fit.
-  The generalised VIF of Fox and Monette (1992) compares the confidence region
-  of a term's coefficients with the one they would have without collinearity,
-  so it depends on those weights. The VIFs now come from the covariance of the
-  coefficients, as `car::vif()` computes them, and agree with it. For
-  `glm(adverse_event ~ biomarker + age + arm, family = binomial)` fitted to
-  `clinical_trial`, the VIF of age moves from 1.0073 to 1.0046. An unweighted
-  `lm` with an intercept gives the values it gave before. A model fitted
-  without an intercept now gives VIFs computed from columns that are not
-  centred, with a warning, as `car::vif()` does.
-
-* A multivariate `ts`, such as `cbind(mdeaths, fdeaths)`, or a numeric matrix
-  was read as one series, its columns laid end to end. `timeseries_plot()` drew
-  a single line. For a `ts` it zigzagged between the columns at every time, and
-  for a matrix it ran on from one column into the next. `acf_plot()` returned
-  the autocorrelation of the joined columns. `seasonal_plot()` and the
-  classical `decompose_plot()` recycled the seasons and times of one column
-  over all of them, so the columns were drawn over one another, and
-  `ts_forecast()` forecast the joined columns at missing times.
-  `timeseries_plot()` now draws one line per column, named after the columns.
-  `acf_plot()`, `decompose_plot()`, `seasonal_plot()` and `ts_forecast()`
-  refuse more than one column with a message that gives the count. They read a
-  `ts` with a single column as that series. `ts()` makes one from a one-column
-  data frame, and the STL decomposition stopped on it with "only univariate
-  series are allowed".
-* `decompose_plot()` and `ts_forecast()` now trim missing values at either end
-  of a series, as the Python package does, so a forecast, the overlay of
-  `timeseries_plot()` included, starts after the last observation.
-  `ts_forecast()` and the STL decomposition stopped with the error "missing
-  values in object" from `stl()`. A missing value inside the series is refused
-  with a message that names `x` and asks for the value to be dropped or
-  imputed, where `stl()` and `decompose()` stopped with errors of their own.
-  `acf_plot()` still computes the correlations across such a gap from the pairs
-  of observations present, with a warning, while the Python package refuses the
-  series. The help pages of both packages now say so.
-* `timeseries_plot()` keeps the level order of a factor `group`, which sets the
-  legend and the colours, and leaves out levels that no row uses. It ordered
-  the groups by first appearance.
-
-* `summary_table()` and `explore_bivariate()` took a date for a category.
-  `summary_table()` gave a `Date`, `POSIXct` or `difftime` column one row per
-  distinct value, so 40 visits on 40 days filled 40 rows. Dates are now
-  summarised as a range instead of one row per day: a single `Range` row reads
-  `2024-01-01 to 2024-04-27` overall and in each group, with the time to the
-  minute or second where the column has one. A duration is summarised as mean
-  (SD) in its own units, which the statistic names, as in `Mean (SD), days`.
-  `explore_bivariate()` drew a date against a number as one box plot per day,
-  and against a category as bars with a colour for each day, both with a
-  warning that the colours had been interpolated past the eight of the
-  built-in palette. Dates, date-times and durations now count as numeric.
-  Against a numeric variable, they give the scatter plot with a trend of
-  `scatter_trend()`, and against a categorical one box plots of their values
-  by level. A duration is drawn as a number in its own units, named in the
-  default axis title. The Python package now does the same.
-
-* `timeseries_plot()` drew a moving average over an even window, such as
-  `rolling = 12` for monthly data, half an observation early. Equal weights
-  over twelve observations are centred between two of them, and the mean of
-  observations 1 to 12 was drawn at observation 6, where its centre is 6.5. An
-  even window now gives the 2×12 moving average (Hyndman & Athanasopoulos,
-  2021, Section 3.3), a 12-point average followed by a 2-point one, which is
-  centred on each observation and is the trend that `decompose()` estimates.
-  The caption of a grouped overlay names it, and the window needs a series one
-  observation longer than itself. The Python package drew the same average
-  half an observation late, and the two packages now draw the same values. An
-  odd window is unchanged.
-
-* `threshold_plot()` joined the metrics at adjacent scores with straight lines,
-  which passed through values that no threshold gives, while its help page
-  promised exact step functions. The curves are now drawn as steps. Every
-  threshold between two adjacent scores predicts what the upper score
-  predicts, so each step changes at a score and runs flat below it. The Python
-  package now evaluates the metrics at every distinct score too, and draws the
-  same steps.
-* `dumbbell_plot(sort = "none")` promised the data's own order but sorted the
-  categories alphabetically, so levels West, South, North and East gave East,
-  North, South and West. It now keeps the order of a factor's levels, and
-  otherwise the order in which the categories first appear.
-
-## Degenerate input
-
-* `survival_plot()` truncated a non-integer status code, so `c(0, 0.5, 1)` was
-  read as two censored observations and an event. Non-integer codes are now
-  refused with the existing coding message.
-* `survival_plot()` kept an arm whose every `status` was missing when `group`
-  was a factor. The arm stayed in the legend with no curve and a row of zeros
-  in the risk table, and `logrank = TRUE` failed with an error that did not say
-  why. The arm is now dropped with the missing statuses, as it already was for
-  a character `group`.
-
-* `vif_plot()` refuses a model with aliased coefficients, for which no VIF
-  exists, and names the terms they belong to. It failed with an unrelated
-  base-R error, "missing value where TRUE/FALSE needed".
-
-* `correlation_heatmap()` refuses a column in `cols` that it cannot correlate
-  and names it, in the words of `explore_pairs()`. A factor failed with an
-  error from `var()` that did not name the column, and a date with "'x' must
-  be numeric" from `cor()`. Logical columns are still correlated as 0 and 1.
-
-* `seasonal_plot()` refused every frequency that is not a whole number, such
-  as the 365.25 / 7 of weekly data, with a message about `season_labels` that
-  no labels could satisfy, while `decompose_plot()` drew the same series. Such
-  a frequency is now rounded down to whole seasons, counted from the first
-  observation as `stl()` counts them, and a message says so.
-
-* A `conf_level` given as a percentage, such as 95, gave missing intervals,
-  with at most a `NaNs produced` warning, in `tidy_estimates()`,
-  `coefficient_plot()`, `compare_models()`, `effects_plot()`,
-  `interaction_plot()`, `group_comparison_plot()`, `calibration_plot()` and
-  `random_effects_plot()`. `estimation_plot()`, `roc_curve_plot()` and
-  `frequentist_bayesian_plot()` failed with `'probs' outside [0,1]`. A level of
-  0 or 1, which no interval can have, was accepted too. Every function that
-  takes a `conf_level` now refuses a value outside (0, 1). The message is the
-  one `acf_plot()` gave: "`conf_level` must be a single number strictly
-  between 0 and 1." `survival_plot()` and `calibration_plot()` still take `NA`
-  to leave the limits out. The other functions refuse it, where it gave
-  missing intervals, and `survival_plot()` refuses `NaN`, which it read as
-  `NA`.
-
-## Auditing a finished figure
-
-* `check_figure()` measured all text against the plot background, so text on a
-  coloured facet strip or legend box was judged against a background it is not
-  drawn on: white strip text on a dark strip failed and unreadable grey strip text
-  passed. Each text is now measured against its own background, with a
-  translucent fill taken as the colour it shows over what lies beneath it. Large
-  text (18 pt, or 14 pt bold, as printed) is held to the 3:1 that WCAG asks of it,
-  where it used to be held to 4.5:1. The `text_contrast` row reports the text that
-  falls furthest short of its own threshold and gives that threshold, and its
-  detail names the text's printed size and weight. A translucent plot or panel
-  background is also measured as the colour it shows. Its alpha used to be
-  dropped, so `geometry_contrast` moves for such a figure. The
-  relative-luminance code now cites the current WCAG 2.2 definition and its
-  0.04045 breakpoint, which changes no ratio.
-* `check_figure()` measured translucent marks and text as if they were opaque,
-  so a figure could pass contrast, colour-vision and greyscale checks that its
-  drawn colours fail. The 'mended' example in the Get started vignette was one:
-  its points, drawn at alpha 0.7, passed the geometry check at 3.87:1, and the
-  vermillion a reader sees reaches 2.56:1. Colours are now composited over
-  their background with the alpha each geom applies, outlines drawn opaque are
-  credited, and the colours of each aesthetic are compared among themselves. A
-  translucent colour or text is named in the detail with its alpha and the
-  colour it is drawn as, and the separability rows say whether their closest
-  pair are colours or fill colours. Verdicts on translucent figures can change
-  in either direction. The vignette's example now draws its points opaque.
-* `check_figure()` now treats a colour or fill mapped in several layers, one
-  value per layer, as the encoding it is. Such figures were reported as
-  encoding nothing by colour. With red and green drawn one group per layer,
-  every colour row read "not applicable", whereas the same figure drawn in one
-  layer fails the deuteranopia check at 0.37. `frequentist_bayesian_plot()`
-  with draws, whose half-eyes and frequentist overlay are separate layers, was
-  never audited for colour. It now is, and the orange of its half-eyes fails
-  `geometry_contrast` at 2.25:1, as that colour does on white in any figure.
-  Shape and line type split across layers count towards `redundant_encoding` in
-  the same way. A colour set as a constant, as in `geom_point(colour = "red")`,
-  is still left out, as the help page now says.
-* `check_figure()` gains an `annotation_text_size` row for the text drawn
-  inside the panel: annotations, the labels of layers such as `geom_text()` and
-  `geom_label()`, and the cell values and labels of depictr's own plots. The
-  text-size check never saw that text, so a 5.7 pt annotation passed a 6 pt
-  floor while the report gave 8.80 pt as the smallest text. The new row holds
-  it to the same floor at its printed size. It is appended last, so the report
-  now has ten rows. The contrast of that text is not measured, and nor is text
-  a layer builds only when it is drawn, such as ggrepel's labels. When all of a
-  figure's text is inside the panel, the two rows for the text around it no
-  longer say that the figure draws no text.
-* The colour rows of a figure coloured by a continuous scale, such as a
-  heatmap, said that nothing was distinguished by colour. They now say that
-  colour is a continuous scale, which these checks do not audit, and the
-  documentation recommends a perceptually ordered map such as viridis for one.
-  The help page and the README now also give the default palette's contrast
-  limit, which the Get started vignette already stated: four of its eight
-  colours fall below the 3:1 that WCAG asks of a graphical object against
-  white, the orange from the second group on. The documentation shows how to
-  audit a figure saved at its final width, with that width given as both
-  widths or neither, and the help page gives four publishers' text floors,
-  dated and linked, where it called 6 pt a common publisher floor.
-* `check_figure()` accepts a multi-panel composite and audits each panel on
-  its own, in the order patchwork tags them, with a leading `panel` column. It
-  used to refuse one, which left the package's own composites without an
-  audit. Among them are the figures of `arrange_plots()`,
-  `residual_diagnostics_plot()`, `model_report()`, `estimation_plot()` and
-  `survival_plot(risk_table = TRUE)`. Each panel's legend is measured with the
-  panel. A spacer or a guide area takes no panel number, and a wrapped element,
-  such as a grob or a table, is left out with a warning. Composite-level titles
-  and tags are not measured.
-* `check_figure(max_text_pt =)` checks a ceiling as well as a floor, and
-  `save_plot(check = TRUE)` audits the figure at the width it is saved at, so
-  the text sizes are the printed ones. The ceiling adds a last row,
-  `text_size_max`, for the largest text at its printed size, around the panel
-  and inside it, and that row passes at or below its threshold. Nature, for
-  one, allowed no text above 7 pt but the panel labels. Without `max_text_pt`,
-  the report keeps its ten rows. `save_plot(check = TRUE)` gives the saved
-  width, converted to centimetres from inches, millimetres or pixels, as both
-  `width_cm` and `render_width_cm`. It warns with each check the figure fails
-  and attaches the report to the file name it returns, as `attr(, "check")`.
-
-## Metadata and documentation
-
-* The declared ggplot2 floor rises from 3.5.0 to 3.5.2. The current patchwork
-  cannot load against ggplot2 3.5.0 or 3.5.1, so every function that composes
-  panels failed on the floor the package declared: `arrange_plots()`,
-  `model_report()`, `residual_diagnostics_plot()`, `estimation_plot()`,
-  `explore_pairs()`, `decompose_plot()` and `survival_plot(risk_table = TRUE)`.
-  On ggplot2 3.5.x, `pca_plot()` and `silhouette_plot()` also warned about an
-  unknown `linewidth` and drew borders round their labels. They now name the
-  border argument each ggplot2 version understands and draw no border on either.
-  The reference lines of `coefficient_plot()`, `frequentist_bayesian_plot()`
-  and `posterior_plot()` no longer warn about an unknown `inherit.aes` on
-  ggplot2 3.5.x. The floors job in continuous integration now also tests the
-  floor against the newest patchwork, and runs every example with warnings
-  treated as errors.
-
-* ragg is listed in Suggests. `save_plot()` asks whether it is installed when
-  it chooses a device for a TIFF, and `R CMD check` warns about a package
-  looked up that way unless the package declares it.
-
-* `citation("depictr")`, the website and `CITATION.cff` give the DOI that CRAN
-  assigned to the package, <https://doi.org/10.32614/CRAN.package.depictr>, in
-  place of the Zenodo concept DOI. It names the R package across all its
-  versions, and it is the DOI that the CRAN page and the citation R generates
-  for a CRAN package already gave, so the package no longer circulates under
-  two. Zenodo still archives every GitHub release, and `CITATION.cff` lists both
-  identifiers. The CRAN DOI is shown as a full link in the README and on the
-  website, and the Zenodo concept DOI as one on the About page. The sidebar of
-  the home page shows the CRAN DOI once: the DOI badge in the README no longer
-  appears there a second time.
-
-* `citation("depictr")` and the About page name the package's publisher, in
-  full: "Comprehensive R Archive Network (CRAN)" stands before the DOI in the
-  reference, and the BibTeX entry gives it as `publisher`. The reference named
-  no publisher before. Every reference across the package family and the
-  author's website now names CRAN in the same words.
-
-* `citation("depictr")` gives the author's ORCID iD, as DESCRIPTION and
-  `CITATION.cff` do. `CITATION.cff` dates 0.3.0 by its first public release,
-  2026-08-27, the day of the GitHub release that Zenodo archived, and records
-  CRAN's publication on 2026-09-01 beside it. It gave 2026-08-21, when 0.3.0
-  was not yet public on any channel.
-
-* `posterior_plot()` and `frequentist_bayesian_plot()` formatted a label for
-  every posterior draw, which made a ten-parameter figure take seconds and a
-  full brms draws object minutes. Labels are formatted once per parameter.
-  `format_terms()` now strips the `b_` and `bs_` prefixes from a whole vector
-  with one regular expression. It split each term on its colons and took about
-  15 seconds for 40,000 labels, a job that now takes a fraction of a second. An
-  unnamed `labels` vector, one label per parameter in the order of `draws`,
-  now works in `posterior_plot()`. It failed with a message that counted the
-  draws as terms. The two bootstrap tests that took most of the test time are
-  skipped on CRAN and still run in continuous integration.
-
-* The README no longer says that the Python package differs from this one in a
-  few places. Its README now lists the differences that change what a figure
-  shows, many of them arguments the Python functions do not yet take, and a
-  test there accounts for every argument of this package's functions.
-
-* The help page of `posterior_plot()` now says that its intervals are central
-  (equal-tailed) quantile intervals, which leave the same share of the draws in
-  either tail. It did not say which kind of interval it drew.
-
-* A new spelling test checks DESCRIPTION, the help pages, the vignettes and
-  `NEWS.md` against the British English dictionary and `inst/WORDLIST`, and
-  spelling joins Suggests. The package had a word list but no test that read
-  it. The test fails a check run with `NOT_CRAN` set, as in `devtools::check()`
-  and on GitHub Actions, at any word found in neither, and CRAN and a plain
-  `R CMD check` skip it. Of the 65 words the test first stopped at, one was an
-  American spelling, now "afterwards". Six came from a hyphenated word, a web
-  address and two possessives, and their passages are reworded. The other 58
-  are names, packages, abbreviations and terms of art, and join the word list,
-  which also drops eleven entries the documentation no longer uses.
-
-* The references of `estimation_plot()`, `silhouette_plot()`, `k_diagnostic()`
-  and `vif_plot()` come from `inst/REFERENCES.bib`, as every other citation in
-  the package does. They were written out by hand on each page.
-  `vignette("multivariate-and-survival")` now cites Rousseeuw (1987) and
-  Tibshirani et al. (2001) from the same file, so both appear in its list of
-  references, where it sent the reader to `?k_diagnostic` for them.
-
-* Several help pages described behaviour the code does not have. The page of
-  `explore_pairs()` read as though columns beyond `max_cols` were trimmed, which
-  is what the Python twin does. Here they are an error naming the count, and
-  the page now says so. `posterior_plot()` said that an unknown `style` fell
-  back to `"interval"`, while it is an error. Only a missing 'ggdist' falls
-  back. `depictr_palette()` said that `n = NULL` returns the full qualitative
-  palette, also for the sequential and diverging types, which return seven
-  colours. `depictr_options()` and `theme_depictr()` named `depictr_brand()`,
-  `depictr_accent()` and `depictr_reference()` as accessors, but the package
-  does not export them. The pages now describe the three colours by their use.
-  Six pages also drop remarks about how a function used to behave.
-
-* More help pages described behaviour the code does not have.
-  `depictr_palette()` named the bluish green and the vermillion as the pair 3.31
-  apart in lightness among the first four colours of the contrast-first order,
-  where that pair is the bluish green and the reddish purple. The page of
-  `cluster_plot()` said that `seed = NULL` leaves the random-number state
-  untouched, while k-means then draws from it. A seed, when given, is used for
-  that call alone, and the caller's state is restored. `coefficient_plot()` said
-  that `interaction` is ignored whenever `labels` is supplied, but it still
-  formats every term that a named vector leaves out. `missingness_map()` said
-  that its missing-cell colour comes from `depictr_palette()`, where it is the
-  accent set with `depictr_options()`. `k_diagnostic()` described its elbow as
-  the point of maximum curvature, as well as the point farthest from the chord,
-  which is the one it picks. `dumbbell_plot()` said that the default sort puts
-  the shortest dumbbell at the top, which holds only when every difference is
-  negative. `survival_plot()` said that `survival::survdiff()` computes the
-  log-rank test whenever 'survival' is installed, but a `survfit` object always
-  takes the base-R test. The example of `vif_plot()` that was to show a
-  generalised VIF used a two-level factor, which has an ordinary one, and now
-  uses a four-level factor. `binned_residual_plot()`, `palette_safety()`,
-  `check_figure()` and `depictr_palette()` also drop remarks about earlier
-  versions.
-
-* Other help pages left out what a user needs. `tidy_estimates()` now lists the
-  columns it reads from a data frame and says that missing limits are filled in
-  as z intervals at `conf_level`, which `coefficient_plot()` passes on for a
-  data frame too. `posterior_plot()` names the columns that make a data frame
-  long, and `frequentist_bayesian_plot()` says when a data frame counts as draws
-  and what it draws without 'ggdist'. `optimizer_fixef_plot()` accepts the
-  `summary()` of an `lme4::allFit()` object, as its page now says.
-  `estimation_plot()` names the columns of its `"differences"` attribute,
-  `roc_curve_plot()` documents its `"auc_ci"` and `"youden"` attributes and
-  `pr_curve_plot()` its `"max_f1"`. `model_fit_table()` says that `df` counts
-  the estimated parameters and which residuals `RMSE` is computed from.
-  `random_effects_plot()` says that it leaves the level names off the axis when
-  there are more than 30, and how to bring them back.
-  `palette_preview(type = "all")` says that it draws no hex labels,
-  `simulate_cvd()` that it drops alpha and `group_comparison_plot()` that
-  `x_lab` is not drawn with `differences = TRUE`. `k_diagnostic()` and the
-  bootstrap band of `roc_curve_plot()` draw from the session's random-number
-  stream, and their pages now say to call `set.seed()` first.
-
-* Two more help pages, three vignettes and the README described behaviour the
-  code does not have. `vignette("exploring-data")` said that column names can be
-  given quoted or unquoted, but `summary_table()` takes its `vars` and `group`
-  as strings, as its page now says, and an argument that names several columns,
-  such as `cols`, takes a character vector. The vignette also said that the
-  model-estimate plots take `standardise`, which only `coefficient_plot()` does,
-  and that every depictr function returns a ggplot, which holds only for the
-  plotting functions. `threshold_plot()` and
-  `vignette("diagnostics-and-uncertainty")` said that the maximum-F1 threshold
-  is marked with a dashed line, where it is dotted, and the vignette said that
-  power stays at 99% beyond 24 participants, while it is 98% at 60.
-  `vignette("multivariate-and-survival")` promised a median guide for each arm
-  and called the treatment arm's median clearly longer, but that arm's curve
-  stays above 0.5, so its median is not reached and it gets no guide. The
-  vignette now attributes the silhouette bands to Kaufman and Rousseeuw (1990),
-  which it cites, rather than to Rousseeuw alone. The README said that
-  `R CMD check` runs on every push, where it runs on pushes to `main` and on
-  pull requests into it.
-
-* The README and the help pages of `depictr_palette()`, `depictr_options()` and
-  `palette_safety()` called the built-in qualitative palette the Okabe-Ito set.
-  It is based on that set and keeps six of its eight colours, with the brand
-  blue and a grey in place of its blue and black, as the page of
-  `depictr_palette()` now says. The page of `palette_safety()` credited the
-  Okabe-Ito set with the pair that the default `threshold` of 5 is calibrated
-  against, the reddish purple and the grey, 6.43 apart under full
-  deuteranopia. That set has no grey, and the page now gives the pair to the
-  built-in palette.
-
-## Changed defaults
-
-* The gap statistic's default search in `k_diagnostic()` and
-  `cluster_plot(suggest_k = "gap")` could not return `k = 1`, so it reported
-  clusters in pure noise (`k = 2` for 20 of 20 seeded Gaussian data sets).
-  `k_range` now defaults to `NULL`, which searches `1:8` for the gap and elbow
-  criteria and `2:8` for the silhouette, as before. A suggestion made with the
-  old default can change, so pass `k_range = 2:8` to reproduce it. The help
-  pages now say that the elbow never chooses the first or last candidate.
-
-* `standardise = TRUE` in `coefficient_plot()`, and so the default
-  `model_report()`, multiplied every model-matrix column by its standard
-  deviation. That made a factor contrast depend on how the groups happened to
-  be balanced: one true effect of 1 came out as 0.52, 0.43 or 0.23 with 50%,
-  20% or 5% of observations in the group. It also scaled an interaction by the
-  spread of a product column, 265 for `rainfall:treatment` in the crop-yield
-  model. Continuous inputs are now scaled by their standard deviation, and
-  factor, logical and two-valued inputs such as 0/1 are left as they are
-  (Gelman, 2008). An
-  interaction is scaled through its continuous inputs, so
-  `rainfall:treatment` becomes the change in the rainfall slope per SD of
-  rainfall. The new `sd_multiple = 2` gives Gelman's two-SD convention.
-  `poly()`, `ns()` and other matrix-valued terms are left unscaled with a
-  message. An interaction of continuous inputs draws a warning unless they are
-  all centred, because each main effect is a slope at zero on the other input.
-  The axis label adds "(contrasts unscaled)" when a contrast is drawn, and the
-  `model_report()` panel is titled "Coefficients (per SD of continuous
-  predictors)". The help page and the model-estimates vignette no longer claim
-  that the standardised magnitudes are comparable.
-
-* `binned_residual_plot()` draws its band from the model, as twice the
-  standard error of a bin's mean residual that the fitted model implies. The
-  old band, twice the standard deviation of the bin's residuals over the square
-  root of its count, collapsed wherever a bin held no events. On the package's
-  own example, a correctly specified model, it flagged five of seventeen bins.
-  When the adverse events were redrawn 200 times from the fitted model, so that
-  each refit was correct by construction, the old band flagged 31% of the bins
-  and the new one 3%. The binned-residual panel that
-  `residual_diagnostics_plot()` and `model_report()` draw for a `glm` changes
-  with it. `band = "empirical"` reproduces the earlier figure, whose band is
-  the one `arm::binnedplot()` draws. Observations with zero prior weight, which
-  take no part in the fit, are now left out of the bins.
-
-* `survival_plot()` draws log-log confidence limits by default. They stay
-  between 0 and 1 and cover better in small samples than the untransformed
-  Greenwood limits it drew before (Borgan & Liestøl, 1990). The new
-  `conf_type` argument restores those with `"plain"` and gives the default of
-  `survival::survfit()` with `"log"`. The limits of a `survfit` object were
-  copied from the object, at the level and on the scale it was made with, so
-  `conf_level` was ignored and a 90% band showed the object's 95% limits. They
-  are now recomputed from the object's standard errors at the requested
-  `conf_level` and `conf_type`, so they equal those that `survfit()` gives with
-  the same `conf.int` and `conf.type`. An object made with
-  `conf.type = "none"` keeps its standard errors, so it now gets limits as
-  well, which `conf_level = NA` leaves out. An object without standard errors,
-  or one whose lower limits follow `conf.lower = "peto"` or `"modified"`, keeps
-  its own limits, with a warning when they differ from those requested. Where
-  a curve falls to zero, the limits keep the values of the step before, so a
-  band drawn from follow-up times no longer stops one event early. A
-  `conf_level` outside (0, 1), such as 95 meant as a percentage, is now an
-  error.
-
-* The cycle lines of `seasonal_plot(style = "season")` start from a colour
-  that clears 3:1 against white. They took the sequential ramp of
-  `depictr_palette()`, which starts at `#e6eff5`, 1.16:1 against white, so the
-  earliest cycles were close to invisible. With twelve cycles, four of the
-  lines fell below the 3:1 that WCAG 2.2 asks of a graphical object. The ramp
-  now runs from `#4a8fc0`, at 3.51:1, through the brand blue to `#08315a`, and
-  `palette` still replaces it. The sequential palette keeps its pale end for
-  fills. Past about six cycles, neighbouring lines take colours too close to
-  tell apart, as the help page now says, and `style = "subseries"` keeps each
-  cycle in its own place on the axis.
-
-* Colour separability in `palette_safety()` and `check_figure()` is now
-  measured with CIEDE2000 (Sharma, Wu & Dalal, 2005). The 1976 Euclidean
-  distance it replaces overstates differences between saturated colours:
-  ggplot2's default five-colour palette was certified safe under
-  deuteranopia, though two of its colours become almost identical, 2.74 apart
-  in CIEDE2000. The threshold stays at 5, and the built-in palette's closest
-  pair now measures 6.43, where it measured 7.4. `depictr_palette(9)` already
-  warned that interpolated colours lose the guarantee, and its nine colours
-  now fail the check too. `metric = "cie76"` restores the old measure for this
-  release, and the greyscale check is the lightness gap under either.
-
-* `simulate_cvd()` at partial severity now uses Machado et al.'s published
-  matrices, interpolated between the tabulated severities. Interpolating
-  towards normal vision missed them on the default palette by up to 11 units
-  of the 1976 Delta-E, or 6.2 in CIEDE2000. Full-severity results, and so
-  `palette_safety()`, `palette_preview()` and `check_figure()`, are unchanged.
-  The authors tabulate a matrix for each tenth of severity, and a severity
-  between two tenths now takes the linear interpolation of the two, as the
-  colorspace package does, whose output it matches. The old transform drew the
-  full-severity matrix towards the identity. Between severities 0.3 and 0.7, it
-  moved the palette's colours too little under protan and deutan and too far
-  under tritan, so under a red-green deficiency they looked further apart than
-  the model predicts.
-
-* Confidence intervals for a `glm` whose dispersion is estimated (the
-  Gaussian, Gamma, inverse Gaussian and quasi families) now use the t
-  distribution on the residual degrees of freedom, matching the t tests of
-  `summary.glm()` and the `lm` path. They used z and were about 10% too narrow
-  at 12 residual degrees of freedom, so a Gaussian `glm` disagreed with `lm()`
-  on the same model. At 100 degrees of freedom, the two differ by about 1%.
-  The choice is read from the model's own summary, so binomial, Poisson and
-  `MASS::glm.nb()` fits keep z, as do mixed models. `tidy_estimates()`,
-  `coefficient_plot()`, `compare_models()`, `frequentist_bayesian_plot()` and
-  `model_report()` change with it, and so do the bands of `effects_plot()`
-  and `interaction_plot()`. In the Python twin the intervals follow the
-  fitted result's `use_t`. A GLM whose dispersion is estimated gets the same t
-  intervals when it is fitted with `use_t=True`, and z intervals by default.
-
-* The coefficient of a two-level factor is now labelled with its level,
-  `treatment: enhanced`, as the coefficients of factors with more levels
-  already were, so the row says which contrast it shows. It was labelled
-  `treatment`, which hid the direction of the contrast. Interaction rows name
-  their levels the same way, `rainfall × treatment: enhanced` where they showed
-  `rainfall × treatmentenhanced`. The labels change in `coefficient_plot()`,
-  `compare_models()`, `frequentist_bayesian_plot()` and
-  `optimizer_fixef_plot()`. `compare_models()` now takes them from every
-  fitted model it is given, so a factor term that only a later model holds is
-  labelled too. A named `labels` vector still sets any label, and
-  `labels = c(treatmentenhanced = "treatment")` restores the old one. The
-  Python twin now labels its terms by the same rules.
+  draw each label in black or white, whichever contrasts more with its tile,
+  where some labels fell below the 4.5:1 that WCAG asks of text.
+* `pca_plot()` fixes the aspect ratio, so a figure of another shape gains blank
+  space, and draws its loading arrows and labels in dark grey, where they took
+  the accent, the palette's fourth colour.
+* Without `group`, `power_curve_plot()` draws one curve per level of an
+  `effect`, `param` or `term` column, with a message, where it joined them into
+  one line.
+* `power_curve_plot()` draws a confidence band from `<power>_lo` and
+  `<power>_hi` columns, such as the `power_lo` and `power_hi` of a pilotr sweep
+  over sample size, where it drew none, and reads them before `lower` and
+  `upper`.
+* `scatter_trend()`, `explore_distribution()`, `ecdf_plot()`,
+  `raincloud_plot()`, `group_comparison_plot()`, `explore_categorical()`,
+  `explore_pairs()`, `ridgeline_plot()` and `outlier_plot()` drop rows with a
+  missing group, with a message, and give no colour to a level without rows, so
+  the colours of the levels after it can shift.
+* `ridgeline_plot()` keeps each ridge's colour when an earlier group is too
+  sparse to draw, where the later ridges shifted colour.
+  `group_comparison_plot()` and `raincloud_plot()` leave a level without rows
+  off the axis, where they kept an empty place for it with a warning.
+* `explore_distribution()` and `ecdf_plot()` draw a numeric group code, such as
+  blocks numbered 1 and 2, as groups, where they drew one ungrouped curve.
+* `explore_categorical()` orders its groups by level, where it sorted them
+  alphabetically.
+* With the default palette, `scatter_trend()`, `explore_distribution()`,
+  `ecdf_plot()`, `raincloud_plot()`, `group_comparison_plot()`,
+  `explore_categorical()`, `ridgeline_plot()` and `outlier_plot()` warn once
+  past eight groups, when the plot is made, where they warned each time the
+  plot was drawn.
+* The caption of a grouped `timeseries_plot()` names the average of an even
+  `rolling` window as, for example, '2×12 centred moving average', where it
+  said '12-point'.
+* `timeseries_plot()` keeps the level order of a factor `group`, where it
+  ordered the groups by first appearance, and leaves out unused levels, so the
+  legend order and colours can change.
+* `decompose_plot(method = "classical")` leaves out missing values at either
+  end of a series, so its panels start at the first observation and end at the
+  last, where they spanned the missing stretch.
+* `explore_bivariate()` treats dates, date-times and durations as numeric,
+  where it took them for categories, so they give a scatter plot with a trend
+  or box plots by level.
+* `threshold_plot()` draws its metrics as steps that change at each score,
+  where it joined adjacent scores with straight lines.
+* `dumbbell_plot(sort = "none")` keeps a factor's level order, or else the
+  order in which the categories first appear, where it sorted them
+  alphabetically.
+* `survival_plot()` drops an arm whose every `status` is missing, also when
+  `group` is a factor, where it kept it in the legend with no curve and made
+  `logrank = TRUE` fail.
+* The `text_contrast` row of `check_figure()` reports the text furthest short
+  of its own threshold, with that threshold and the text's printed size and
+  weight, and a translucent colour is named with its alpha.
+* The colour rows of `check_figure()` say when colour is a continuous scale,
+  which they do not audit, where they said that nothing was distinguished by
+  colour.
+* The separability rows of `check_figure()` say whether their closest pair are
+  colours or fill colours, and its `text_size` and `text_contrast` rows no
+  longer say that a figure draws no text when all of its text is inside the
+  panel.
+* On ggplot2 3.5.x, `pca_plot()` and `silhouette_plot()` draw their labels
+  without a border or a warning about `linewidth`, as on later versions.
 
 ## New features
 
-* `depictr_palette(order = "contrast")`, also accepted by
-  `scale_colour_depictr()` and `scale_fill_depictr()`, reorders the built-in
-  palette so that up to three groups pass every colour check of
-  `check_figure()`, contrast against white included, and up to four keep 3:1.
-  It leads with the brand blue, the vermillion and the reddish purple, then the
-  bluish green. It warns past four colours. The ramps refuse it, and a palette
-  set with `depictr_options(palette = )` is returned as it was set, with a
-  warning. `depictr_options(palette = depictr_palette(order = "contrast"))`
-  makes the order the default for every later plot. The default order is
-  unchanged, and the Python twin gives the same order.
+* `simulate_figure()` shows a finished ggplot or patchwork, legend and
+  colourbar included, as a reader with a colour-vision deficiency sees it, and
+  returns a gtable to draw or save.
+* `depictr_palette(order = "contrast")`, also in `scale_colour_depictr()` and
+  `scale_fill_depictr()`, reorders the palette so that up to three groups pass
+  every colour check of `check_figure()` and four keep 3:1 against white.
+  `depictr_options(palette = )` can make it the default.
+* `exponentiate = TRUE` in `coefficient_plot()` and `compare_models()` gives
+  odds, rate or risk ratios, which the plots draw on a log axis with the
+  reference line at 1 and an axis title naming the ratio.
+* `check_figure()` audits a patchwork composite, the package's own included,
+  panel by panel, with a leading `panel` column, where it refused one.
+* `check_figure(max_text_pt = )` checks a ceiling on text size in a
+  `text_size_max` row, and `save_plot(check = TRUE)` audits a figure at the
+  width it is saved at, gives one warning that names each failed check and
+  attaches the report as `attr(, "check")`.
+* `power_curve_plot(solved = )` marks a solved sample size, such as the result
+  of pilotr's `target_n()`, with a dashed line and its interval as a grey band.
+* `power_curve_plot()` reads the output of pilotr's `power_curve_mixed()` as it
+  is, with its `n_subject` column and its band, and gains `n`, `power`,
+  `group`, `lower`, `upper` and `y_lab` after its existing arguments. Several
+  curves are told apart by colour and line type.
+* `coefficient_plot(standardise = TRUE, sd_multiple = 2)` scales continuous
+  inputs by two standard deviations, Gelman's (2008) convention.
+* `ts_forecast()` and `timeseries_plot()` gain `lambda`, for a Box-Cox or log
+  transformation, and `decompose_plot()` gains `s_window`, the STL seasonal
+  window.
 
-* `simulate_figure()` shows a finished figure, legend and colourbar included,
-  as a reader with a colour-vision deficiency sees it. It builds the grob
-  table of a ggplot or a patchwork and passes every colour in it through
-  `simulate_cvd()`. That covers the line and fill colours of each grob and the
-  cells of each raster, and each colour keeps its alpha. It returns a gtable,
-  which `grid::grid.draw()` draws and `save_plot()` saves. Recolouring the data
-  before the plot is built would have left the legend keys and colourbars in
-  their original colours. The Python twin's `simulate_figure()` uses the same
-  matrices on the pixels of the rendered figure.
+## Minor improvements
 
-* `exponentiate = TRUE` in `tidy_estimates()`, `coefficient_plot()` and
-  `compare_models()` gives odds, rate or risk ratios, and the two plots draw
-  them on a log axis with the reference line at 1. The axis is labelled "Odds
-  ratio" for a logit link, "Rate ratio" for a log link in a Poisson,
-  quasi-Poisson or negative binomial model, "Risk ratio" for a binomial model
-  with a log link and "exp(Estimate)" otherwise. `tidy_estimates()`
-  exponentiates the estimates and interval limits and leaves `std.error` on
-  the link scale, as `broom::tidy()` does. Its `glm` method used to swallow
-  the argument and return log-odds. `coefficient_plot()` exponentiates after
-  `standardise`, so a standardised slope becomes a ratio per SD of its
-  predictor. A data frame of estimates is read on the link scale.
-  `reference_line` now defaults to 1 when exponentiating and to 0 otherwise.
-  The Python twin gains the same arguments.
+* `posterior_plot()` and `frequentist_bayesian_plot()` format each parameter's
+  label once, and `format_terms()` is much faster on long vectors, so a draws
+  object with many draws no longer takes minutes to plot.
+* `pca_plot()` takes an unquoted `group` column name and refuses a `prcomp` fit
+  that holds no scores, with a message that says so.
+* `vif_plot()` refuses a model with aliased coefficients and names their terms,
+  where it failed with an unrelated base-R error.
+* `correlation_heatmap()` refuses a column in `cols` that it cannot correlate,
+  such as a factor or a date, and names it, where it failed with an error that
+  did not.
+* `explore_pairs()` refuses a numeric `group` named in `cols` with a message
+  that says so, where it failed with an error from `cor()`.
+* `decompose_plot()` and `ts_forecast()` refuse a missing value inside the
+  series with a message that names `x`, and a series of exactly two cycles gets
+  the package's own message.
 
-* `power_curve_plot()` gains `solved`, which marks a solved sample size and its
-  interval, such as the result of pilotr's `target_n()`. The value is drawn as
-  a dashed vertical line and the interval as a grey band behind the curve. The
-  Python twin gains the same argument.
+## Fixes
+
+* `estimation_plot()` and `group_comparison_plot(differences = TRUE)` work in a
+  fresh R session, where they failed unless patchwork had been loaded.
+* `effects_plot()`, `interaction_plot()` and `model_report()` work with a
+  transformed term, such as `log()`, `poly()` or `ns()`, and with an offset,
+  held at its mean on the link scale, where they failed. A name such as
+  `"log(rainfall)"` stands for the variable it transforms.
+* `random_effects_plot()` draws models with several uncorrelated or split
+  random-effect terms per grouping factor, such as `(1 + x || g)`, fitted with
+  `lmer()` or `glmer()`, where it failed.
+* A `glm` fitted with `na.action = na.exclude` works in the ROC,
+  precision-recall, threshold, gain and lift plots and in
+  `confusion_matrix_plot()`, which failed.
+* `posterior_plot()` reads a `posterior` draws object made from a brms fit, on
+  which it failed with an error about duplicated factor levels.
+* `posterior_plot()` accepts an unnamed `labels` vector with one label per
+  parameter, which it refused.
+* `frequentist_bayesian_plot()` with summaries no longer warns about `labels`
+  keys it was not given.
+* `ts_forecast()`, the forecast overlay of `timeseries_plot()` and
+  `decompose_plot()` with its default STL method read a one-column `ts` and
+  trim missing values at either end of a series, where the STL decomposition
+  failed. A forecast starts after the last observation.
+* `seasonal_plot()` accepts a frequency that is not a whole number, such as
+  365.25 / 7, and rounds it down to whole seasons with a message, where it
+  refused every such frequency.
+* `scatter_trend()` accepts a numeric group code, which failed with a
+  discrete-scale error.
+* `explore_pairs()` leaves a numeric `group` out of its default columns, where
+  it failed with an error from `cor()`.
+* On ggplot2 3.5.x, the reference lines of `coefficient_plot()`,
+  `frequentist_bayesian_plot()` and `posterior_plot()` no longer warn about an
+  unknown `inherit.aes`.
+
+## Deprecated
+
+* `metric = "cie76"` in `palette_safety()` and `check_figure()`, kept to
+  reproduce colour distances computed before this release. The default,
+  `"ciede2000"`, replaces it, and a later release will remove it.
+
+## Documentation
+
+* The README and the help pages of `depictr_palette()`, `depictr_options()`
+  and `palette_safety()` no longer call the built-in palette the Okabe-Ito set.
+  The help page of `depictr_palette()` says that it keeps six of that set's
+  eight colours, with the brand blue and a grey in place of its blue and black.
+* The README points to the Python README's list of the differences between the
+  twins, where it said that they differ in a few places.
+* Help pages that described behaviour the code does not have now match it.
+  `explore_pairs()` refuses columns beyond `max_cols`, `posterior_plot()`
+  refuses an unknown `style` and `depictr_palette(n = NULL)` gives seven
+  colours for a ramp. `depictr_options()` and `theme_depictr()` no longer
+  present `depictr_brand()`, `depictr_accent()` and `depictr_reference()` as
+  functions to call, since the package does not export them.
+  `cluster_plot(seed = NULL)` draws from the session's random-number stream,
+  `coefficient_plot()` applies `interaction` to the terms a named `labels`
+  vector leaves out and `survival_plot()` tests a `survfit` object with the
+  base-R log-rank test. `missingness_map()` takes its missing-cell colour from
+  the accent, `k_diagnostic()` takes the elbow farthest from the chord,
+  `dumbbell_plot()` puts the shortest dumbbell at the top only when every
+  difference is negative and `estimation_plot()` no longer says that zero lines
+  up with the reference group's mean.
+* `vignette("exploring-data")` says that `summary_table()` takes its column
+  names as strings and that an argument naming several columns, such as `cols`,
+  takes a character vector, where it said that column names could be given
+  quoted or unquoted. It also says that, of the model-estimate plots, only
+  `coefficient_plot()` takes `standardise` and that every plotting function
+  returns a ggplot, where it said that all of them took `standardise` and that
+  every function returned a ggplot. `vignette("model-estimates")` and the help
+  page of `coefficient_plot()` no longer claim that standardised magnitudes are
+  comparable. The help page of `threshold_plot()` and
+  `vignette("diagnostics-and-uncertainty")` say that the maximum-F1 threshold is
+  drawn dotted and the Youden threshold dashed, where they said both were
+  dashed. `vignette("multivariate-and-survival")` says that only an arm whose
+  curve reaches 0.5 gets a median guide, and `vignette("time-series")` says that
+  STL holds the seasonal component fixed under the default
+  `s_window = "periodic"`, where it said that STL lets it change from year to
+  year.
+* The help page of `check_figure()` gains a section on auditing a figure at the
+  width it is printed at, with the text floors of four publishers, where it
+  called 6 pt a common publisher floor, and says that four colours of the
+  default palette fall below 3:1 against white. The help page of `save_plot()`
+  describes the formats that three publishers accept.
+* `vignette("depictr")` shows a figure drawn by `simulate_figure()` and covers
+  four publishers' text floors, Nature's ceiling, the contrast-first palette
+  order and how the audit treats a continuous colour scale.
 
 # depictr 0.3.0
 
