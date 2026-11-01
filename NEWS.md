@@ -1,6 +1,6 @@
 # depictr (development version)
 
-## Upgrading from the previous release
+## Upgrading from the previous release (0.3.0)
 
 ### Changed results
 
@@ -317,6 +317,9 @@
   panel.
 * On ggplot2 3.5.x, `pca_plot()` and `silhouette_plot()` draw their labels
   without a border or a warning about `linewidth`, as on later versions.
+* `citation("depictr")` gives the DOI that CRAN registered,
+  <https://doi.org/10.32614/CRAN.package.depictr>, where it gave the Zenodo
+  concept DOI, <https://doi.org/10.5281/zenodo.21266308>.
 
 ## New features
 
