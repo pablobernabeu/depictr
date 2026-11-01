@@ -7,7 +7,8 @@ on:
 
 name: R-CMD-check
 
-# The workflow only checks out the repository and runs R CMD check, so
+# Every job here only checks out the repository, installs packages and runs
+# R CMD check, the test suite, the examples or roxygen2's namespace roclet, so
 # read-only permissions on everything are sufficient (uploading snapshot
 # artifacts needs no write scope).
 permissions: read-all
@@ -27,7 +28,8 @@ jobs:
           # Windows on R-devel is the combination win-builder checks, and the one
           # the rest of this matrix leaves uncovered (Windows is otherwise only
           # on release, R-devel only on Linux). Running it here gives the same
-          # signal on every push, rather than by email after an upload.
+          # signal on every push to main and every pull request into it, rather
+          # than by email after an upload.
           - {os: windows-latest, r: 'devel'}
           - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,  r: 'release'}
@@ -106,7 +108,7 @@ jobs:
       # whole job down before a line of depictr runs. 4.2.0 is the last release
       # before Deriv gained compiled code at all -- NeedsCompilation: no, pure R
       # over methods -- so it cannot fail this way on any R. Drop the pin once
-      # Deriv declares its R requirement, or once oldrel-3 has moved past R 4.3.
+      # Deriv declares its R requirement, or once oldrel-3 has reached R 4.5.
       - uses: r-lib/actions/setup-r-dependencies@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
         with:
           extra-packages: any::testthat, any::pkgload, Deriv@4.2.0

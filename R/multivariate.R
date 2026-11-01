@@ -154,7 +154,8 @@ pca_plot <- function(x, cols = NULL, group = NULL, components = c(1, 2),
 #'
 #' Every check runs before pca_plot() subsets anything. Indexing a short vector
 #' with the complete-case mask pads it with `NA`, and assigning it to the
-#' scores recycles it, so a wrong length used to pass in silence.
+#' scores recycles it, so a wrong length checked afterwards would pass in
+#' silence.
 #'
 #' @param quo The quosure of `group`.
 #' @param data The data frame, or `NULL` when `x` is a prcomp object.

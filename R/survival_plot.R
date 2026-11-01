@@ -40,9 +40,10 @@
 #'   (median not estimable) are skipped.
 #' * **Log-rank test** (`logrank = TRUE`): for two or more groups, the
 #'   chi-squared log-rank statistic and its p-value are added as a subtitle.
-#'   [survival::survdiff()] is used when the 'survival' package is installed,
-#'   otherwise an equivalent base-R log-rank test is computed from the
-#'   risk/event tables.
+#'   For vector or data-frame input, [survival::survdiff()] computes it when
+#'   the 'survival' package is installed. For a `survfit` object, which keeps
+#'   only its risk and event tables, or without 'survival', an equivalent
+#'   base-R log-rank test is computed from the per-group risk and event tables.
 #'
 #' @param time A numeric vector of follow-up times, a data frame with `time`,
 #'   `status` and optional `group` columns, or a `survfit` object. Every time
@@ -283,8 +284,9 @@ km_input <- function(time, status, group, conf_level, conf_type = "log-log") {
   # would be taken for an arm in which everybody had the event.
   sv <- normalise_status(sv)
   # Keep the factor order for the arms the drops have left. An arm whose every
-  # status was missing has no observations, and keeping its level left it in
-  # the legend and the risk table with no curve and broke the log-rank test.
+  # status was missing has no observations, and keeping its level would leave
+  # it in the legend and the risk table with no curve and break the log-rank
+  # test.
   groups <- if (!is.null(glevels)) glevels[glevels %in% gv] else unique(gv)
   curves <- list()
   censors <- list()
@@ -547,8 +549,9 @@ km_from_survfit <- function(sf, conf_level, conf_type = "log-log") {
     } else if (stored) {
       lo <- sf$lower[sel][ord]
       up <- sf$upper[sel][ord]
-      # survfit reports NA limits at points with no events (e.g. tail rows);
-      # carry the step forward so the band is drawn continuously.
+      # survfit reports NA limits where the estimate falls to 0, since no
+      # formula holds there. The previous step is carried forward so the band
+      # runs to the last event, as km_limits() does for recomputed limits.
       lo <- fill_forward(lo, 1)
       up <- fill_forward(up, 1)
       curve$lower <- c(1, lo)
@@ -725,9 +728,10 @@ risk_break_default <- function(time) {
 #' The number at risk at time `t` is the count with follow-up time \eqn{>= t}
 #' (the standard convention used by [survival::summary.survfit()] with
 #' `times =`). When the raw follow-up times are available (`all_time`) they are
-#' counted directly; for the survfit path, where only the tabulated risk set at
-#' event times is kept, the at-risk count is the risk set carried back from the
-#' first event time at or after `t`.
+#' counted directly. For the survfit path, which keeps the risk set at every
+#' reported time, events and censorings alike (`risk_time`, `risk_n`), the
+#' at-risk count is the risk set of the first reported time at or after `t`,
+#' and 0 after the last.
 #' @noRd
 n_at_risk <- function(counts, breaks) {
   groups <- names(counts)
@@ -790,9 +794,11 @@ risk_table_plot <- function(natrisk, breaks, col_map, multi, x_lab) {
 
 #' Log-rank test of the group difference, returning chi-squared, df and p
 #'
-#' Uses [survival::survdiff()] when the 'survival' package is available, and
-#' otherwise an equivalent base-R Mantel-Haenszel log-rank test computed from
-#' the per-group risk/event tables already carried on each curve.
+#' Uses [survival::survdiff()] when the raw times and statuses are at hand
+#' (vector or data-frame input) and the 'survival' package is installed.
+#' Otherwise, and always for a survfit object, which keeps only its risk and
+#' event tables, it uses an equivalent base-R Mantel-Haenszel log-rank test
+#' computed from the per-group risk/event tables carried on each curve.
 #' @noRd
 logrank_test <- function(counts) {
   groups <- names(counts)
@@ -835,7 +841,8 @@ base_logrank <- function(counts) {
   if (length(all_times) == 0) return(NULL)
 
   # Per-time, per-group risk set: number with follow-up >= t. The survfit path
-  # keeps risk sets only at event times, so reuse risk_at() for consistency.
+  # keeps no follow-up times, only the risk set at each reported time, so
+  # risk_at() reads either path.
   O <- numeric(k)            # observed events per group
   E <- numeric(k)            # expected events per group
   V <- matrix(0, k, k)       # variance-covariance

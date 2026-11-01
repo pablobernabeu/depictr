@@ -7,9 +7,9 @@
 #SBATCH --output=/data/educ-lift/educ1242/depictr/logs/install-%j.out
 
 # Build the depictr R environment in the project DATA space (not HOME).
-# Installs depictr's deps plus the modelling/Bayesian stack used by the
-# revision (brms/rstan/rstanarm, ggdist/posterior/tidybayes/bayesplot,
-# lme4/lmerTest/simr/survival) and dev tooling.
+# Installs depictr's deps, dev tooling and the modelling/Bayesian stack that
+# fit_models.R and fit_power.R use, with related packages (brms/rstan/rstanarm,
+# ggdist/posterior/tidybayes/bayesplot, lme4/lmerTest/simr/survival).
 set -euo pipefail
 
 # Site-specific project space. Override at submission time with

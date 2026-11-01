@@ -25,7 +25,21 @@
 #' a data frame with your own intervals (for example profiled or posterior
 #' intervals) to override this.
 #'
-#' @param x A fitted model or a data frame of results.
+#' A data frame is read by column name, taking for each quantity the first of
+#' these names that it holds. The term comes from `term`, `parameter`,
+#' `Parameter`, `predictor`, `variable`, `fixed_effect` or `rowname`, otherwise
+#' from the row names. The estimate comes from `estimate`, `Estimate`,
+#' `frequentist_estimate`, `coef`, `mean` or `value`, and a data frame without
+#' one is refused. The standard error comes from `std.error`, `Std. Error`,
+#' `std_error`, `SE` or `se`. The limits come from `conf.low`, `CI_2.5`,
+#' `2.5 %`, `lower`, `ci_low`, `Q2.5`, `lwr` or `l-95% CI` and from
+#' `conf.high`, `CI_97.5`, `97.5 %`, `upper`, `ci_high`, `Q97.5`, `upr` or
+#' `u-95% CI`. A row that holds both limits keeps them as they stand. A row
+#' that lacks either limit but has a standard error gets both from it, as a z
+#' interval at `conf_level`. Other columns are dropped.
+#'
+#' @param x A fitted model or a data frame of results (see Details for the
+#'   columns read).
 #' @param conf_level Confidence (or credible) level for the interval, a single
 #'   number strictly between 0 and 1.
 #' @param exponentiate Whether to exponentiate the estimates and interval
@@ -170,7 +184,8 @@ interval_high_columns <- c("conf.high", "CI_97.5", "97.5 %", "upper",
 #'
 #' Such limits are drawn as they stand, at whatever level they were computed.
 #' Without them, the data-frame method fills the limits in from the standard
-#' errors at `conf_level`, as the model methods compute theirs.
+#' errors at `conf_level` as z-based Wald intervals (see `fill_ci()`), whatever
+#' model produced the table.
 #' @noRd
 holds_intervals <- function(x) {
   is.data.frame(x) && any(interval_low_columns %in% names(x)) &&
@@ -242,7 +257,7 @@ build_estimates <- function(term, est, se, ci) {
   out
 }
 
-#' Fill in missing confidence limits from the standard error
+#' Fill in missing confidence limits from the standard error, as z intervals
 #' @noRd
 fill_ci <- function(out, conf_level) {
   need <- is.na(out$conf.low) | is.na(out$conf.high)

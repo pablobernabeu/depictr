@@ -241,6 +241,45 @@ test_that("group_colours() honours a supplied palette", {
   expect_named(cols, c("a", "b", "c"))
 })
 
+test_that("group_colours() takes a named palette by name", {
+  cols <- depictr:::group_colours(c("b", "a"),
+                                  palette = c(a = "#111111", b = "#222222"))
+  expect_equal(cols, c(b = "#222222", a = "#111111"))
+  # An unnamed palette is taken in the order of the groups.
+  cols <- depictr:::group_colours(c("b", "a"),
+                                  palette = c("#111111", "#222222"))
+  expect_equal(cols, c(b = "#111111", a = "#222222"))
+})
+
+# The colour of each group's mean and interval, named by the group, as drawn.
+pointrange_colours <- function(panel) {
+  built <- ggplot2::ggplot_build(panel)
+  geoms <- vapply(panel$layers, function(l) class(l$geom)[1], character(1))
+  drawn <- built$data[[which(geoms == "GeomPointrange")]]
+  groups <- built$layout$panel_params[[1]]$x$get_limits()
+  stats::setNames(drawn$colour, groups[as.integer(drawn$x)])
+}
+
+test_that("group_comparison_plot(differences = TRUE) keeps each group's colour", {
+  # The reference is drawn first, so a reference other than the first level
+  # changes the order of the groups but not their colours, in either panel.
+  for (palette in list(NULL, c("#111111", "#222222", "#333333", "#444444"))) {
+    plain <- pointrange_colours(
+      group_comparison_plot(wellbeing_survey, life_satisfaction, region,
+                            palette = palette)
+    )
+    set.seed(1)
+    p <- group_comparison_plot(wellbeing_survey, life_satisfaction, region,
+                               differences = TRUE, reference = "South",
+                               n_boot = 200, palette = palette)
+    upper <- pointrange_colours(p[[1]])
+    lower <- pointrange_colours(p[[2]])
+    expect_named(upper, c("South", "East", "North", "West"))
+    expect_equal(upper[names(plain)], plain)
+    expect_equal(lower, plain[names(lower)])
+  }
+})
+
 # ---- a fresh R session ------------------------------------------------------
 # The two panels are composed by patchwork, whose plot operators exist only once
 # its namespace is loaded, and depictr imports from patchwork so that

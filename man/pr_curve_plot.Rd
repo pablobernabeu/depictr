@@ -31,7 +31,10 @@ curve (the threshold maximising the harmonic mean of precision and recall).}
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object. The average precision is stored in
 \code{attr(plot, "average_precision")} (a named vector when several models are
-supplied).
+supplied). With \code{f1 = TRUE}, the maximum-F1 point is stored in
+\code{attr(plot, "max_f1")}: a list of \code{threshold}, \code{recall}, \code{precision} and
+\code{f1}, or a list of such lists named by model when several models are
+supplied.
 }
 \description{
 Plots precision against recall for a binary classifier and reports the

@@ -38,9 +38,9 @@ for the text around the panel and the text inside it alike. Defaults to
 size").}
 
 \item{metric}{The colour difference the colour separability checks measure:
-\code{"ciede2000"}, the default, or \code{"cie76"}, the Euclidean distance in CIELAB
-that earlier versions measured. \code{"cie76"} is kept so that earlier results
-can be reproduced, and a later release will remove it.}
+\code{"ciede2000"}, the default, or \code{"cie76"}, the Euclidean distance in CIELAB.
+\code{"cie76"} is kept so that results computed with it can be reproduced, and
+a later release will remove it.}
 
 \item{max_text_pt}{The largest acceptable printed text size, in points, or
 \code{NULL}, the default, for no ceiling. When given, a \code{text_size_max} row is
@@ -91,7 +91,7 @@ that is not measured.
 
 \code{colour_separability} is the smallest colour difference between two of the
 figure's encoding colours, by the CIEDE2000 formula (Sharma, Wu & Dalal,
-2005) unless \code{metric} asks for the older CIE76. The three
+2005) unless \code{metric} asks for CIE76. The three
 \verb{colour_separability_*} rows repeat that measurement after simulating each
 dichromacy at full severity with \code{\link[=simulate_cvd]{simulate_cvd()}}. Encoding colours are the
 distinct colour and fill values that tell groups apart. A layer contributes
@@ -180,8 +180,8 @@ confusion, and it was never a claim about greyscale. A figure that may be
 printed in black and white should use fewer groups, or a sequential palette,
 or add a redundant shape or line type; the four leading colours of the
 palette are also not safe in greyscale, since the bluish green and the
-vermillion differ by 3.55. The threshold has been left where it is rather
-than moved to let the package's own defaults through.
+vermillion differ by 3.55. The threshold is not lowered to let the package's
+own defaults through.
 
 The palette falls short on contrast as well. Four of its eight colours are
 below the 3:1 against white that WCAG asks of a graphical object: the orange

@@ -30,7 +30,9 @@ brand blue. Ignored when several models are overlaid (the colourblind-aware
 
 \item{ci}{Bootstrap confidence band for a single ROC curve and its AUC.
 \code{FALSE} (default) draws none; \code{TRUE} uses 2000 resamples; a positive integer
-sets the number of resamples. Ignored when several models are overlaid.}
+sets the number of resamples. The resamples come from the session's
+random-number stream, so call \code{set.seed()} first for a reproducible band.
+Ignored when several models are overlaid.}
 
 \item{conf_level}{Confidence level for the bootstrap band, a single number
 strictly between 0 and 1.}
@@ -48,6 +50,12 @@ Defaults to \code{FALSE}.}
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object. The AUC(s) are stored in
 \code{attr(plot, "auc")} (a named vector when several models are supplied).
+When \code{ci} draws a band, which it does for a single model, the bootstrap
+interval of the AUC is stored in \code{attr(plot, "auc_ci")}, a vector named
+\code{lower} and \code{upper}. With \code{youden = TRUE}, the Youden point is stored in
+\code{attr(plot, "youden")}: a list of \code{threshold}, \code{fpr}, \code{tpr}, \code{j},
+\code{sensitivity} and \code{specificity}, or a list of such lists named by model
+when several models are supplied.
 }
 \description{
 Plots the receiver operating characteristic (ROC) curve for a binary

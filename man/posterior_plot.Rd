@@ -100,8 +100,12 @@ draws in either tail.
 \details{
 Draws may be supplied in many shapes: a fitted Bayesian model (\code{brms} or
 \code{rstanarm}), a \code{posterior} \emph{draws} object, a wide data frame or matrix with
-one column of draws per parameter, or a long data frame (a parameter column
-and a value column). For fitted models only the fixed-effect (population)
+one column of draws per parameter, or a long data frame with a parameter
+column named \code{parameter}, \code{term}, \code{.variable} or \code{variable} and a value
+column named \code{value}, \code{.value}, \code{draw} or \code{estimate}. In a wide data frame,
+the numeric columns \code{.chain}, \code{.iteration}, \code{.draw}, \code{draw}, \code{chain},
+\code{iteration} and \code{.row} are read as sampler indices and left out. For fitted
+models only the fixed-effect (population)
 parameters are kept, with the \code{brms} \code{b_} prefix stripped. A draws object
 that holds \code{b_} parameters, as \code{posterior::as_draws_df()} returns for a
 \code{brms} fit, is read the same way, with a message naming the variables it

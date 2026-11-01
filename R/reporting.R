@@ -16,7 +16,8 @@
 #'
 #' @param n Number of colours to preview.
 #' @param type Palette type to preview: `"qualitative"`, `"sequential"`,
-#'   `"diverging"`, or `"all"` to show all three.
+#'   `"diverging"`, or `"all"` to show all three, one panel each, without the
+#'   hex labels.
 #' @param cvd Colour-vision-deficiency simulation for the tiles: `"none"` (the
 #'   default, true colours), `"deutan"` (red-green, deuteranopia), `"protan"`
 #'   (red-green, protanopia) or `"tritan"` (blue-yellow, tritanopia).
@@ -24,6 +25,8 @@
 #' @return A [ggplot2::ggplot] object.
 #' @references
 #' \insertRef{machado2009}{depictr}
+#'
+#' \insertRef{wcag22}{depictr}
 #' @export
 #' @examples
 #' palette_preview()

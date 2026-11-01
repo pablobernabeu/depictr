@@ -52,7 +52,7 @@ correlation_heatmap <- function(data, cols = NULL, method = "pearson",
     cols <- names(data)[vapply(data, is.numeric, logical(1))]
   } else {
     check_columns(data, cols)
-    # cor() takes numbers and logicals only. A factor failed in var() with
+    # cor() takes numbers and logicals only. A factor would fail in var() with
     # "Calling var(x) on a factor x is defunct", and a date in cor() itself.
     correlatable <- vapply(data[cols], function(v) {
       is.numeric(v) || is.logical(v)

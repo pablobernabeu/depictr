@@ -7,8 +7,9 @@
 #' a data frame of pre-computed estimates.
 #'
 #' @param x A fitted model or a tidy data frame of estimates.
-#' @param conf_level Confidence/credible level, passed to [tidy_estimates()]
-#'   when `x` is a model: a single number strictly between 0 and 1.
+#' @param conf_level Confidence/credible level, passed to [tidy_estimates()],
+#'   which uses it for a model and for the limits it fills in from the standard
+#'   errors of a data frame: a single number strictly between 0 and 1.
 #' @param intercept Whether to keep the intercept term. Defaults to `FALSE`,
 #'   since the intercept is seldom of interest on a forest plot and its scale
 #'   often overwhelms the other terms.
@@ -26,7 +27,9 @@
 #'   terms too, so the contrast of enhanced with the reference level reads
 #'   `treatment: enhanced`. Other names are tidied with [format_terms()].
 #' @param interaction Passed to [format_terms()] to control how interaction
-#'   terms are rendered (ignored when `labels` is supplied).
+#'   terms are rendered, in the automatic labels and for any term a named
+#'   `labels` vector leaves out. It is ignored when `labels` is an unnamed
+#'   vector.
 #' @param point_colour,reference_colour Colours for the estimates and the
 #'   reference line.
 #' @param reference_line Position of a vertical reference line. Defaults to 0,
@@ -240,11 +243,13 @@ coefficient_plot <- function(x,
 #' character inputs included, which `model.matrix()` codes the same way) or
 #' when its term spans several columns, as `poly()` does. A one-column term
 #' whose column name extends its label, such as `poly(x, 1)`, is labelled with
-#' the term alone, as before. Each entry is also keyed under a `b_` prefix so
+#' the term alone. Each entry is also keyed under a `b_` prefix so
 #' a brms summary term aligns with its frequentist counterpart. Columns with
 #' no such component are left to [format_terms()], which tidies them and shows
 #' underscores as spaces. Returns a named character vector, or `NULL` when `x`
-#' is not a supported model or has no factor columns.
+#' is not a supported model or none of its columns extends the name of its
+#' variable, as the columns of a factor or of a multi-column term such as
+#' `poly(x, 2)` do.
 #' @noRd
 pretty_coef_map <- function(x, interaction = "times") {
   if (!inherits(x, c("lm", "glm", "merMod", "lmerMod", "glmerMod",
@@ -462,8 +467,9 @@ standardised_axis_label <- function(sd_multiple, contrasts_unscaled,
 #'
 #' exp() of a logit coefficient is an odds ratio. exp() of a log-link
 #' coefficient is a rate ratio in a Poisson, quasi-Poisson or negative
-#' binomial model and a risk ratio in a binomial one. Anything else, a data
-#' frame or an identity link among them, is "exp(Estimate)": exp() of an
+#' binomial model and a risk ratio in a binomial or quasi-binomial one.
+#' Anything else, a data frame or an identity link among them, is
+#' "exp(Estimate)": exp() of an
 #' lm(log(y) ~ x) slope, for one, is a ratio of geometric means. The family
 #' of a MASS::glm.nb() or lme4::glmer.nb() fit is named "Negative
 #' Binomial(theta)".
@@ -614,7 +620,7 @@ check_label_count <- function(labels, n, owner, read_in, intercept_dropped) {
        call. = FALSE)
 }
 
-#' Key an unnamed `labels` vector by term name, one label per row drawn
+#' Key an unnamed `labels` vector by term name, one per distinct default label
 #'
 #' [compare_models()] holds each term once per source, and the distribution
 #' path of [frequentist_bayesian_plot()] holds it once per posterior draw.

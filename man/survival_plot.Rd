@@ -122,9 +122,10 @@ last time, the median is the midpoint of that stretch, as in
 (median not estimable) are skipped.
 \item \strong{Log-rank test} (\code{logrank = TRUE}): for two or more groups, the
 chi-squared log-rank statistic and its p-value are added as a subtitle.
-\code{\link[survival:survdiff]{survival::survdiff()}} is used when the 'survival' package is installed,
-otherwise an equivalent base-R log-rank test is computed from the
-risk/event tables.
+For vector or data-frame input, \code{\link[survival:survdiff]{survival::survdiff()}} computes it when
+the 'survival' package is installed. For a \code{survfit} object, which keeps
+only its risk and event tables, or without 'survival', an equivalent
+base-R log-rank test is computed from the per-group risk and event tables.
 }
 }
 \examples{

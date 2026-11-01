@@ -1,8 +1,9 @@
 # Scheduled check of depictr against current and development dependency versions.
 # It runs daily (and on demand) so that a breaking change in any
 # dependency is caught quickly. On failure it opens, or comments on, a single
-# issue to flag the maintainer; the companion dependency-autofix workflow can
-# attempt a fix first when a Claude Code OAuth token is configured.
+# issue to flag the maintainer. Once the run has finished, the companion
+# dependency-autofix workflow can attempt a fix when a Claude Code OAuth token
+# is configured.
 name: dependency-check
 
 on:

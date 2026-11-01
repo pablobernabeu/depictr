@@ -210,17 +210,18 @@ interaction_plot <- function(model, predictor, moderator,
 #' transforms its variable, the model frame supplies them. Otherwise, they are
 #' recovered from the data the call names and cut to the rows of the model
 #' frame, so typical values remain statistics of the estimation sample. A
-#' formula or offset that reads a data frame with `$` is refused, and so is a
-#' term that predict() would compute afresh over a grid (see
+#' formula or offset that reads a data frame with `$` or `[[` is refused, and
+#' so is a term that predict() would compute afresh over a grid (see
 #' grid_unsafe_terms()).
 #'
 #' @return A list. `data` holds the variables over the estimation rows.
 #'   `predictors` are the variables that enter through a term, in formula
 #'   order, and `offset_only` those that enter only through an offset.
 #'   `categorical` names the variables held at their most frequent value, and
-#'   `terms` gives the variables behind each model-frame name. `offset_mean`
-#'   is the mean offset over the estimation rows on the link scale, or `NULL`
-#'   for a model without one.
+#'   `terms` gives the variables behind each model-frame name. `response` is
+#'   the name of the model frame's first column, the response, which labels the
+#'   y-axis of a non-binomial model. `offset_mean` is the mean offset over the
+#'   estimation rows on the link scale, or `NULL` for a model without one.
 #' @noRd
 model_raw_data <- function(model) {
   is_mer <- inherits(model, "merMod")

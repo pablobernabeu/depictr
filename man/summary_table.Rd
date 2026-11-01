@@ -16,13 +16,15 @@ summary_table(
 \arguments{
 \item{data}{A data frame.}
 
-\item{vars}{Columns to summarise. If \code{NULL}, all columns except \code{group} are
-used, with high-cardinality identifier-like columns skipped (see Details).}
+\item{vars}{Names of the columns to summarise, as a character vector. If
+\code{NULL}, all columns except \code{group} are used, with high-cardinality
+identifier-like columns skipped (see Details).}
 
-\item{group}{Optional grouping variable; one summary column is produced per
-level, alongside an overall column. Records whose group value is missing
-get a trailing \code{Missing} column of their own, so the group sizes still sum
-to the overall \code{N}.}
+\item{group}{Optional name of the grouping column, given as a string rather
+than unquoted. One summary column is produced per level, alongside an
+overall column. Records whose group value is missing get a trailing
+\code{Missing} column of their own, so the group sizes still sum to the overall
+\code{N}.}
 
 \item{digits}{Number of decimal places for numeric summaries.}
 

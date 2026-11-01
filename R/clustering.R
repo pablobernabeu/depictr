@@ -36,7 +36,11 @@
 #' @param palette Colours for the clusters; defaults to [depictr_palette()].
 #' @param title Plot title.
 #' @param seed Optional integer seed for reproducible k-means (ignored when
-#'   `clusters` is supplied). Default `NULL` leaves the RNG state untouched.
+#'   `clusters` is supplied). It applies to this call alone, and the caller's
+#'   random-number state is restored afterwards. The default, `NULL`, takes the
+#'   random starts of [stats::kmeans()], and any random draws of a `suggest_k`
+#'   diagnostic, from the session's random-number stream, so call `set.seed()`
+#'   first for a reproducible result.
 #' @param nstart Number of random starts for [stats::kmeans()].
 #' @param iter.max Maximum iterations for [stats::kmeans()].
 #'

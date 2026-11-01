@@ -17,9 +17,12 @@ A data frame with one row per model and columns \code{model}, \code{n}, \code{df
 }
 \description{
 Collects the usual model-comparison statistics into one tidy data frame, one
-row per model. These comprise the number of observations, the degrees of
-freedom, AIC, BIC, the log-likelihood, an R-squared and the root-mean-square
-error.
+row per model. These comprise the number of observations, the number of
+estimated parameters (\code{df}, as \code{\link[stats:logLik]{stats::logLik()}} counts them for AIC and
+BIC), AIC, BIC, the log-likelihood, an R-squared and the root-mean-square of
+the residuals (response residuals for a \code{glm}, deviance residuals otherwise,
+which for an unweighted linear or linear mixed model are the ordinary
+residuals).
 }
 \details{
 The R-squared depends on the kind of model. An \code{lm} reports the ordinary

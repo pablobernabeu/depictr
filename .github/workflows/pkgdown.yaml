@@ -67,9 +67,7 @@ jobs:
           # clean: true so files dropped from the build (e.g. a page whose
           # source moved out of pkgdown's scan path) are removed from the live
           # site rather than lingering as orphans. gh-pages holds only the
-          # pkgdown output, so a full mirror is safe. This was false until now,
-          # which is why a dev/ subsite stayed live long after _pkgdown.yml
-          # stopped configuring a development mode.
+          # pkgdown output, so a full mirror is safe.
           clean: true
           branch: gh-pages
           folder: docs

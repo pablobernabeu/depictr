@@ -27,12 +27,14 @@
 #' via `vars` to override this.
 #'
 #' @param data A data frame.
-#' @param vars Columns to summarise. If `NULL`, all columns except `group` are
-#'   used, with high-cardinality identifier-like columns skipped (see Details).
-#' @param group Optional grouping variable; one summary column is produced per
-#'   level, alongside an overall column. Records whose group value is missing
-#'   get a trailing `Missing` column of their own, so the group sizes still sum
-#'   to the overall `N`.
+#' @param vars Names of the columns to summarise, as a character vector. If
+#'   `NULL`, all columns except `group` are used, with high-cardinality
+#'   identifier-like columns skipped (see Details).
+#' @param group Optional name of the grouping column, given as a string rather
+#'   than unquoted. One summary column is produced per level, alongside an
+#'   overall column. Records whose group value is missing get a trailing
+#'   `Missing` column of their own, so the group sizes still sum to the overall
+#'   `N`.
 #' @param digits Number of decimal places for numeric summaries.
 #' @param missing Whether to add a `Missing, n (%)` row for variables that
 #'   contain missing values. Defaults to `TRUE`.
@@ -118,7 +120,7 @@ summary_table <- function(data, vars = NULL, group = NULL, digits = 1,
   for (v in vars) {
     col <- data[[v]]
     if (inherits(col, c("Date", "POSIXt"))) {
-      # A date is not a level: expanded as one, it gave a row per day.
+      # A date is not a level: expanded as one, it would give a row per day.
       fmt <- date_cell_format(col)
       cells <- vapply(groups, function(g) date_range_cell(g[[v]], fmt),
                       character(1))

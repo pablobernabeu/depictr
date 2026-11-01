@@ -52,7 +52,9 @@ otherwise.}
 
 \item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
-\item{title, x_lab, y_lab}{Title and axis labels.}
+\item{title, x_lab, y_lab}{Title and axis labels. \code{x_lab} is not drawn when
+\code{differences = TRUE}, since the estimation plot names its groups on the
+axis alone.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object, or a 'patchwork' object when

@@ -1,9 +1,11 @@
 # Normalise Bayesian draws to a tidy long table -----------------------------
 #
-# Shared by posterior_plot() and frequentist_bayesian_plot(): a single place
-# that knows how to coax the many shapes a posterior can arrive in (brms /
-# rstanarm fits, a posterior 'draws' object, a wide draws matrix/data frame, or
-# an already-long table) into one long data frame with the columns
+# Used by frequentist_bayesian_plot() for every Bayesian input that has_draws()
+# accepts, and by posterior_plot() for every input but a plain data frame,
+# which draws_to_long() in posterior_plot.R reads by the same column rules. It
+# coaxes the many shapes a posterior can arrive in (brms / rstanarm fits, a
+# posterior 'draws' object, a wide draws matrix/data frame, or an already-long
+# table) into one long data frame with the columns
 # `term`, `.value` and `.draw`. Only fixed-effect parameters are retained from
 # fitted models and from draws objects that hold brms's `b_` parameters, with
 # the `b_` prefix stripped so terms line up with the frequentist side. The log
@@ -40,10 +42,10 @@ is_summary_matrix <- function(x) {
 #' Is `x` a recognised source of posterior draws?
 #'
 #' TRUE for fitted Bayesian models (brms/rstanarm), posterior `draws` objects,
-#' and matrices other than summary matrices. Data frames are *not* claimed here,
-#' because a tidy data frame of posterior *summaries* (estimate/conf.low/...)
-#' must keep flowing down the summary path; `has_draws()` disambiguates those
-#' two data-frame cases.
+#' and matrices other than summary matrices. Plain data frames are *not*
+#' claimed here (a `draws_df` is, by its class), because a tidy data frame of
+#' posterior *summaries* (estimate/conf.low/...) must keep flowing down the
+#' summary path; `has_draws()` disambiguates those two data-frame cases.
 #' @noRd
 is_draws_source <- function(x) {
   inherits(x, c("brmsfit", "stanreg", "draws", "draws_df", "draws_matrix",
@@ -53,11 +55,15 @@ is_draws_source <- function(x) {
 
 #' Does this object actually carry per-draw samples (not just summaries)?
 #'
-#' A data frame counts as draws when it is long (a parameter column plus a value
-#' column) or wide (several numeric columns and clearly more rows than a summary
-#' table would have, or sampler index columns such as `.draw`). Anything that
-#' [tidy_estimates()] would read as a summary table (estimate + conf.low/high)
-#' is treated as summaries, not draws.
+#' A data frame counts as draws when it is long (a parameter column plus a
+#' value column, and no summary column), when it has a sampler index column
+#' (`.chain`, `.iteration` or `.draw`), whatever else it holds, or when it is
+#' wide: at least 50 rows, more than a summary table would have, no summary
+#' column and at least one numeric column other than the index and
+#' book-keeping columns (`.chain`, `.iteration`, `.draw`, `chain`,
+#' `iteration`, `draw` and `.row`). A summary table that [tidy_estimates()]
+#' reads (estimate + conf.low/high) is therefore treated as summaries unless it
+#' carries a sampler index column.
 #' @noRd
 has_draws <- function(x) {
   if (is_draws_source(x)) return(TRUE)
@@ -77,8 +83,9 @@ has_draws <- function(x) {
   }
   # Sampler index columns are a strong signal of raw draws.
   if (has_index) return(TRUE)
-  # Wide draws: many numeric columns, no summary columns, and more rows than a
-  # forest plot's worth of terms (draws come in the hundreds/thousands).
+  # Wide draws: at least one numeric column, no summary columns, and at least
+  # 50 rows, more than a forest plot's worth of terms (draws come in the
+  # hundreds or thousands).
   num <- nm[vapply(x, is.numeric, logical(1))]
   num <- setdiff(num, c(".chain", ".iteration", ".draw", "draw", "chain",
                         "iteration", ".row"))
@@ -91,8 +98,9 @@ has_draws <- function(x) {
 #' Extract a tidy long table of draws from any supported source
 #'
 #' @return A data frame with columns `term` (character), `.value` (numeric) and
-#'   `.draw` (integer). NA values are dropped, matching `draws_to_long()`, and so
-#'   are `lp__` and `lprior`, with a message.
+#'   `.draw` (integer). NA values are dropped, as `draws_to_long()` drops them,
+#'   and so are `lp__` and `lprior`: silently from a brms fit, which keeps only
+#'   its `b_` parameters, and otherwise with a message.
 #' @noRd
 extract_draws <- function(x) {
   long <- if (inherits(x, "brmsfit")) {
@@ -128,7 +136,9 @@ extract_draws_brms <- function(x) {
   draws <- posterior::as_draws_df(x)
   df <- as.data.frame(draws)
   # Keep only population-level (fixed) effects: the `b_` parameters. Drop the
-  # intercept-less book-keeping and group-level (`r_`, `sd_`, `cor_`) terms.
+  # rest, such as the centred `Intercept`, `sigma`, the group-level (`r_`,
+  # `sd_`, `cor_`) terms and the log densities, without a message.
+  # extract_draws_posterior() names what it drops from a draws object.
   b_cols <- grep("^b_", names(df), value = TRUE)
   if (!length(b_cols)) {
     stop("No fixed-effect (b_*) parameters found in the brms fit.",
@@ -253,8 +263,8 @@ extract_draws_df <- function(x) {
 
 #' Long-melt a wide draws data frame, dropping sampler index columns
 #'
-#' Mirrors the column-selection logic in `draws_to_long()` (the existing wide
-#' path), but emits the `term` / `.value` / `.draw` schema used throughout the
+#' Uses the same column selection as the wide path of `draws_to_long()`, but
+#' emits the `term` / `.value` / `.draw` schema used throughout the
 #' distribution layer.
 #' @noRd
 wide_to_long_draws <- function(df) {

@@ -264,10 +264,9 @@ the one making that claim. The eight-colour qualitative palette clears every
 colour-vision check and fails the greyscale check: its orange and its sky blue
 differ by 0.79 in CIE lightness, so a black-and-white printer renders them as the
 same grey. The Okabe-Ito guarantee is about hue confusion and was never a claim
-about greyscale. The threshold stays where it is, the check reports the number,
-and the claim has been narrowed to match. A figure that may be printed in black
-and white wants fewer groups, a sequential palette, or a redundant shape or line
-type.
+about greyscale. The threshold stays where it is, and the check reports the
+number. A figure that may be printed in black and white wants fewer groups, a
+sequential palette, or a redundant shape or line type.
 
 ```{r}
 eight <- data.frame(g = factor(letters[1:8]), x = 1:8, y = 1:8)

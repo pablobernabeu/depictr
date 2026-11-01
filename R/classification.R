@@ -22,7 +22,9 @@
 #'   [scale_colour_depictr()] palette is used instead).
 #' @param ci Bootstrap confidence band for a single ROC curve and its AUC.
 #'   `FALSE` (default) draws none; `TRUE` uses 2000 resamples; a positive integer
-#'   sets the number of resamples. Ignored when several models are overlaid.
+#'   sets the number of resamples. The resamples come from the session's
+#'   random-number stream, so call `set.seed()` first for a reproducible band.
+#'   Ignored when several models are overlaid.
 #' @param conf_level Confidence level for the bootstrap band, a single number
 #'   strictly between 0 and 1.
 #' @param youden Logical; if `TRUE`, mark the Youden's J operating point (the
@@ -41,6 +43,12 @@
 #'
 #' @return A [ggplot2::ggplot] object. The AUC(s) are stored in
 #'   `attr(plot, "auc")` (a named vector when several models are supplied).
+#'   When `ci` draws a band, which it does for a single model, the bootstrap
+#'   interval of the AUC is stored in `attr(plot, "auc_ci")`, a vector named
+#'   `lower` and `upper`. With `youden = TRUE`, the Youden point is stored in
+#'   `attr(plot, "youden")`: a list of `threshold`, `fpr`, `tpr`, `j`,
+#'   `sensitivity` and `specificity`, or a list of such lists named by model
+#'   when several models are supplied.
 #' @export
 #' @examples
 #' gfit <- glm(accuracy ~ word_frequency + condition + RT,
@@ -467,8 +475,8 @@ binary_inputs <- function(x, score) {
 #' Normalise the curve inputs into a named list of (actual, score) pairs
 #'
 #' This is the single entry point that lets every classification curve accept
-#' either a single model/vector (the original, backward-compatible behaviour) or
-#' a *named list* of models or (actual, score) pairs to overlay. It always
+#' either a single model or outcome vector, or a *named list* of models or
+#' (actual, score) pairs to overlay. It always
 #' returns a list of `list(actual = , score = )` entries with `names()` set, plus
 #' an attribute `"multi"` recording whether more than one model was supplied (so
 #' the callers know whether to draw a legend).
@@ -598,8 +606,11 @@ roc_boot_ci <- function(actual, score, n_boot = 2000, conf_level = 0.95,
       next
     }
     rb <- roc_points(ab, sb)
-    # Step-interpolate TPR at each grid FPR (ROC is a step/right-continuous
-    # function; approx with a monotone rule gives a conservative reading).
+    # Interpolate TPR linearly at each grid FPR. The ROC points are joined by
+    # straight segments (horizontal, vertical or diagonal across a run of tied
+    # scores), so this follows the curve. At a vertical step, ties = "ordered"
+    # reads the upper TPR. rule = 2 holds the end values outside the observed
+    # FPR range.
     tpr_mat[b, ] <- stats::approx(rb$fpr, rb$tpr, xout = grid, ties = "ordered",
                                   rule = 2)$y
     aucs[b] <- roc_auc(rb)

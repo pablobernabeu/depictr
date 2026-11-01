@@ -57,8 +57,13 @@ cases.}
 }
 \value{
 A 'patchwork' object (printable like a \link[ggplot2:ggplot]{ggplot2::ggplot}). The
-computed differences and their bootstrap intervals are attached as the
-\code{"differences"} attribute (a data frame).
+\code{"differences"} attribute holds a data frame with one row per group other
+than the reference and the columns \code{group}, \code{reference}, \code{diff} (the
+group's mean minus the reference's), \code{lower} and \code{upper} (the bootstrap
+interval at \code{conf_level}), \code{cohens_d} and \code{hedges_g}. The interval limits
+and the effect sizes are \code{NA} where either group has fewer than two
+observations, and the effect sizes are also \code{NA} when the pooled standard
+deviation is zero.
 }
 \description{
 An estimation plot puts the \emph{effect size} and its uncertainty at the centre

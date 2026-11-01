@@ -14,7 +14,8 @@ palette_preview(
 \item{n}{Number of colours to preview.}
 
 \item{type}{Palette type to preview: \code{"qualitative"}, \code{"sequential"},
-\code{"diverging"}, or \code{"all"} to show all three.}
+\code{"diverging"}, or \code{"all"} to show all three, one panel each, without the
+hex labels.}
 
 \item{cvd}{Colour-vision-deficiency simulation for the tiles: \code{"none"} (the
 default, true colours), \code{"deutan"} (red-green, deuteranopia), \code{"protan"}
@@ -45,4 +46,6 @@ palette_preview(cvd = "deutan")
 }
 \references{
 \insertRef{machado2009}{depictr}
+
+\insertRef{wcag22}{depictr}
 }

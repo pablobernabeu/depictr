@@ -29,9 +29,9 @@
 #' the wide side. Observations with zero prior weight take no part in the fit
 #' and are left out of the bins.
 #'
-#' `band = "empirical"` draws the band of depictr 0.3.0 and earlier, the one
-#' `arm::binnedplot()` draws: twice the standard deviation of the residuals in
-#' the bin, divided by \eqn{\sqrt{n_b}}. It collapses wherever the outcomes in
+#' `band = "empirical"` draws the band that `arm::binnedplot()` draws: twice
+#' the standard deviation of the residuals in the bin, divided by
+#' \eqn{\sqrt{n_b}}. It collapses wherever the outcomes in
 #' a bin are all alike. The residuals in a logistic model's bin without events
 #' all lie just below zero, so its band nearly vanishes and the bin is flagged.
 #' Where events are rare, such bins are what the model expects. The example
@@ -51,7 +51,7 @@
 #' @param band Where the standard errors come from. The default, `"model"`,
 #'   takes them from the variance the fitted model implies for each residual.
 #'   `"empirical"` takes them from the spread of the residuals in each bin, as
-#'   in depictr 0.3.0 and `arm::binnedplot()`.
+#'   `arm::binnedplot()` does.
 #'
 #' @return A [ggplot2::ggplot] object. The per-bin summary (mean fitted value,
 #'   mean residual, number of observations `n`, the band's half-width `se2`
@@ -64,7 +64,7 @@
 #'             data = clinical_trial, family = binomial)
 #' binned_residual_plot(gfit)
 #'
-#' # The band of depictr 0.3.0, which flags the bins that hold no events:
+#' # The band arm::binnedplot() draws, which flags the bins that hold no events:
 #' binned_residual_plot(gfit, band = "empirical")
 binned_residual_plot <- function(model, bins = NULL,
                                  type = c("response", "pearson"),
