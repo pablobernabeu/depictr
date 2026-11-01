@@ -1,71 +1,68 @@
 ## Submission
 
-This is a new submission. depictr has not been on CRAN before. The version
-number is 0.3.0 rather than 0.1.0 because the package already has a public
-release history on GitHub and Zenodo; this is the first release offered to CRAN,
-so the standard new-submission note is expected.
+This is an update from depictr 0.3.0, which CRAN published on 2026-09-01, to
+0.4.0.
 
-depictr is a unified toolkit of publication-ready plots that span the analysis
-workflow: exploratory data analysis, model estimates and predictions,
-diagnostics and classification, multivariate and survival methods, time series,
-uncertainty and reporting. Every plotting function returns a 'ggplot2' object,
-or a 'patchwork' object for composite panels.
+0.4.0 changes results and interfaces. Some functions return different values
+for the same input (the confidence intervals of a 'glm' with an estimated
+dispersion, standardised coefficients, fit statistics, variance inflation
+factors and binned-residual bands among them), some arguments must now be
+passed by name and some input that 0.3.0 accepted is refused. The package also
+requires ggplot2 3.5.2 or later, where it required 3.5.0. NEWS.md lists each of
+these changes under 'Upgrading from the previous release (0.3.0)', in three
+parts: 'Changed results', 'Changed interface' and 'Changed output'.
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
-
-The note is the standard one for a first release, reproduced in full:
-
-```
-* checking CRAN incoming feasibility ... [15s] NOTE
-Maintainer: 'Pablo Bernabeu <pcbernabeu@gmail.com>'
-
-New submission
-```
+0 errors | 0 warnings | 0 notes
 
 ## Test environments
 
-* Local: Windows 11, R 4.6.1. `R CMD check --as-cran` run on the built tarball
-  on 2026-08-21. Result: 1 note, the one shown above.
-* Local: Windows 11, R 4.6.1. `R CMD check` run on the same tarball on
-  2026-08-21 with `_R_CHECK_DEPENDS_ONLY_=true`, so that none of the suggested
-  packages were on the library path. Result: OK, with no errors, warnings or
-  notes. The test suite ran there in full, with 1224 tests passing and 17
-  skipped by the guards that stand in front of the suggested back-ends.
+GitHub Actions, run 41310413560 on 2026-11-01, at commit 49a56c1 on the main
+branch. That commit differs from this submission only in the version number and
+the first heading of NEWS.md. Each leg built the tarball with
+`--compact-vignettes=gs+qpdf` and ran `R CMD check --as-cran --no-manual` on
+it, without the CRAN incoming checks, which r-lib/actions turns off. Each leg
+ended with 'Status: OK':
 
-The same sources also pass on GitHub Actions across ubuntu-latest (release,
-devel and oldrel-1), windows-latest (release and devel) and macOS-latest
-(release). The most recent run was on 2026-08-20, at the commit this tarball was
-built from, so it covers the same code but not the version number now in
-DESCRIPTION.
+* ubuntu-latest (Ubuntu 24.04.5 LTS), R 4.6.2
+* ubuntu-latest (Ubuntu 24.04.5 LTS), R-devel (2026-10-31 r90820)
+* ubuntu-latest (Ubuntu 24.04.5 LTS), R 4.5.3
+* windows-latest (x86_64-w64-mingw32), R 4.6.2
+* windows-latest (x86_64-w64-mingw32), R-devel (2026-10-31 r90820)
+* macos-latest (macOS 26.6.2, aarch64-apple-darwin23), R 4.6.2
+
+The test suite passed in every leg, with no failures or warnings. Four tests
+skip everywhere because they read repository files that R CMD check cannot
+reach: CITATION.cff in two of them and the R sources in the other two. Five
+more skip on macOS, where the cairo device cannot be loaded.
+
+The same run installed the minimum versions that DESCRIPTION declares (ggplot2
+3.5.2, with patchwork 1.3.0 and with the newest patchwork) on R oldrel-3 under
+ubuntu-latest. There the test suite passed, and every example ran without a
+warning.
 
 ## Notes
 
-* The heavier modelling back-ends that some functions can consume (lme4,
-  lmerTest, broom, simr, survival, ggdist, posterior, cluster and boot) are in
-  Suggests and used conditionally, so the package installs and checks without
-  them. The depends-only run listed above is the evidence for that. colorspace
-  is suggested for tests only, as an independent implementation of the
-  Machado colour-vision transforms against which the package's own transforms
-  are compared; those tests skip when colorspace is absent.
-* Every example, test and vignette runs either on base models ('lm', 'glm') and
-  the bundled simulated datasets or, where a Bayesian or mixed-model result is
-  shown, on a small precomputed model object shipped in inst/extdata. No
-  heavyweight fitting toolchain is needed at check time, and nothing reaches the
-  network or requires a credential.
-* Example variants that render several multi-panel figures are wrapped in
-  `\donttest{}`, which keeps each example file inside the five-second budget.
-  With `--run-donttest` the slowest example measured 2.8 seconds elapsed here.
-  The first call of every example remains runnable.
-* Any "possibly misspelled words" reported for the DESCRIPTION are technical
-  terms, acronyms and package names such as 'ggplot2', 'lme4', 'Bayesian',
-  'Okabe' and 'ROC', all of them listed in inst/WORDLIST. The machine used for
-  the runs above has no aspell dictionary installed, so those runs could not
-  reproduce that part of the incoming check.
+* The modelling back-ends that some functions can take (lme4, lmerTest, broom,
+  simr, survival, ggdist, posterior, cluster and boot) are in Suggests and used
+  conditionally, so the package installs and checks without them.
+* ragg is in Suggests for save_plot(). When ragg is installed, ggsave() writes
+  a TIFF with it, and otherwise with grDevices::tiff().
+* MASS, callr, colorspace and spelling are used by the tests only, and each
+  test that needs one of them skips when it is absent. MASS supplies the
+  negative binomial fits that some tests check. colorspace is an independent
+  implementation of the Machado colour-vision transforms, against which the
+  package's own transforms are compared. callr runs one test in a fresh R
+  session. That test and tests/spelling.R skip on CRAN. testthat and withr run
+  the tests, and knitr and rmarkdown build the vignettes.
+* Example variants that draw several multi-panel figures are wrapped in
+  `\donttest{}`. In the runs above, R CMD check timed one example at more than
+  five seconds: save_plot() on Windows with R-devel, at 6.5 seconds elapsed and
+  1.0 second of CPU time.
 * The five bundled datasets are reproducibly simulated and contain no personal
-  or proprietary data. They are regenerated by data-raw/generate_datasets.R.
+  or proprietary data.
 
 ## Downstream dependencies
 
-This is a new package, so there are no downstream dependencies.
+There are no reverse dependencies on CRAN.

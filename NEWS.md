@@ -1,4 +1,4 @@
-# depictr (development version)
+# depictr 0.4.0
 
 ## Upgrading from the previous release (0.3.0)
 

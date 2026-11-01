@@ -16,5 +16,6 @@
 ^figure$
 ^\.gitignore$
 ^CRAN-SUBMISSION$
+^revdep$
 ^vignettes/articles$
 ^tests/testthat/Rplots\.pdf$
