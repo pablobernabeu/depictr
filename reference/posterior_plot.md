@@ -135,10 +135,14 @@ object.
 
 Draws may be supplied in many shapes: a fitted Bayesian model (`brms` or
 `rstanarm`), a `posterior` *draws* object, a wide data frame or matrix
-with one column of draws per parameter, or a long data frame (a
-parameter column and a value column). For fitted models only the
-fixed-effect (population) parameters are kept, with the `brms` `b_`
-prefix stripped. A draws object that holds `b_` parameters, as
+with one column of draws per parameter, or a long data frame with a
+parameter column named `parameter`, `term`, `.variable` or `variable`
+and a value column named `value`, `.value`, `draw` or `estimate`. In a
+wide data frame, the numeric columns `.chain`, `.iteration`, `.draw`,
+`draw`, `chain`, `iteration` and `.row` are read as sampler indices and
+left out. For fitted models only the fixed-effect (population)
+parameters are kept, with the `brms` `b_` prefix stripped. A draws
+object that holds `b_` parameters, as
 [`posterior::as_draws_df()`](https://mc-stan.org/posterior/reference/draws_df.html)
 returns for a `brms` fit, is read the same way, with a message naming
 the variables it dropped. Pass it through

@@ -159,6 +159,14 @@ function shows the familiar two-source forest plot via <code><a href="compare_mo
 It reads tidy columns (<code>term</code>, <code>estimate</code>, <code>conf.low</code>, <code>conf.high</code>), the
 <code>Estimate</code>, <code>Q2.5</code> and <code>Q97.5</code> of the matrix <code>brms::fixef()</code> returns, and the
 <code>l-95% CI</code> and <code>u-95% CI</code> of <code>summary(fit)$fixed</code>.</p>
+<p>A data frame counts as draws when it holds a sampler index column (<code>.chain</code>,
+<code>.iteration</code> or <code>.draw</code>), when it is long, with a parameter column
+(<code>parameter</code>, <code>term</code>, <code>.variable</code> or <code>variable</code>) and a value column
+(<code>value</code>, <code>.value</code> or <code>draw</code>) but no summary column such as <code>estimate</code> or
+<code>conf.low</code>, or when it is wide, with at least 50 rows and no summary column.
+Any other data frame is read as summaries. The half-eyes need the 'ggdist'
+package. Without it, each posterior is drawn as its median and <code>conf_level</code>
+interval, with a message.</p>
 <p>Terms are aligned by their canonical display label, so the <code>brms</code>-style <code>b_</code>
 prefix is reconciled automatically against the frequentist term names. Draws
 are read as in <code><a href="posterior_plot.html">posterior_plot()</a></code>, so a draws object holding <code>b_</code> parameters

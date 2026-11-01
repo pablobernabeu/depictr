@@ -2,392 +2,425 @@
 
 ## depictr (development version)
 
-### Figures that misreported the data
+### Upgrading from the previous release (0.3.0)
 
-- [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md),
-  and `group_comparison_plot(differences = TRUE)` which calls it, failed
-  in a fresh R session with “Can’t find method for generic `/(e1, e2)`”,
-  or with “non-numeric argument to binary operator” under ggplot2 3.5.
-  The two panels were stacked with patchwork’s `/` operator, which
-  exists only once patchwork has been loaded, and nothing in depictr
-  loaded it. The panels are now composed with
-  [`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html),
-  and depictr imports patchwork, so
-  [`library(depictr)`](https://pablobernabeu.github.io/depictr/) loads
-  it.
+#### Changed results
 
-- [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md)
-  drew the differences out of line with the groups they belong to. The
-  lower panel had one column fewer than the upper and spread its columns
-  across the full width, so with reference North, the East difference
-  sat beneath North, and with two groups, the single difference sat
-  midway between them. Every group now keeps its column in both panels,
-  and the reference’s column in the lower panel is left empty.
-  `group_comparison_plot(differences = TRUE)` is fixed with it. The
-  function is also described for what it draws, a Cumming estimation
-  plot with the differences stacked beneath the data. The claim that
-  zero lines up with the reference group’s mean has been removed, since
-  the stacked panels have independent axes. The caption now writes a
-  round number of resamples in full, as 100,000 where it printed 1e+05.
-
+- Confidence intervals for a `glm` whose dispersion is estimated
+  (Gaussian, Gamma, inverse Gaussian and quasi families) use the t
+  distribution, as
+  [`summary.glm()`](https://rdrr.io/r/stats/summary.glm.html) does,
+  where they used z and were too narrow. They widen wherever depictr
+  reports or draws them.
+- `coefficient_plot(standardise = TRUE)`, and so
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md),
+  scales continuous inputs by their standard deviation and an
+  interaction through its continuous inputs, leaving factor, logical and
+  two-valued inputs unscaled (Gelman, 2008), where it scaled every
+  model-matrix column, so a contrast depended on group balance.
+- `coefficient_plot(standardise = TRUE)` leaves
+  [`poly()`](https://rdrr.io/r/stats/poly.html), `ns()` and other matrix
+  terms unscaled, with a message, and warns about an interaction of
+  continuous inputs that are not all centred. The axis and panel titles
+  say which inputs were scaled.
 - [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)
-  attached an unnamed `labels` vector to the wrong coefficients. The
-  labels were assigned after the terms had been reversed or sorted for
-  display, so in `lm(yield ~ rainfall + fertiliser + soil_ph)` soil pH
-  was labelled ‘Rainfall’. An unnamed vector is now bound to the terms
-  in model order before any reordering.
-  [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md)
-  and
-  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
-  counted one row per term and source, or one per posterior draw, and so
-  refused a vector with one label per term. Both now accept one, read
-  with the terms in the order they first appear. Named labels are
-  unchanged and remain the safer form. The documentation of `order` now
-  says which end the largest estimate lands at.
-
+  reads an unnamed `labels` vector in model order, whatever `order` is,
+  where it matched the vector to the terms as reversed or sorted for
+  display, so a vector written for 0.3.0 can put labels on other terms.
+  Named labels are unaffected.
 - [`model_fit_table()`](https://pablobernabeu.github.io/depictr/reference/model_fit_table.md)
   and the
   [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
-  subtitle misreported R² for `glm` models. McFadden’s ratio was applied
-  to every family, so a Gaussian `glm` could report a negative value and
-  a quasi-likelihood family reported `NA`. The null model was refitted
-  with [`update()`](https://rdrr.io/r/stats/update.html). That used more
-  rows than the model when a predictor had missing values, dropped an
-  offset written in the formula, put an intercept in the null of a model
-  fitted without one and gave `NA` for a model fitted inside a function.
-  Every `glm`, including quasi-likelihood and negative binomial fits,
-  now reports the deviance R², 1 - D/D0, computed from the deviances the
-  fit already holds. It equals the ordinary R² for a Gaussian model with
-  the identity link and McFadden’s R² for binary logistic regression, so
-  a binary logistic value changes only where the old refit went wrong.
-  Values for Poisson, grouped binomial, Gamma and other models change by
-  definition. The
-  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
-  subtitle now calls it the deviance R², where it said pseudo-R².
-
-- For mixed models fitted by REML with
-  [`lme4::lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html),
-  [`model_fit_table()`](https://pablobernabeu.github.io/depictr/reference/model_fit_table.md)
-  now takes AIC, BIC and the log-likelihood from a maximum-likelihood
-  refit and says so in a message. REML criteria cannot be compared
-  between models with different fixed effects, which is the comparison
-  the model-estimates vignette makes. If a refit fails, a warning says
-  so and that model’s criteria are `NA`. The `R2` column stays `NA` for
-  mixed models, as the help page now documents.
-
-- A `glm` fitted with `na.action = na.exclude` broke the classification
-  and diagnostic plots. Its fitted values are padded with `NA` to the
-  length of the data while its response is not, and the plots paired the
-  two. The ROC, precision-recall, threshold, gain and lift plots and the
-  confusion matrix failed, and
-  [`calibration_plot()`](https://pablobernabeu.github.io/depictr/reference/calibration_plot.md)
-  silently dropped bins and drew the rest with other rows’ outcomes. In
-  the Q-Q panel of
-  [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md),
-  the quantile residuals set each response against another row’s fitted
-  value, and for a Gaussian model they were all `NA`, so the panel was
-  empty. All of them now use the model’s own unpadded components.
-  [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
-  and
-  [`influence_plot()`](https://pablobernabeu.github.io/depictr/reference/influence_plot.md)
-  also leave the excluded rows out of their frames, for an `lm` as for a
-  `glm`. They no longer warn about removing those rows, and the 2p/n
-  leverage line of
-  [`influence_plot()`](https://pablobernabeu.github.io/depictr/reference/influence_plot.md)
-  no longer counts them.
-
-- The quantile residuals in the Q-Q panel of
-  [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
-  ignored prior weights in Gaussian and Gamma models. Every observation
-  was given the same scale, so a correctly specified weighted model
-  showed spurious departures from the line. The weights now scale each
-  observation’s variance, as they do in the fit.
-
-- A brms posterior passed as a `posterior` draws object was read as a
-  plain table.
-  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
-  silently pooled `b_Intercept` with `Intercept`, the intercept brms
-  reports for centred predictors, into one slab. It also drew the
-  sampler’s log density and every random effect as parameters.
-  [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
-  stopped with an error about duplicated factor levels. Draws objects
-  now keep their population-level (`b_`) parameters, named without the
-  prefix as for a brms fit, with a message naming what was dropped. A
-  `labels` key for one of them is written without the prefix too. In
-  both functions, two parameters whose draws would share a label are now
-  an error, and `lp__` and `lprior` are never drawn as parameters,
-  whatever form the draws take. For a `stanreg` fit, the group-level
-  `b[...]` and `Sigma[...]` draws are no longer read as fixed effects
-  either.
-
-- When `bayesian` holds draws,
-  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
-  now draws only the terms both inputs share, and a message names any it
-  dropped. A `sigma` in the posterior, or a frequentist term with no
-  posterior, no longer takes a row of its own. Inputs that share no
-  terms are an error.
-
-- A `brms::fixef()` matrix was read as draws, so it came out as four
-  ‘parameters’ named after its columns.
-  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
-  now takes the summary path for it, and
-  [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md),
-  which needs draws, refuses it. The summary path also no longer warns
-  about label keys you never supplied.
-
-- `conf_level` in
-  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
-  set the level of the frequentist intervals only. With draws, the
-  half-eyes stayed at 66% and 95%, so `conf_level = 0.8` drew 80%
-  confidence intervals beside 95% credible ones, and nothing on the
-  figure named either level. The level now sets the outer posterior
-  interval too. The interval drawn when ggdist is not installed follows
-  it, and so does the span that decides which faceted panels draw the
-  reference line. The 66% inner interval is kept while `conf_level`
-  exceeds 0.66, so that it stays the narrower of the two. A caption now
-  names the level of each source’s intervals on either path, and the new
-  `caption` argument replaces it or, with `NA`, omits it. A table of
-  estimates keeps the intervals it holds, and the caption says that they
-  are as supplied.
-
-- The two paths of
-  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
-  no longer swap the sources’ colours. With draws, the Bayesian
-  half-eyes were brand blue and the frequentist overlay orange, the
-  reverse of the forest plot drawn from summaries and of the Python
-  package. The frequentist estimates are now brand blue and the Bayesian
-  ones orange on both paths.
-
-- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
-  read the `status` coding separately in each group. Under the
-  [`survival::Surv()`](https://rdrr.io/pkg/survival/man/Surv.html) 1/2
-  convention, a group whose subjects were all censored (all `1`) fits
-  the 0/1 convention as well, so it was read as a group in which every
-  subject had the event, and its curve fell to zero. Codings that mixed
-  the two conventions across groups were accepted silently. The coding
-  is now read once, over all observations.
-
-- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
-  silently misread a factor `status`. The factor was coerced to its
-  level codes and read under the 1/2 convention, so whichever level
-  sorted first was taken as censored, whatever it meant. A character
-  `status` became `NA` throughout, with only a coercion warning, and
-  drew a flat curve at one. Both are now refused with an error that says
-  to recode the indicator first.
-
-- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
-  ignored its `group` and `status` arguments when `time` was a data
-  frame. It read both from conventionally named columns only (`group`,
-  `strata` or `arm`, and `status` or `event`), so
-  `survival_plot(df, group = "treatment")` drew a single pooled curve
-  with no legend, log-rank test or risk-table rows. A column name or a
-  vector with one entry per row is now honoured for both, and takes
-  precedence over the conventionally named column. A name that matches
-  no column is an error.
-
-- The number-at-risk table of
-  [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
-  could miscount at its default breaks.
-  [`pretty()`](https://rdrr.io/r/base/pretty.html) returns multiples of
-  a binary floating-point step, so with follow-up up to 1.2 the break
-  labelled 0.6 was 0.6000000000000001, and a subject followed up to
-  exactly 0.6 was left out of the count there. A last break equal to the
-  longest follow-up was lost the same way. The breaks are now rounded to
-  their step before the counts are taken.
-
-- The median-survival guides of
-  [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
-  mislabelled some medians. The survival estimate was compared with 0.5
-  without a tolerance, so a step that the arithmetic left a rounding
-  error above 0.5 was taken to stay above it. With times
-  `c(2, 3, 4, 8, 8, 10, 10, 11)` and status `c(1, 1, 1, 1, 0, 1, 0, 1)`,
-  the guide read ‘median 10’ where
-  [`survival::quantile.survfit()`](https://rdrr.io/pkg/survival/man/quantile.survfit.html)
-  gives 9. A curve that ended at 0.5 drew no guide. For a `survfit`
-  object, the midpoint of a curve that sat at 0.5 was taken with the
-  next row, which can be a censoring time at which the curve does not
-  move. The medians now follow the rule of `quantile.survfit()`,
-  including its tolerance and its midpoint for a curve that ends at 0.5,
-  whatever the input and whether or not survival is installed.
-
-- [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
-  wrote files that fail the checks journals run on submitted figures. An
-  EPS left out every translucent element, including all the points and
-  the confidence band of the first
-  [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md)
-  example, with only a terse device warning to show for it, and it named
-  its fonts without embedding them. A PDF did not embed its fonts
-  either. A TIFF was uncompressed: 8.1 MiB at the default 7 by 4.5
-  inches, and more than the 10 MB PLOS allows at the largest figure size
-  it accepts. A transparent background, such as
-  [`theme_void()`](https://ggplot2.tidyverse.org/reference/ggtheme.html)
-  leaves, could also give the TIFF the alpha channel PLOS refuses. PDF
-  and EPS files now go through the cairo devices, which embed the fonts.
-  An EPS rasterises its translucent layers, and whatever they overlap,
-  at 600 dpi or more, with a message when it does. A TIFF is now
-  LZW-compressed and drawn on white unless `bg` is given. On a Mac
-  without ragg, it is drawn by the cairo TIFF device, because the
-  default quartz one ignores compression. A `device` or device argument
-  passed to
-  [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
-  still wins. Without cairo, the old devices are used, with a message or
-  a warning saying what the file lacks. R for macOS from CRAN loads
-  cairo only where XQuartz is installed, so on a Mac without it a PDF or
-  EPS is written this way, and a TIFF is left uncompressed unless ragg
-  is installed.
-
+  subtitle give every `glm` the deviance R², where they applied
+  McFadden’s ratio to every family and could refit the null model on
+  other rows. Binary logistic values change only where that refit went
+  wrong.
+- [`model_fit_table()`](https://pablobernabeu.github.io/depictr/reference/model_fit_table.md)
+  takes the AIC, BIC and log-likelihood of an
+  [`lme4::lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html) REML fit from
+  a maximum-likelihood refit, with a message, where it reported REML
+  criteria, which cannot be compared between models with different fixed
+  effects.
+- [`vif_plot()`](https://pablobernabeu.github.io/depictr/reference/vif_plot.md)
+  computes VIFs from the coefficients’ covariance, as
+  [`car::vif()`](https://rdrr.io/pkg/car/man/vif.html) does, where it
+  ignored the fit’s weights. Values change for a weighted `lm`, a
+  binomial or Poisson `glm` and any other `glm` that weights its
+  observations unequally. A model without an intercept changes too, with
+  a warning.
+- [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md)
+  exponentiates the estimates and limits of an `lm`, a `glm`, an lme4
+  fit and a data frame when given `exponentiate = TRUE`, where it
+  ignored the argument for these and returned the link scale.
 - [`effects_plot()`](https://pablobernabeu.github.io/depictr/reference/effects_plot.md),
   [`interaction_plot()`](https://pablobernabeu.github.io/depictr/reference/interaction_plot.md)
   and
   [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
-  failed on any model with a transformed term
-  ([`log()`](https://rdrr.io/r/base/Log.html),
-  [`poly()`](https://rdrr.io/r/stats/poly.html), `ns()`,
-  [`scale()`](https://rdrr.io/r/base/scale.html),
-  [`factor()`](https://rdrr.io/r/base/factor.html),
-  [`I()`](https://rdrr.io/r/base/AsIs.html)) or an offset. Where a
-  transformed term sat beside its raw variable, they drew a flat effect
-  line or coincident interaction lines without complaint. The prediction
-  grid is now built from the raw variables, so
+  build the prediction grid from the raw variables, so
   [`predict()`](https://rdrr.io/r/stats/predict.html) re-applies every
-  transformation, and offsets are held at their sample mean on the link
-  scale, as the y-axis label now says. A model-frame name such as
-  `"log(rainfall)"` stands for the variable it transforms, and the
-  x-axis shows that variable.
-
-- The raw values behind a transformed term come from the data named in
-  the model’s call. A model fitted to workspace vectors without `data =`
-  is therefore refused, where it could silently plot its fitted values
-  against the grid, and so is a data frame that has changed since the
-  fit or a formula that reads one with `$`. A term computed from
-  statistics of its rows, such as `I(x - mean(x))`, is refused as well,
-  since [`predict()`](https://rdrr.io/r/stats/predict.html) would
-  compute it afresh over the grid. Beside its raw variable, such a term
-  used to shift the line without complaint.
-
-- [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
-  judged every `glm` by normal-theory panels. A correctly specified
-  logistic model, simulated with 400 observations, put about a third of
-  its standardised deviance residuals outside the Q-Q band, the picture
-  of a broken model. A `glm` now gets the binned-residual and
-  quantile-residual panels that
+  transformation, where a transformed term beside its raw variable gave
+  a flat effect line or coincident interaction lines.
+- [`calibration_plot()`](https://pablobernabeu.github.io/depictr/reference/calibration_plot.md)
+  and the Q-Q panel of
   [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
-  already used, and
-  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
-  gains the same `glm_panels` and `seed` arguments. `glm_panels = FALSE`
-  restores the old panels. The help page of
-  [`qq_plot()`](https://pablobernabeu.github.io/depictr/reference/qq_plot.md)
-  now says that the standardised deviance residuals of a non-Gaussian
-  `glm` are not expected to be normal.
-
-- [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md),
-  and the forecast overlay of
-  [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md),
-  drew prediction intervals far too narrow. In rolling-origin backtests
-  on eight classic series, the nominal 95% band covered about 60% of
-  one-step-ahead outcomes. The documentation credited its square-root
-  widening to seasonal naive forecasting, whose variance does not grow
-  that way. Forecasts now come from a random walk with drift on the
-  STL-seasonally-adjusted series, with the last seasonal cycle added
-  back, which reproduces
-  `forecast::stlf(method = "rwdrift", s.window = "periodic")`. A new
-  `lambda` argument in both functions applies a Box-Cox (or log)
-  transformation for a seasonal swing that grows with the level, and a
-  caption on the overlay names the interval and the method. A series of
-  exactly two cycles now gets the package’s own message, and
-  [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md)
-  gains `s_window`. The vignette’s claim that STL lets the seasonal
-  component evolve held only for a window this release exposes for the
-  first time.
-
-- [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
-  drew the forecast of a numeric `x` in the wrong place. The forecaster
-  counted time in cycles from 1, while the history sits at the
-  observation index or at the supplied `time`. The overlay therefore
-  jumped back towards the start of the axis, and on a `Date` axis it
-  landed in the year 4. The forecast now continues the history’s own
-  axis, one typical step at a time. An unsorted `time` is also put in
-  order before forecasting, as it already was for the moving average.
-
-- [`pca_plot()`](https://pablobernabeu.github.io/depictr/reference/pca_plot.md)
-  now fixes the aspect ratio, so the angles drawn between the loading
-  arrows are their angles in loading space whatever the size of the
-  device. The panel’s height and width follow the ranges of its axes, so
-  a figure of another shape gains blank space around the panel. The
-  arrows and their labels are drawn in a neutral dark grey (`grey20`) in
-  place of the accent, which is also the palette’s fourth colour and so
-  tied the variables to the fourth group. A misspelt `group` column, a
-  column name passed with a `prcomp` object and a `group` vector of the
-  wrong length are now errors. The first put one point in a level named
-  after the misspelling and the rest in `NA`. The second put every point
-  in one level named after the column, and the third was padded with
-  `NA` or recycled in silence. `group` also takes an unquoted column
-  name, as elsewhere in the package. A `prcomp` object fitted with
-  `retx = FALSE` has no scores to draw, and it is now refused with a
-  message that says so.
-
+  pair each outcome of a `glm` fitted with `na.action = na.exclude` with
+  its own fitted value, where they paired it with another row’s.
+- [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
+  and
+  [`influence_plot()`](https://pablobernabeu.github.io/depictr/reference/influence_plot.md)
+  leave out the rows that `na.action = na.exclude` excludes, for an `lm`
+  as for a `glm`, without the warning they gave, and the 2p/n leverage
+  line of
+  [`influence_plot()`](https://pablobernabeu.github.io/depictr/reference/influence_plot.md)
+  no longer counts them.
+- The Q-Q panel of
+  [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
+  scales the quantile residuals of a weighted Gaussian or Gamma model by
+  its prior weights, which it ignored, and leaves out observations with
+  zero prior weight.
+- [`binned_residual_plot()`](https://pablobernabeu.github.io/depictr/reference/binned_residual_plot.md)
+  and the binned panel of
+  [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
+  draw the band from the fitted model, where the empirical band was too
+  narrow in bins without events, and leave out observations with zero
+  prior weight. `binned_residual_plot(band = "empirical")`, though not
+  the panel, restores the old band.
+- [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
+  draws binned-residual and quantile-residual panels for a `glm`, as
+  [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
+  does, where it drew normal-theory panels that flag a correct logistic
+  model. `glm_panels = FALSE` restores the old panels, and `seed` fixes
+  the randomised residuals.
+- [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  and
+  [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
+  keep only the `b_` parameters of a `posterior` draws object that has
+  them, as one made from a brms fit does, with a message, where
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  drew the group-level effects as parameters and pooled `b_Intercept`
+  with `Intercept`.
+- [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  and
+  [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
+  leave out the group-level effects of a `stanreg` fit and the log
+  densities `lp__` and `lprior` of any draws, which they drew as
+  parameters.
+- [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  with draws plots only the terms both inputs share, with a message
+  naming those it drops, where `sigma` and terms without a posterior
+  took rows of their own, and sets the outer posterior interval by
+  `conf_level`, where it stayed at 95%.
+- [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  reads a `brms::fixef()` matrix as a summary, where it drew the
+  matrix’s four columns as parameters.
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  draws log-log confidence limits by default (Borgan & Liestøl, 1990),
+  where it drew untransformed Greenwood limits. Unless `time` is a
+  `survfit` object, `conf_type = "plain"` restores them, apart from the
+  last step of a curve that falls to zero. `conf_type = "log"` gives the
+  default of
+  [`survival::survfit()`](https://rdrr.io/pkg/survival/man/survfit.html).
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  recomputes a `survfit` object’s limits at `conf_level` and
+  `conf_type`, where it copied the object’s own and ignored
+  `conf_level`. `conf_type = "log"` restores the limits of an object
+  made with the defaults of `survfit()`.
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  draws limits for a `survfit` object made with `conf.type = "none"`,
+  where it drew none. `conf_level = NA` leaves them out. An object
+  without standard errors, or with Peto or modified lower limits, keeps
+  its own and warns when they differ from those asked for.
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  reads the `status` coding once over all observations, where it read
+  each group separately and so drew a group whose subjects are all
+  censored under the 1/2 coding falling to zero. That group’s curve now
+  stays at one.
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  honours `group` and `status`, as a column name or a vector, when
+  `time` is a data frame, where it read them only from conventionally
+  named columns and could pool the groups.
+- The number-at-risk table of
+  [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  counts a subject followed up to exactly a break and keeps a last break
+  equal to the longest follow-up, both of which a floating-point error
+  in the default breaks left out.
+- The median guides of
+  [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  follow
+  [`survival::quantile.survfit()`](https://rdrr.io/pkg/survival/man/quantile.survfit.html),
+  where a rounding error could label the wrong time, a `survfit` curve
+  flat at 0.5 could take its midpoint from a censoring time and a curve
+  that ends at 0.5 got no guide.
+- Unless `time` is a `survfit` object, the confidence band of
+  [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  reaches the last event of a curve that falls to zero, where it stopped
+  one event early.
+- [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
+  and
+  [`cluster_plot()`](https://pablobernabeu.github.io/depictr/reference/cluster_plot.md)
+  default to `k_range = NULL`, which searches `1:8` for the gap and
+  elbow criteria. The old `2:8` let the gap statistic find clusters in
+  pure noise and kept the elbow from suggesting two. `k_range = 2:8`
+  restores it.
 - [`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md)
-  recoded the cluster labels it was given to 1, 2, 3 and so on, so a
-  clustering labelled `"low"`, `"mid"` and `"high"`, or coded 2, 5 and
-  9, came back with other names in the band labels and in the attached
-  `"silhouette"` table. The labels passed in are now kept, and the
-  table’s `neighbor` column is a factor of them.
-
-- [`random_effects_plot()`](https://pablobernabeu.github.io/depictr/reference/random_effects_plot.md)
-  failed for any model with more than one random-effect term per
-  grouping factor fitted without a correlation, `(1 + x || g)` for
-  instance. The same error, “incorrect number of dimensions”, stopped
-  split terms such as `(1 | g) + (0 + x | g)` and their `glmer()`
-  equivalents. It now reads lme4’s conditional standard deviations for
-  every model shape. For a correlated model, they equal the square roots
-  of the diagonal it used before, so those intervals are unchanged. lme4
-  is now suggested at version 1.1-19 or later. Conditional variances for
-  several terms per factor arrived in lme4 1.1-18, and 1.1-19 revised
-  the data-frame method that reads them.
-
-- [`power_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/power_curve_plot.md)
-  reads power tables with several curves, one per effect or design, and
-  draws one line each, told apart by colour and line type. It joined
-  them into a single zigzag before. An `effect`, `param` or `term`
-  column with more than one level separates the curves, with a message
-  naming the columns used, and rows that share a sample size with no
-  such column are now an error. It recognises `n_subject` and
-  `<power>_lo`/`<power>_hi` columns such as pilotr’s, so the output of
-  pilotr’s `power_curve_mixed()` plots as it is, with its band. It gains
-  `n`, `power`, `group`, `lower`, `upper` and `y_lab`, appended after
-  the existing arguments so that positional calls keep working. The
-  y-axis title is “Power” for the usual power columns and the column’s
-  name otherwise, so a decision probability such as pilotr’s
-  `p_meaningful` is not labelled as power.
-
-- The grouped plots each treated a grouping variable in their own way. A
-  numeric code, such as a block numbered 1 and 2, failed in
-  [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md)
-  with “Continuous value supplied to a discrete scale”, and
-  [`explore_distribution()`](https://pablobernabeu.github.io/depictr/reference/explore_distribution.md)
+  keeps the cluster labels it is given in its bands and in its
+  `"silhouette"` table, whose `cluster` and `neighbor` columns are
+  factors of them, where it recoded them to 1, 2, 3 and so on and gave
+  `neighbor` as integer codes.
+- [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)
+  and the forecast overlay of
+  [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
+  forecast the seasonally adjusted series with a random walk with drift,
+  as `forecast::stlf(method = "rwdrift", s.window = "periodic")` does,
+  where they extrapolated the last cycle’s trend with intervals far too
+  narrow. The overlay caption names the method.
+- [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
+  continues a forecast along the history’s own axis, numeric or `Date`,
+  where it restarted near the start of the axis, and sorts an unsorted
+  `time` before forecasting.
+- [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
+  centres the moving average of an even `rolling` window, as a 2×12
+  average for `rolling = 12` (Hyndman & Athanasopoulos, 2021), where the
+  average was drawn half an observation early. Odd windows are
+  unchanged.
+- [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
+  draws one line per column of a multivariate `ts` or a matrix, where it
+  joined the columns into one series.
+- [`summary_table()`](https://pablobernabeu.github.io/depictr/reference/summary_table.md)
+  summarises a date or date-time column as one `Range` row and a
+  duration as mean (SD) in a unit that the statistic names, where it
+  gave one row per distinct value.
+- [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
   and
-  [`ecdf_plot()`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot.md)
-  drew it as one ungrouped curve. A level with no rows, as
-  [`subset()`](https://rdrr.io/r/base/subset.html) leaves in a factor,
-  took a colour in the correlation panel of
-  [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md)
-  but not in its scatter panels, so the levels after it changed colour
-  from one panel to the next.
-  [`group_comparison_plot()`](https://pablobernabeu.github.io/depictr/reference/group_comparison_plot.md)
+  [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  measure colour separability with CIEDE2000 (Sharma, Wu & Dalal, 2005),
+  where the 1976 distance overstated the differences between saturated
+  colours, so distances and some verdicts change. `metric = "cie76"`
+  restores the old measure.
+- [`simulate_cvd()`](https://pablobernabeu.github.io/depictr/reference/simulate_cvd.md)
+  at partial severity interpolates between the published matrices of
+  Machado et al. (2009), where it drew the full-severity matrix towards
+  the identity, so its colours between severities 0 and 1 change. Full
+  severity is unchanged.
+- [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  measures each text against its own background, holds large text to 3:1
+  and measures a translucent plot or panel background as the colour it
+  shows, where it measured all text against the plot background at
+  4.5:1.
+- [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  composites translucent colours over their background with the alpha
+  each geom applies, where it measured them as opaque, and compares
+  colours and fill colours each among themselves, where it pooled them,
+  so verdicts can change in either direction.
+- [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  counts a colour or fill split across layers, one value per layer, as a
+  colour encoding, where it reported none, and counts shape and line
+  type split that way towards `redundant_encoding`.
+- [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  adds a tenth row, `annotation_text_size`, which holds the text inside
+  the panel, such as annotations,
+  [`geom_text()`](https://ggplot2.tidyverse.org/reference/geom_text.html)
+  labels and the cell values of depictr’s plots, to the size floor, so a
+  figure that passed can fail.
+
+#### Changed interface
+
+- depictr requires ggplot2 3.5.2 or later, where it declared 3.5.0, with
+  which the current patchwork cannot load, and suggests lme4 1.1-19 or
+  later.
+- [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
+  [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
   and
-  [`raincloud_plot()`](https://pablobernabeu.github.io/depictr/reference/raincloud_plot.md)
-  warned that such a level had too few observations and kept an empty
-  place for it on the axis, which
-  [`group_comparison_plot()`](https://pablobernabeu.github.io/depictr/reference/group_comparison_plot.md)
-  moved to the end. Missing groups made
-  [`raincloud_plot()`](https://pablobernabeu.github.io/depictr/reference/raincloud_plot.md)
-  fail, were drawn as a grey group of their own by
-  [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md),
-  [`outlier_plot()`](https://pablobernabeu.github.io/depictr/reference/outlier_plot.md)
+  [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md)
+  take new arguments before `title`, `palette` and `confidence`
+  respectively, so those arguments and the ones after them must be
+  passed by name.
+- [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md),
+  [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md),
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md),
+  [`scale_colour_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md)
   and
+  [`scale_fill_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md)
+  take a new argument before `...`, so an argument meant for `...` must
+  be passed by name.
+- A `conf_level` outside (0, 1), such as 95, is refused by every
+  function that takes one, where a level of 0 or 1 gave the model
+  estimates zero-width or unbounded intervals, 95 gave missing intervals
+  or an error and
+  [`roc_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/roc_curve_plot.md)
+  without `ci` ignored the level. Without `ci`,
+  [`roc_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/roc_curve_plot.md)
+  also refuses `NULL`, which it ignored.
+- Every function that takes a `conf_level`, except
+  [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  and
+  [`calibration_plot()`](https://pablobernabeu.github.io/depictr/reference/calibration_plot.md),
+  refuses `NA`, where most gave missing intervals. Those two still take
+  it to leave the limits out, and both refuse `NaN`, which they read as
+  `NA`.
+- [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md)
+  and
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  read an unnamed `labels` vector as one label per term, in the order
+  the terms first appear, where they took one label per row of the
+  stacked estimates or per posterior draw, and refuse a vector of the
+  old length.
+- For a `posterior` draws object that holds `b_` parameters,
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  and
+  [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
+  take `labels` keys without the prefix, so a key such as `b_rainfall`
+  written for 0.3.0 no longer matches.
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  refuses a factor, character or non-integer `status`, which it read by
+  its level codes, as missing or truncated to an integer.
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  refuses a `status` coded 0/1 in some groups and 1/2 in others, which
+  it read group by group.
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  refuses a `group` or `status` name that matches no column of a data
+  frame `time`, which it ignored.
+- [`effects_plot()`](https://pablobernabeu.github.io/depictr/reference/effects_plot.md),
+  [`interaction_plot()`](https://pablobernabeu.github.io/depictr/reference/interaction_plot.md)
+  and
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
+  refuse a formula term computed from statistics of its rows, such as
+  `I(x - mean(x))`, which shifted the line, a formula that reads columns
+  with `$` and a transformed term whose data the call cannot supply.
+- [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  with draws refuses inputs that share no terms and two terms of either
+  input that would share a label, and
+  [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
+  refuses a `brms::fixef()` matrix and two parameters that would share a
+  label.
+- [`explore_distribution()`](https://pablobernabeu.github.io/depictr/reference/explore_distribution.md),
+  [`ecdf_plot()`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot.md),
+  [`raincloud_plot()`](https://pablobernabeu.github.io/depictr/reference/raincloud_plot.md),
+  [`group_comparison_plot()`](https://pablobernabeu.github.io/depictr/reference/group_comparison_plot.md),
+  [`explore_categorical()`](https://pablobernabeu.github.io/depictr/reference/explore_categorical.md),
   [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md),
-  and vanished without a word elsewhere.
-  [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md),
+  [`ridgeline_plot()`](https://pablobernabeu.github.io/depictr/reference/ridgeline_plot.md)
+  and
+  [`outlier_plot()`](https://pablobernabeu.github.io/depictr/reference/outlier_plot.md)
+  refuse a numeric `group` with more than 20 distinct values, which they
+  drew, and
+  [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md)
+  refuses one when called, where it returned a plot that failed when
+  drawn.
+- [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md),
+  [`explore_distribution()`](https://pablobernabeu.github.io/depictr/reference/explore_distribution.md),
+  [`ecdf_plot()`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot.md),
+  [`raincloud_plot()`](https://pablobernabeu.github.io/depictr/reference/raincloud_plot.md),
+  [`explore_categorical()`](https://pablobernabeu.github.io/depictr/reference/explore_categorical.md)
+  and
+  [`outlier_plot()`](https://pablobernabeu.github.io/depictr/reference/outlier_plot.md)
+  refuse a `group` missing for every row when called, where they drew it
+  or returned a plot that failed when drawn.
+- [`power_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/power_curve_plot.md)
+  refuses rows of one curve that share a sample size, where it joined
+  them into a zigzag line.
+- [`acf_plot()`](https://pablobernabeu.github.io/depictr/reference/acf_plot.md),
+  [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md),
+  [`seasonal_plot()`](https://pablobernabeu.github.io/depictr/reference/seasonal_plot.md)
+  and
+  [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)
+  refuse a series of more than one column, and
+  [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
+  refuses a `forecast` for one, where they joined the columns into one
+  series.
+- [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
+  refuses an even `rolling` window as long as the shortest series, since
+  the centred average spans one observation more than the window.
+- [`pca_plot()`](https://pablobernabeu.github.io/depictr/reference/pca_plot.md)
+  refuses a misspelt `group` column, a `group` vector of the wrong
+  length and a column name passed with a `prcomp` object, which it read
+  as one level or padded with `NA`.
+
+#### Changed output
+
+- [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
+  [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md),
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md),
+  [`optimizer_fixef_plot()`](https://pablobernabeu.github.io/depictr/reference/optimizer_fixef_plot.md)
+  and the coefficient panel of
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
+  label a two-level factor or logical input with its level, as in
+  `treatment: enhanced`, where they showed `treatment`. Except in
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md),
+  `labels = c(treatmentenhanced = "treatment")` restores an old label.
+- In an interaction row, the same functions name the variable and level
+  of every factor, as in `rainfall × treatment: enhanced`, where they
+  showed `rainfall × treatmentenhanced`. Except in
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md),
+  a `labels` entry for the raw term restores it.
+- [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md)
+  labels the factor levels of every model, as in `region: South`, where
+  it labelled only those of the first model holding a factor and showed
+  the rest as `regionSouth`. A `labels` entry for the raw term restores
+  them.
+- `compare_models(x_lab = NULL)`, and
+  `frequentist_bayesian_plot(x_lab = NULL)` with summaries, draw the
+  default axis title, ‘Estimate’ or the ratio’s name, where they drew
+  none. Adding `ggplot2::labs(x = NULL)` removes it.
+- The
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
+  subtitle of a `glm` calls its R² ‘deviance R²’, where it said
+  ‘pseudo-R²’.
+- [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md)
+  and `group_comparison_plot(differences = TRUE)` give every group a
+  column in the difference panel, the reference’s first and empty, so
+  each difference sits in its own group’s column, where the difference
+  panel had one column fewer than the groups and spread across the full
+  width.
+- The caption of
+  [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md)
+  and `group_comparison_plot(differences = TRUE)` writes a round number
+  of resamples in full, as 100,000, where it printed 1e+05.
+- `group_comparison_plot(differences = TRUE)` keeps each group’s colour
+  whatever the `reference`, where the colours moved between groups, and
+  [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md)
+  matches a named `palette` to the levels by name.
+- [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  draws the frequentist estimates in brand blue and the Bayesian ones in
+  orange on both paths, where the draws path swapped them, and adds a
+  caption naming each source’s interval level. `caption = NA` omits it.
+- [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
+  writes PDF, EPS and PostScript files with the cairo devices, which
+  embed the fonts, and a TIFF LZW-compressed on white unless `bg` is
+  given, where the files failed journals’ checks. `device = "pdf"`,
+  `"eps"`, `"ps"` or `"tiff"` restores ggplot2’s devices.
+- [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
+  rasterises the translucent layers of an EPS or PostScript file at 600
+  dpi or more, with a message, where it left them out.
+- Without cairo, as on a Mac without XQuartz,
+  [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
+  writes a PDF, EPS or PostScript file with a message or warning saying
+  what the file lacks, and a Mac with neither XQuartz nor ragg writes
+  the TIFF uncompressed, with a warning.
+- `seasonal_plot(style = "season")` draws its cycle lines from a ramp
+  that starts at `#4a8fc0`, at 3.51:1 against white, where the earliest
+  cycles were close to invisible.
+  `palette = depictr_palette(n, type = "sequential")`, with `n` the
+  number of cycles, restores the old ramp.
+- [`palette_preview()`](https://pablobernabeu.github.io/depictr/reference/palette_preview.md),
+  [`confusion_matrix_plot()`](https://pablobernabeu.github.io/depictr/reference/confusion_matrix_plot.md)
+  and
+  [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md)
+  draw each label in black or white, whichever contrasts more with its
+  tile, where some labels fell below the 4.5:1 that WCAG asks of text.
+- [`pca_plot()`](https://pablobernabeu.github.io/depictr/reference/pca_plot.md)
+  fixes the aspect ratio, so a figure of another shape gains blank
+  space, and draws its loading arrows and labels in dark grey, where
+  they took the accent, the palette’s fourth colour.
+- Without `group`,
+  [`power_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/power_curve_plot.md)
+  draws one curve per level of an `effect`, `param` or `term` column,
+  with a message, where it joined them into one line.
+- [`power_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/power_curve_plot.md)
+  draws a confidence band from `<power>_lo` and `<power>_hi` columns,
+  such as the `power_lo` and `power_hi` of a pilotr sweep over sample
+  size, where it drew none, and reads them before `lower` and `upper`.
+- [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md),
   [`explore_distribution()`](https://pablobernabeu.github.io/depictr/reference/explore_distribution.md),
   [`ecdf_plot()`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot.md),
   [`raincloud_plot()`](https://pablobernabeu.github.io/depictr/reference/raincloud_plot.md),
@@ -397,694 +430,307 @@
   [`ridgeline_plot()`](https://pablobernabeu.github.io/depictr/reference/ridgeline_plot.md)
   and
   [`outlier_plot()`](https://pablobernabeu.github.io/depictr/reference/outlier_plot.md)
-  now share one rule. The group becomes a factor, so a numeric code is a
-  group, but a numeric column with more than 20 distinct values is
-  refused as continuous, as
-  [`explore_categorical()`](https://pablobernabeu.github.io/depictr/reference/explore_categorical.md)
-  already refused such an `x`. Rows with a missing group are dropped
-  with a message, as
-  [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
-  drops them, and levels left without rows take no colour, legend key or
-  place on an axis. Colours are matched to the levels by name, so a
-  level keeps its colour in every layer and panel, and a group too
-  sparse for a ridge no longer shifts the colours of the ridges after
-  it. An unnamed `palette` is assigned to the levels in use in their
-  order, and a named one still pins a colour to each level.
-  [`explore_categorical()`](https://pablobernabeu.github.io/depictr/reference/explore_categorical.md)
-  now orders its groups by level, where it sorted them alphabetically,
-  so they take the same colours as in the Python package.
-  [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md)
-  leaves a numeric `group` out of its default columns and stops with a
-  clear error when `cols` names it. With the default palette, the
-  warning that more than eight groups lose the colour-vision guarantee
-  now comes once, when the plot is made, where it came each time the
-  plot was drawn.
-
-- [`palette_preview()`](https://pablobernabeu.github.io/depictr/reference/palette_preview.md),
-  [`confusion_matrix_plot()`](https://pablobernabeu.github.io/depictr/reference/confusion_matrix_plot.md)
+  drop rows with a missing group, with a message, and give no colour to
+  a level without rows, so the colours of the levels after it can shift.
+- [`ridgeline_plot()`](https://pablobernabeu.github.io/depictr/reference/ridgeline_plot.md)
+  keeps each ridge’s colour when an earlier group is too sparse to draw,
+  where the later ridges shifted colour.
+  [`group_comparison_plot()`](https://pablobernabeu.github.io/depictr/reference/group_comparison_plot.md)
   and
-  [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md)
-  drew some labels below the 4.5:1 contrast that WCAG asks of text. The
-  first two switched from white to dark grey text at a relative
-  luminance of 0.4, although the two colours tie near 0.2. Four of the
-  eight default swatches therefore had white labels at 2.85 to 3.87:1,
-  and counts on mid-blue cells of a confusion matrix fell as low as
-  2.3:1.
-  [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md)
-  drew white labels whenever \|r\| exceeded 0.6, which left the r =
-  -0.70 of `wellbeing_survey` at 3.6:1, and its `n/a` sat in grey40 on a
-  grey85 cell at 4.1:1. Each label is now black or white, whichever has
-  the higher contrast against its tile as drawn, which is at least
-  4.58:1 on any colour. The tile colours are read as the fill scale
-  draws them, interpolated in the Lab colour space, where the confusion
-  matrix used an RGB approximation.
-
-- [`vif_plot()`](https://pablobernabeu.github.io/depictr/reference/vif_plot.md)
-  computed the VIFs of a weighted `lm` or a `glm` from the correlations
-  of the design matrix, which leave out the weights of the fit. The
-  generalised VIF of Fox and Monette (1992) compares the confidence
-  region of a term’s coefficients with the one they would have without
-  collinearity, so it depends on those weights. The VIFs now come from
-  the covariance of the coefficients, as
-  [`car::vif()`](https://rdrr.io/pkg/car/man/vif.html) computes them,
-  and agree with it. For
-  `glm(adverse_event ~ biomarker + age + arm, family = binomial)` fitted
-  to `clinical_trial`, the VIF of age moves from 1.0073 to 1.0046. An
-  unweighted `lm` with an intercept gives the values it gave before. A
-  model fitted without an intercept now gives VIFs computed from columns
-  that are not centred, with a warning, as
-  [`car::vif()`](https://rdrr.io/pkg/car/man/vif.html) does.
-
-- A multivariate `ts`, such as `cbind(mdeaths, fdeaths)`, or a numeric
-  matrix was read as one series, its columns laid end to end.
-  [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
-  drew a single line. For a `ts` it zigzagged between the columns at
-  every time, and for a matrix it ran on from one column into the next.
-  [`acf_plot()`](https://pablobernabeu.github.io/depictr/reference/acf_plot.md)
-  returned the autocorrelation of the joined columns.
-  [`seasonal_plot()`](https://pablobernabeu.github.io/depictr/reference/seasonal_plot.md)
-  and the classical
-  [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md)
-  recycled the seasons and times of one column over all of them, so the
-  columns were drawn over one another, and
-  [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)
-  forecast the joined columns at missing times.
-  [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
-  now draws one line per column, named after the columns.
-  [`acf_plot()`](https://pablobernabeu.github.io/depictr/reference/acf_plot.md),
-  [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md),
-  [`seasonal_plot()`](https://pablobernabeu.github.io/depictr/reference/seasonal_plot.md)
+  [`raincloud_plot()`](https://pablobernabeu.github.io/depictr/reference/raincloud_plot.md)
+  leave a level without rows off the axis, where they kept an empty
+  place for it with a warning.
+- [`explore_distribution()`](https://pablobernabeu.github.io/depictr/reference/explore_distribution.md)
   and
-  [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)
-  refuse more than one column with a message that gives the count. They
-  read a `ts` with a single column as that series.
-  [`ts()`](https://rdrr.io/r/stats/ts.html) makes one from a one-column
-  data frame, and the STL decomposition stopped on it with “only
-  univariate series are allowed”.
-
-- [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md)
-  and
-  [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)
-  now trim missing values at either end of a series, as the Python
-  package does, so a forecast, the overlay of
-  [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
-  included, starts after the last observation.
-  [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)
-  and the STL decomposition stopped with the error “missing values in
-  object” from [`stl()`](https://rdrr.io/r/stats/stl.html). A missing
-  value inside the series is refused with a message that names `x` and
-  asks for the value to be dropped or imputed, where
-  [`stl()`](https://rdrr.io/r/stats/stl.html) and
-  [`decompose()`](https://rdrr.io/r/stats/decompose.html) stopped with
-  errors of their own.
-  [`acf_plot()`](https://pablobernabeu.github.io/depictr/reference/acf_plot.md)
-  still computes the correlations across such a gap from the pairs of
-  observations present, with a warning, while the Python package refuses
-  the series. The help pages of both packages now say so.
-
-- [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
-  keeps the level order of a factor `group`, which sets the legend and
-  the colours, and leaves out levels that no row uses. It ordered the
-  groups by first appearance.
-
-- [`summary_table()`](https://pablobernabeu.github.io/depictr/reference/summary_table.md)
-  and
-  [`explore_bivariate()`](https://pablobernabeu.github.io/depictr/reference/explore_bivariate.md)
-  took a date for a category.
-  [`summary_table()`](https://pablobernabeu.github.io/depictr/reference/summary_table.md)
-  gave a `Date`, `POSIXct` or `difftime` column one row per distinct
-  value, so 40 visits on 40 days filled 40 rows. Dates are now
-  summarised as a range instead of one row per day: a single `Range` row
-  reads `2024-01-01 to 2024-04-27` overall and in each group, with the
-  time to the minute or second where the column has one. A duration is
-  summarised as mean (SD) in its own units, which the statistic names,
-  as in `Mean (SD), days`.
-  [`explore_bivariate()`](https://pablobernabeu.github.io/depictr/reference/explore_bivariate.md)
-  drew a date against a number as one box plot per day, and against a
-  category as bars with a colour for each day, both with a warning that
-  the colours had been interpolated past the eight of the Okabe-Ito set.
-  Dates, date-times and durations now count as numeric. Against a
-  numeric variable, they give the scatter plot with a trend of
+  [`ecdf_plot()`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot.md)
+  draw a numeric group code, such as blocks numbered 1 and 2, as groups,
+  where they drew one ungrouped curve.
+- [`explore_categorical()`](https://pablobernabeu.github.io/depictr/reference/explore_categorical.md)
+  orders its groups by level, where it sorted them alphabetically.
+- With the default palette,
   [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md),
-  and against a categorical one box plots of their values by level. A
-  duration is drawn as a number in its own units, named in the default
-  axis title. The Python package now does the same.
-
-- [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
-  drew a moving average over an even window, such as `rolling = 12` for
-  monthly data, half an observation early. Equal weights over twelve
-  observations are centred between two of them, and the mean of
-  observations 1 to 12 was drawn at observation 6, where its centre is
-  6.5. An even window now gives the 2×12 moving average (Hyndman &
-  Athanasopoulos, 2021, Section 3.3), a 12-point average followed by a
-  2-point one, which is centred on each observation and is the trend
-  that [`decompose()`](https://rdrr.io/r/stats/decompose.html)
-  estimates. The caption of a grouped overlay names it, and the window
-  needs a series one observation longer than itself. The Python package
-  drew the same average half an observation late, and the two packages
-  now draw the same values. An odd window is unchanged.
-
-- [`threshold_plot()`](https://pablobernabeu.github.io/depictr/reference/threshold_plot.md)
-  joined the metrics at adjacent scores with straight lines, which
-  passed through values that no threshold gives, while its help page
-  promised exact step functions. The curves are now drawn as steps.
-  Every threshold between two adjacent scores predicts what the upper
-  score predicts, so each step changes at a score and runs flat below
-  it. The Python package now evaluates the metrics at every distinct
-  score too, and draws the same steps.
-
-- `dumbbell_plot(sort = "none")` promised the data’s own order but
-  sorted the categories alphabetically, so levels West, South, North and
-  East gave East, North, South and West. It now keeps the order of a
-  factor’s levels, and otherwise the order in which the categories first
-  appear.
-
-### Degenerate input
-
-- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
-  truncated a non-integer status code, so `c(0, 0.5, 1)` was read as two
-  censored observations and an event. Non-integer codes are now refused
-  with the existing coding message.
-
-- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
-  kept an arm whose every `status` was missing when `group` was a
-  factor. The arm stayed in the legend with no curve and a row of zeros
-  in the risk table, and `logrank = TRUE` failed with an error that did
-  not say why. The arm is now dropped with the missing statuses, as it
-  already was for a character `group`.
-
-- [`vif_plot()`](https://pablobernabeu.github.io/depictr/reference/vif_plot.md)
-  refuses a model with aliased coefficients, for which no VIF exists,
-  and names the terms they belong to. It failed with an unrelated base-R
-  error, “missing value where TRUE/FALSE needed”.
-
-- [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md)
-  refuses a column in `cols` that it cannot correlate and names it, in
-  the words of
-  [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md).
-  A factor failed with an error from
-  [`var()`](https://rdrr.io/r/stats/cor.html) that did not name the
-  column, and a date with “‘x’ must be numeric” from
-  [`cor()`](https://rdrr.io/r/stats/cor.html). Logical columns are still
-  correlated as 0 and 1.
-
-- [`seasonal_plot()`](https://pablobernabeu.github.io/depictr/reference/seasonal_plot.md)
-  refused every frequency that is not a whole number, such as the 365.25
-  / 7 of weekly data, with a message about `season_labels` that no
-  labels could satisfy, while
-  [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md)
-  drew the same series. Such a frequency is now rounded down to whole
-  seasons, counted from the first observation as
-  [`stl()`](https://rdrr.io/r/stats/stl.html) counts them, and a message
-  says so.
-
-- A `conf_level` given as a percentage, such as 95, gave missing
-  intervals, with at most a `NaNs produced` warning, in
-  [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md),
-  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
-  [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md),
-  [`effects_plot()`](https://pablobernabeu.github.io/depictr/reference/effects_plot.md),
-  [`interaction_plot()`](https://pablobernabeu.github.io/depictr/reference/interaction_plot.md),
+  [`explore_distribution()`](https://pablobernabeu.github.io/depictr/reference/explore_distribution.md),
+  [`ecdf_plot()`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot.md),
+  [`raincloud_plot()`](https://pablobernabeu.github.io/depictr/reference/raincloud_plot.md),
   [`group_comparison_plot()`](https://pablobernabeu.github.io/depictr/reference/group_comparison_plot.md),
-  [`calibration_plot()`](https://pablobernabeu.github.io/depictr/reference/calibration_plot.md)
+  [`explore_categorical()`](https://pablobernabeu.github.io/depictr/reference/explore_categorical.md),
+  [`ridgeline_plot()`](https://pablobernabeu.github.io/depictr/reference/ridgeline_plot.md)
   and
-  [`random_effects_plot()`](https://pablobernabeu.github.io/depictr/reference/random_effects_plot.md).
-  [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md),
-  [`roc_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/roc_curve_plot.md)
-  and
-  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
-  failed with `'probs' outside [0,1]`. A level of 0 or 1, which no
-  interval can have, was accepted too. Every function that takes a
-  `conf_level` now refuses a value outside (0, 1). The message is the
-  one
-  [`acf_plot()`](https://pablobernabeu.github.io/depictr/reference/acf_plot.md)
-  gave: “`conf_level` must be a single number strictly between 0 and 1.”
-  [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
-  and
-  [`calibration_plot()`](https://pablobernabeu.github.io/depictr/reference/calibration_plot.md)
-  still take `NA` to leave the limits out. The other functions refuse
-  it, where it gave missing intervals, and
-  [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
-  refuses `NaN`, which it read as `NA`.
-
-### Auditing a finished figure
-
-- [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
-  measured all text against the plot background, so text on a coloured
-  facet strip or legend box was judged against a background it is not
-  drawn on: white strip text on a dark strip failed and unreadable grey
-  strip text passed. Each text is now measured against its own
-  background, with a translucent fill taken as the colour it shows over
-  what lies beneath it. Large text (18 pt, or 14 pt bold, as printed) is
-  held to the 3:1 that WCAG asks of it, where it used to be held to
-  4.5:1. The `text_contrast` row reports the text that falls furthest
-  short of its own threshold and gives that threshold, and its detail
-  names the text’s printed size and weight. A translucent plot or panel
-  background is also measured as the colour it shows. Its alpha used to
-  be dropped, so `geometry_contrast` moves for such a figure. The
-  relative-luminance code now cites the current WCAG 2.2 definition and
-  its 0.04045 breakpoint, which changes no ratio.
-- [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
-  measured translucent marks and text as if they were opaque, so a
-  figure could pass contrast, colour-vision and greyscale checks that
-  its drawn colours fail. The ‘mended’ example in the Get started
-  vignette was one: its points, drawn at alpha 0.7, passed the geometry
-  check at 3.87:1, and the vermillion a reader sees reaches 2.56:1.
-  Colours are now composited over their background with the alpha each
-  geom applies, outlines drawn opaque are credited, and the colours of
-  each aesthetic are compared among themselves. A translucent colour or
-  text is named in the detail with its alpha and the colour it is drawn
-  as, and the separability rows say whether their closest pair are
-  colours or fill colours. Verdicts on translucent figures can change in
-  either direction. The vignette’s example now draws its points opaque.
-- [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
-  now treats a colour or fill mapped in several layers, one value per
-  layer, as the encoding it is. Such figures were reported as encoding
-  nothing by colour. With red and green drawn one group per layer, every
-  colour row read “not applicable”, whereas the same figure drawn in one
-  layer fails the deuteranopia check at 0.37.
-  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
-  with draws, whose half-eyes and frequentist overlay are separate
-  layers, was never audited for colour. It now is, and the orange of its
-  half-eyes fails `geometry_contrast` at 2.25:1, as that colour does on
-  white in any figure. Shape and line type split across layers count
-  towards `redundant_encoding` in the same way. A colour set as a
-  constant, as in `geom_point(colour = "red")`, is still left out, as
-  the help page now says.
-- [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
-  gains an `annotation_text_size` row for the text drawn inside the
-  panel: annotations, the labels of layers such as
-  [`geom_text()`](https://ggplot2.tidyverse.org/reference/geom_text.html)
-  and
-  [`geom_label()`](https://ggplot2.tidyverse.org/reference/geom_text.html),
-  and the cell values and labels of depictr’s own plots. The text-size
-  check never saw that text, so a 5.7 pt annotation passed a 6 pt floor
-  while the report gave 8.80 pt as the smallest text. The new row holds
-  it to the same floor at its printed size. It is appended last, so the
-  report now has ten rows. The contrast of that text is not measured,
-  and nor is text a layer builds only when it is drawn, such as
-  ggrepel’s labels. When all of a figure’s text is inside the panel, the
-  two rows for the text around it no longer say that the figure draws no
-  text.
-- The colour rows of a figure coloured by a continuous scale, such as a
-  heatmap, said that nothing was distinguished by colour. They now say
-  that colour is a continuous scale, which these checks do not audit,
-  and the documentation recommends a perceptually ordered map such as
-  viridis for one. The help page and the README now also give the
-  default palette’s contrast limit, which the Get started vignette
-  already stated: four of its eight colours fall below the 3:1 that WCAG
-  asks of a graphical object against white, the orange from the second
-  group on. The documentation shows how to audit a figure saved at its
-  final width, with that width given as both widths or neither, and the
-  help page gives four publishers’ text floors, dated and linked, where
-  it called 6 pt a common publisher floor.
-- [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
-  accepts a multi-panel composite and audits each panel on its own, in
-  the order patchwork tags them, with a leading `panel` column. It used
-  to refuse one, which left the package’s own composites without an
-  audit. Among them are the figures of
-  [`arrange_plots()`](https://pablobernabeu.github.io/depictr/reference/arrange_plots.md),
-  [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md),
-  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md),
-  [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md)
-  and `survival_plot(risk_table = TRUE)`. Each panel’s legend is
-  measured with the panel. A spacer or a guide area takes no panel
-  number, and a wrapped element, such as a grob or a table, is left out
-  with a warning. Composite-level titles and tags are not measured.
-- `check_figure(max_text_pt =)` checks a ceiling as well as a floor, and
-  `save_plot(check = TRUE)` audits the figure at the width it is saved
-  at, so the text sizes are the printed ones. The ceiling adds a last
-  row, `text_size_max`, for the largest text at its printed size, around
-  the panel and inside it, and that row passes at or below its
-  threshold. Nature, for one, allowed no text above 7 pt but the panel
-  labels. Without `max_text_pt`, the report keeps its ten rows.
-  `save_plot(check = TRUE)` gives the saved width, converted to
-  centimetres from inches, millimetres or pixels, as both `width_cm` and
-  `render_width_cm`. It warns with each check the figure fails and
-  attaches the report to the file name it returns, as `attr(, "check")`.
-
-### Metadata and documentation
-
-- The declared ggplot2 floor rises from 3.5.0 to 3.5.2. The current
-  patchwork cannot load against ggplot2 3.5.0 or 3.5.1, so every
-  function that composes panels failed on the floor the package
-  declared:
-  [`arrange_plots()`](https://pablobernabeu.github.io/depictr/reference/arrange_plots.md),
-  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md),
-  [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md),
-  [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md),
-  [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md),
-  [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md)
-  and `survival_plot(risk_table = TRUE)`. On ggplot2 3.5.x,
+  [`outlier_plot()`](https://pablobernabeu.github.io/depictr/reference/outlier_plot.md)
+  warn once past eight groups, when the plot is made, where they warned
+  each time the plot was drawn.
+- The caption of a grouped
+  [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
+  names the average of an even `rolling` window as, for example, ‘2×12
+  centred moving average’, where it said ‘12-point’.
+- [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
+  keeps the level order of a factor `group`, where it ordered the groups
+  by first appearance, and leaves out unused levels, so the legend order
+  and colours can change.
+- `decompose_plot(method = "classical")` leaves out missing values at
+  either end of a series, so its panels start at the first observation
+  and end at the last, where they spanned the missing stretch.
+- [`explore_bivariate()`](https://pablobernabeu.github.io/depictr/reference/explore_bivariate.md)
+  treats dates, date-times and durations as numeric, where it took them
+  for categories, so they give a scatter plot with a trend or box plots
+  by level.
+- [`threshold_plot()`](https://pablobernabeu.github.io/depictr/reference/threshold_plot.md)
+  draws its metrics as steps that change at each score, where it joined
+  adjacent scores with straight lines.
+- `dumbbell_plot(sort = "none")` keeps a factor’s level order, or else
+  the order in which the categories first appear, where it sorted them
+  alphabetically.
+- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  drops an arm whose every `status` is missing, also when `group` is a
+  factor, where it kept it in the legend with no curve and made
+  `logrank = TRUE` fail.
+- The `text_contrast` row of
+  [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  reports the text furthest short of its own threshold, with that
+  threshold and the text’s printed size and weight, and a translucent
+  colour is named with its alpha.
+- The colour rows of
+  [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  say when colour is a continuous scale, which they do not audit, where
+  they said that nothing was distinguished by colour.
+- The separability rows of
+  [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  say whether their closest pair are colours or fill colours, and its
+  `text_size` and `text_contrast` rows no longer say that a figure draws
+  no text when all of its text is inside the panel.
+- On ggplot2 3.5.x,
   [`pca_plot()`](https://pablobernabeu.github.io/depictr/reference/pca_plot.md)
   and
   [`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md)
-  also warned about an unknown `linewidth` and drew borders round their
-  labels. They now name the border argument each ggplot2 version
-  understands and draw no border on either. The reference lines of
-  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
-  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  draw their labels without a border or a warning about `linewidth`, as
+  on later versions.
+- `citation("depictr")` gives the DOI that CRAN registered,
+  <https://doi.org/10.32614/CRAN.package.depictr>, where it gave the
+  Zenodo concept DOI, <https://doi.org/10.5281/zenodo.21266308>.
+
+### New features
+
+- [`simulate_figure()`](https://pablobernabeu.github.io/depictr/reference/simulate_figure.md)
+  shows a finished ggplot or patchwork, legend and colourbar included,
+  as a reader with a colour-vision deficiency sees it, and returns a
+  gtable to draw or save.
+- `depictr_palette(order = "contrast")`, also in
+  [`scale_colour_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md)
   and
-  [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
-  no longer warn about an unknown `inherit.aes` on ggplot2 3.5.x. The
-  floors job in continuous integration now also tests the floor against
-  the newest patchwork, and runs every example with warnings treated as
-  errors.
+  [`scale_fill_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md),
+  reorders the palette so that up to three groups pass every colour
+  check of
+  [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  and four keep 3:1 against white. `depictr_options(palette = )` can
+  make it the default.
+- `exponentiate = TRUE` in
+  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)
+  and
+  [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md)
+  gives odds, rate or risk ratios, which the plots draw on a log axis
+  with the reference line at 1 and an axis title naming the ratio.
+- [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  audits a patchwork composite, the package’s own included, panel by
+  panel, with a leading `panel` column, where it refused one.
+- `check_figure(max_text_pt = )` checks a ceiling on text size in a
+  `text_size_max` row, and `save_plot(check = TRUE)` audits a figure at
+  the width it is saved at, gives one warning that names each failed
+  check and attaches the report as `attr(, "check")`.
+- `power_curve_plot(solved = )` marks a solved sample size, such as the
+  result of pilotr’s `target_n()`, with a dashed line and its interval
+  as a grey band.
+- [`power_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/power_curve_plot.md)
+  reads the output of pilotr’s `power_curve_mixed()` as it is, with its
+  `n_subject` column and its band, and gains `n`, `power`, `group`,
+  `lower`, `upper` and `y_lab` after its existing arguments. Several
+  curves are told apart by colour and line type.
+- `coefficient_plot(standardise = TRUE, sd_multiple = 2)` scales
+  continuous inputs by two standard deviations, Gelman’s (2008)
+  convention.
+- [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)
+  and
+  [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
+  gain `lambda`, for a Box-Cox or log transformation, and
+  [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md)
+  gains `s_window`, the STL seasonal window.
 
-- ragg is listed in Suggests.
-  [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
-  asks whether it is installed when it chooses a device for a TIFF, and
-  `R CMD check` warns about a package looked up that way unless the
-  package declares it.
-
-- `citation("depictr")`, the website and `CITATION.cff` give the DOI
-  that CRAN assigned to the package,
-  <https://doi.org/10.32614/CRAN.package.depictr>, in place of the
-  Zenodo concept DOI. It names the R package across all its versions,
-  and it is the DOI that the CRAN page and the citation R generates for
-  a CRAN package already gave, so the package no longer circulates under
-  two. Zenodo still archives every GitHub release, and `CITATION.cff`
-  lists both identifiers. The CRAN DOI and the Zenodo DOI are shown as
-  full links on the website and in the README, and the sidebar of the
-  home page shows the CRAN DOI once: the DOI badge in the README no
-  longer appears there a second time.
-
-- `citation("depictr")` and the About page name the package’s publisher,
-  in full: “Comprehensive R Archive Network (CRAN)” stands before the
-  DOI in the reference, and the BibTeX entry gives it as `publisher`.
-  The reference named no publisher before. Every reference across the
-  package family and the author’s website now names CRAN in the same
-  words.
-
-- `citation("depictr")` gives the author’s ORCID iD, as DESCRIPTION and
-  `CITATION.cff` do. `CITATION.cff` dates 0.3.0 by its first public
-  release, 2026-08-27, the day of the GitHub release that Zenodo
-  archived, and records CRAN’s publication on 2026-09-01 beside it. It
-  gave 2026-08-21, when 0.3.0 was not yet public on any channel.
+### Minor improvements
 
 - [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
   and
   [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
-  formatted a label for every posterior draw, which made a ten-parameter
-  figure take seconds and a full brms draws object minutes. Labels are
-  formatted once per parameter.
+  format each parameter’s label once, and
   [`format_terms()`](https://pablobernabeu.github.io/depictr/reference/format_terms.md)
-  now strips the `b_` and `bs_` prefixes from a whole vector with one
-  regular expression. It split each term on its colons and took about 15
-  seconds for 40,000 labels, a job that now takes a fraction of a
-  second. An unnamed `labels` vector, one label per parameter in the
-  order of `draws`, now works in
-  [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md).
-  It failed with a message that counted the draws as terms. The two
-  bootstrap tests that took most of the test time are skipped on CRAN
-  and still run in continuous integration.
-
-- The README no longer says that the Python package differs from this
-  one in a few places. Its README now lists the differences that change
-  what a figure shows, many of them arguments the Python functions do
-  not yet take, and a test there accounts for every argument of this
-  package’s functions.
-
-- The help page of
-  [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
-  now says that its intervals are central (equal-tailed) quantile
-  intervals, which leave the same share of the draws in either tail. It
-  did not say which kind of interval it drew.
-
-- A new spelling test checks DESCRIPTION, the help pages, the vignettes
-  and `NEWS.md` against the British English dictionary and
-  `inst/WORDLIST`, and spelling joins Suggests. The package had a word
-  list but no test that read it. The test fails a check run with
-  `NOT_CRAN` set, as in `devtools::check()` and on GitHub Actions, at
-  any word found in neither, and CRAN and a plain `R CMD check` skip it.
-  Of the 65 words the test first stopped at, one was an American
-  spelling, now “afterwards”. Six came from a hyphenated word, a web
-  address and two possessives, and their passages are reworded. The
-  other 58 are names, packages, abbreviations and terms of art, and join
-  the word list, which also drops eleven entries the documentation no
-  longer uses.
-
-- The references of
-  [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md),
-  [`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md),
-  [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
+  is much faster on long vectors, so a draws object with many draws no
+  longer takes minutes to plot.
+- [`pca_plot()`](https://pablobernabeu.github.io/depictr/reference/pca_plot.md)
+  takes an unquoted `group` column name and refuses a `prcomp` fit that
+  holds no scores, with a message that says so.
+- [`vif_plot()`](https://pablobernabeu.github.io/depictr/reference/vif_plot.md)
+  refuses a model with aliased coefficients and names their terms, where
+  it failed with an unrelated base-R error.
+- [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md)
+  refuses a column in `cols` that it cannot correlate, such as a factor
+  or a date, and names it, where it failed with an error that did not.
+- [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md)
+  refuses a numeric `group` named in `cols` with a message that says so,
+  where it failed with an error from
+  [`cor()`](https://rdrr.io/r/stats/cor.html).
+- [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md)
   and
-  [`vif_plot()`](https://pablobernabeu.github.io/depictr/reference/vif_plot.md)
-  come from `inst/REFERENCES.bib`, as every other citation in the
-  package does. They were written out by hand on each page.
-  [`vignette("multivariate-and-survival")`](https://pablobernabeu.github.io/depictr/articles/multivariate-and-survival.md)
-  now cites Rousseeuw (1987) and Tibshirani et al. (2001) from the same
-  file, so both appear in its list of references, where it sent the
-  reader to
-  [`?k_diagnostic`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
-  for them.
+  [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)
+  refuse a missing value inside the series with a message that names
+  `x`, and a series of exactly two cycles gets the package’s own
+  message.
 
-- Several help pages described behaviour the code does not have. The
-  page of
-  [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md)
-  read as though columns beyond `max_cols` were trimmed, which is what
-  the Python twin does. Here they are an error naming the count, and the
-  page now says so.
+### Fixes
+
+- [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md)
+  and `group_comparison_plot(differences = TRUE)` work in a fresh R
+  session, where they failed unless patchwork had been loaded.
+- [`effects_plot()`](https://pablobernabeu.github.io/depictr/reference/effects_plot.md),
+  [`interaction_plot()`](https://pablobernabeu.github.io/depictr/reference/interaction_plot.md)
+  and
+  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
+  work with a transformed term, such as
+  [`log()`](https://rdrr.io/r/base/Log.html),
+  [`poly()`](https://rdrr.io/r/stats/poly.html) or `ns()`, and with an
+  offset, held at its mean on the link scale, where they failed. A name
+  such as `"log(rainfall)"` stands for the variable it transforms.
+- [`random_effects_plot()`](https://pablobernabeu.github.io/depictr/reference/random_effects_plot.md)
+  draws models with several uncorrelated or split random-effect terms
+  per grouping factor, such as `(1 + x || g)`, fitted with `lmer()` or
+  `glmer()`, where it failed.
+- A `glm` fitted with `na.action = na.exclude` works in the ROC,
+  precision-recall, threshold, gain and lift plots and in
+  [`confusion_matrix_plot()`](https://pablobernabeu.github.io/depictr/reference/confusion_matrix_plot.md),
+  which failed.
+- [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
+  reads a `posterior` draws object made from a brms fit, on which it
+  failed with an error about duplicated factor levels.
+- [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
+  accepts an unnamed `labels` vector with one label per parameter, which
+  it refused.
+- [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  with summaries no longer warns about `labels` keys it was not given.
+- [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md),
+  the forecast overlay of
+  [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
+  and
+  [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md)
+  with its default STL method read a one-column `ts` and trim missing
+  values at either end of a series, where the STL decomposition failed.
+  A forecast starts after the last observation.
+- [`seasonal_plot()`](https://pablobernabeu.github.io/depictr/reference/seasonal_plot.md)
+  accepts a frequency that is not a whole number, such as 365.25 / 7,
+  and rounds it down to whole seasons with a message, where it refused
+  every such frequency.
+- [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md)
+  accepts a numeric group code, which failed with a discrete-scale
+  error.
+- [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md)
+  leaves a numeric `group` out of its default columns, where it failed
+  with an error from [`cor()`](https://rdrr.io/r/stats/cor.html).
+- On ggplot2 3.5.x, the reference lines of
+  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
+  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
+  and
   [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
-  said that an unknown `style` fell back to `"interval"`, while it is an
-  error. Only a missing ‘ggdist’ falls back.
+  no longer warn about an unknown `inherit.aes`.
+
+### Deprecated
+
+- `metric = "cie76"` in
+  [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
+  and
+  [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md),
+  kept to reproduce colour distances computed before this release. The
+  default, `"ciede2000"`, replaces it, and a later release will remove
+  it.
+
+### Documentation
+
+- The README and the help pages of
+  [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md),
+  [`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md)
+  and
+  [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
+  no longer call the built-in palette the Okabe-Ito set. The help page
+  of
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
-  said that `n = NULL` returns the full qualitative palette, also for
-  the sequential and diverging types, which return seven colours.
+  says that it keeps six of that set’s eight colours, with the brand
+  blue and a grey in place of its blue and black.
+- The README points to the Python README’s list of the differences
+  between the twins, where it said that they differ in a few places.
+- Help pages that described behaviour the code does not have now match
+  it.
+  [`explore_pairs()`](https://pablobernabeu.github.io/depictr/reference/explore_pairs.md)
+  refuses columns beyond `max_cols`,
+  [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
+  refuses an unknown `style` and `depictr_palette(n = NULL)` gives seven
+  colours for a ramp.
   [`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md)
   and
   [`theme_depictr()`](https://pablobernabeu.github.io/depictr/reference/theme_depictr.md)
-  named `depictr_brand()`, `depictr_accent()` and `depictr_reference()`
-  as accessors, but the package does not export them. The pages now
-  describe the three colours by their use. Six pages also drop remarks
-  about how a function used to behave.
-
-### Changed defaults
-
-- The gap statistic’s default search in
+  no longer present `depictr_brand()`, `depictr_accent()` and
+  `depictr_reference()` as functions to call, since the package does not
+  export them. `cluster_plot(seed = NULL)` draws from the session’s
+  random-number stream,
+  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)
+  applies `interaction` to the terms a named `labels` vector leaves out
+  and
+  [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
+  tests a `survfit` object with the base-R log-rank test.
+  [`missingness_map()`](https://pablobernabeu.github.io/depictr/reference/missingness_map.md)
+  takes its missing-cell colour from the accent,
   [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
-  and `cluster_plot(suggest_k = "gap")` could not return `k = 1`, so it
-  reported clusters in pure noise (`k = 2` for 20 of 20 seeded Gaussian
-  data sets). `k_range` now defaults to `NULL`, which searches `1:8` for
-  the gap and elbow criteria and `2:8` for the silhouette, as before. A
-  suggestion made with the old default can change, so pass
-  `k_range = 2:8` to reproduce it. The help pages now say that the elbow
-  never chooses the first or last candidate.
-
-- `standardise = TRUE` in
-  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
-  and so the default
-  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md),
-  multiplied every model-matrix column by its standard deviation. That
-  made a factor contrast depend on how the groups happened to be
-  balanced: one true effect of 1 came out as 0.52, 0.43 or 0.23 with
-  50%, 20% or 5% of observations in the group. It also scaled an
-  interaction by the spread of a product column, 265 for
-  `rainfall:treatment` in the crop-yield model. Continuous inputs are
-  now scaled by their standard deviation, and factor, logical and
-  two-valued inputs such as 0/1 are left as they are (Gelman, 2008). An
-  interaction is scaled through its continuous inputs, so
-  `rainfall:treatment` becomes the change in the rainfall slope per SD
-  of rainfall. The new `sd_multiple = 2` gives Gelman’s two-SD
-  convention. [`poly()`](https://rdrr.io/r/stats/poly.html), `ns()` and
-  other matrix-valued terms are left unscaled with a message. An
-  interaction of continuous inputs draws a warning unless they are all
-  centred, because each main effect is a slope at zero on the other
-  input. The axis label adds “(contrasts unscaled)” when a contrast is
-  drawn, and the
-  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
-  panel is titled “Coefficients (per SD of continuous predictors)”. The
-  help page and the model-estimates vignette no longer claim that the
-  standardised magnitudes are comparable.
-
-- [`binned_residual_plot()`](https://pablobernabeu.github.io/depictr/reference/binned_residual_plot.md)
-  draws its band from the model, as twice the standard error of a bin’s
-  mean residual that the fitted model implies. The old band, twice the
-  standard deviation of the bin’s residuals over the square root of its
-  count, collapsed wherever a bin held no events. On the package’s own
-  example, a correctly specified model, it flagged five of seventeen
-  bins. When the adverse events were redrawn 200 times from the fitted
-  model, so that each refit was correct by construction, the old band
-  flagged 31% of the bins and the new one 3%. The binned-residual panel
-  that
-  [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
+  takes the elbow farthest from the chord,
+  [`dumbbell_plot()`](https://pablobernabeu.github.io/depictr/reference/dumbbell_plot.md)
+  puts the shortest dumbbell at the top only when every difference is
+  negative and
+  [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md)
+  no longer says that zero lines up with the reference group’s mean.
+- [`vignette("exploring-data")`](https://pablobernabeu.github.io/depictr/articles/exploring-data.md)
+  says that
+  [`summary_table()`](https://pablobernabeu.github.io/depictr/reference/summary_table.md)
+  takes its column names as strings and that an argument naming several
+  columns, such as `cols`, takes a character vector, where it said that
+  column names could be given quoted or unquoted. It also says that, of
+  the model-estimate plots, only
+  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)
+  takes `standardise` and that every plotting function returns a ggplot,
+  where it said that all of them took `standardise` and that every
+  function returned a ggplot.
+  [`vignette("model-estimates")`](https://pablobernabeu.github.io/depictr/articles/model-estimates.md)
+  and the help page of
+  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)
+  no longer claim that standardised magnitudes are comparable. The help
+  page of
+  [`threshold_plot()`](https://pablobernabeu.github.io/depictr/reference/threshold_plot.md)
   and
-  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
-  draw for a `glm` changes with it. `band = "empirical"` reproduces the
-  earlier figure, whose band is the one `arm::binnedplot()` draws.
-  Observations with zero prior weight, which take no part in the fit,
-  are now left out of the bins.
-
-- [`survival_plot()`](https://pablobernabeu.github.io/depictr/reference/survival_plot.md)
-  draws log-log confidence limits by default. They stay between 0 and 1
-  and cover better in small samples than the untransformed Greenwood
-  limits it drew before (Borgan & Liestøl, 1990). The new `conf_type`
-  argument restores those with `"plain"` and gives the default of
-  [`survival::survfit()`](https://rdrr.io/pkg/survival/man/survfit.html)
-  with `"log"`. The limits of a `survfit` object were copied from the
-  object, at the level and on the scale it was made with, so
-  `conf_level` was ignored and a 90% band showed the object’s 95%
-  limits. They are now recomputed from the object’s standard errors at
-  the requested `conf_level` and `conf_type`, so they equal those that
-  `survfit()` gives with the same `conf.int` and `conf.type`. An object
-  made with `conf.type = "none"` keeps its standard errors, so it now
-  gets limits as well, which `conf_level = NA` leaves out. An object
-  without standard errors, or one whose lower limits follow
-  `conf.lower = "peto"` or `"modified"`, keeps its own limits, with a
-  warning when they differ from those requested. Where a curve falls to
-  zero, the limits keep the values of the step before, so a band drawn
-  from follow-up times no longer stops one event early. A `conf_level`
-  outside (0, 1), such as 95 meant as a percentage, is now an error.
-
-- The cycle lines of `seasonal_plot(style = "season")` start from a
-  colour that clears 3:1 against white. They took the sequential ramp of
-  [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md),
-  which starts at `#e6eff5`, 1.16:1 against white, so the earliest
-  cycles were close to invisible. With twelve cycles, four of the lines
-  fell below the 3:1 that WCAG 2.2 asks of a graphical object. The ramp
-  now runs from `#4a8fc0`, at 3.51:1, through the brand blue to
-  `#08315a`, and `palette` still replaces it. The sequential palette
-  keeps its pale end for fills. Past about six cycles, neighbouring
-  lines take colours too close to tell apart, as the help page now says,
-  and `style = "subseries"` keeps each cycle in its own place on the
-  axis.
-
-- Colour separability in
-  [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
-  and
+  [`vignette("diagnostics-and-uncertainty")`](https://pablobernabeu.github.io/depictr/articles/diagnostics-and-uncertainty.md)
+  say that the maximum-F1 threshold is drawn dotted and the Youden
+  threshold dashed, where they said both were dashed.
+  [`vignette("multivariate-and-survival")`](https://pablobernabeu.github.io/depictr/articles/multivariate-and-survival.md)
+  says that only an arm whose curve reaches 0.5 gets a median guide, and
+  [`vignette("time-series")`](https://pablobernabeu.github.io/depictr/articles/time-series.md)
+  says that STL holds the seasonal component fixed under the default
+  `s_window = "periodic"`, where it said that STL lets it change from
+  year to year.
+- The help page of
   [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
-  is now measured with CIEDE2000 (Sharma, Wu & Dalal, 2005). The 1976
-  Euclidean distance it replaces overstates differences between
-  saturated colours: ggplot2’s default five-colour palette was certified
-  safe under deuteranopia, though two of its colours become almost
-  identical, 2.74 apart in CIEDE2000. The threshold stays at 5, and the
-  Okabe-Ito palette’s closest pair now measures 6.43, where it measured
-  7.4. `depictr_palette(9)` already warned that interpolated colours
-  lose the guarantee, and its nine colours now fail the check too.
-  `metric = "cie76"` restores the old measure for this release, and the
-  greyscale check is the lightness gap under either.
-
-- [`simulate_cvd()`](https://pablobernabeu.github.io/depictr/reference/simulate_cvd.md)
-  at partial severity now uses Machado et al.’s published matrices,
-  interpolated between the tabulated severities. Interpolating towards
-  normal vision missed them on the default palette by up to 11 units of
-  the 1976 Delta-E, or 6.2 in CIEDE2000. Full-severity results, and so
-  [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md),
-  [`palette_preview()`](https://pablobernabeu.github.io/depictr/reference/palette_preview.md)
-  and
-  [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md),
-  are unchanged. The authors tabulate a matrix for each tenth of
-  severity, and a severity between two tenths now takes the linear
-  interpolation of the two, as the colorspace package does, whose output
-  it matches. The old transform drew the full-severity matrix towards
-  the identity. Between severities 0.3 and 0.7, it moved the palette’s
-  colours too little under protan and deutan and too far under tritan,
-  so under a red-green deficiency they looked further apart than the
-  model predicts.
-
-- Confidence intervals for a `glm` whose dispersion is estimated (the
-  Gaussian, Gamma, inverse Gaussian and quasi families) now use the t
-  distribution on the residual degrees of freedom, matching the t tests
-  of [`summary.glm()`](https://rdrr.io/r/stats/summary.glm.html) and the
-  `lm` path. They used z and were about 10% too narrow at 12 residual
-  degrees of freedom, so a Gaussian `glm` disagreed with
-  [`lm()`](https://rdrr.io/r/stats/lm.html) on the same model. At 100
-  degrees of freedom, the two differ by about 1%. The choice is read
-  from the model’s own summary, so binomial, Poisson and
-  [`MASS::glm.nb()`](https://rdrr.io/pkg/MASS/man/glm.nb.html) fits keep
-  z, as do mixed models.
-  [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md),
-  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
-  [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md),
-  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
-  and
-  [`model_report()`](https://pablobernabeu.github.io/depictr/reference/model_report.md)
-  change with it, and so do the bands of
-  [`effects_plot()`](https://pablobernabeu.github.io/depictr/reference/effects_plot.md)
-  and
-  [`interaction_plot()`](https://pablobernabeu.github.io/depictr/reference/interaction_plot.md).
-  In the Python twin the intervals follow the fitted result’s `use_t`,
-  which gives the same t intervals.
-
-- The coefficient of a two-level factor is now labelled with its level,
-  `treatment: enhanced`, as the coefficients of factors with more levels
-  already were, so the row says which contrast it shows. It was labelled
-  `treatment`, which hid the direction of the contrast. Interaction rows
-  name their levels the same way, `rainfall × treatment: enhanced` where
-  they showed `rainfall × treatmentenhanced`. The labels change in
-  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
-  [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md),
-  [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
-  and
-  [`optimizer_fixef_plot()`](https://pablobernabeu.github.io/depictr/reference/optimizer_fixef_plot.md).
-  [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md)
-  now takes them from every fitted model it is given, so a factor term
-  that only a later model holds is labelled too. A named `labels` vector
-  still sets any label, and
-  `labels = c(treatmentenhanced = "treatment")` restores the old one.
-  The Python twin now labels its terms by the same rules.
-
-### New features
-
-- `depictr_palette(order = "contrast")`, also accepted by
-  [`scale_colour_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md)
-  and
-  [`scale_fill_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md),
-  reorders the built-in palette so that up to three groups pass every
-  colour check of
-  [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md),
-  contrast against white included, and up to four keep 3:1. It leads
-  with the brand blue, the vermillion and the reddish purple, then the
-  bluish green. It warns past four colours. The ramps refuse it, and a
-  palette set with `depictr_options(palette = )` is returned as it was
-  set, with a warning.
-  `depictr_options(palette = depictr_palette(order = "contrast"))` makes
-  the order the default for every later plot. The default order is
-  unchanged, and the Python twin gives the same order.
-
-- [`simulate_figure()`](https://pablobernabeu.github.io/depictr/reference/simulate_figure.md)
-  shows a finished figure, legend and colourbar included, as a reader
-  with a colour-vision deficiency sees it. It builds the grob table of a
-  ggplot or a patchwork and passes every colour in it through
-  [`simulate_cvd()`](https://pablobernabeu.github.io/depictr/reference/simulate_cvd.md).
-  That covers the line and fill colours of each grob and the cells of
-  each raster, and each colour keeps its alpha. It returns a gtable,
-  which [`grid::grid.draw()`](https://rdrr.io/r/grid/grid.draw.html)
-  draws and
+  gains a section on auditing a figure at the width it is printed at,
+  with the text floors of four publishers, where it called 6 pt a common
+  publisher floor, and says that four colours of the default palette
+  fall below 3:1 against white. The help page of
   [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
-  saves. Recolouring the data before the plot is built would have left
-  the legend keys and colourbars in their original colours. The Python
-  twin’s
+  describes the formats that three publishers accept.
+- [`vignette("depictr")`](https://pablobernabeu.github.io/depictr/articles/depictr.md)
+  shows a figure drawn by
   [`simulate_figure()`](https://pablobernabeu.github.io/depictr/reference/simulate_figure.md)
-  uses the same matrices on the pixels of the rendered figure.
-
-- `exponentiate = TRUE` in
-  [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md),
-  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)
-  and
-  [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md)
-  gives odds, rate or risk ratios, and the two plots draw them on a log
-  axis with the reference line at 1. The axis is labelled “Odds ratio”
-  for a logit link, “Rate ratio” for a log link in a Poisson,
-  quasi-Poisson or negative binomial model, “Risk ratio” for a binomial
-  model with a log link and “exp(Estimate)” otherwise.
-  [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md)
-  exponentiates the estimates and interval limits and leaves `std.error`
-  on the link scale, as
-  [`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html)
-  does. Its `glm` method used to swallow the argument and return
-  log-odds.
-  [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)
-  exponentiates after `standardise`, so a standardised slope becomes a
-  ratio per SD of its predictor. A data frame of estimates is read on
-  the link scale. `reference_line` now defaults to 1 when exponentiating
-  and to 0 otherwise. The Python twin gains the same arguments.
-
-- [`power_curve_plot()`](https://pablobernabeu.github.io/depictr/reference/power_curve_plot.md)
-  gains `solved`, which marks a solved sample size and its interval,
-  such as the result of pilotr’s `target_n()`. The value is drawn as a
-  dashed vertical line and the interval as a grey band behind the curve.
-  The Python twin gains the same argument.
+  and covers four publishers’ text floors, Nature’s ceiling, the
+  contrast-first palette order and how the audit treats a continuous
+  colour scale.
 
 ## depictr 0.3.0
 

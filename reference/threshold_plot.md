@@ -40,9 +40,10 @@ threshold_plot(
 
 - mark:
 
-  Which optimal operating points to mark with a dashed vertical line:
-  any subset of `"youden"` (max sensitivity + specificity - 1) and
-  `"f1"` (max F1). Use `character(0)` or `NULL` to mark none.
+  Which optimal operating points to mark with a vertical line: any
+  subset of `"youden"` (max sensitivity + specificity - 1), drawn
+  dashed, and `"f1"` (max F1), drawn dotted. Use `character(0)` or
+  `NULL` to mark none.
 
 - title:
 

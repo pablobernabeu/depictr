@@ -175,9 +175,9 @@ lift_plot(models, legend_inside = TRUE)
 
 [`threshold_plot()`](https://pablobernabeu.github.io/depictr/reference/threshold_plot.md)
 sweeps the decision threshold across the full range of scores and plots
-each metric as it trades off, marking the Youden and maximum-F1 optimal
-thresholds with dashed lines. It is the natural companion to the ROC and
-PR curves for actually *choosing* a cut-off.
+each metric as it trades off, marking the Youden threshold with a dashed
+line and the maximum-F1 threshold with a dotted one. It is the natural
+companion to the ROC and PR curves for actually *choosing* a cut-off.
 
 ``` r
 
@@ -267,10 +267,10 @@ power_curve_plot(pc, x_lab = "Number of participants",
 
 The analysis ran 100 simulations at each of 12, 24, 36, 48 and 60
 participants. Power for the word-frequency slope is 88% with 12
-participants and 99% with 24, and it stays there for the larger samples.
-The confidence band is widest at the smallest sample size, where its
-lower limit falls on the 80% target line, so 24 participants is the
-first design the simulation clears comfortably.
+participants and 99% with 24, and it stays at 98% or above for the
+larger samples. The confidence band is widest at the smallest sample
+size, where its lower limit falls on the 80% target line, so 24
+participants is the first design the simulation clears comfortably.
 
 ## Composing and saving
 

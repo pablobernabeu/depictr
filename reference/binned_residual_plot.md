@@ -56,7 +56,7 @@ binned_residual_plot(
   Where the standard errors come from. The default, `"model"`, takes
   them from the variance the fitted model implies for each residual.
   `"empirical"` takes them from the spread of the residuals in each bin,
-  as in depictr 0.3.0 and `arm::binnedplot()`.
+  as `arm::binnedplot()` does.
 
 ## Value
 
@@ -82,14 +82,14 @@ little of each observation's variance, so a residual varies slightly
 less than this and the band errs on the wide side. Observations with
 zero prior weight take no part in the fit and are left out of the bins.
 
-`band = "empirical"` draws the band of depictr 0.3.0 and earlier, the
-one `arm::binnedplot()` draws: twice the standard deviation of the
-residuals in the bin, divided by \\\sqrt{n_b}\\. It collapses wherever
-the outcomes in a bin are all alike. The residuals in a logistic model's
-bin without events all lie just below zero, so its band nearly vanishes
-and the bin is flagged. Where events are rare, such bins are what the
-model expects. The example below, a correctly specified model, has five
-of its seventeen bins flagged by that band and none by the model's.
+`band = "empirical"` draws the band that `arm::binnedplot()` draws:
+twice the standard deviation of the residuals in the bin, divided by
+\\\sqrt{n_b}\\. It collapses wherever the outcomes in a bin are all
+alike. The residuals in a logistic model's bin without events all lie
+just below zero, so its band nearly vanishes and the bin is flagged.
+Where events are rare, such bins are what the model expects. The example
+below, a correctly specified model, has five of its seventeen bins
+flagged by that band and none by the model's.
 
 ## References
 
@@ -107,6 +107,6 @@ gfit <- glm(adverse_event ~ biomarker + age + arm,
 binned_residual_plot(gfit)
 
 
-# The band of depictr 0.3.0, which flags the bins that hold no events:
+# The band arm::binnedplot() draws, which flags the bins that hold no events:
 binned_residual_plot(gfit, band = "empirical")
 ```

@@ -112,7 +112,9 @@ brand blue. Ignored when several models are overlaid (the colourblind-aware
 <dt id="arg-ci">ci<a class="anchor" aria-label="anchor" href="#arg-ci"></a></dt>
 <dd><p>Bootstrap confidence band for a single ROC curve and its AUC.
 <code>FALSE</code> (default) draws none; <code>TRUE</code> uses 2000 resamples; a positive integer
-sets the number of resamples. Ignored when several models are overlaid.</p></dd>
+sets the number of resamples. The resamples come from the session's
+random-number stream, so call <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> first for a reproducible band.
+Ignored when several models are overlaid.</p></dd>
 
 
 <dt id="arg-conf-level">conf_level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
@@ -139,7 +141,13 @@ Defaults to <code>FALSE</code>.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot</a> object. The AUC(s) are stored in
-<code>attr(plot, "auc")</code> (a named vector when several models are supplied).</p>
+<code>attr(plot, "auc")</code> (a named vector when several models are supplied).
+When <code>ci</code> draws a band, which it does for a single model, the bootstrap
+interval of the AUC is stored in <code>attr(plot, "auc_ci")</code>, a vector named
+<code>lower</code> and <code>upper</code>. With <code>youden = TRUE</code>, the Youden point is stored in
+<code>attr(plot, "youden")</code>: a list of <code>threshold</code>, <code>fpr</code>, <code>tpr</code>, <code>j</code>,
+<code>sensitivity</code> and <code>specificity</code>, or a list of such lists named by model
+when several models are supplied.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>

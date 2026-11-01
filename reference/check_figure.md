@@ -64,8 +64,8 @@ check_figure(
 
   The colour difference the colour separability checks measure:
   `"ciede2000"`, the default, or `"cie76"`, the Euclidean distance in
-  CIELAB that earlier versions measured. `"cie76"` is kept so that
-  earlier results can be reproduced, and a later release will remove it.
+  CIELAB. `"cie76"` is kept so that results computed with it can be
+  reproduced, and a later release will remove it.
 
 - max_text_pt:
 
@@ -110,7 +110,7 @@ that shows depends on what lies beneath it, and that is not measured.
 
 `colour_separability` is the smallest colour difference between two of
 the figure's encoding colours, by the CIEDE2000 formula (Sharma, Wu &
-Dalal, 2005) unless `metric` asks for the older CIE76. The three
+Dalal, 2005) unless `metric` asks for CIE76. The three
 `colour_separability_*` rows repeat that measurement after simulating
 each dichromacy at full severity with
 [`simulate_cvd()`](https://pablobernabeu.github.io/depictr/reference/simulate_cvd.md).
@@ -206,9 +206,8 @@ makes is about hue confusion, and it was never a claim about greyscale.
 A figure that may be printed in black and white should use fewer groups,
 or a sequential palette, or add a redundant shape or line type; the four
 leading colours of the palette are also not safe in greyscale, since the
-bluish green and the vermillion differ by 3.55. The threshold has been
-left where it is rather than moved to let the package's own defaults
-through.
+bluish green and the vermillion differ by 3.55. The threshold is not
+lowered to let the package's own defaults through.
 
 The palette falls short on contrast as well. Four of its eight colours
 are below the 3:1 against white that WCAG asks of a graphical object:

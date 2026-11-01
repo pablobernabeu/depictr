@@ -28,15 +28,17 @@ summary_table(
 
 - vars:
 
-  Columns to summarise. If `NULL`, all columns except `group` are used,
-  with high-cardinality identifier-like columns skipped (see Details).
+  Names of the columns to summarise, as a character vector. If `NULL`,
+  all columns except `group` are used, with high-cardinality
+  identifier-like columns skipped (see Details).
 
 - group:
 
-  Optional grouping variable; one summary column is produced per level,
-  alongside an overall column. Records whose group value is missing get
-  a trailing `Missing` column of their own, so the group sizes still sum
-  to the overall `N`.
+  Optional name of the grouping column, given as a string rather than
+  unquoted. One summary column is produced per level, alongside an
+  overall column. Records whose group value is missing get a trailing
+  `Missing` column of their own, so the group sizes still sum to the
+  overall `N`.
 
 - digits:
 

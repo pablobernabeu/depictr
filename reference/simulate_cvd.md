@@ -36,8 +36,10 @@ simulate_cvd(colours, deficiency, severity = 1)
 
 ## Value
 
-A character vector of lower-case hex colours, the same length as
-`colours`.
+A character vector of opaque, lower-case six-digit hex colours, the same
+length as `colours`. Any alpha is dropped, whereas
+[`simulate_figure()`](https://pablobernabeu.github.io/depictr/reference/simulate_figure.md)
+keeps it.
 
 ## Details
 

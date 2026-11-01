@@ -3,10 +3,10 @@
 For normal vision and each deficiency at full severity, the palette's
 colours are converted to CIELAB and the smallest colour difference
 between any two of them is found. The difference is CIEDE2000 (Sharma,
-Wu & Dalal, 2005) unless `metric` asks for the older measure. The lower
-this minimum, the more likely two categories are to be confused. A
-palette counts as safe when the minimum across all four conditions is at
-least `threshold`.
+Wu & Dalal, 2005) unless `metric` asks for CIE76. The lower this
+minimum, the more likely two categories are to be confused. A palette
+counts as safe when the minimum across all four conditions is at least
+`threshold`.
 
 ## Usage
 
@@ -29,9 +29,9 @@ palette_safety(colours = NULL, threshold = 5, metric = c("ciede2000", "cie76"))
 - metric:
 
   The colour difference to measure: `"ciede2000"`, the default, or
-  `"cie76"`, the Euclidean distance in CIELAB that earlier versions
-  measured. `"cie76"` is kept so that earlier results can be reproduced,
-  and a later release will remove it.
+  `"cie76"`, the Euclidean distance in CIELAB. `"cie76"` is kept so that
+  results computed with it can be reproduced, and a later release will
+  remove it.
 
 ## Value
 
@@ -43,22 +43,25 @@ and `threshold`.
 
 ## Details
 
-Earlier versions measured the Euclidean distance in CIELAB, known as
-CIE76, which overstates the difference between saturated colours: the
-blues `#005b96` and `#0060a8` are 8.20 apart by CIE76 and 2.69 by
-CIEDE2000. ggplot2's default palette of five colours passed the check
-under CIE76, although under deuteranopia its sky blue and its pink come
-within 2.74 of each other in CIEDE2000.
+The Euclidean distance in CIELAB, known as CIE76, overstates the
+difference between saturated colours: the blues `#005b96` and `#0060a8`
+are 8.20 apart by CIE76 and 2.69 by CIEDE2000. ggplot2's default palette
+of five colours passes the check under CIE76, although under
+deuteranopia its sky blue and its pink come within 2.74 of each other in
+CIEDE2000.
 
-The default `threshold` of 5 is calibrated against the reference
-colourblind-safe palette: the Okabe-Ito set's tightest pair (reddish
+The default `threshold` of 5 is calibrated against the built-in palette
+of
+[`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md),
+which is based on the Okabe-Ito set with the brand blue and a grey in
+place of its blue and black. That palette's tightest pair (reddish
 purple against grey) sits at 6.43 under full deuteranopia, so the cut
-must lie below that to pass the recommended palette, while still
-flagging colours that become near-identical under a deficiency. The
-difference includes lightness, which survives colour-vision deficiency,
-so two colours that share a hue but differ in lightness are correctly
-treated as distinguishable. Full severity is the worst case; most
-colour-vision deficiency is milder.
+must lie below that to pass the built-in palette, while still flagging
+colours that become near-identical under a deficiency. The difference
+includes lightness, which survives colour-vision deficiency, so two
+colours that share a hue but differ in lightness are correctly treated
+as distinguishable. Full severity is the worst case; most colour-vision
+deficiency is milder.
 
 This looks at a palette in the abstract. To audit a finished figure,
 which uses only as many colours as it has groups and has text and a
@@ -127,7 +130,7 @@ palette_safety(c("#005b96", "#015c97"))
 #> [1] 5
 #> 
 
-# ggplot2's default palette of five colours, which passed under CIE76.
+# ggplot2's default palette of five colours, which passes under CIE76.
 hue5 <- c("#F8766D", "#A3A500", "#00BF7D", "#00B0F6", "#E76BF3")
 palette_safety(hue5)$safe
 #> [1] FALSE

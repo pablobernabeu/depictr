@@ -64,6 +64,7 @@
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">document</span><span class="op">(</span><span class="op">)</span>   <span class="co"># regenerate man/ and NAMESPACE after editing roxygen</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span>       <span class="co"># run the test suite</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span><span class="op">)</span>      <span class="co"># a full R CMD check</span></span></code></pre></div>
+<p><code>man/</code> and <code>NAMESPACE</code> are generated with the roxygen2 version recorded in DESCRIPTION under <code>Config/roxygen2/version</code>. The NAMESPACE check in CI installs the roxygen2 version pinned in <code>.github/workflows/R-CMD-check.yaml</code> and fails when DESCRIPTION records another, which a newer roxygen2 would write there. Document with that version, for example <code>pak::pak("roxygen2@8.0.0")</code> when DESCRIPTION records 8.0.0. Moving to a newer roxygen2 means updating that pin in the same change.</p>
 </div>
 <div class="section level2">
 <h2 id="conventions">Conventions<a class="anchor" aria-label="anchor" href="#conventions"></a></h2>

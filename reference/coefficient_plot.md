@@ -40,8 +40,10 @@ coefficient_plot(
 - conf_level:
 
   Confidence/credible level, passed to
-  [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md)
-  when `x` is a model: a single number strictly between 0 and 1.
+  [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md),
+  which uses it for a model and for the limits it fills in from the
+  standard errors of a data frame: a single number strictly between 0
+  and 1.
 
 - intercept:
 
@@ -74,8 +76,9 @@ coefficient_plot(
 
   Passed to
   [`format_terms()`](https://pablobernabeu.github.io/depictr/reference/format_terms.md)
-  to control how interaction terms are rendered (ignored when `labels`
-  is supplied).
+  to control how interaction terms are rendered, in the automatic labels
+  and for any term a named `labels` vector leaves out. It is ignored
+  when `labels` is an unnamed vector.
 
 - point_colour, reference_colour:
 

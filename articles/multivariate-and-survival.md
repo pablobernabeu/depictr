@@ -150,11 +150,11 @@ silhouette_plot(crop_yield, cl, cols = num,
 ![](multivariate-and-survival_files/figure-html/unnamed-chunk-9-1.png)
 
 The overall average here is 0.24, and only six of the two hundred bars
-fall below zero, none of them by much. Rousseeuw’s rough guide treats an
-average at or below 0.25 as no substantial structure, so this figure
-agrees with the gap statistic: k-means returns clusters whether or not
-the data contains any, and the silhouette is one way of asking which
-case you are in.
+fall below zero, none of them by much. Kaufman and Rousseeuw’s
+([1990](#ref-kaufman1990)) rough guide treats an average at or below
+0.25 as no substantial structure, so this figure agrees with the gap
+statistic: k-means returns clusters whether or not the data contains
+any, and the silhouette is one way of asking which case you are in.
 
 The same diagnostics apply to the numeric profile of the wellbeing
 survey:
@@ -194,11 +194,11 @@ object, whose limits are recomputed at the requested `conf_level`.
 The `clinical_trial` dataset has two arms with a real survival
 difference (the treatment arm has a lower hazard), so the curves
 separate. Turning on the three publication annotations gives a
-survminer-style figure: a number-at-risk table beneath the curves,
-dashed guides to each arm’s median survival and the log-rank test of the
-difference as a subtitle. A survival curve is monotone-decreasing, so
-its bottom-left corner is always empty, and `legend_inside = TRUE` puts
-the group legend there.
+survminer-style figure: a number-at-risk table beneath the curves, the
+log-rank test of the difference as a subtitle and dashed guides to the
+median survival of each arm whose curve reaches 0.5. A survival curve is
+monotone-decreasing, so its bottom-left corner is always empty, and
+`legend_inside = TRUE` puts the group legend there.
 
 ``` r
 
@@ -211,10 +211,11 @@ survival_plot(
 
 ![](multivariate-and-survival_files/figure-html/unnamed-chunk-11-1.png)
 
-The log-rank p-value is tiny and the median survival is clearly longer
-in the treatment arm. Because its event times are longer, that arm is
-more often right-censored at the 36-month study end, visible as the
-denser run of censoring marks.
+The log-rank p-value is tiny. Median survival on placebo is 18.2 months,
+while the treatment arm’s curve stays above 0.5 to the 36-month study
+end, so its median is not reached and it gets no guide. Because its
+event times are longer, that arm is also more often right-censored at
+the study end, visible as the denser run of censoring marks.
 
 ## References
 
@@ -229,6 +230,10 @@ Kaplan, E. L., & Meier, P. (1958). Nonparametric estimation from
 incomplete observations. *Journal of the American Statistical
 Association*, *53*(282), 457–481.
 <https://doi.org/10.1080/01621459.1958.10501452>
+
+Kaufman, L., & Rousseeuw, P. J. (1990). *Finding groups in data: An
+introduction to cluster analysis*. Wiley.
+<https://doi.org/10.1002/9780470316801>
 
 Rousseeuw, P. J. (1987). Silhouettes: A graphical aid to the
 interpretation and validation of cluster analysis. *Journal of

@@ -3,7 +3,11 @@
 Displays the conditional modes ("BLUPs") of a mixed model's random
 effects as a sorted point-and-interval ("caterpillar") plot. It is the
 usual way to inspect by-group departures from the average, and to
-identify unusual groups.
+identify unusual groups. When the plot holds more than 30 distinct level
+names across all its panels, the names and their tick marks are left off
+the y-axis, since they would overlap. Add
+`ggplot2::theme(axis.text.y = ggplot2::element_text())` to bring the
+names back.
 
 ## Usage
 

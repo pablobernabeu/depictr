@@ -122,7 +122,7 @@ minus fitted on the response scale, the Gelman-Hill default) or
 <dd><p>Where the standard errors come from. The default, <code>"model"</code>,
 takes them from the variance the fitted model implies for each residual.
 <code>"empirical"</code> takes them from the spread of the residuals in each bin, as
-in depictr 0.3.0 and <code>arm::binnedplot()</code>.</p></dd>
+<code>arm::binnedplot()</code> does.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -149,9 +149,9 @@ variance \(\phi\), so its bin mean has standard error
 variance, so a residual varies slightly less than this and the band errs on
 the wide side. Observations with zero prior weight take no part in the fit
 and are left out of the bins.</p>
-<p><code>band = "empirical"</code> draws the band of depictr 0.3.0 and earlier, the one
-<code>arm::binnedplot()</code> draws: twice the standard deviation of the residuals in
-the bin, divided by \(\sqrt{n_b}\). It collapses wherever the outcomes in
+<p><code>band = "empirical"</code> draws the band that <code>arm::binnedplot()</code> draws: twice
+the standard deviation of the residuals in the bin, divided by
+\(\sqrt{n_b}\). It collapses wherever the outcomes in
 a bin are all alike. The residuals in a logistic model's bin without events
 all lie just below zero, so its band nearly vanishes and the bin is flagged.
 Where events are rare, such bins are what the model expects. The example
@@ -175,7 +175,7 @@ ISBN 978-0-521-68689-1.
 <span class="r-in"><span><span class="fu">binned_residual_plot</span><span class="op">(</span><span class="va">gfit</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="binned_residual_plot-1.png" alt="" width="672" height="432"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># The band of depictr 0.3.0, which flags the bins that hold no events:</span></span></span>
+<span class="r-in"><span><span class="co"># The band arm::binnedplot() draws, which flags the bins that hold no events:</span></span></span>
 <span class="r-in"><span><span class="fu">binned_residual_plot</span><span class="op">(</span><span class="va">gfit</span>, band <span class="op">=</span> <span class="st">"empirical"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="binned_residual_plot-2.png" alt="" width="672" height="432"></span>
 </code></pre></div>

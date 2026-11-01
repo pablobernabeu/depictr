@@ -95,8 +95,13 @@ estimation_plot(
 
 A 'patchwork' object (printable like a
 [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)).
-The computed differences and their bootstrap intervals are attached as
-the `"differences"` attribute (a data frame).
+The `"differences"` attribute holds a data frame with one row per group
+other than the reference and the columns `group`, `reference`, `diff`
+(the group's mean minus the reference's), `lower` and `upper` (the
+bootstrap interval at `conf_level`), `cohens_d` and `hedges_g`. The
+interval limits and the effect sizes are `NA` where either group has
+fewer than two observations, and the effect sizes are also `NA` when the
+pooled standard deviation is zero.
 
 ## Details
 

@@ -154,7 +154,11 @@ suggest a single cluster.</p></dd>
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
 <dd><p>Optional integer seed for reproducible k-means (ignored when
-<code>clusters</code> is supplied). Default <code>NULL</code> leaves the RNG state untouched.</p></dd>
+<code>clusters</code> is supplied). It applies to this call alone, and the caller's
+random-number state is restored afterwards. The default, <code>NULL</code>, takes the
+random starts of <code><a href="https://rdrr.io/r/stats/kmeans.html" class="external-link">stats::kmeans()</a></code>, and any random draws of a <code>suggest_k</code>
+diagnostic, from the session's random-number stream, so call <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code>
+first for a reproducible result.</p></dd>
 
 
 <dt id="arg-nstart">nstart<a class="anchor" aria-label="anchor" href="#arg-nstart"></a></dt>

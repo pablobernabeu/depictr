@@ -74,7 +74,8 @@ on its own.</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A fitted model or a data frame of results.</p></dd>
+<dd><p>A fitted model or a data frame of results (see Details for the
+columns read).</p></dd>
 
 
 <dt id="arg-conf-level">conf_level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
@@ -118,6 +119,18 @@ or "z value". At 12 residual degrees of freedom, the t interval is about
 gets z, since 'lme4' gives no degrees of freedom. Supply
 a data frame with your own intervals (for example profiled or posterior
 intervals) to override this.</p>
+<p>A data frame is read by column name, taking for each quantity the first of
+these names that it holds. The term comes from <code>term</code>, <code>parameter</code>,
+<code>Parameter</code>, <code>predictor</code>, <code>variable</code>, <code>fixed_effect</code> or <code>rowname</code>, otherwise
+from the row names. The estimate comes from <code>estimate</code>, <code>Estimate</code>,
+<code>frequentist_estimate</code>, <code>coef</code>, <code>mean</code> or <code>value</code>, and a data frame without
+one is refused. The standard error comes from <code>std.error</code>, <code>Std. Error</code>,
+<code>std_error</code>, <code>SE</code> or <code>se</code>. The limits come from <code>conf.low</code>, <code>CI_2.5</code>,
+<code>2.5 %</code>, <code>lower</code>, <code>ci_low</code>, <code>Q2.5</code>, <code>lwr</code> or <code>l-95% CI</code> and from
+<code>conf.high</code>, <code>CI_97.5</code>, <code>97.5 %</code>, <code>upper</code>, <code>ci_high</code>, <code>Q97.5</code>, <code>upr</code> or
+<code>u-95% CI</code>. A row that holds both limits keeps them as they stand. A row
+that lacks either limit but has a standard error gets both from it, as a z
+interval at <code>conf_level</code>. Other columns are dropped.</p>
     </div>
 
     <div class="section level2">

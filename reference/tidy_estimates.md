@@ -19,7 +19,8 @@ tidy_estimates(x, conf_level = 0.95, exponentiate = FALSE, ...)
 
 - x:
 
-  A fitted model or a data frame of results.
+  A fitted model or a data frame of results (see Details for the columns
+  read).
 
 - conf_level:
 
@@ -70,6 +71,20 @@ wider than the z interval, and at 100 about 1% wider. A `merMod` fit
 gets z, since 'lme4' gives no degrees of freedom. Supply a data frame
 with your own intervals (for example profiled or posterior intervals) to
 override this.
+
+A data frame is read by column name, taking for each quantity the first
+of these names that it holds. The term comes from `term`, `parameter`,
+`Parameter`, `predictor`, `variable`, `fixed_effect` or `rowname`,
+otherwise from the row names. The estimate comes from `estimate`,
+`Estimate`, `frequentist_estimate`, `coef`, `mean` or `value`, and a
+data frame without one is refused. The standard error comes from
+`std.error`, `Std. Error`, `std_error`, `SE` or `se`. The limits come
+from `conf.low`, `CI_2.5`, `2.5 %`, `lower`, `ci_low`, `Q2.5`, `lwr` or
+`l-95% CI` and from `conf.high`, `CI_97.5`, `97.5 %`, `upper`,
+`ci_high`, `Q97.5`, `upr` or `u-95% CI`. A row that holds both limits
+keeps them as they stand. A row that lacks either limit but has a
+standard error gets both from it, as a z interval at `conf_level`. Other
+columns are dropped.
 
 ## Examples
 

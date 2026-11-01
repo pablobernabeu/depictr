@@ -85,15 +85,17 @@ grouping variable. The result is a plain data frame, ready to pass to
 
 
 <dt id="arg-vars">vars<a class="anchor" aria-label="anchor" href="#arg-vars"></a></dt>
-<dd><p>Columns to summarise. If <code>NULL</code>, all columns except <code>group</code> are
-used, with high-cardinality identifier-like columns skipped (see Details).</p></dd>
+<dd><p>Names of the columns to summarise, as a character vector. If
+<code>NULL</code>, all columns except <code>group</code> are used, with high-cardinality
+identifier-like columns skipped (see Details).</p></dd>
 
 
 <dt id="arg-group">group<a class="anchor" aria-label="anchor" href="#arg-group"></a></dt>
-<dd><p>Optional grouping variable; one summary column is produced per
-level, alongside an overall column. Records whose group value is missing
-get a trailing <code>Missing</code> column of their own, so the group sizes still sum
-to the overall <code>N</code>.</p></dd>
+<dd><p>Optional name of the grouping column, given as a string rather
+than unquoted. One summary column is produced per level, alongside an
+overall column. Records whose group value is missing get a trailing
+<code>Missing</code> column of their own, so the group sizes still sum to the overall
+<code>N</code>.</p></dd>
 
 
 <dt id="arg-digits">digits<a class="anchor" aria-label="anchor" href="#arg-digits"></a></dt>

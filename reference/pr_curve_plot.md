@@ -52,7 +52,10 @@ pr_curve_plot(
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
 object. The average precision is stored in
 `attr(plot, "average_precision")` (a named vector when several models
-are supplied).
+are supplied). With `f1 = TRUE`, the maximum-F1 point is stored in
+`attr(plot, "max_f1")`: a list of `threshold`, `recall`, `precision` and
+`f1`, or a list of such lists named by model when several models are
+supplied.
 
 ## Examples
 

@@ -84,9 +84,11 @@ agreement between optimisers, whereas scatter signals a fragile fit.</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>Either the object returned by <code><a href="https://rdrr.io/pkg/lme4/man/allFit.html" class="external-link">lme4::allFit()</a></code>, or a data frame with
-one row per optimiser-by-term combination (columns such as <code>optimizer</code>,
-<code>term</code> and <code>value</code>/<code>estimate</code>).</p></dd>
+<dd><p>The object returned by <code><a href="https://rdrr.io/pkg/lme4/man/allFit.html" class="external-link">lme4::allFit()</a></code>, its <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> or a data
+frame with one row per optimiser-by-term combination: an optimiser column
+(<code>optimizer</code>, <code>Optimizer</code> or <code>optimiser</code>), a term column (<code>term</code>,
+<code>fixed_effect</code>, <code>parameter</code> or <code>Var2</code>) and a value column (<code>value</code>,
+<code>estimate</code> or <code>Estimate</code>).</p></dd>
 
 
 <dt id="arg-intercept">intercept<a class="anchor" aria-label="anchor" href="#arg-intercept"></a></dt>

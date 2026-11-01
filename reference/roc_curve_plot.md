@@ -49,8 +49,10 @@ roc_curve_plot(
 
   Bootstrap confidence band for a single ROC curve and its AUC. `FALSE`
   (default) draws none; `TRUE` uses 2000 resamples; a positive integer
-  sets the number of resamples. Ignored when several models are
-  overlaid.
+  sets the number of resamples. The resamples come from the session's
+  random-number stream, so call
+  [`set.seed()`](https://rdrr.io/r/base/Random.html) first for a
+  reproducible band. Ignored when several models are overlaid.
 
 - conf_level:
 
@@ -77,7 +79,12 @@ roc_curve_plot(
 
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
 object. The AUC(s) are stored in `attr(plot, "auc")` (a named vector
-when several models are supplied).
+when several models are supplied). When `ci` draws a band, which it does
+for a single model, the bootstrap interval of the AUC is stored in
+`attr(plot, "auc_ci")`, a vector named `lower` and `upper`. With
+`youden = TRUE`, the Youden point is stored in `attr(plot, "youden")`: a
+list of `threshold`, `fpr`, `tpr`, `j`, `sensitivity` and `specificity`,
+or a list of such lists named by model when several models are supplied.
 
 ## Details
 

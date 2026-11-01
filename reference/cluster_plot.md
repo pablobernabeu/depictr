@@ -105,8 +105,14 @@ cluster_plot(
 - seed:
 
   Optional integer seed for reproducible k-means (ignored when
-  `clusters` is supplied). Default `NULL` leaves the RNG state
-  untouched.
+  `clusters` is supplied). It applies to this call alone, and the
+  caller's random-number state is restored afterwards. The default,
+  `NULL`, takes the random starts of
+  [`stats::kmeans()`](https://rdrr.io/r/stats/kmeans.html), and any
+  random draws of a `suggest_k` diagnostic, from the session's
+  random-number stream, so call
+  [`set.seed()`](https://rdrr.io/r/base/Random.html) first for a
+  reproducible result.
 
 - nstart:
 

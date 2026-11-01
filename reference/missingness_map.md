@@ -41,9 +41,10 @@ missingness_map(
 - colours:
 
   Length-2 vector: colours for present and missing cells. Defaults to a
-  muted grey for present cells and the colourblind-safe
-  [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
-  accent for missing cells.
+  muted grey (`"grey85"`) for present cells and, for missing cells, the
+  accent colour set with `accent` in
+  [`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md),
+  the colourblind-safe vermillion `#d55e00` unless changed.
 
 - legend_inside:
 

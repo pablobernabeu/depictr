@@ -204,9 +204,10 @@ last time, the median is the midpoint of that stretch, as in
 (median not estimable) are skipped.</p></li>
 <li><p><strong>Log-rank test</strong> (<code>logrank = TRUE</code>): for two or more groups, the
 chi-squared log-rank statistic and its p-value are added as a subtitle.
-<code><a href="https://rdrr.io/pkg/survival/man/survdiff.html" class="external-link">survival::survdiff()</a></code> is used when the 'survival' package is installed,
-otherwise an equivalent base-R log-rank test is computed from the
-risk/event tables.</p></li>
+For vector or data-frame input, <code><a href="https://rdrr.io/pkg/survival/man/survdiff.html" class="external-link">survival::survdiff()</a></code> computes it when
+the 'survival' package is installed. For a <code>survfit</code> object, which keeps
+only its risk and event tables, or without 'survival', an equivalent
+base-R log-rank test is computed from the per-group risk and event tables.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>

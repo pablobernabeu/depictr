@@ -114,7 +114,10 @@ curve (the threshold maximising the harmonic mean of precision and recall).</p><
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot</a> object. The average precision is stored in
 <code>attr(plot, "average_precision")</code> (a named vector when several models are
-supplied).</p>
+supplied). With <code>f1 = TRUE</code>, the maximum-F1 point is stored in
+<code>attr(plot, "max_f1")</code>: a list of <code>threshold</code>, <code>recall</code>, <code>precision</code> and
+<code>f1</code>, or a list of such lists named by model when several models are
+supplied.</p>
     </div>
 
     <div class="section level2">

@@ -30,10 +30,13 @@ optimizer_fixef_plot(
 
 - x:
 
-  Either the object returned by
-  [`lme4::allFit()`](https://rdrr.io/pkg/lme4/man/allFit.html), or a
-  data frame with one row per optimiser-by-term combination (columns
-  such as `optimizer`, `term` and `value`/`estimate`).
+  The object returned by
+  [`lme4::allFit()`](https://rdrr.io/pkg/lme4/man/allFit.html), its
+  [`summary()`](https://rdrr.io/r/base/summary.html) or a data frame
+  with one row per optimiser-by-term combination: an optimiser column
+  (`optimizer`, `Optimizer` or `optimiser`), a term column (`term`,
+  `fixed_effect`, `parameter` or `Var2`) and a value column (`value`,
+  `estimate` or `Estimate`).
 
 - intercept:
 

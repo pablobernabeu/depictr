@@ -24,10 +24,10 @@ A grouped density (the default palette is a colourblind-safe set based
 on Okabe-Ito) and Kaplan-Meier survival curves with confidence bands and
 a number-at-risk table, each from a single function call:
 
-![Grouped density of response times by priming condition, in the
-Okabe-Ito palette](reference/figures/README-distribution.png)
+![Grouped density of response times by priming condition, in the default
+palette](reference/figures/README-distribution.png)
 
-Grouped density of response times by priming condition, in the Okabe-Ito
+Grouped density of response times by priming condition, in the default
 palette
 
 ![Kaplan-Meier survival curves by treatment arm, with confidence bands,
@@ -73,9 +73,9 @@ tests and vignettes run on base `lm`/`glm` and the bundled data alone.
 
 ## Measured accessibility
 
-The default palette is the Okabe-Ito set, and that choice is checked.
-The package ships a simulator of colour-vision deficiency based on the
-model of Machado, Oliveira and Fernandes (2009), and
+The default palette is based on the Okabe-Ito set, and that choice is
+checked. The package ships a simulator of colour-vision deficiency based
+on the model of Machado, Oliveira and Fernandes (2009), and
 [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
 measures how far apart the palette’s colours stay under each deficiency.
 
@@ -197,8 +197,9 @@ depictr draws on a number of plotting and modelling packages, so
 scheduled GitHub Actions keep it healthy between releases. A daily job
 checks the package and its full test suite against both the current and
 the development versions of its dependencies, and a weekly job checks
-every URL in the documentation. On top of those, `R CMD check` runs on
-every push across Linux, macOS and Windows.
+every URL in the documentation. On top of those, `R CMD check` runs
+across Linux, macOS and Windows on every push to `main` and on every
+pull request into it.
 
 ## Citation
 
@@ -218,7 +219,7 @@ on a single bibliography at
 ## Licence
 
 MIT (c) Pablo Bernabeu. See the
-[licence](https://github.com/pablobernabeu/depictr/blob/main/LICENSE).
+[licence](https://github.com/pablobernabeu/depictr/blob/main/LICENSE.md).
 
 ## Contributing
 

@@ -83,7 +83,8 @@ group_comparison_plot(
 
 - title, x_lab, y_lab:
 
-  Title and axis labels.
+  Title and axis labels. `x_lab` is not drawn when `differences = TRUE`,
+  since the estimation plot names its groups on the axis alone.
 
 ## Value
 

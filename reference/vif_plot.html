@@ -143,8 +143,10 @@ does, because its VIFs then come from columns that are not centred.</p>
 <span class="r-in"><span><span class="fu">vif_plot</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">rainfall</span> <span class="op">+</span> <span class="va">soil_moisture</span> <span class="op">+</span> <span class="va">fertiliser</span>, data <span class="op">=</span> <span class="va">d</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="vif_plot-1.png" alt="" width="672" height="432"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Multi-level factors get a single generalised VIF per term</span></span></span>
-<span class="r-in"><span><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">rainfall</span> <span class="op">+</span> <span class="va">fertiliser</span> <span class="op">+</span> <span class="va">treatment</span>, data <span class="op">=</span> <span class="va">crop_yield</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># A factor with more than two levels gets a single generalised VIF per term,</span></span></span>
+<span class="r-in"><span><span class="co"># and the axis switches to GVIF^(1/(2 df))</span></span></span>
+<span class="r-in"><span><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">stress</span> <span class="op">+</span> <span class="va">sleep_hours</span> <span class="op">+</span> <span class="va">region</span>,</span></span>
+<span class="r-in"><span>           data <span class="op">=</span> <span class="va">wellbeing_survey</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">vif_plot</span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="vif_plot-2.png" alt="" width="672" height="432"></span>
 </code></pre></div>

@@ -27,7 +27,8 @@ palette_preview(
 - type:
 
   Palette type to preview: `"qualitative"`, `"sequential"`,
-  `"diverging"`, or `"all"` to show all three.
+  `"diverging"`, or `"all"` to show all three, one panel each, without
+  the hex labels.
 
 - cvd:
 
@@ -55,6 +56,10 @@ Machado GM, Oliveira MM, Fernandes LAF (2009). “A physiologically-based
 model for simulation of color vision deficiency.” *IEEE Transactions on
 Visualization and Computer Graphics*, **15**(6), 1291–1298.
 [doi:10.1109/TVCG.2009.113](https://doi.org/10.1109/TVCG.2009.113) .
+
+World Wide Web Consortium (2023). “Web Content Accessibility Guidelines
+(WCAG) 2.2.” W3C Recommendation, <https://www.w3.org/TR/WCAG22/>.
+Accessed 2026-08-18.
 
 ## Examples
 

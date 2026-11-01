@@ -1,11 +1,15 @@
 # Exploring data
 
 depictr provides a coherent set of exploratory plots, estimation plots
-and a descriptive table, all sharing the package theme and palette.
-Column names can be given quoted or unquoted. The examples use the
-bundled `lexical_decision`, `wellbeing_survey` and `crop_yield`
-datasets. A closing section shows how to customise any of these plots
-with ordinary ggplot2 code.
+and a descriptive table, all sharing the package theme and palette. An
+argument that names one column, such as `x`, `y` or `group`, takes it
+quoted or unquoted. One that names several, such as `cols`, takes a
+character vector, and
+[`summary_table()`](https://pablobernabeu.github.io/depictr/reference/summary_table.md)
+takes its `vars` and `group` as strings. The examples use the bundled
+`lexical_decision`, `wellbeing_survey` and `crop_yield` datasets. A
+closing section shows how to customise any of these plots with ordinary
+ggplot2 code.
 
 ## One variable
 
@@ -262,9 +266,9 @@ knitr::kable(tab)
 
 ## Customising and extending the plots
 
-Every depictr function returns a plain `ggplot2` object (composite
-figures return a `patchwork`), so you can keep adding layers, scales,
-labels and theme tweaks with the usual `+`:
+Every depictr plotting function returns a plain `ggplot2` object
+(composite figures return a `patchwork`), so you can keep adding layers,
+scales, labels and theme tweaks with the usual `+`:
 
 ``` r
 
@@ -325,6 +329,8 @@ Many functions also expose layout controls directly.
 `explore_distribution(facet = TRUE)` and
 [`ridgeline_plot()`](https://pablobernabeu.github.io/depictr/reference/ridgeline_plot.md)
 separate groups, `correlation_heatmap(reorder = TRUE)` clusters
-variables, and the model-estimate plots take `facet` and `standardise`
-to keep coefficients on very different scales legible (see
+variables, and the model-estimate plots take `facet` to keep
+coefficients on very different scales legible.
+[`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)
+also takes `standardise` to the same end (see
 [`vignette("model-estimates")`](https://pablobernabeu.github.io/depictr/articles/model-estimates.md)).

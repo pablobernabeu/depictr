@@ -62,8 +62,8 @@ depictr_options(
   An optional custom qualitative palette: a character vector of hex
   colours used by
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
-  (type `"qualitative"`) and the discrete scales in place of the
-  built-in Okabe-Ito set. `NULL` restores the built-in palette.
+  (type `"qualitative"`) and the discrete scales in place of the eight
+  built-in colours. `NULL` restores the built-in palette.
   `depictr_palette(order = "contrast")` here draws every later plot in
   the contrast-first order (see
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)).

@@ -92,8 +92,9 @@ a data frame of pre-computed estimates.</p>
 
 
 <dt id="arg-conf-level">conf_level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
-<dd><p>Confidence/credible level, passed to <code><a href="tidy_estimates.html">tidy_estimates()</a></code>
-when <code>x</code> is a model: a single number strictly between 0 and 1.</p></dd>
+<dd><p>Confidence/credible level, passed to <code><a href="tidy_estimates.html">tidy_estimates()</a></code>,
+which uses it for a model and for the limits it fills in from the standard
+errors of a data frame: a single number strictly between 0 and 1.</p></dd>
 
 
 <dt id="arg-intercept">intercept<a class="anchor" aria-label="anchor" href="#arg-intercept"></a></dt>
@@ -123,7 +124,9 @@ terms too, so the contrast of enhanced with the reference level reads
 
 <dt id="arg-interaction">interaction<a class="anchor" aria-label="anchor" href="#arg-interaction"></a></dt>
 <dd><p>Passed to <code><a href="format_terms.html">format_terms()</a></code> to control how interaction
-terms are rendered (ignored when <code>labels</code> is supplied).</p></dd>
+terms are rendered, in the automatic labels and for any term a named
+<code>labels</code> vector leaves out. It is ignored when <code>labels</code> is an unnamed
+vector.</p></dd>
 
 
 <dt id="arg-point-colour-reference-colour">point_colour, reference_colour<a class="anchor" aria-label="anchor" href="#arg-point-colour-reference-colour"></a></dt>

@@ -108,6 +108,15 @@ It reads tidy columns (`term`, `estimate`, `conf.low`, `conf.high`), the
 `Estimate`, `Q2.5` and `Q97.5` of the matrix `brms::fixef()` returns,
 and the `l-95% CI` and `u-95% CI` of `summary(fit)$fixed`.
 
+A data frame counts as draws when it holds a sampler index column
+(`.chain`, `.iteration` or `.draw`), when it is long, with a parameter
+column (`parameter`, `term`, `.variable` or `variable`) and a value
+column (`value`, `.value` or `draw`) but no summary column such as
+`estimate` or `conf.low`, or when it is wide, with at least 50 rows and
+no summary column. Any other data frame is read as summaries. The
+half-eyes need the 'ggdist' package. Without it, each posterior is drawn
+as its median and `conf_level` interval, with a message.
+
 Terms are aligned by their canonical display label, so the `brms`-style
 `b_` prefix is reconciled automatically against the frequentist term
 names. Draws are read as in

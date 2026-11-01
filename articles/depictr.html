@@ -372,10 +372,9 @@ palette clears every colour-vision check and fails the greyscale check:
 its orange and its sky blue differ by 0.79 in CIE lightness, so a
 black-and-white printer renders them as the same grey. The Okabe-Ito
 guarantee is about hue confusion and was never a claim about greyscale.
-The threshold stays where it is, the check reports the number, and the
-claim has been narrowed to match. A figure that may be printed in black
-and white wants fewer groups, a sequential palette, or a redundant shape
-or line type.</p>
+The threshold stays where it is, and the check reports the number. A
+figure that may be printed in black and white wants fewer groups, a
+sequential palette, or a redundant shape or line type.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">eight</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>g <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">]</span><span class="op">)</span>, x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, y <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">)</span></span>
 <span><span class="va">p8</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">eight</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, colour <span class="op">=</span> <span class="va">g</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>

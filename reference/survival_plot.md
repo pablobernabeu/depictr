@@ -157,11 +157,12 @@ argument and off by default:
 
 - **Log-rank test** (`logrank = TRUE`): for two or more groups, the
   chi-squared log-rank statistic and its p-value are added as a
-  subtitle.
+  subtitle. For vector or data-frame input,
   [`survival::survdiff()`](https://rdrr.io/pkg/survival/man/survdiff.html)
-  is used when the 'survival' package is installed, otherwise an
-  equivalent base-R log-rank test is computed from the risk/event
-  tables.
+  computes it when the 'survival' package is installed. For a `survfit`
+  object, which keeps only its risk and event tables, or without
+  'survival', an equivalent base-R log-rank test is computed from the
+  per-group risk and event tables.
 
 ## References
 

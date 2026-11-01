@@ -90,7 +90,7 @@
 </h2>
 <p>A grouped density (the default palette is a colourblind-safe set based on Okabe-Ito) and Kaplan-Meier survival curves with confidence bands and a number-at-risk table, each from a single function call:</p>
 <div class="float">
-<img src="reference/figures/README-distribution.png" alt="Grouped density of response times by priming condition, in the Okabe-Ito palette"><div class="figcaption">Grouped density of response times by priming condition, in the Okabe-Ito palette</div>
+<img src="reference/figures/README-distribution.png" alt="Grouped density of response times by priming condition, in the default palette"><div class="figcaption">Grouped density of response times by priming condition, in the default palette</div>
 </div>
 <div class="float">
 <img src="reference/figures/README-survival.png" alt="Kaplan-Meier survival curves by treatment arm, with confidence bands, censoring marks, a log-rank test and a number-at-risk table"><div class="figcaption">Kaplan-Meier survival curves by treatment arm, with confidence bands, censoring marks, a log-rank test and a number-at-risk table</div>
@@ -116,7 +116,7 @@
 <div class="section level2">
 <h2 id="measured-accessibility">Measured accessibility<a class="anchor" aria-label="anchor" href="#measured-accessibility"></a>
 </h2>
-<p>The default palette is the Okabe-Ito set, and that choice is checked. The package ships a simulator of colour-vision deficiency based on the model of Machado, Oliveira and Fernandes (2009), and <code><a href="reference/palette_safety.html">palette_safety()</a></code> measures how far apart the palette’s colours stay under each deficiency.</p>
+<p>The default palette is based on the Okabe-Ito set, and that choice is checked. The package ships a simulator of colour-vision deficiency based on the model of Machado, Oliveira and Fernandes (2009), and <code><a href="reference/palette_safety.html">palette_safety()</a></code> measures how far apart the palette’s colours stay under each deficiency.</p>
 <p>A safe palette is not a safe figure, though, so <code><a href="reference/check_figure.html">check_figure()</a></code> audits the plot you are about to submit. It measures how separable the encoding colours are under each dichromacy and in greyscale, how small the text becomes at a stated output width, how well text and geometry contrast with their backgrounds under WCAG, and whether any distinction rests on colour alone. The size check covers the text drawn inside the panel as well as around it, and the contrast check covers the text around it alone. Each row reports the value it measured next to the threshold, so a verdict can be argued with. For a figure saved at its final width, give that width as both <code>width_cm</code> and <code>render_width_cm</code>, or neither, or let <code>save_plot(check = TRUE)</code> audit it at the width it saves. A journal that caps text size, as Nature does at 7 pt, can be held to its cap with <code>max_text_pt</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/check_figure.html">check_figure</a></span><span class="op">(</span><span class="fu"><a href="reference/explore_distribution.html">explore_distribution</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">RT</span>, group <span class="op">=</span> <span class="va">condition</span><span class="op">)</span>,</span>
@@ -166,7 +166,7 @@
 <div class="section level2">
 <h2 id="automated-maintenance">Automated maintenance<a class="anchor" aria-label="anchor" href="#automated-maintenance"></a>
 </h2>
-<p>depictr draws on a number of plotting and modelling packages, so scheduled GitHub Actions keep it healthy between releases. A daily job checks the package and its full test suite against both the current and the development versions of its dependencies, and a weekly job checks every URL in the documentation. On top of those, <code>R CMD check</code> runs on every push across Linux, macOS and Windows.</p>
+<p>depictr draws on a number of plotting and modelling packages, so scheduled GitHub Actions keep it healthy between releases. A daily job checks the package and its full test suite against both the current and the development versions of its dependencies, and a weekly job checks every URL in the documentation. On top of those, <code>R CMD check</code> runs across Linux, macOS and Windows on every push to <code>main</code> and on every pull request into it.</p>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
@@ -176,7 +176,7 @@
 <div class="section level2">
 <h2 id="licence">Licence<a class="anchor" aria-label="anchor" href="#licence"></a>
 </h2>
-<p>MIT (c) Pablo Bernabeu. See the <a href="https://github.com/pablobernabeu/depictr/blob/main/LICENSE" class="external-link">licence</a>.</p>
+<p>MIT (c) Pablo Bernabeu. See the <a href="https://github.com/pablobernabeu/depictr/blob/main/LICENSE.md" class="external-link">licence</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>

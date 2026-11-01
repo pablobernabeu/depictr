@@ -197,8 +197,12 @@ mass; pass <code>NA</code> to omit a caption.</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Draws may be supplied in many shapes: a fitted Bayesian model (<code>brms</code> or
 <code>rstanarm</code>), a <code>posterior</code> <em>draws</em> object, a wide data frame or matrix with
-one column of draws per parameter, or a long data frame (a parameter column
-and a value column). For fitted models only the fixed-effect (population)
+one column of draws per parameter, or a long data frame with a parameter
+column named <code>parameter</code>, <code>term</code>, <code>.variable</code> or <code>variable</code> and a value
+column named <code>value</code>, <code>.value</code>, <code>draw</code> or <code>estimate</code>. In a wide data frame,
+the numeric columns <code>.chain</code>, <code>.iteration</code>, <code>.draw</code>, <code>draw</code>, <code>chain</code>,
+<code>iteration</code> and <code>.row</code> are read as sampler indices and left out. For fitted
+models only the fixed-effect (population)
 parameters are kept, with the <code>brms</code> <code>b_</code> prefix stripped. A draws object
 that holds <code>b_</code> parameters, as <code><a href="https://mc-stan.org/posterior/reference/draws_df.html" class="external-link">posterior::as_draws_df()</a></code> returns for a
 <code>brms</code> fit, is read the same way, with a message naming the variables it
