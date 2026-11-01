@@ -221,8 +221,11 @@
   old label.
 * In an interaction row, the same functions name the variable and level of
   every factor, as in `rainfall × treatment: enhanced`, where they showed
-  `rainfall × treatmentenhanced`. `compare_models()` also labels a factor that
-  only a later model holds.
+  `rainfall × treatmentenhanced`. Except in `model_report()`, a `labels` entry
+  for the raw term restores it.
+* `compare_models()` names the variable and level of a factor that only a later
+  model holds, as in `region: South`, where it showed `regionSouth`. A `labels`
+  entry for the raw term restores it.
 * `compare_models(x_lab = NULL)`, and `frequentist_bayesian_plot(x_lab = NULL)`
   with summaries, draw the default axis title, 'Estimate' or the ratio's name,
   where they drew none. Adding `ggplot2::labs(x = NULL)` removes it.
