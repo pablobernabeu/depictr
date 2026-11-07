@@ -152,8 +152,8 @@ reference:
 
 - title: Diagnostics and classification
   desc: >
-    Residual diagnostics, influence, and the standard classification curves
-    and tables.
+    Residual diagnostics, influence and the standard classification curves and
+    tables.
   contents:
   - residual_diagnostics_plot
   - binned_residual_plot

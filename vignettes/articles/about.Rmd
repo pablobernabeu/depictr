@@ -59,17 +59,17 @@ function depictrCopyBibtex(btn) {
 ', esc(bib), uri))
 ```
 
-R users can also retrieve this citation directly with `citation("depictr")`.
+R users can also retrieve this citation with `citation("depictr")`.
 
 ## The developer
 
 depictr is developed by Pablo Bernabeu, a researcher in the Department of
 Education at the University of Oxford. His work spans cognitive psychology and
-neuroscience, linguistics, education and digital technologies, drawing on a
-range of methods that include behavioural and EEG experiments, corpus analysis
-and computational modelling. He is a Fellow of the Software Sustainability
-Institute (2020), recognised for his work on R-based tools for data
-presentation, and holds a PhD in Psychology from Lancaster University.
+neuroscience, linguistics, education and digital technologies. His methods
+include behavioural and EEG experiments, corpus analysis and computational
+modelling. He is a Fellow of the Software Sustainability Institute (2020),
+recognised for his work on R-based tools for data presentation, and holds a PhD
+in Psychology from Lancaster University.
 
 More about his work is on [his website](https://pablobernabeu.github.io),
 on [GitHub](https://github.com/pablobernabeu) and via
@@ -80,10 +80,10 @@ available on PyPI, shares the same design.
 
 ## Licence
 
-depictr is released under the [MIT licence](../LICENSE.html), a short
-permissive licence that allows use, modification and redistribution in both
-open and closed projects, provided the copyright notice is retained. The full
-text is on the site's licence page.
+depictr is released under the MIT licence, whose full text is on the site's
+[licence page](../LICENSE.html). This short permissive licence allows use,
+modification and redistribution in open and closed projects, provided the
+copyright notice is retained.
 
 ## Versioning and archival
 
@@ -94,8 +94,8 @@ in the citation identifies the release used. Releases are also tagged on
 [GitHub](https://github.com/pablobernabeu/depictr/releases) and archived on
 Zenodo, where the concept DOI
 <https://doi.org/10.5281/zenodo.21266308> resolves to
-the latest archived release and each release has a DOI of its own. What changed
-in each release is recorded in the [changelog](../news/index.html).
+the latest archived release and each release has a DOI of its own. The
+[changelog](../news/index.html) records what changed in each release.
 
 ## Contributing and support
 

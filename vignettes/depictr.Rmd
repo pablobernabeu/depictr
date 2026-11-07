@@ -43,12 +43,12 @@ simulate_figure <- function(plot, ...) {
 
 ```
 
-depictr is a single, consistent toolkit of plots that span the whole
-analysis workflow, from a first look at the data, through model estimates and
-predictions, to diagnostics, uncertainty and reporting. Every plotting function
-returns a `ggplot2` object [@wickham2016] (or a `patchwork` for composite
-panels), so you can keep customising with the usual `+` syntax, and every plot
-shares one theme, one palette and one set of label conventions.
+depictr is a toolkit of plots that cover the analysis workflow, from a first
+look at the data, through model estimates and predictions, to diagnostics,
+uncertainty and reporting. Every plotting function returns a `ggplot2` object
+[@wickham2016], or a `patchwork` for composite panels, so you can customise it
+further with the usual `+` syntax. All plots use the same theme, palette and
+label conventions.
 
 ```{r}
 library(depictr)
@@ -56,9 +56,9 @@ library(depictr)
 
 ## Five datasets to explore
 
-The package ships with five reproducibly simulated datasets, each chosen to
-exercise a different family of plots. They are documented under their names
-(e.g. `?lexical_decision`) and load with `data()`:
+The package includes five reproducibly simulated datasets, each chosen to
+illustrate a different family of plots. They are documented under their own
+names, as in `?lexical_decision`, and load with `data()`:
 
 * `lexical_decision`: a counterbalanced, crossed reaction-time/accuracy
   experiment (participant, item, condition, modality, word frequency). For
@@ -75,15 +75,15 @@ exercise a different family of plots. They are documented under their names
 
 ## A tour by task
 
-Begin with the data. `explore_bivariate()` chooses a suitable plot for any pair
-of variables, here a scatter with a trend because both are numeric.
+For a first look at the data, `explore_bivariate()` chooses a suitable plot for
+any pair of variables, here a scatter with a trend because both are numeric.
 
 ```{r}
 explore_bivariate(crop_yield, fertiliser, yield)
 ```
 
-Turn next to the model. After fitting it, `coefficient_plot()` draws a forest
-plot of the estimates.
+Once a model is fitted, `coefficient_plot()` draws a forest plot of its
+estimates.
 
 ```{r}
 fit <- lm(yield ~ rainfall + fertiliser + soil_ph + treatment,
@@ -107,7 +107,7 @@ residual_diagnostics_plot(fit)
 
 For uncertainty, `posterior_plot()` summarises posterior or simulation draws as
 a distribution per parameter. These are the fixed-effect posterior draws from a
-Bayesian fit of the lexical-decision model, shipped with the package.
+Bayesian fit of the lexical-decision model, included with the package.
 
 ```{r}
 draws <- readRDS(system.file("extdata", "lexdec_draws.rds",
@@ -120,13 +120,13 @@ posterior_plot(draws[c("conditionunrelated", "modalityauditory",
                title = "Lexical-decision fixed effects (ms)")
 ```
 
-## The shared spine: `tidy_estimates()`
+## A standard estimate table: `tidy_estimates()`
 
-Most of the model functions rest on `tidy_estimates()`, which turns a model, or
-a data frame of pre-computed estimates, into one standard table. Because the
-plotting functions also accept that table, estimates from any source (Bayesian
-posteriors, bootstrap intervals, or figures taken from a paper) can be supplied
-directly.
+Most of the model functions use `tidy_estimates()`, which turns a model, or a
+data frame of pre-computed estimates, into one standard table. The plotting
+functions also accept that table, so estimates from any source, such as
+Bayesian posteriors, bootstrap intervals or figures taken from a paper, can be
+supplied directly.
 
 ```{r}
 tidy_estimates(fit)
@@ -145,7 +145,7 @@ ggplot(crop_yield, aes(fertiliser, yield, colour = treatment)) +
   theme_depictr()
 ```
 
-`depictr_palette()` returns the underlying hex colours directly, ready to feed
+`depictr_palette()` returns the palette's hex colours for use in
 `scale_fill_manual()` or a base-graphics `col =` argument:
 
 ```{r}
@@ -153,35 +153,36 @@ depictr_palette(4)
 ```
 
 The qualitative palette is based on the Okabe-Ito set [@okabe2008], which stays
-distinguishable under the common forms of colour-vision deficiency, and
-sequential and diverging variants are available too. Preview them with:
+distinguishable under the common forms of colour-vision deficiency. Sequential
+and diverging variants are also available, and `palette_preview()` draws all
+three:
 
 ```{r, fig.height = 5}
 palette_preview(type = "all")
 ```
 
-`palette_preview()` can also *simulate* a colour-vision deficiency, so you can
-check a palette as a deuteranope (red-green) would see it:
+`palette_preview()` can also simulate a colour-vision deficiency and show a
+palette as a deuteranope (red-green) would see it:
 
 ```{r, fig.height = 2.6}
 palette_preview(cvd = "deutan")
 ```
 
-The simulation is available on its own as `simulate_cvd()`, and `palette_safety()`
-turns it into a verdict: for normal vision and each deficiency at full severity it
-reports the smallest perceptual distance between any two colours in a palette, the
-CIEDE2000 colour difference [@sharma2005], so the accessibility claim comes with a
-number attached.
+The simulation is available on its own as `simulate_cvd()`, and
+`palette_safety()` uses it to give a verdict. For normal vision and each
+deficiency at full severity, `palette_safety()` reports the smallest perceptual
+distance between any two colours in a palette, the CIEDE2000 colour difference
+[@sharma2005].
 
 ```{r}
 palette_safety()
 ```
 
-`simulate_figure()` applies the same simulation to a whole figure. Every colour
-the figure draws goes through it, in the legend keys, the text and any
-colourbar as well as in the data. The result is a gtable that
-`grid::grid.draw()` draws and `save_plot()` saves. Here is the scatter plot
-from the start of this section as a reader with deuteranopia sees it:
+`simulate_figure()` applies the same simulation to a whole figure. It covers
+every colour the figure draws, in the data, the legend keys, the text and any
+colourbar. The result is a gtable that `grid::grid.draw()` draws and
+`save_plot()` saves. The example draws the scatter plot from the start of this
+section as a reader with deuteranopia sees it:
 
 ```{r}
 by_treatment <- ggplot(crop_yield, aes(fertiliser, yield, colour = treatment)) +
@@ -195,11 +196,11 @@ grid::grid.draw(simulate_figure(by_treatment, "deutan"))
 
 ## Auditing the figure you are about to submit
 
-A safe palette is not a safe figure. Once a plot has been extended with your own
-scale, shrunk to fit a journal column, or asked to distinguish groups by colour
-alone, the palette's guarantee no longer describes what a reader will see.
-`check_figure()` reads a built plot and reports what it measured, next to the
-threshold it was measured against, so each verdict can be argued with.
+Once a plot has been extended with your own scale, shrunk to fit a journal
+column or made to distinguish groups by colour alone, the palette's guarantee
+no longer describes what a reader will see. `check_figure()` reads a built plot
+and reports each value it measured next to the threshold it was measured
+against.
 
 ```{r}
 grouped <- ggplot(crop_yield, aes(fertiliser, yield, colour = treatment)) +
@@ -210,13 +211,13 @@ grouped <- ggplot(crop_yield, aes(fertiliser, yield, colour = treatment)) +
 check_figure(grouped)
 ```
 
-Two rows are worth dwelling on. `geometry_contrast` measures each encoding colour,
-as it is drawn, against the panel background. The palette's orange falls below the
-3:1 that WCAG asks of a graphical object [@wcag22] even when opaque, at 2.25:1,
-and further when drawn translucent, as these points are. `redundant_encoding` is
-zero because nothing but colour tells the two treatments apart. Mapping shape as
-well, letting the darker vermillion do the second colour's work and drawing the
-points opaque clears both:
+`geometry_contrast` measures each encoding colour, as it is drawn, against the
+panel background. Even when opaque, the palette's orange falls below the 3:1
+that WCAG asks of a graphical object [@wcag22], at 2.25:1, and it falls further
+when drawn translucent, as these points are. `redundant_encoding` is zero
+because nothing but colour tells the two treatments apart. Both rows pass once
+shape is mapped as well, the darker vermillion is used as the second colour and
+the points are drawn opaque:
 
 ```{r}
 mended <- ggplot(crop_yield, aes(fertiliser, yield, colour = treatment,
@@ -230,17 +231,19 @@ check_figure(mended)[, c("check", "measured", "threshold", "verdict")]
 
 The vermillion need not be typed by hand.
 `scale_colour_depictr(order = "contrast")` draws the groups in the
-contrast-first order of `depictr_palette()`. It leads with the brand blue, the
+contrast-first order of `depictr_palette()`. It starts with the brand blue, the
 vermillion and the reddish purple, the only three of the eight colours that
-clear every colour row together. The bluish green comes fourth, and with it
+pass every colour row together. The bluish green comes fourth, and with it
 four groups still keep 3:1 against white.
 `depictr_options(palette = depictr_palette(order = "contrast"))` makes that
-order the default for every later plot. Under it, the second group takes the
-vermillion, which depictr also uses as its accent for single highlights.
+order the default for every later plot. Under that default, the second group
+takes the vermillion, which depictr also uses as its accent for single
+highlights.
 
-The audit also takes a stated output width, which is where most figure text
-quietly fails. Text is drawn in points, so a figure saved seven inches wide and
-then printed in an 8.9 cm column arrives at half the size it looked on screen:
+The audit also takes a stated output width, because most figure text fails
+unnoticed at its printed width. Text is drawn in points, so the text of a figure
+saved seven inches wide and then printed in an 8.9 cm column is half the size
+it was on screen:
 
 ```{r}
 subset(check_figure(grouped, width_cm = 8.9), check == "text_size")
@@ -248,25 +251,26 @@ subset(check_figure(grouped, width_cm = 8.9), check == "text_size")
 
 A figure saved at the size it will be printed is drawn at that size, so give
 the saved width as both `width_cm` and `render_width_cm`, or leave both at
-their defaults. Text drawn inside the panel, such as an annotation, a label or
-a cell value, has a row of its own, `annotation_text_size`, held to the same
-floor. That floor defaults to 6 pt, which is lenient. As their guidelines stood
-on 30 September 2026, PLOS and APA Style asked for at least 8 pt, Elsevier for
-7 pt and Nature for 5 to 7 pt, and `?check_figure` links all four.
+their defaults. `save_plot(check = TRUE)` runs the audit as it saves, at the
+width it saves at, and warns about each check the figure fails.
 
-Nature's range has a ceiling as well as a floor, since no text but the panel
-labels may exceed 7 pt. Passing `max_text_pt = 7` holds a figure to it in a row
-of its own, `text_size_max`. `save_plot(check = TRUE)` runs the audit as it
-saves, at the width it saves at, and warns about each check the figure fails.
+Text drawn inside the panel, such as an annotation, a label or a cell value,
+has a row of its own, `annotation_text_size`, held to the same floor as
+`text_size`. That floor defaults to 6 pt, which is lenient. As their
+guidelines stood on 30 September 2026, PLOS and APA Style asked for at least
+8 pt, Elsevier for 7 pt and Nature for 5 to 7 pt, and `?check_figure` links
+all four. Nature's range also has a ceiling, since no text but the panel
+labels may exceed 7 pt. Passing `max_text_pt = 7` adds a row, `text_size_max`,
+that holds a figure to that ceiling.
 
-One limitation belongs here, beside the claim it qualifies, since the package is
-the one making that claim. The eight-colour qualitative palette clears every
-colour-vision check and fails the greyscale check: its orange and its sky blue
-differ by 0.79 in CIE lightness, so a black-and-white printer renders them as the
-same grey. The Okabe-Ito guarantee is about hue confusion and was never a claim
-about greyscale. The threshold stays where it is, and the check reports the
-number. A figure that may be printed in black and white wants fewer groups, a
-sequential palette, or a redundant shape or line type.
+The eight-colour qualitative palette passes every colour-vision check and fails
+the greyscale check. The Okabe-Ito guarantee covers hue confusion alone. The
+palette's orange and sky blue differ by 0.79 in CIE lightness, so a
+black-and-white printer renders them as the same grey. The greyscale check
+holds the package's own palette to the same threshold as any other and reports
+the measured difference. A figure that may be printed in black and white
+should use fewer groups or a sequential palette, or add a redundant shape or
+line type.
 
 ```{r}
 eight <- data.frame(g = factor(letters[1:8]), x = 1:8, y = 1:8)
@@ -279,15 +283,14 @@ subset(check_figure(p8), check == "greyscale_separability")
 ```
 
 The audit does not measure a continuous colour or fill scale, such as that of
-a heatmap: its colour rows abstain and say why. A ramp is read by its
-lightness, so prefer one whose lightness runs evenly from end to end, such as
-viridis or depictr's sequential and diverging ramps, over a rainbow
+a heatmap. Its colour rows then report no result and give the reason. A ramp
+is read by its lightness, so prefer one whose lightness changes evenly, such
+as viridis or depictr's sequential and diverging ramps, over a rainbow
 [@crameri2020].
 
-Set the look once for a whole script with `depictr_options()`. It carries the
-base size and family, the brand and accent colours and a custom palette, so the
-same arguments need not travel with every call. Called with no arguments it
-reports the current settings:
+Set the look once for a whole script with `depictr_options()`. It holds the
+base size and family, the brand and accent colours and a custom palette. Called
+with no arguments, it reports the current settings:
 
 ```{r}
 depictr_options()
@@ -308,7 +311,7 @@ The remaining articles go into each area in turn.
 `vignette("exploring-data")` covers distributions, categories, bivariate plots,
 scatter-plot matrices, correlations, missingness, outliers, summary tables and
 the estimation plots.
-`vignette("model-estimates")` is the flagship: forest plots, model comparison,
+`vignette("model-estimates")` covers forest plots, model comparison,
 predicted values, interactions, random effects, optimiser checks and the
 frequentist-over-Bayesian-posterior overlay.
 `vignette("diagnostics-and-uncertainty")` covers residuals, GLM-appropriate

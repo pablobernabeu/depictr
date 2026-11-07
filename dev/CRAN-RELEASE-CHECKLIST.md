@@ -1,7 +1,7 @@
 # CRAN update release checklist for depictr
 
-A short, practical checklist for each update release on CRAN. Most of the checks
-need a networked machine with a full R toolchain.
+This checklist is for each update release on CRAN. Most of the checks need a
+networked machine with a full R toolchain.
 
 ## Before submitting
 
@@ -28,7 +28,7 @@ need a networked machine with a full R toolchain.
   `_R_CHECK_DEPENDS_ONLY_=true`: status OK, with no errors, warnings or notes
   and the tests that need a suggested package skipped by their guards.
 - [ ] Run a `rhub::rhub_check()` across platforms. GitHub Actions checks the R
-  release on Linux, macOS and Windows, R-devel on Linux and Windows and
+  release on Linux, macOS and Windows, R-devel on Linux and Windows, and
   oldrel-1 on Linux. Windows on R-devel is what `devtools::check_win_devel()`
   checks on win-builder, so that call is optional.
 - [ ] Rewrite `cran-comments.md` for this submission, with its check results,
