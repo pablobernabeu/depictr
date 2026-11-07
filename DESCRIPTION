@@ -7,25 +7,25 @@ Authors@R: person(given = "Pablo",
                   email = "pcbernabeu@gmail.com",
                   role = c("aut", "cre"),
                   comment = c(ORCID = "0000-0003-1083-2460"))
-Description: A cohesive, publication-ready toolkit of plots that span the
-    whole analysis workflow with one consistent look. It covers exploratory
+Description: A toolkit of publication-ready plots that span the whole
+    analysis workflow with one consistent appearance. It covers exploratory
     data analysis (distributions, categorical summaries, bivariate plots,
     scatter-plot matrices, correlation heatmaps, missing-data maps,
-    outliers, estimation statistics and descriptive tables); multivariate
-    analysis, clustering with diagnostics and Kaplan-Meier survival curves;
+    outliers, estimation statistics and descriptive tables), multivariate
+    analysis, clustering with diagnostics, Kaplan-Meier survival curves and
     time series (trends, autocorrelation, decomposition, seasonality and
-    forecasting); model estimates and inference (forest plots, model
-    comparison, frequentist and Bayesian estimates, predicted values,
-    interactions, random effects and optimiser checks); diagnostics and
-    classification (residual panels, binned residuals, influence,
+    forecasting). It also covers model estimates and inference (forest
+    plots, model comparison, frequentist and Bayesian estimates, predicted
+    values, interactions, random effects and optimiser checks), diagnostics
+    and classification (residual panels, binned residuals, influence,
     quantile-quantile, receiver operating characteristic (ROC) curves,
-    calibration, threshold tuning and confusion matrices); uncertainty and
-    power; and reporting helpers (a shared theme, colourblind-aware
+    calibration, threshold tuning and confusion matrices), uncertainty and
+    power, and reporting helpers (a shared theme, colourblind-aware
     palettes, plot composition and saving). Every plotting function returns
-    a 'ggplot2' object (or a 'patchwork' object for composite panels),
-    heavier modelling back-ends are optional, and the package ships with
-    reproducibly simulated datasets so that every example and vignette runs
-    without further setup.
+    a 'ggplot2' object, or a 'patchwork' object for composite panels.
+    Heavier modelling back-ends are optional. The package includes
+    reproducibly simulated datasets on which every example and vignette
+    runs without further setup.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Language: en-GB
