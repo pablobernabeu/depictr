@@ -36,9 +36,9 @@ knit_print.patchwork <- function(x, ...) knitr::normal_print(x & transparent_bg)
 library(depictr)
 ```
 
-depictr provides exploratory plots, estimation plots and a descriptive table,
-all sharing the package theme and palette. An argument that names one column,
-such as `x`, `y` or `group`, takes it quoted or unquoted. One that names
+depictr provides exploratory plots, estimation plots and a descriptive table.
+The plots share the package theme and palette. An argument that names one
+column, such as `x`, `y` or `group`, takes it quoted or unquoted. One that names
 several, such as `cols`, takes a character vector, and `summary_table()` takes
 its `vars` and `group` as strings. The examples use the bundled
 `lexical_decision`, `wellbeing_survey` and `crop_yield` datasets. A closing

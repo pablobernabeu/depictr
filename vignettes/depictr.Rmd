@@ -154,7 +154,7 @@ depictr_palette(4)
 
 The qualitative palette is based on the Okabe-Ito set [@okabe2008], which stays
 distinguishable under the common forms of colour-vision deficiency. Sequential
-and diverging variants are also available, and `palette_preview()` draws all
+and diverging variants are also available, and `palette_preview()` can draw all
 three:
 
 ```{r, fig.height = 5}
@@ -283,14 +283,15 @@ subset(check_figure(p8), check == "greyscale_separability")
 ```
 
 The audit does not measure a continuous colour or fill scale, such as that of
-a heatmap. Its colour rows then report no result and give the reason. A ramp
-is read by its lightness, so prefer one whose lightness changes evenly, such
-as viridis or depictr's sequential and diverging ramps, over a rainbow
-[@crameri2020].
+a heatmap. When nothing else in the figure encodes by colour, its colour rows
+report no result and give the reason. A ramp is read by its lightness, so
+prefer one whose lightness changes evenly, such as viridis or depictr's
+sequential and diverging ramps, over a rainbow [@crameri2020].
 
 Set the look once for a whole script with `depictr_options()`. It holds the
-base size and family, the brand and accent colours and a custom palette. Called
-with no arguments, it reports the current settings:
+base size and family, the brand, accent and reference-line colours, a custom
+palette and the colour of `NA` levels. Called with no arguments, it reports the
+current settings:
 
 ```{r}
 depictr_options()

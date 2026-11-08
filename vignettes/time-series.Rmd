@@ -108,7 +108,9 @@ decompose_plot(AirPassengers, s_window = 13,
 
 `acf_plot()` draws the autocorrelation function or, with `type = "partial"`,
 the partial autocorrelation function, each with approximate significance
-bounds. The spikes at multiples of twelve are the annual seasonality.
+bounds. For the 72-month indoor series, the default lags run from 1 to 18. The
+annual seasonality shows as a wave in the autocorrelation, which dips near lag
+six and rises again near lag twelve, the only multiple of twelve in that range.
 
 ```{r, fig.height = 3.4}
 acf_plot(indoor_ts)

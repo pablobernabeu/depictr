@@ -11,7 +11,8 @@ networked machine with a full R toolchain.
   the installed version, so both need an edit only when the year changes.
 - [ ] `DESCRIPTION` complete: Title, Description, Authors@R (aut, cre),
   License (MIT + file LICENSE), URL, BugReports, Language: en-GB.
-- [ ] `NAMESPACE`, all `man/*.Rd` and `NEWS.md` generated and current.
+- [ ] `NAMESPACE` and all `man/*.Rd` generated and current, and `NEWS.md`
+  current.
 - [ ] Every exported function has a runnable example. The heavy back-ends
   (lme4, broom, simr) are in Suggests and used conditionally.
 - [ ] Tests (testthat, edition 3) and the vignettes build offline.

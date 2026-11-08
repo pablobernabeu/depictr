@@ -6,10 +6,12 @@ labels: bug
 assignees: ''
 ---
 
-**Describe the bug**
+### Describe the bug
+
 A clear description of what went wrong and what you expected instead.
 
-**Reproducible example**
+### Reproducible example
+
 A small [reprex](https://reprex.tidyverse.org) helps a great deal. If it involves
 a plot, a screenshot of the result is useful too.
 
@@ -17,7 +19,8 @@ a plot, a screenshot of the result is useful too.
 # your reprex here
 ```
 
-**Session information**
+### Session information
+
 <details>
 
 ```r
@@ -26,5 +29,6 @@ a plot, a screenshot of the result is useful too.
 
 </details>
 
-**Anything else**
+### Anything else
+
 Any other context that might help.

@@ -83,7 +83,7 @@ available on PyPI, shares the same design.
 depictr is released under the MIT licence, whose full text is on the site's
 [licence page](../LICENSE.html). This short permissive licence allows use,
 modification and redistribution in open and closed projects, provided the
-copyright notice is retained.
+copyright and permission notices are included with the code.
 
 ## Versioning and archival
 

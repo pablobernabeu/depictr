@@ -4,6 +4,12 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  # dependency-autofix opens its pull request with GITHUB_TOKEN, and a pull
+  # request opened with that token starts no workflow run. A maintainer
+  # therefore starts this workflow with 'Run workflow' on the pull request's
+  # branch, and the run reports on the branch's head commit, which is the pull
+  # request's head.
+  workflow_dispatch:
 
 name: R-CMD-check
 

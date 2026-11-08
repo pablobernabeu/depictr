@@ -12,7 +12,10 @@ depictr's dependencies has introduced a change that breaks the package.
 This issue receives a comment on each subsequent failure and can be closed once
 the dependency check passes again.
 
-If a `CLAUDE_CODE_OAUTH_TOKEN` secret is set, the `dependency-autofix` workflow
-starts once the failing run has finished. Where it can fix the failure safely,
-it opens a pull request, on which a maintainer has to start R-CMD-check.
-Otherwise, it comments here with the cause and the options.
+Once the failing run has finished, the `dependency-autofix` workflow starts. If
+a `CLAUDE_CODE_OAUTH_TOKEN` secret is set, it attempts a fix. Where it can fix
+the failure safely, it opens a pull request, on which a maintainer has to start
+R-CMD-check, from the Actions tab or by closing and reopening the pull request.
+Otherwise, it comments here with the cause and the options. It can open the pull
+request only when 'Allow GitHub Actions to create and approve pull requests' is
+enabled under Settings > Actions > General.
