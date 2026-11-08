@@ -36,22 +36,21 @@ knit_print.patchwork <- function(x, ...) knitr::normal_print(x & transparent_bg)
 library(depictr)
 ```
 
-depictr provides a coherent set of exploratory plots, estimation plots and a
-descriptive table, all sharing the package theme and palette. An argument that
-names one column, such as `x`, `y` or `group`, takes it quoted or unquoted. One
-that names several, such as `cols`, takes a character vector, and
-`summary_table()` takes its `vars` and `group` as strings. The examples use the
-bundled `lexical_decision`, `wellbeing_survey` and `crop_yield` datasets. A
-closing section shows how to customise any of these plots with ordinary ggplot2
-code.
+depictr provides exploratory plots, estimation plots and a descriptive table.
+The plots share the package theme and palette. An argument that names one
+column, such as `x`, `y` or `group`, takes it quoted or unquoted. One that names
+several, such as `cols`, takes a character vector, and `summary_table()` takes
+its `vars` and `group` as strings. The examples use the bundled
+`lexical_decision`, `wellbeing_survey` and `crop_yield` datasets. A closing
+section shows how to customise any of these plots with ordinary ggplot2 code.
 
 ## One variable
 
-`explore_distribution()` for a numeric variable, `explore_categorical()` for a
+`explore_distribution()` plots a numeric variable and `explore_categorical()` a
 categorical one. A unimodal density leaves its upper corners empty, so
-`legend_inside = TRUE` tucks the colour legend into the top-right rather than
-spending a right-hand margin on it. Several plots take this argument, and it is
-off by default because the empty corner depends on the data.
+`legend_inside = TRUE` moves the colour legend from the right-hand margin into
+the top-right corner. Several plots take this argument, and it is off by default
+because the empty corner depends on the data.
 
 ```{r}
 explore_distribution(lexical_decision, RT, group = condition, type = "density",
@@ -66,9 +65,9 @@ explore_distribution(wellbeing_survey, life_satisfaction, group = region,
                      type = "both", facet = TRUE)
 ```
 
-`ecdf_plot()` is a bin-free alternative: the empirical cumulative distribution
-lets you read medians and quantiles straight off the curve and makes a shift
-between groups obvious (here the related condition is faster throughout).
+`ecdf_plot()` is a bin-free alternative. The empirical cumulative distribution
+lets you read medians and quantiles off the curve and makes a shift between
+groups obvious. Here the related condition is faster throughout.
 
 ```{r}
 ecdf_plot(lexical_decision, RT, group = condition,
@@ -82,17 +81,17 @@ explore_categorical(wellbeing_survey, education, group = region,
 
 ## Two variables, any types
 
-`explore_bivariate()` selects the appropriate plot automatically: a scatter
-plot for two numeric variables, box plots for a numeric variable against a
+`explore_bivariate()` chooses the plot from the variable types: a scatter plot
+for two numeric variables, box plots for a numeric variable against a
 categorical one, and a filled bar chart for two categorical variables.
 
 ```{r}
 explore_bivariate(lexical_decision, condition, RT)
 ```
 
-For a focused scatter with a fitted trend, use `scatter_trend()`. The crop-yield
-trial has a real fertiliser-by-treatment interaction, visible here as two
-diverging slopes.
+For a focused scatter with a fitted trend, use `scatter_trend()`. The
+data-generating process of `crop_yield` contains a fertiliser-by-treatment
+interaction, visible here as two diverging slopes.
 
 ```{r}
 scatter_trend(crop_yield, fertiliser, yield, group = treatment)
@@ -113,7 +112,7 @@ correlation_heatmap(wellbeing_survey)
 ```
 
 `reorder = TRUE` orders the variables by hierarchical clustering, so blocks of
-mutually correlated variables sit together and the structure is easier to read:
+mutually correlated variables sit together:
 
 ```{r, fig.height = 5}
 correlation_heatmap(wellbeing_survey, reorder = TRUE)
@@ -122,9 +121,10 @@ correlation_heatmap(wellbeing_survey, reorder = TRUE)
 ## Distributions across groups
 
 `raincloud_plot()` shows the density, the box summary and the raw points
-together, and `group_comparison_plot()` adds the group means with confidence
-intervals over the raw data. By showing the estimate alongside its uncertainty,
-the latter conveys whether the groups differ more faithfully than a bar chart.
+together. `group_comparison_plot()` draws the group means with confidence
+intervals over the raw data. Because it shows each estimate with its
+uncertainty, it conveys more faithfully than a bar chart whether the groups
+differ.
 
 ```{r}
 raincloud_plot(lexical_decision, RT, group = condition)
@@ -156,10 +156,9 @@ estimation_plot(lexical_decision, RT, condition,
                 title = "RT difference: unrelated vs. related priming")
 ```
 
-`group_comparison_plot(differences = TRUE)` is the same idea reached from the
-group-means plot: it appends the difference panel, turning a means comparison
-into a full estimation plot. With more than two groups every other group is
-compared against a chosen reference.
+`group_comparison_plot(differences = TRUE)` turns the group-means plot into an
+estimation plot by appending the difference panel. With more than two groups,
+every other group is compared against a chosen reference.
 
 ```{r, fig.height = 5}
 set.seed(1)
@@ -170,9 +169,9 @@ group_comparison_plot(crop_yield, yield, treatment, differences = TRUE,
 ## Comparing two groups across categories
 
 `dumbbell_plot()` compares one value between two groups across a set of
-categories: the two group values per category are joined by a segment, so the
-size and direction of each gap can be read off directly. Here it contrasts
-younger and older respondents' life satisfaction by region.
+categories. A segment joins the two group values in each category and shows
+the size and direction of the gap. Here the plot contrasts younger and older
+respondents' life satisfaction by region.
 
 ```{r}
 wb <- wellbeing_survey
@@ -183,15 +182,16 @@ dumbbell_plot(wb, region, life_satisfaction, age_group, legend_inside = TRUE)
 ## Data quality: outliers and missingness
 
 `outlier_plot()` draws the distribution as a box or violin plot and highlights
-the points beyond the 1.5 * IQR fences, so unusual values are easy to see before
-any modelling begins.
+the points beyond the 1.5 * IQR fences. Use it to check for unusual values
+before modelling.
 
 ```{r}
 outlier_plot(crop_yield, yield)
 ```
 
-`wellbeing_survey` has *informative* missingness (income is missing more often
-at higher stress), so the missingness map is worth a look before modelling.
+`wellbeing_survey` has *informative* missingness, with income missing more
+often at higher stress, so its missingness map is worth checking before
+modelling.
 
 ```{r, fig.height = 5}
 missingness_map(wellbeing_survey, legend_inside = TRUE)
@@ -202,8 +202,8 @@ missingness_map(wellbeing_survey, legend_inside = TRUE)
 `summary_table()` builds a 'Table 1': mean (SD) for numeric variables, counts
 and percentages for categorical ones, optionally by group. The first row always
 reports the sample size (`N`), and any variable with missing values gets a
-`Missing, n (%)` row, both visible here for the wellbeing survey. It returns a
-plain data frame, ready for `knitr::kable()`.
+`Missing, n (%)` row. The `wellbeing_survey` table below shows both.
+`summary_table()` returns a plain data frame, ready for `knitr::kable()`.
 
 ```{r}
 tab <- summary_table(
@@ -216,9 +216,9 @@ knitr::kable(tab)
 
 ## Customising and extending the plots
 
-Every depictr plotting function returns a plain `ggplot2` object (composite
-figures return a `patchwork`), so you can keep adding layers, scales, labels
-and theme tweaks with the usual `+`:
+Every depictr plotting function returns a plain `ggplot2` object, or a
+`patchwork` for a composite figure, so you can keep adding layers, scales,
+labels and theme tweaks with the usual `+`:
 
 ```{r}
 library(ggplot2)
@@ -231,10 +231,10 @@ scatter_trend(crop_yield, fertiliser, yield, group = treatment) +
 
 ### Tidying the legend
 
-depictr centres a legend title over its keys by default. When the levels speak
-for themselves, though, the title is just clutter, so drop it by mapping it to
-`NULL`. Reversing a discrete colour legend at the same time makes it read
-top-to-bottom in the order the curves are stacked:
+depictr centres a legend title over its keys by default. When the level names
+are self-explanatory, drop the title by setting it to `NULL`. Reversing a
+discrete colour legend at the same time makes it read top-to-bottom in the order
+the curves are stacked:
 
 ```{r}
 ecdf_plot(lexical_decision, RT, group = condition) +
@@ -244,12 +244,12 @@ ecdf_plot(lexical_decision, RT, group = condition) +
 
 ### Moving the legend into the plot
 
-Several plots take `legend_inside = TRUE` to tuck the legend into a corner they
-usually leave empty (see e.g. `?ecdf_plot`). For any plot that does not, the same
-move is one `theme()` call. A dodged bar chart, for instance, leaves the
-top-right clear when the right-most category is short, so the legend fits there.
-Because the regions are self-evident, we drop the title too (with
-`element_blank()`, since this plot sets the legend name on its fill scale):
+Several plots take `legend_inside = TRUE` to place the legend in a corner they
+usually leave empty (see e.g. `?ecdf_plot`). For any other plot, one `theme()`
+call does the same. A dodged bar chart, for instance, leaves the top-right clear
+when the right-most category is short, so the legend fits there. We drop the
+title too, as the region names are self-explanatory, and use `element_blank()`
+because this plot sets the legend name on its fill scale:
 
 ```{r}
 explore_categorical(wellbeing_survey, education, group = region,
@@ -262,8 +262,9 @@ explore_categorical(wellbeing_survey, education, group = region,
 
 ### Built-in layout controls
 
-Many functions also expose layout controls directly. `explore_distribution(facet
-= TRUE)` and `ridgeline_plot()` separate groups, `correlation_heatmap(reorder =
-TRUE)` clusters variables, and the model-estimate plots take `facet` to keep
-coefficients on very different scales legible. `coefficient_plot()` also takes
-`standardise` to the same end (see `vignette("model-estimates")`).
+Many functions also have layout controls of their own.
+`explore_distribution(facet = TRUE)` and `ridgeline_plot()` separate groups,
+`correlation_heatmap(reorder = TRUE)` clusters variables, and the model-estimate
+plots take `facet` to keep coefficients on very different scales legible.
+`coefficient_plot()` also takes `standardise` to the same end (see
+`vignette("model-estimates")`).

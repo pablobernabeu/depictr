@@ -58,7 +58,8 @@ jobs:
           # GitHub Actions to create and approve pull requests" is enabled
           # under Settings > Actions > General. GitHub starts no workflow runs
           # for events made with this token, so a maintainer has to start
-          # R-CMD-check on the pull request it opens.
+          # R-CMD-check on the pull request it opens, from the Actions tab or
+          # by closing and reopening the pull request.
           github_token: ${{ secrets.GITHUB_TOKEN }}
           prompt: >
             The scheduled dependency-check workflow for this R package is

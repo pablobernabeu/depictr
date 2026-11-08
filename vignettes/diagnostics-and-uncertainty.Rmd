@@ -43,8 +43,8 @@ has_simr <- requireNamespace("simr", quietly = TRUE)
 ## Regression diagnostics
 
 `residual_diagnostics_plot()` assembles the classic panel. `influence_plot()`
-and `qq_plot()` zoom in on particular checks. We fit a linear model to the
-crop-yield trial.
+and `qq_plot()` each show one of its checks in more detail. We fit a linear
+model to the crop-yield trial.
 
 ```{r}
 fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
@@ -61,9 +61,9 @@ influence_plot(fit)
 The bubble area is Cook's distance, the standard measure of an observation's
 influence on the fitted coefficients [@cook1977].
 
-`vif_plot()` checks for multicollinearity among the predictors. The crop-yield
-predictors are close to orthogonal, so to see the diagnostic do its job we add a
-soil-moisture measure that is largely driven by rainfall.
+`vif_plot()` checks for multicollinearity among the predictors. Because the
+crop-yield predictors are close to orthogonal, we create collinearity by adding
+a soil-moisture measure that is largely driven by rainfall.
 
 ```{r, fig.height = 3.2}
 set.seed(1)
@@ -78,15 +78,17 @@ the rule-of-thumb line at 5, while fertiliser stays at 1.
 
 ## Diagnostics for a generalised linear model
 
-For a binary `glm` the raw residuals take only a few values, so a plain
+For a binary `glm`, the raw residuals take only a few values, so a plain
 residual-versus-fitted plot is hard to read. `binned_residual_plot()` instead
 splits the data into equal-count bins of fitted values and plots the mean
-residual per bin [@gelman2007] against a band of +/- 2 standard errors, which
-the fitted model implies for each bin's mean. Under a correct model, about 95%
-of the points sit inside the band, scattered around zero.
+residual per bin [@gelman2007] against a band of +/- 2 standard errors. These
+are the standard errors that the fitted model implies for each bin's mean.
+Under a correct model, about 95% of the points sit inside the band, scattered
+around zero.
 
-We model the *rare* adverse-event outcome from the clinical trial (about a 10%
-base rate) on the baseline biomarker, age and treatment arm.
+We model the adverse-event outcome from the clinical trial on the baseline
+biomarker, age and treatment arm. The outcome is rare, with a base rate of about
+10%.
 
 ```{r}
 gfit <- glm(adverse_event ~ biomarker + age + arm,
@@ -97,10 +99,10 @@ gfit <- glm(adverse_event ~ biomarker + age + arm,
 binned_residual_plot(gfit, title = "Binned residuals: adverse-event model")
 ```
 
-`residual_diagnostics_plot()` recognises a `glm` and switches to
-GLM-appropriate panels (binned residuals and a Q-Q plot of randomised quantile
-residuals, which are standard-normal under a correct model regardless of the
-response distribution):
+For a `glm`, `residual_diagnostics_plot()` replaces two of the classic panels
+with GLM-appropriate ones: binned residuals and a Q-Q plot of randomised
+quantile residuals, which are standard-normal under a correct model regardless
+of the response distribution.
 
 ```{r, fig.height = 6}
 residual_diagnostics_plot(gfit, title = "Adverse-event model")
@@ -108,10 +110,10 @@ residual_diagnostics_plot(gfit, title = "Adverse-event model")
 
 ## Classification on an imbalanced outcome
 
-The adverse-event outcome is imbalanced, the case the precision-recall, gains
-and lift charts are built for. depictr's classification plots each read a
-binomial `glm` directly, a pair of vectors or, to compare
-several models, a named list of models.
+The precision-recall, gains and lift charts are built for an imbalanced outcome
+such as the adverse event. depictr's classification plots each read a binomial
+`glm` directly, a pair of vectors or, to compare several models, a named list
+of models.
 
 The ROC curve reports the AUC. Passing `youden = TRUE` marks the Youden's J
 operating point (the threshold maximising sensitivity + specificity - 1):
@@ -120,7 +122,7 @@ operating point (the threshold maximising sensitivity + specificity - 1):
 roc_curve_plot(gfit, youden = TRUE)
 ```
 
-When the positive class is rare the precision-recall curve is more informative
+When the positive class is rare, the precision-recall curve is more informative
 than the ROC curve, because it ignores the many true negatives. The baseline is
 the positive prevalence, and `f1 = TRUE` marks the maximum-F1 operating point:
 
@@ -130,9 +132,9 @@ pr_curve_plot(gfit, f1 = TRUE)
 
 ### Comparing two models in one figure
 
-A *named list* overlays one colour-coded curve per model, with a per-curve AUC
-(or average precision) in the legend. Here the full model is compared with a
-biomarker-only model.
+Passing a named list overlays one colour-coded curve per model, with a
+per-curve AUC (or average precision) in the legend. Here, the full model is
+compared with a biomarker-only model.
 
 ```{r}
 reduced <- glm(adverse_event ~ biomarker, data = clinical_trial,
@@ -140,9 +142,9 @@ reduced <- glm(adverse_event ~ biomarker, data = clinical_trial,
 models <- list(Full = gfit, `Biomarker only` = reduced)
 ```
 
-Because an ROC curve hugs the top-left, the bottom-right corner is always free,
-so `legend_inside = TRUE` tucks the per-model legend there and reclaims the
-right-hand margin:
+An ROC curve rises towards the top-left corner, so its bottom-right corner is
+always empty. `legend_inside = TRUE` puts the per-model legend in that corner,
+and the figure then needs no right-hand margin.
 
 ```{r, fig.width = 5, fig.height = 5}
 roc_curve_plot(models, youden = TRUE, legend_inside = TRUE)
@@ -154,7 +156,7 @@ pr_curve_plot(models, f1 = TRUE)
 
 For ranking and targeting tasks, the cumulative gains and lift charts show how
 many positive cases are captured as more of the score-ordered population is
-targeted, again overlaying both models:
+targeted. Both charts again overlay the two models.
 
 ```{r, fig.width = 5, fig.height = 5}
 gain_plot(models, legend_inside = TRUE)
@@ -166,10 +168,10 @@ lift_plot(models, legend_inside = TRUE)
 
 ### Choosing an operating point
 
-`threshold_plot()` sweeps the decision threshold across the full range of scores
-and plots each metric as it trades off, marking the Youden threshold with a
-dashed line and the maximum-F1 threshold with a dotted one. It is the natural
-companion to the ROC and PR curves for actually *choosing* a cut-off.
+For choosing a threshold, `threshold_plot()` complements the ROC and PR curves.
+It sweeps the decision threshold across the range of scores and plots how each
+metric trades off against the others. A dashed line marks the Youden threshold
+and a dotted line the maximum-F1 threshold.
 
 ```{r}
 tp <- threshold_plot(gfit, title = "Metrics across the decision threshold")
@@ -181,15 +183,15 @@ attr(tp, "thresholds")   # the Youden and max-F1 thresholds
 
 `calibration_plot()` checks whether predicted probabilities match observed
 frequencies. Each bin's observed rate carries a Wilson binomial confidence
-interval, so bins backed by few observations (common in the sparse upper tail
-when the outcome is rare) are not over-interpreted.
+interval, so bins backed by few observations are not over-interpreted. Such
+bins are common in the sparse upper tail when the outcome is rare.
 
 ```{r, fig.width = 5, fig.height = 5}
 calibration_plot(gfit, bins = 6)
 ```
 
-A confusion-matrix heatmap completes the picture. Passing `threshold = "youden"`
-reuses the same operating point the ROC curve marks, so the two agree:
+For the confusion-matrix heatmap, `threshold = "youden"` reuses the operating
+point that the ROC curve marks.
 
 ```{r, fig.width = 5, fig.height = 4.5}
 confusion_matrix_plot(gfit, threshold = "youden", normalise = "row")
@@ -197,9 +199,9 @@ confusion_matrix_plot(gfit, threshold = "youden", normalise = "row")
 
 ## Uncertainty
 
-`posterior_plot()` summarises draws (posterior, bootstrap, simulation) as a
-distribution per parameter. Here are the posterior draws from a Bayesian fit of
-the lexical-decision model, shown as point-and-interval forests.
+`posterior_plot()` summarises posterior, bootstrap or simulation draws as a
+distribution per parameter. The example shows the posterior draws from a
+Bayesian fit of the lexical-decision model as point-and-interval forests.
 
 ```{r}
 draws <- readRDS(
@@ -217,9 +219,9 @@ posterior_plot(draws[c("conditionunrelated", "modalityauditory",
 
 `power_curve_plot()` reads a `simr::powerCurve()` object or a tidy data frame, so
 a slow power simulation does not have to be re-run to redraw it. The package
-ships a `powerCurve` object produced by a `simr` analysis of the lexical-decision
-design, which simulated power for the word-frequency slope as the number of
-participants grows. We read it straight from disk.
+includes a `powerCurve` object produced by a `simr` analysis of the
+lexical-decision design, which simulated power for the word-frequency slope as
+the number of participants grows. We read it from disk.
 
 ```{r, eval = has_simr}
 pc <- readRDS(
@@ -261,10 +263,10 @@ panel <- arrange_plots(
 panel
 ```
 
-`save_plot()` writes it out at a print-ready 300 dpi by default, creating any
-missing directories along the way. A PDF or EPS embeds its fonts and a TIFF is
-LZW-compressed, as journals ask of submitted figures, and the help page,
-`?save_plot`, lists the formats PLOS, Nature and Elsevier accept.
+`save_plot()` writes it at a print-ready 300 dpi by default and creates any
+missing directories. A PDF or EPS embeds its fonts and a TIFF is
+LZW-compressed, as journals ask of submitted figures. The help page,
+`?save_plot`, lists the formats that PLOS, Nature and Elsevier accept.
 
 ```{r, eval = FALSE}
 save_plot("figures/diagnostics.png", panel, width = 7, height = 3.2, dpi = 300)

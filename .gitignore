@@ -17,6 +17,12 @@ Rplots.pdf
 # Claude Code worktrees / local settings
 .claude/
 
+# revdepcheck::revdep_check() output, if reverse dependencies ever need checking
+/revdep/
+
+# written by devtools::submit_cran() and removed by hand once CRAN has published
+/CRAN-SUBMISSION
+
 # OS cruft
 .DS_Store
 Thumbs.db

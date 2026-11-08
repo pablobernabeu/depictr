@@ -1,9 +1,10 @@
 <!-- Thank you for contributing to depictr. -->
 
-**What does this change do?**
+### What does this change do?
+
 A short description, and a link to the issue it addresses if there is one.
 
-**Checklist**
+### Checklist
 
 - [ ] `devtools::document()` has been run if the roxygen comments changed.
 - [ ] `devtools::test()` passes, and new behaviour has tests.
