@@ -18,19 +18,22 @@ parts: 'Changed results', 'Changed interface' and 'Changed output'.
 
 ## Test environments
 
-GitHub Actions, run 41310413560 on 2026-11-01, at commit 49a56c1 on the main
-branch. That commit differs from this submission only in the version number and
-the first heading of NEWS.md. Each leg built the tarball with
+GitHub Actions, run 42427786440 on 2026-11-08, started by pull request #26 at
+commit ac1ab8e on the release branch. The package sources of this submission
+are those of that commit. Because a pull request started the run, each job
+checked out GitHub's merge of that commit into main (f18af53), which differs
+from ac1ab8e only in one line of a workflow file under .github, a directory
+that .Rbuildignore keeps out of the tarball. Each leg built the tarball with
 `--compact-vignettes=gs+qpdf` and ran `R CMD check --as-cran --no-manual` on
 it, without the CRAN incoming checks, which r-lib/actions turns off. Each leg
 ended with 'Status: OK':
 
 * ubuntu-latest (Ubuntu 24.04.5 LTS), R 4.6.2
-* ubuntu-latest (Ubuntu 24.04.5 LTS), R-devel (2026-10-31 r90820)
+* ubuntu-latest (Ubuntu 24.04.5 LTS), R-devel (2026-11-06 r90845)
 * ubuntu-latest (Ubuntu 24.04.5 LTS), R 4.5.3
 * windows-latest (x86_64-w64-mingw32), R 4.6.2
-* windows-latest (x86_64-w64-mingw32), R-devel (2026-10-31 r90820)
-* macos-latest (macOS 26.6.2, aarch64-apple-darwin23), R 4.6.2
+* windows-latest (x86_64-w64-mingw32), R-devel (2026-11-06 r90845 ucrt)
+* macos-latest (macOS Tahoe 26.7.2, aarch64-apple-darwin23), R 4.6.2
 
 The test suite passed in every leg, with no failures or warnings. Four tests
 skip everywhere because they read repository files that R CMD check cannot
@@ -59,9 +62,8 @@ passed and every example ran without a warning.
   testthat and withr run the tests, and knitr and rmarkdown build the
   vignettes.
 * Example variants that draw several multi-panel figures are wrapped in
-  `\donttest{}`. In the runs above, R CMD check timed one example at more than
-  five seconds: save_plot() on Windows with R-devel, at 6.5 seconds elapsed and
-  1.0 second of CPU time.
+  `\donttest{}`. In the run above, R CMD check timed no example at more than
+  five seconds in any leg.
 * The five bundled datasets are reproducibly simulated and contain no personal
   or proprietary data.
 
