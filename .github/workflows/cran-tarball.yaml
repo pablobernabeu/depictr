@@ -52,9 +52,9 @@ jobs:
       - uses: r-lib/actions/setup-tinytex@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
 
       # ghostscript and qpdf compact PDFs in the build and check their size.
-      # tidy validates the HTML manual and aspell spells the Description field,
-      # as CRAN's incoming checks do. Without them the check skips those steps
-      # with a NOTE.
+      # tidy validates the HTML manual, which the check otherwise skips with a
+      # NOTE. aspell spells the Description field, as CRAN's incoming checks
+      # do.
       - name: Install the system tools that CRAN's checks use
         run: |
           sudo apt-get update
@@ -99,8 +99,9 @@ jobs:
       # Status line instead, after the summary and the logs are written.
       # R_CRAN_WEB and R_CRAN_SRC point the incoming checks (the CRAN version
       # comparison among them) at a CRAN mirror rather than at the binary
-      # repository that setup-r configures. setup-r's _R_CHECK_SYSTEM_CLOCK_=FALSE
-      # stays, since the clock check tests the runner, not the package.
+      # repository that setup-r configures. The _R_CHECK_SYSTEM_CLOCK_=FALSE
+      # that setup-r sets stays, since the clock check tests the runner, not
+      # the package.
       - name: Check the tarball as CRAN's incoming checks do
         id: check
         shell: bash
