@@ -71,10 +71,14 @@ jobs:
 
       # The same build as `devtools::build(args = '--compact-vignettes=gs+qpdf',
       # manual = TRUE)`, made outside the source tree so that it stays clean.
+      # setup-r sets NOT_CRAN=true for the steps after it. CRAN leaves it
+      # unset, so the build and the check unset it, and the tests that skip on
+      # CRAN skip here too.
       - name: Build the tarball
         id: build
         shell: bash
         run: |
+          unset NOT_CRAN
           pkg=$(Rscript -e 'cat(read.dcf(file.path(Sys.getenv("PKG_DIR"), "DESCRIPTION"), "Package"))')
           version=$(Rscript -e 'cat(read.dcf(file.path(Sys.getenv("PKG_DIR"), "DESCRIPTION"), "Version"))')
           tarball="${pkg}_${version}.tar.gz"
@@ -95,7 +99,8 @@ jobs:
       # Status line instead, after the summary and the logs are written.
       # R_CRAN_WEB and R_CRAN_SRC point the incoming checks (the CRAN version
       # comparison among them) at a CRAN mirror rather than at the binary
-      # repository that setup-r configures.
+      # repository that setup-r configures. setup-r's _R_CHECK_SYSTEM_CLOCK_=FALSE
+      # stays, since the clock check tests the runner, not the package.
       - name: Check the tarball as CRAN's incoming checks do
         id: check
         shell: bash
@@ -107,6 +112,7 @@ jobs:
           PKG: ${{ steps.build.outputs.pkg }}
           TARBALL: ${{ steps.build.outputs.tarball }}
         run: |
+          unset NOT_CRAN
           cd "$RUNNER_TEMP/cran"
           R CMD check --as-cran "$TARBALL" || true
           log="$PKG.Rcheck/00check.log"
@@ -126,7 +132,7 @@ jobs:
           out="$RUNNER_TEMP/cran"
           R CMD INSTALL "$out/$TARBALL" > "$out/install.log" 2>&1 || cat "$out/install.log"
           cd "$GITHUB_WORKSPACE/$PKG_DIR"
-          Rscript -e 'print(urlchecker::url_check("."))' > "$out/url-check.txt" 2>&1 \
+          Rscript -e 'print(urlchecker::url_check(".", progress = FALSE))' > "$out/url-check.txt" 2>&1 \
             || echo "url_check() failed." >> "$out/url-check.txt"
           cat "$out/url-check.txt"
           Rscript -e "print(tools::package_dependencies('$PKG', db = available.packages(repos = 'https://cloud.r-project.org'), reverse = TRUE, which = 'all'))" \
