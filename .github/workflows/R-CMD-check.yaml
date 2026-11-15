@@ -46,7 +46,7 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - uses: r-lib/actions/setup-pandoc@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
 
@@ -66,17 +66,104 @@ jobs:
           upload-snapshots: true
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
 
+      # CRAN's r-devel-linux-x86_64-debian-clang flavour runs its checks in a
+      # Latin-9 locale (en_US.iso885915), and every leg above runs in UTF-8.
+      # There a string not marked as UTF-8 is read as Latin-9, which no UTF-8
+      # leg can show, so the Linux R-devel leg runs the tests once more in that
+      # locale, with NOT_CRAN unset, as CRAN runs them. The first line of the R
+      # code stops the step if the locale did not take.
+      - name: Tests in a Latin-9 locale, as on CRAN's Debian clang flavour
+        if: runner.os == 'Linux' && matrix.config.r == 'devel'
+        shell: bash
+        run: |
+          sudo localedef -i en_US -f ISO-8859-15 en_US.iso885915
+          env -u NOT_CRAN LANG=en_US.iso885915 LC_ALL=en_US.iso885915 Rscript -e '
+            stopifnot(identical(l10n_info()$codeset, "ISO-8859-15"))
+            pkgload::load_all(".", quiet = TRUE)
+            invisible(testthat::test_dir("tests/testthat", stop_on_failure = TRUE))
+          '
+
+  # Checks the package with only its strong dependencies on the library path,
+  # as CRAN's noSuggests check does, so that nothing in R/, the examples or the
+  # tests relies on a package in Suggests without a guard. Examples that use a
+  # suggested package guard it with @examplesIf or requireNamespace(), and
+  # tests with skip_if_not_installed(). The vignettes are built in full by
+  # R CMD build, which sees every package, and are not run again in the check,
+  # since knitr and rmarkdown are in Suggests. The matrix above checks them.
+  depends-only:
+    runs-on: ubuntu-latest
+
+    name: Strong dependencies only (_R_CHECK_DEPENDS_ONLY_)
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      _R_CHECK_DEPENDS_ONLY_: true
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - uses: r-lib/actions/setup-pandoc@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
+
+      - uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - uses: r-lib/actions/check-r-package@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
+        with:
+          args: 'c("--no-manual", "--as-cran", "--no-vignettes")'
+          build_args: 'c("--no-manual")'
+
+  # DESCRIPTION declares `R (>= 4.1.0)`, and the oldest R anywhere else in this
+  # workflow is oldrel-3, so this job runs the test suite on R 4.1 itself. It
+  # is not a second `--as-cran` check: it tests that the code runs on the
+  # oldest R the package promises, not that the package passes CRAN's checks
+  # on an R that CRAN no longer checks. Only the strong dependencies are
+  # installed, since Suggests are not part of that promise, and the tests that
+  # need a suggested package skip themselves, as the depends-only job shows.
+  r-minimum:
+    runs-on: ubuntu-latest
+
+    name: R (declared minimum, 4.1)
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
+        with:
+          r-version: '4.1'
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
+        with:
+          dependencies: '"hard"'
+          extra-packages: any::testthat, any::pkgload
+
+      - name: Tests
+        shell: Rscript {0}
+        run: |
+          cat(R.version.string, "\n")
+          pkgload::load_all(".", quiet = TRUE)
+          res <- testthat::test_dir("tests/testthat", stop_on_failure = TRUE)
+          invisible(res)
+
   # The version floors in DESCRIPTION are a promise to anyone resolving against
   # an older stack, and nothing tested them: setup-r-dependencies always
   # resolves the newest CRAN versions, so the matrix above only ever exercises
   # the ceiling. This job installs the declared minima and runs the suite
   # against them. A failure here means a floor needs raising to what actually
-  # works, not that the job is too strict -- that is how the patchwork floor
-  # was found to be a release too low.
+  # works, not that the job is too strict. That is how the patchwork floor was
+  # found to be a release too low.
   #
-  # Note that this pins the packages, not R. r-lib/actions does not reach back
-  # to the declared R 4.1.0 floor, so oldrel-3 is the oldest R exercised
-  # anywhere here and the R floor itself remains an untested claim.
+  # This job pins the packages, not R. It runs on oldrel-3, and the r-minimum
+  # job above runs the tests on R 4.1, the floor that DESCRIPTION declares.
   minimum-versions:
     runs-on: ubuntu-latest
 
@@ -98,7 +185,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
         with:
@@ -112,8 +199,8 @@ jobs:
       # declares Depends: Rcpp and names no R version at all. pak therefore
       # offers it to the R pinned below, where it fails to compile and takes the
       # whole job down before a line of depictr runs. 4.2.0 is the last release
-      # before Deriv gained compiled code at all -- NeedsCompilation: no, pure R
-      # over methods -- so it cannot fail this way on any R. Drop the pin once
+      # before Deriv gained compiled code (NeedsCompilation: no, pure R over
+      # methods), so it cannot fail this way on any R. Drop the pin once
       # Deriv declares its R requirement, or once oldrel-3 has reached R 4.5.
       - uses: r-lib/actions/setup-r-dependencies@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
         with:
@@ -151,22 +238,26 @@ jobs:
   # An @export that never reaches NAMESPACE is invisible to the test suite:
   # testthat runs inside the package namespace, where unexported internals are
   # reachable too, so a dropped export passes every test and surfaces only once
-  # a user calls the function. This job regenerates NAMESPACE from the roxygen
-  # comments and fails when the committed copy differs.
+  # a user calls the function. A help page in man/ that no longer matches its
+  # roxygen comment is invisible to every check, and it is what CRAN
+  # publishes. This job regenerates NAMESPACE and man/ from the roxygen
+  # comments and fails when the committed files differ, printing the
+  # difference to the log.
   #
-  # NAMESPACE alone is gated. man/*.Rd is the obvious companion and is left out
-  # deliberately: Rd formatting churns between roxygen2 releases, so gating it
-  # would redden the job on upgrades that changed nothing about the package.
+  # Rd formatting changes between roxygen2 releases, so roxygen2 is pinned
+  # below and the job fails when DESCRIPTION records another version. A
+  # roxygen2 release therefore cannot turn this job red with no change to the
+  # sources.
   namespace-check:
     runs-on: ubuntu-latest
 
-    name: NAMESPACE matches the roxygen tags
+    name: NAMESPACE and man/ match the roxygen comments
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
         with:
@@ -198,7 +289,7 @@ jobs:
               stop(
                 "roxygen2 ", installed, " is installed but DESCRIPTION records ", recorded,
                 ". A diff from this job would then reflect the roxygen2 version difference ",
-                "rather than a stale NAMESPACE. Update whichever of the two is behind: the ",
+                "rather than a stale NAMESPACE or man/. Update whichever of the two is behind: the ",
                 "pin in this workflow, or DESCRIPTION by running devtools::document().",
                 call. = FALSE
               )
@@ -209,8 +300,13 @@ jobs:
       # and says nothing when it does not. Without this check a header lost in
       # an edit would leave the job green over a file nothing regenerates, which
       # is the failure it exists to catch.
-      - name: Regenerate NAMESPACE from the roxygen comments
+      - name: Regenerate NAMESPACE and man/ from the roxygen comments
         shell: Rscript {0}
+        # A default argument that holds a non-ASCII character is written
+        # differently outside a UTF-8 locale, so the help is regenerated in one.
+        env:
+          LANG: C.UTF-8
+          LC_ALL: C.UTF-8
         run: |
           header <- readLines("NAMESPACE", n = 1L, warn = FALSE)
           if (!any(grepl("Generated by roxygen2", header, fixed = TRUE))) {
@@ -221,15 +317,22 @@ jobs:
               call. = FALSE
             )
           }
-          roxygen2::roxygenise(".", roclets = "namespace")
+          roxygen2::roxygenise(".", roclets = c("namespace", "rd"))
 
-      - name: Fail if NAMESPACE drifted
+      # git diff leaves out new files, so a help page that roxygenise() newly
+      # writes is listed and printed in full as well.
+      - name: Fail if NAMESPACE or man/ drifted
         run: |
-          if ! git diff --exit-code -- NAMESPACE; then
+          changes=$(git status --porcelain --untracked-files=all -- NAMESPACE man)
+          if [ -n "$changes" ]; then
+            echo "$changes"
+            git --no-pager diff -- NAMESPACE man
+            git ls-files --others --exclude-standard -- man | while read -r f; do
+              echo "New file $f:"
+              cat "$f"
+            done
             echo
-            echo "NAMESPACE is out of date with the roxygen tags in R/."
-            echo "The diff above is what regenerating the file produced: the lines"
-            echo "marked + are what the committed NAMESPACE is missing."
-            echo "Fix it by running devtools::document() locally and committing NAMESPACE."
+            echo "::error::NAMESPACE or man/ is out of date with the roxygen comments in R/. The diff above is what roxygen2 would have written. Run devtools::document() and commit NAMESPACE and man/."
             exit 1
           fi
+          echo "NAMESPACE and man/ match the roxygen comments in R/."

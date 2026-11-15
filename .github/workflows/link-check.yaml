@@ -30,7 +30,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - uses: r-lib/actions/setup-pandoc@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
 
@@ -40,10 +40,15 @@ jobs:
 
       # Install urlchecker and the package itself: urlchecker expands the Rdpack
       # \insertRef macros in the help pages, which needs depictr (and its bundled
-      # inst/REFERENCES.bib) on the library path.
+      # inst/REFERENCES.bib) on the library path. urlchecker is pinned to 2.0.0,
+      # because the next step relies on how that release stops on a failing URL
+      # (the 'Found N invalid URL(s).' error and its 'urlchecker_db' table). A
+      # new release could change either and fail every scheduled run, so raise
+      # the pin only after running the step on the new release with the 'url'
+      # input.
       - uses: r-lib/actions/setup-r-dependencies@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
         with:
-          extra-packages: any::urlchecker, local::.
+          extra-packages: urlchecker@2.0.0, local::.
           needs: check
 
       # GitHub's runners sometimes cannot reach a host at all: each failing run

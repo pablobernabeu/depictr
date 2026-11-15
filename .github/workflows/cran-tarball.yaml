@@ -36,7 +36,7 @@ jobs:
       PKG_DIR: .
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
@@ -192,7 +192,7 @@ jobs:
 
       - name: Upload the check logs
         if: always() && steps.build.outcome == 'success'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
           name: ${{ steps.build.outputs.pkg }}_${{ steps.build.outputs.version }}-check-logs
           path: |
@@ -212,7 +212,7 @@ jobs:
 
       # Only a tarball whose check gave no ERROR or WARNING is uploaded.
       - name: Upload the tarball
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
           name: ${{ steps.build.outputs.pkg }}_${{ steps.build.outputs.version }}-tarball
           path: ${{ runner.temp }}/cran/${{ steps.build.outputs.tarball }}
