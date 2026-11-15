@@ -13,6 +13,8 @@ destination and each broken one to a working equivalent.
 
 A URL that gives no answer at all, by a timeout or a connection error, does not
 fail the run: the workflow asks for it three more times and then reports it as a
-warning. An HTTP error can still be transient, so re-run the `link-check`
-workflow to confirm before changing anything. This issue receives a comment on
-each subsequent failure and can be closed once the link check passes again.
+warning. A host name that still does not resolve after those three tries fails
+the run, as CRAN reports it. An HTTP error can still be transient, so re-run the
+`link-check` workflow to confirm before changing anything. This issue receives a
+comment on each subsequent failure and can be closed once the link check passes
+again.
