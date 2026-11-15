@@ -4,12 +4,20 @@
 # package sources (DESCRIPTION, README, help pages and vignettes) on a weekly
 # cadence (and on demand). On failure it opens, or comments on, a single issue
 # so a broken or redirecting link can be fixed before it becomes a CRAN problem.
+# A URL that the runner cannot reach at all, by a timeout or a connection
+# error, is asked again and, if it still gives no answer, reported as a
+# warning, which neither fails the run nor touches the issue.
 name: link-check
 
 on:
   schedule:
     - cron: "0 5 * * 1"   # Mondays at 05:00 UTC
   workflow_dispatch:
+    inputs:
+      url:
+        description: "Check only this URL, to see how the job reports it. No issue is opened or updated."
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -22,7 +30,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - uses: r-lib/actions/setup-pandoc@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
 
@@ -32,29 +40,209 @@ jobs:
 
       # Install urlchecker and the package itself: urlchecker expands the Rdpack
       # \insertRef macros in the help pages, which needs depictr (and its bundled
-      # inst/REFERENCES.bib) on the library path.
+      # inst/REFERENCES.bib) on the library path. urlchecker is pinned to 2.0.0,
+      # because the next step relies on how that release stops on a failing URL
+      # (the 'Found N invalid URL(s).' error and its 'urlchecker_db' table). A
+      # new release could change either and fail every scheduled run, so raise
+      # the pin only after running the step on the new release with the 'url'
+      # input.
       - uses: r-lib/actions/setup-r-dependencies@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
         with:
-          extra-packages: any::urlchecker, local::.
+          extra-packages: urlchecker@2.0.0, local::.
           needs: check
 
+      # GitHub's runners sometimes cannot reach a host at all: each failing run
+      # from 26 October to 9 November 2026 timed out reaching CRAN.R-project.org
+      # (issue #23). Such a failure says nothing about the link, so a URL that
+      # got no HTTP answer, by a timeout or a connection error, is asked again
+      # three times, 15 seconds apart. If it answers, the answer is judged as
+      # urlchecker judges one: an HTTP error, a 301 to a new address or a
+      # certificate error fails the run. If it never answers, the run reports
+      # it as a warning and passes. A host name that does not resolve is asked
+      # again in the same way, but fails the run if it never resolves, since
+      # CRAN reports such a URL. An HTTP error (404, 410, 500 and so on), a
+      # moved URL, a certificate error or a CRAN URL not in canonical form
+      # found by urlchecker fails the run as before.
       - name: Check URLs with urlchecker
+        env:
+          TEST_URL: ${{ inputs.url }}
         run: |
-          problems <- urlchecker::url_check(".")
-          print(problems)
-          if (nrow(problems) > 0) {
-            stop(sprintf("urlchecker found %d problem URL(s).", nrow(problems)))
+          # A run started by hand with the 'url' input checks that URL alone.
+          # urlchecker reads the file that holds a failing URL to show the
+          # line, so the URL is written to url-input.txt.
+          test_url <- Sys.getenv("TEST_URL")
+          db <- NULL
+          if (nzchar(test_url)) {
+            writeLines(test_url, "url-input.txt")
+            db <- data.frame(URL = test_url, Parent = "url-input.txt")
           }
-          cat("All URLs OK.\n")
+
+          # url_check() gives a table of the URLs that failed. When a URL
+          # fails, urlchecker 2.0.0 prints the table from inside url_check()
+          # and then stops R with 'Found 1 invalid URL.' (run 42625847774).
+          # For that error alone, the calling handler takes the finished
+          # table, of class 'urlchecker_db', from the call stack, where it
+          # still is when the error is signalled. Any other error, such as one
+          # raised while urlchecker is still fetching the URLs and holds only
+          # an empty or partial table, fails the step.
+          on_stack <- function() {
+            for (frame in rev(sys.frames())) {
+              for (name in ls(frame, all.names = TRUE)) {
+                value <- tryCatch(get(name, envir = frame, inherits = FALSE),
+                                  error = function(e) NULL)
+                if (inherits(value, "urlchecker_db") && NROW(value) > 0) return(value)
+              }
+            }
+            NULL
+          }
+          found <- NULL
+          res <- tryCatch(
+            withCallingHandlers(
+              urlchecker::url_check(".", db = db, progress = FALSE),
+              error = function(e) {
+                if (is.null(found) && grepl("Found [0-9]+ invalid URLs?", conditionMessage(e))) {
+                  found <<- on_stack()
+                }
+              }
+            ),
+            error = function(e) if (is.null(found)) stop(e) else found
+          )
+          column <- function(name) {
+            if (name %in% names(res)) as.character(res[[name]]) else rep("", nrow(res))
+          }
+          status <- column("Status")
+          reason <- column("Message")
+          new <- column("New")
+          cran <- column("CRAN")
+          spaces <- column("Spaces")
+          http_r <- column("R")
+          from <- vapply(res$From, function(f) paste(f, collapse = ", "), "")
+
+          # urlchecker gives the status 'Error' when curl got no HTTP answer.
+          # These messages mean that the runner did not reach the host. A
+          # certificate error is not among them, since CRAN reports it. A host
+          # name that does not resolve ('dns') is asked again too, but it
+          # fails the run if it still does not resolve.
+          dns <- "resolve host"
+          network <- paste(
+            "Timeout was reached", "timed out", dns, "Couldn't resolve",
+            "Couldn't connect", "Failed to connect", "Connection refused",
+            "Connection reset", "Recv failure", "Send failure", "receiving data",
+            "sending data", "Empty reply", "returned nothing", "HTTP/2 stream",
+            sep = "|"
+          )
+          flagged <- nzchar(new) | nzchar(cran) | nzchar(spaces) | nzchar(http_r)
+          unreached <- status == "Error" & !flagged & grepl(network, reason, ignore.case = TRUE)
+
+          # Asks as R CMD check does: HEAD, following redirects, then GET if
+          # HEAD gets no 200, and a DOI through the doi.org handle API. As in
+          # urlchecker's 'New' column, a first answer of 301 whose Location is
+          # an absolute address means that the URL has moved. Gives a list of
+          # the HTTP status and the new address, or curl's message if there
+          # was no answer.
+          probe <- function(url) {
+            target <- sub("^https?://(dx[.])?doi[.]org/(10[.][^?#]*)$",
+                          "https://doi.org/api/handles/\\2", url)
+            ask <- function(head) {
+              h <- curl::new_handle(nobody = head, followlocation = TRUE,
+                                    connecttimeout = 20, timeout = 60)
+              if (grepl("^https?://github[.]com", target) && nzchar(Sys.getenv("GITHUB_PAT"))) {
+                curl::handle_setheaders(h, Authorization = paste("token", Sys.getenv("GITHUB_PAT")))
+              }
+              tryCatch(curl::curl_fetch_memory(target, handle = h),
+                       error = function(e) trimws(gsub("[\r\n]+", " ", conditionMessage(e))))
+            }
+            first <- ask(TRUE)
+            if (is.character(first)) return(first)
+            moved <- ""
+            chain <- curl::parse_headers(first$headers, multiple = TRUE)
+            codes <- vapply(chain, function(r) sub("^HTTP/[^ ]+ ([0-9]+).*$", "\\1", r[1]), "")
+            if (codes[1] == "301") {
+              last <- max(which(cumprod(codes == "301") == 1))
+              loc <- grep("^[Ll]ocation:", chain[[last]], value = TRUE)[1]
+              loc <- sub("^[Ll]ocation: *", "", loc)
+              if (!is.na(loc) && grepl("^[A-Za-z][A-Za-z0-9+.-]*:", loc)) {
+                fragment <- sub("^[^#]*", "", url)
+                moved <- if (nzchar(fragment) && !grepl("#", loc)) paste0(loc, fragment) else loc
+              }
+            }
+            status <- first$status_code
+            if (status != 200) {
+              again <- ask(FALSE)
+              if (is.list(again) && again$status_code == 200) status <- 200
+            }
+            list(status = status, moved = moved)
+          }
+
+          # Only a URL whose answer is again a network failure is asked again.
+          is_network <- function(a) is.character(a) && grepl(network, a, ignore.case = TRUE)
+          answers <- vector("list", nrow(res))
+          pending <- which(unreached)
+          for (attempt in 1:3) {
+            if (length(pending) == 0) break
+            Sys.sleep(15)
+            for (i in pending) answers[[i]] <- probe(res$URL[i])
+            pending <- pending[vapply(answers[pending], is_network, NA)]
+          }
+          passed <- rep(FALSE, nrow(res))
+          for (i in which(unreached)) {
+            a <- answers[[i]]
+            if (is.list(a)) {
+              unreached[i] <- FALSE
+              status[i] <- as.character(a$status)
+              reason[i] <- "HTTP status when asked again"
+              new[i] <- a$moved
+              passed[i] <- a$status %in% c(200, 405) && !nzchar(a$moved)
+            } else {
+              reason[i] <- a
+              # A certificate error or a host name that does not resolve
+              # fails, as it does in CRAN's check.
+              if (!is_network(a) || grepl(dns, a, ignore.case = TRUE)) unreached[i] <- FALSE
+            }
+          }
+          broken <- !unreached & !passed
+
+          # GitHub shows a line that starts with '::warning' or '::error' as an
+          # annotation of the run. '%', CR and LF in its text are escaped.
+          annotate <- function(level, title, text) {
+            text <- gsub("%", "%25", text, fixed = TRUE)
+            text <- gsub("\r", "%0D", text, fixed = TRUE)
+            text <- gsub("\n", "%0A", text, fixed = TRUE)
+            cat(sprintf("::%s title=%s::%s\n", level, title, text))
+          }
+          for (i in which(passed)) {
+            cat(sprintf("%s (in %s) answered when asked again.\n", res$URL[i], from[i]))
+          }
+          for (i in which(unreached)) {
+            annotate("warning", "URL not reached", sprintf(
+              "%s (in %s) gave no answer, also when asked three more times: %s",
+              res$URL[i], from[i], reason[i]))
+          }
+          what <- ifelse(nzchar(new), paste("moved to", new),
+                  ifelse(nzchar(cran), "CRAN URL not in canonical form",
+                  ifelse(nzchar(spaces), "the URL contains spaces",
+                  ifelse(nzchar(http_r), "use https for r-project.org",
+                  ifelse(nzchar(status), paste0(status, ": ", reason), reason)))))
+          for (i in which(broken)) {
+            annotate("error", "Broken URL", sprintf("%s (in %s): %s", res$URL[i], from[i], what[i]))
+          }
+          if (any(broken)) {
+            stop(sprintf("urlchecker found %d broken or moved URL(s).", sum(broken)), call. = FALSE)
+          }
+          cat("No broken or moved URLs.\n")
+          if (any(unreached)) {
+            cat(sprintf("%d URL(s) gave no answer. See the warnings.\n", sum(unreached)))
+          }
         shell: Rscript {0}
 
       # The issue is raised with the gh CLI rather than a third-party action:
       # gh already ships on the runner and does the same job without adding an
       # unpinned dependency to the supply chain. The title and label are read
       # from the template's front matter, so the template file stays the single
-      # source of truth for the issue content.
+      # source of truth for the issue content. A run that checks the 'url' input
+      # leaves the issue alone.
       - name: Open or update an issue on failure
-        if: failure()
+        if: failure() && !inputs.url
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
