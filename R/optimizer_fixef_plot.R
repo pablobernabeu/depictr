@@ -203,7 +203,7 @@ allfit_to_long <- function(x) {
 #'
 #' Returns two rows per panel (a low and a high limit) suitable for feeding to
 #' [ggplot2::geom_blank()], so that each free y-axis spans at least a readable
-#' window. When optimisers agree to several decimals the natural spread is a
+#' window. When optimisers agree to several decimals, the natural spread is a
 #' handful of floating-point ULPs. Without a floor on the range, the axis zooms
 #' in until every break carries the same rounded label. The window is centred
 #' on the panel's values and sized to the larger of the observed spread and a

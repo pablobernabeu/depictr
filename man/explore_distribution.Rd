@@ -45,9 +45,9 @@ is set, so that overlapping bars stay readable, and \code{"identity"} otherwise.
 \item{palette}{Colours for the groups. Defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{facet}{When a \code{group} is given, whether to draw one panel per group in
-place of an overlay, which is much clearer once there are more than two or
-three groups, since overlaid histograms in particular become hard to read.
-Defaults to \code{FALSE}. Ignored when there is no \code{group}.}
+place of an overlay. Panels are much clearer once there are more than two
+or three groups, since overlaid histograms in particular become hard to
+read. Defaults to \code{FALSE}. Ignored when there is no \code{group}.}
 
 \item{legend_inside}{When \code{TRUE} and a \code{group} is given without \code{facet}, the
 colour legend is drawn inside the panel, over a translucent background, in

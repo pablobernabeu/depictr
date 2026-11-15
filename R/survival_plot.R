@@ -727,7 +727,7 @@ risk_break_default <- function(time) {
 #'
 #' The number at risk at time `t` is the count with follow-up time \eqn{>= t}
 #' (the standard convention used by [survival::summary.survfit()] with
-#' `times =`). When the raw follow-up times are available (`all_time`) they are
+#' `times =`). When the raw follow-up times are available (`all_time`), they are
 #' counted directly. For the survfit path, which keeps the risk set at every
 #' reported time, events and censorings alike (`risk_time`, `risk_n`), the
 #' at-risk count is the risk set of the first reported time at or after `t`,

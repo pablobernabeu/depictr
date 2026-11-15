@@ -128,8 +128,9 @@ halved. Text drawn inside the panel is measured by \code{annotation_text_size}.
 
 \code{text_contrast} is the WCAG 2.2 contrast ratio of the text that falls
 furthest short of its own threshold. Each text is measured against the
-background it is drawn on: a facet strip's fill for strip text, the legend
-box's fill for legend text, and the plot background for the rest. A
+background it is drawn on. Strip text is measured against the facet strip's
+fill, legend text against the legend box's fill and other text against the
+plot background. A
 translucent fill is measured as the colour it shows over what lies beneath
 it, and so is text drawn with an alpha. Text that is large at its printed
 size, 18 pt or 14 pt in bold, is held to 3:1, and other text to 4.5:1, as

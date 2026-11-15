@@ -36,7 +36,7 @@
 #'             data = lexical_decision, family = binomial)
 #' threshold_plot(gfit)
 #'
-#' #' # The trade-off between sensitivity and specificity only, without markers.
+#' # The trade-off between sensitivity and specificity only, without markers.
 #' threshold_plot(gfit, metrics = c("sensitivity", "specificity"),
 #'                mark = NULL)
 threshold_plot <- function(x, score = NULL,

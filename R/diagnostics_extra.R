@@ -143,7 +143,7 @@ qq_plot <- function(x, colour = depictr_brand(), title = NULL,
 
 #' Confidence band for a normal Q-Q plot
 #'
-#' Returns a data frame of `theoretical` quantiles with `lower`/`upper` band
+#' Returns a data frame of `theoretical` quantiles with `lower` and `upper` band
 #' limits, used by [qq_plot()]. The reference line is fitted robustly through the
 #' first and third theoretical and sample quartiles (matching
 #' [ggplot2::stat_qq_line()]).

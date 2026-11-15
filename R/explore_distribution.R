@@ -22,9 +22,9 @@
 #'   is set, so that overlapping bars stay readable, and `"identity"` otherwise.
 #' @param palette Colours for the groups. Defaults to [depictr_palette()].
 #' @param facet When a `group` is given, whether to draw one panel per group in
-#'   place of an overlay, which is much clearer once there are more than two or
-#'   three groups, since overlaid histograms in particular become hard to read.
-#'   Defaults to `FALSE`. Ignored when there is no `group`.
+#'   place of an overlay. Panels are much clearer once there are more than two
+#'   or three groups, since overlaid histograms in particular become hard to
+#'   read. Defaults to `FALSE`. Ignored when there is no `group`.
 #' @param legend_inside When `TRUE` and a `group` is given without `facet`, the
 #'   colour legend is drawn inside the panel, over a translucent background, in
 #'   the top-right corner, which a unimodal histogram or density leaves empty.

@@ -15,8 +15,9 @@ random_effects_plot(
 }
 \arguments{
 \item{x}{Either a mixed model fitted with 'lme4' (\code{merMod}), or a data frame
-with one row per group level and columns such as \code{level} or \code{group},
-\code{estimate}, and either \code{conf.low} and \code{conf.high} or \code{std.error}. An
+with one row per group level and columns such as \code{level} or \code{group} for
+the level, \code{estimate} for the estimate and either \code{conf.low} and
+\code{conf.high} or \code{std.error} for the interval. An
 optional \code{term} column facets the plot. A model may have several grouping
 factors and several terms per factor, correlated or not. The forms
 \code{(1 + x | g)}, \code{(1 + x || g)} and \code{(1 | g) + (0 + x | g)} are all drawn.

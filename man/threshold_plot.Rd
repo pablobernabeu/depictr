@@ -54,7 +54,7 @@ gfit <- glm(accuracy ~ word_frequency + RT + condition,
             data = lexical_decision, family = binomial)
 threshold_plot(gfit)
 
-#' # The trade-off between sensitivity and specificity only, without markers.
+# The trade-off between sensitivity and specificity only, without markers.
 threshold_plot(gfit, metrics = c("sensitivity", "specificity"),
                mark = NULL)
 }

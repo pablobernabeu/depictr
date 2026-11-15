@@ -39,11 +39,12 @@ single number strictly between 0 and 1.}
 an unnamed \code{labels} vector takes the frequentist terms first, then any
 that only the Bayesian input holds. \code{intercept} defaults to \code{TRUE} here.}
 
-\item{facet, scales}{Layout controls. Because a model often has a large
-intercept beside small slopes, the comparison defaults to a faceted,
-free-scaled layout (\code{facet = TRUE}): each term gets its own panel and free
-x-axis, so every posterior and its frequentist overlay stay legible. Pass
-\code{facet = FALSE} (or \code{scales = "fixed"}) for a single shared axis.}
+\item{facet, scales}{Layout controls. Because a Bayesian model almost always
+has a large intercept beside small slopes, the comparison defaults to a
+faceted, free-scaled layout (\code{facet = TRUE}): each term gets its own panel
+and free x-axis, so every posterior and its frequentist overlay stay
+legible. Pass \code{facet = FALSE} (or \code{scales = "fixed"}) for a single shared
+axis.}
 
 \item{note_frequentist_no_prior}{If \code{TRUE}, append \code{"(no prior)"} to the
 frequentist legend label, which helps when the title names the Bayesian
@@ -77,9 +78,9 @@ with the frequentist point and confidence interval overlaid at the same
 position. When \code{bayesian} is only a table of posterior summaries, the
 function draws the familiar two-source forest plot through
 \code{\link[=compare_models]{compare_models()}}.
-It reads tidy columns (\code{term}, \code{estimate}, \code{conf.low}, \code{conf.high}), the
-\code{Estimate}, \code{Q2.5} and \code{Q97.5} of the matrix \code{brms::fixef()} returns, and the
-\verb{l-95\% CI} and \verb{u-95\% CI} of \code{summary(fit)$fixed}.
+It reads tidy columns (\code{term}, \code{estimate}, \code{conf.low}, \code{conf.high}). It also
+reads the \code{Estimate}, \code{Q2.5} and \code{Q97.5} of the matrix \code{brms::fixef()}
+returns and the \verb{l-95\% CI} and \verb{u-95\% CI} of \code{summary(fit)$fixed}.
 
 A data frame counts as draws when it holds a sampler index column (\code{.chain},
 \code{.iteration} or \code{.draw}), when it is long, with a parameter column

@@ -93,8 +93,9 @@
 #'
 #' `text_contrast` is the WCAG 2.2 contrast ratio of the text that falls
 #' furthest short of its own threshold. Each text is measured against the
-#' background it is drawn on: a facet strip's fill for strip text, the legend
-#' box's fill for legend text, and the plot background for the rest. A
+#' background it is drawn on. Strip text is measured against the facet strip's
+#' fill, legend text against the legend box's fill and other text against the
+#' plot background. A
 #' translucent fill is measured as the colour it shows over what lies beneath
 #' it, and so is text drawn with an alpha. Text that is large at its printed
 #' size, 18 pt or 14 pt in bold, is held to 3:1, and other text to 4.5:1, as
@@ -435,7 +436,7 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #'
 #' Written this way rather than as a literal `ggplot2::complete_theme` because
 #' the literal is a missing export against the declared ggplot2 floor, which
-#' `R CMD check` reports as such under "checking dependencies in R code". This
+#' `R CMD check` reports as such under 'checking dependencies in R code'. This
 #' reaches exports only, so it is not the `:::` that would also reach internals.
 #' @noRd
 .ggplot2_export <- function(name) {
@@ -732,13 +733,14 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' plot that maps nothing to it does not. The Python twin applies the same rule
 #' through plotnine's own `is_empty()`.
 #'
-#' @return A list with `sets`, the drawn colours of the colour and of the fill
-#'   aesthetic across all layers (each a data frame of `drawn` and `declared`,
-#'   sorted so that a tie between two equally close pairs resolves the same way
-#'   in both engines, and absent when nothing encodes by it), `marks`, one
-#'   drawn colour per encoded group for the geometry check, `redundant`, the
-#'   names of the non-colour channels that vary alongside them, and `abstain`,
-#'   the detail the colour rows give when nothing encodes.
+#' @return A list of four elements. `sets` holds the drawn colours of the
+#'   colour and of the fill aesthetic across all layers, each a data frame of
+#'   `drawn` and `declared`, sorted so that a tie between two equally close
+#'   pairs resolves the same way in both engines, and absent when nothing
+#'   encodes by it. `marks` holds one drawn colour per encoded group for the
+#'   geometry check. `redundant` names the non-colour channels that vary
+#'   alongside them. `abstain` is the detail the colour rows give when nothing
+#'   encodes.
 #' @noRd
 .figure_colour_encoding <- function(built, background) {
   continuous <- character(0)

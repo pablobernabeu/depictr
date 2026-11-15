@@ -20,8 +20,8 @@
 #'   blue. Ignored when several models are overlaid.
 #' @param legend_inside When `TRUE` and several models are overlaid, the legend
 #'   is drawn inside the panel, over a translucent background, in the
-#'   bottom-right triangle, which the concave curve leaves empty. Otherwise it
-#'   is drawn in a right-hand margin. Defaults to `FALSE`.
+#'   bottom-right triangle, which the concave curve leaves empty. Otherwise,
+#'   it is drawn in a right-hand margin. Defaults to `FALSE`.
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.

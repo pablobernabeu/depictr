@@ -372,7 +372,7 @@ sil_prepare <- function(data, clusters, cols, scale, distance) {
 #'
 #' Returns a data frame with columns `cluster`, `neighbor` and `sil_width`, one
 #' row per observation, plus an `avg_width` attribute. With fewer than two
-#' distinct clusters the result has zero rows.
+#' distinct clusters, the result has zero rows.
 #' @noRd
 silhouette_widths <- function(clusters, dist) {
   clusters <- as.integer(as.factor(clusters))
@@ -443,7 +443,7 @@ base_silhouette <- function(clusters, dist) {
 #'
 #' Connects the first and last (k, wss) points with a straight line and returns
 #' the k whose point is farthest from that chord, on either side, a common,
-#' parameter-free "elbow" heuristic (the Kneedle idea). Both endpoints lie on
+#' parameter-free 'elbow' heuristic (the Kneedle idea). Both endpoints lie on
 #' the chord, so with three or more candidates neither can be returned unless
 #' every point lies on the chord, when the first is.
 #' @noRd

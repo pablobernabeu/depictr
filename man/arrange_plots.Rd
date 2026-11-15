@@ -32,8 +32,8 @@ A 'patchwork' object.
 }
 \description{
 A wrapper around \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}} that adds the usual finishing
-touches: duplicate legends collected into one, an overall title and subtitle,
-and automatic panel tags (A, B, C and so on).
+touches: duplicate legends collected into one, automatic panel tags (A, B, C
+and so on) and an overall title and subtitle.
 }
 \examples{
 p1 <- explore_distribution(crop_yield, yield)

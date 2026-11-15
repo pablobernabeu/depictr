@@ -127,8 +127,8 @@ palette_preview <- function(n = 8, type = c("qualitative", "sequential",
 #' Compose several plots into one figure
 #'
 #' A wrapper around [patchwork::wrap_plots()] that adds the usual finishing
-#' touches: duplicate legends collected into one, an overall title and subtitle,
-#' and automatic panel tags (A, B, C and so on).
+#' touches: duplicate legends collected into one, automatic panel tags (A, B, C
+#' and so on) and an overall title and subtitle.
 #'
 #' @param ... Plots to combine, or a single list of plots.
 #' @param ncol,nrow Layout dimensions, passed to patchwork.

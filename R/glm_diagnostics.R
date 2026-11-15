@@ -117,7 +117,7 @@ binned_residual_plot <- function(model, bins = NULL,
 #' Hill, 2007). The standard error comes from the fitted model or from the
 #' residuals in the bin, as `band` says. Used by [binned_residual_plot()] and
 #' re-used by [residual_diagnostics_plot()].
-#' @param model A fitted `lm`/`glm`.
+#' @param model A fitted `lm` or `glm`.
 #' @param bins Number of bins, or `NULL` for the \eqn{\sqrt{n}} default.
 #' @param type Residual type, `"response"` or `"pearson"`.
 #' @param band `"model"` for the standard error the model implies, or
@@ -216,7 +216,7 @@ binned_residual_data <- function(model, bins = NULL,
 #' Computes randomised quantile residuals (Dunn & Smyth, 1996): the residual for
 #' observation \eqn{i} is \eqn{\Phi^{-1}(u_i)} where, for a continuous response,
 #' \eqn{u_i = F(y_i;\hat\theta_i)} is the fitted CDF at the observation, and for
-#' a discrete response \eqn{u_i} is drawn uniformly on
+#' a discrete response, \eqn{u_i} is drawn uniformly on
 #' \eqn{(F(y_i - 1), F(y_i)]}. For a correctly specified model these residuals
 #' are i.i.d. standard normal (equivalently, the \eqn{u_i} are uniform on
 #' \eqn{(0,1)}), regardless of the response distribution, which makes the normal

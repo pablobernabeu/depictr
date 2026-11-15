@@ -14,9 +14,9 @@
 #' position. When `bayesian` is only a table of posterior summaries, the
 #' function draws the familiar two-source forest plot through
 #' [compare_models()].
-#' It reads tidy columns (`term`, `estimate`, `conf.low`, `conf.high`), the
-#' `Estimate`, `Q2.5` and `Q97.5` of the matrix `brms::fixef()` returns, and the
-#' `l-95% CI` and `u-95% CI` of `summary(fit)$fixed`.
+#' It reads tidy columns (`term`, `estimate`, `conf.low`, `conf.high`). It also
+#' reads the `Estimate`, `Q2.5` and `Q97.5` of the matrix `brms::fixef()`
+#' returns and the `l-95% CI` and `u-95% CI` of `summary(fit)$fixed`.
 #'
 #' A data frame counts as draws when it holds a sampler index column (`.chain`,
 #' `.iteration` or `.draw`), when it is long, with a parameter column
@@ -56,11 +56,12 @@
 #' @param labels,interaction,intercept See [compare_models()]. On both paths,
 #'   an unnamed `labels` vector takes the frequentist terms first, then any
 #'   that only the Bayesian input holds. `intercept` defaults to `TRUE` here.
-#' @param facet,scales Layout controls. Because a model often has a large
-#'   intercept beside small slopes, the comparison defaults to a faceted,
-#'   free-scaled layout (`facet = TRUE`): each term gets its own panel and free
-#'   x-axis, so every posterior and its frequentist overlay stay legible. Pass
-#'   `facet = FALSE` (or `scales = "fixed"`) for a single shared axis.
+#' @param facet,scales Layout controls. Because a Bayesian model almost always
+#'   has a large intercept beside small slopes, the comparison defaults to a
+#'   faceted, free-scaled layout (`facet = TRUE`): each term gets its own panel
+#'   and free x-axis, so every posterior and its frequentist overlay stay
+#'   legible. Pass `facet = FALSE` (or `scales = "fixed"`) for a single shared
+#'   axis.
 #' @param note_frequentist_no_prior If `TRUE`, append `"(no prior)"` to the
 #'   frequentist legend label, which helps when the title names the Bayesian
 #'   prior.

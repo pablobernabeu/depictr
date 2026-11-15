@@ -108,7 +108,7 @@ m2 <- lm(yield ~ rainfall + fertiliser + soil_ph,
 compare_models(`All fields` = m1, `Standard only` = m2,
                        title = "Estimates by subset")
 
-#' # Keep the intercept legible beside the slopes:
+# Keep the intercept legible beside the slopes:
 compare_models(`All fields` = m1, `Standard only` = m2,
                intercept = TRUE, facet = TRUE)
 

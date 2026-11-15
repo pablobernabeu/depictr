@@ -508,7 +508,8 @@ ratio_label <- function(x) {
 #' re-introducing the very squish that faceting is meant to remove.
 #'
 #' @param p A ggplot whose data has a `label` column (term label) mapped to `y`
-#'   and `conf.low`/`conf.high` (or `outer_lo`/`outer_hi`) interval columns.
+#'   and the interval columns `conf.low` and `conf.high` (or `outer_lo` and
+#'   `outer_hi`).
 #' @param reference_line Position of the per-panel reference line (`NA` to omit).
 #' @param reference_colour Colour of the reference line. Defaults to the
 #'   package-wide `reference` option so a faceted panel matches the shared-axis
