@@ -120,11 +120,12 @@ jobs:
 
   # DESCRIPTION declares `R (>= 4.1.0)`, and the oldest R anywhere else in this
   # workflow is oldrel-3, so this job runs the test suite on R 4.1 itself. It
-  # is not a second `--as-cran` check: it tests that the code runs on the
-  # oldest R the package promises, not that the package passes CRAN's checks
-  # on an R that CRAN no longer checks. Only the strong dependencies are
-  # installed, since Suggests are not part of that promise, and the tests that
-  # need a suggested package skip themselves, as the depends-only job shows.
+  # tests that the code runs on the oldest R the package promises, and it does
+  # not repeat the `--as-cran` check on an R that CRAN no longer checks. Only
+  # the strong dependencies, testthat and pkgload are installed, since Suggests
+  # are not part of that promise. R's recommended packages come with R, so the
+  # tests that use survival, cluster, MASS or boot run, and the tests that need
+  # another suggested package skip themselves.
   r-minimum:
     runs-on: ubuntu-latest
 
