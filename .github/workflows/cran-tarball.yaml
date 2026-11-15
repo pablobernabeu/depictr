@@ -70,7 +70,10 @@ jobs:
           needs: check
 
       # The same build as `devtools::build(args = '--compact-vignettes=gs+qpdf',
-      # manual = TRUE)`, made outside the source tree so that it stays clean.
+      # manual = TRUE)`, which adds --no-resave-data, made outside the source
+      # tree so that it stays clean. R CMD build puts a PDF manual into the
+      # tarball only when a help page has an install-stage or render-stage
+      # \Sexpr. The check below builds the manual in any case, as CRAN's does.
       # setup-r sets NOT_CRAN=true for the steps after it. CRAN leaves it
       # unset, so the build and the check unset it, and the tests that skip on
       # CRAN skip here too.
@@ -85,7 +88,7 @@ jobs:
           src=$(cd "$GITHUB_WORKSPACE/$PKG_DIR" && pwd)
           mkdir -p "$RUNNER_TEMP/cran"
           cd "$RUNNER_TEMP/cran"
-          R CMD build --compact-vignettes=gs+qpdf "$src"
+          R CMD build --compact-vignettes=gs+qpdf --no-resave-data "$src"
           test -f "$tarball"
           {
             echo "pkg=$pkg"
@@ -141,6 +144,9 @@ jobs:
             || echo "The reverse-dependency query failed." >> "$out/revdeps.txt"
           cat "$out/revdeps.txt"
 
+      # 00check.log puts each verdict at the end of its '* checking' line, that
+      # of the tests included, which the console prints on a line of its own.
+      # The summary therefore finds each NOTE, WARNING and ERROR by those lines.
       - name: Write the summary
         if: always() && steps.build.outcome == 'success'
         shell: bash
