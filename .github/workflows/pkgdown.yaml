@@ -21,7 +21,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - uses: r-lib/actions/setup-pandoc@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
 
@@ -46,9 +46,9 @@ jobs:
         #
         # The sitemap entry has to go with the page. pkgdown writes sitemap.xml
         # before this step runs, so deleting the page alone left a <loc>
-        # advertising a URL that 404s -- and a sitemap is read by search engines,
-        # which is the one audience that would then follow it. pkgdown emits one
-        # <url> per line, so a line filter removes exactly that entry.
+        # advertising a URL that 404s, and search engines read the sitemap and
+        # follow it. pkgdown emits one <url> per line, so a line filter removes
+        # exactly that entry.
         run: |
           rm -f docs/LICENSE-text.html docs/LICENSE-text.md
           if [ -f docs/sitemap.xml ]; then
@@ -64,10 +64,10 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@fa24774553152dd7873cd16ebd8d959b010c5445  # v4.9.0
         with:
-          # clean: true so files dropped from the build (e.g. a page whose
-          # source moved out of pkgdown's scan path) are removed from the live
-          # site rather than lingering as orphans. gh-pages holds only the
-          # pkgdown output, so a full mirror is safe.
+          # clean: true, so that files dropped from the build, such as a page
+          # whose source moved out of pkgdown's scan path, are removed from the
+          # live site. gh-pages holds only the pkgdown output, so a full mirror
+          # is safe.
           clean: true
           branch: gh-pages
           folder: docs
