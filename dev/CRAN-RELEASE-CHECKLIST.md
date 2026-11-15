@@ -1,7 +1,7 @@
 # CRAN update release checklist for depictr
 
-This checklist is for each update release on CRAN. Most of the checks need a
-networked machine with a full R toolchain.
+This checklist is for each update release on CRAN. GitHub Actions runs the
+checks, so a browser is enough to submit. A local R toolchain is optional.
 
 ## Before submitting
 
@@ -11,35 +11,36 @@ networked machine with a full R toolchain.
   the installed version, so both need an edit only when the year changes.
 - [ ] `DESCRIPTION` complete: Title, Description, Authors@R (aut, cre),
   License (MIT + file LICENSE), URL, BugReports, Language: en-GB.
-- [ ] `NAMESPACE` and all `man/*.Rd` generated and current, and `NEWS.md`
-  current.
 - [ ] Every exported function has a runnable example. The heavy back-ends
   (lme4, broom, simr) are in Suggests and used conditionally.
-- [ ] Tests (testthat, edition 3) and the vignettes build offline.
+- [ ] Every check of the R-CMD-check workflow passes on the head to submit:
+  - the six platform legs, the Linux R-devel leg with its Latin-9 test run,
+  - 'NAMESPACE and man/ match the roxygen comments', which regenerates both
+    with the roxygen2 version `DESCRIPTION` records,
+  - 'Strong dependencies only', which checks the package with
+    `_R_CHECK_DEPENDS_ONLY_=true`,
+  - 'R (declared minimum, 4.1)', which runs the tests on the R floor in
+    `Depends`,
+  - the two 'Declared minimum dependencies' jobs.
 - [ ] Spell check: `devtools::check()` runs the spelling test in
   `tests/spelling.R`, which stops at any word found neither in the British
   English dictionary nor in `inst/WORDLIST`. A plain `R CMD check` skips it.
-- [ ] URLs validated. `R CMD check --as-cran` reports no invalid URLs, and the
-  addresses in `DESCRIPTION`, `CITATION.cff` and `inst/CITATION` resolve when
-  fetched by hand.
-- [ ] `R CMD check --as-cran` run on a built tarball, with pandoc on the
-  subprocess PATH: 0 errors and 0 warnings, with any note explained in
-  `cran-comments.md`. The PDF manual builds.
-- [ ] Checked with the suggested packages absent, using
-  `_R_CHECK_DEPENDS_ONLY_=true`: status OK, with no errors, warnings or notes
-  and the tests that need a suggested package skipped by their guards.
-- [ ] Run a `rhub::rhub_check()` across platforms. GitHub Actions checks the R
-  release on Linux, macOS and Windows, R-devel on Linux and Windows, and
-  oldrel-1 on Linux. Windows on R-devel is what `devtools::check_win_devel()`
-  checks on win-builder, so that call is optional.
 - [ ] Rewrite `cran-comments.md` for this submission, with its check results,
   test environments, notes and downstream dependencies. Until then, it describes
   the last submission.
+- [ ] Add the label `cran-tarball` to the release pull request. The
+  cran-tarball workflow builds the tarball and checks it with
+  `R CMD check --as-cran` and CRAN's incoming checks, URL checks included. It
+  must give no ERROR or WARNING, and any NOTE must be explained in
+  `cran-comments.md`. The run summary gives the tarball's SHA-256 and the
+  reverse dependencies. Remove the label afterwards.
 
 ## Submitting
 
-- [ ] `devtools::submit_cran()` (or `devtools::release()`), then confirm the
-  email.
+- [ ] Download the tarball artifact of that run, unzip it, upload the tarball
+  at <https://cran.r-project.org/submit.html> with `cran-comments.md` in the
+  comment field, and confirm the email. The maintainer's release guide gives
+  the steps in full.
 
 ## After acceptance
 

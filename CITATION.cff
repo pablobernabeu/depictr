@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use depictr, please cite it as below."
 title: "depictr: A unified toolkit for visualising statistical models and data"
-abstract: "A unified, colourblind-safe toolkit of publication-ready plots spanning the whole analysis workflow, from exploratory data analysis through model estimates and diagnostics to classification and survival."
+abstract: "A unified, colourblind-aware toolkit of publication-ready plots spanning the whole analysis workflow, from exploratory data analysis through model estimates and diagnostics to classification and survival."
 type: software
 authors:
   - family-names: Bernabeu
@@ -35,4 +35,4 @@ keywords:
   - ggplot2
   - reproducible research
   - accessibility
-  - colourblind-safe
+  - colourblind-aware
