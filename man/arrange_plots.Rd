@@ -17,23 +17,23 @@ arrange_plots(
 \arguments{
 \item{...}{Plots to combine, or a single list of plots.}
 
-\item{ncol, nrow}{Layout dimensions (passed to patchwork).}
+\item{ncol, nrow}{Layout dimensions, passed to patchwork.}
 
 \item{guides}{How to treat legends: \code{"collect"} (merge duplicates) or
 \code{"keep"}.}
 
 \item{title, subtitle}{Overall title and subtitle.}
 
-\item{tag_levels}{Panel tag style, e.g. \code{"A"}, \code{"1"} or \code{"i"}; \code{NULL} for no
-tags.}
+\item{tag_levels}{Panel tag style, such as \code{"A"}, \code{"1"} or \code{"i"}, or \code{NULL}
+for no tags.}
 }
 \value{
 A 'patchwork' object.
 }
 \description{
-A thin, friendly wrapper around \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}} that adds the
-common finishing touches: collecting duplicate legends into one, an overall
-title and subtitle, and automatic panel tags (A, B, C, ...).
+A wrapper around \code{\link[patchwork:wrap_plots]{patchwork::wrap_plots()}} that adds the usual finishing
+touches: duplicate legends collected into one, an overall title and subtitle,
+and automatic panel tags (A, B, C and so on).
 }
 \examples{
 p1 <- explore_distribution(crop_yield, yield)

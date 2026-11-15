@@ -7,12 +7,13 @@
 #' brand blue for the frequentist estimates and orange for the Bayesian ones,
 #' whether the Bayesian side is drawn from draws or from summaries.
 #'
-#' When `bayesian` carries posterior *draws* (a `brms`/`rstanarm` fit, a
-#' `posterior` draws object, a draws matrix, or a long/wide draws data frame),
-#' the full posterior *distribution* is drawn per term (a 'ggdist' half-eye)
-#' and the frequentist point and confidence interval is overlaid at the same
-#' position. When `bayesian` is only a table of posterior *summaries*, the
-#' function shows the familiar two-source forest plot via [compare_models()].
+#' When `bayesian` holds posterior draws (a `brms` or `rstanarm` fit, a
+#' `posterior` draws object, a draws matrix or a long or wide draws data frame),
+#' the full posterior distribution of each term is drawn as a 'ggdist' half-eye,
+#' with the frequentist point and confidence interval overlaid at the same
+#' position. When `bayesian` is only a table of posterior summaries, the
+#' function draws the familiar two-source forest plot through
+#' [compare_models()].
 #' It reads tidy columns (`term`, `estimate`, `conf.low`, `conf.high`), the
 #' `Estimate`, `Q2.5` and `Q97.5` of the matrix `brms::fixef()` returns, and the
 #' `l-95% CI` and `u-95% CI` of `summary(fit)$fixed`.
@@ -26,8 +27,8 @@
 #' package. Without it, each posterior is drawn as its median and `conf_level`
 #' interval, with a message.
 #'
-#' Terms are aligned by their canonical display label, so the `brms`-style `b_`
-#' prefix is reconciled automatically against the frequentist term names. Draws
+#' Terms are aligned by their display label, so the `b_` prefix of `brms` is
+#' matched automatically against the frequentist term names. Draws
 #' are read as in [posterior_plot()], so a draws object holding `b_` parameters
 #' keeps only those, and two terms that would share a label are an error. With
 #' draws, only the terms both sides share are drawn, and a message names any
@@ -43,11 +44,11 @@
 #' holds, at whatever level they were computed. By default, a caption names the
 #' level of each source's intervals or says that they are as supplied.
 #'
-#' @param frequentist A frequentist model (e.g. from `lm`, `glm` or
-#'   `lmerTest::lmer`) or a tidy data frame of estimates.
-#' @param bayesian A Bayesian model, a `posterior` draws object, a draws
-#'   matrix/data frame, a tidy data frame of posterior summaries or a summary
-#'   matrix such as `brms::fixef()` returns.
+#' @param frequentist A frequentist model, such as one from `lm`, `glm` or
+#'   `lmerTest::lmer`, or a tidy data frame of estimates.
+#' @param bayesian A Bayesian model, a `posterior` draws object, a draws matrix
+#'   or data frame, a tidy data frame of posterior summaries or a summary matrix
+#'   such as `brms::fixef()` returns.
 #' @param conf_level Level of the intervals the function computes: the
 #'   confidence intervals of a frequentist model and, when `bayesian` holds
 #'   draws, the outer credible interval of each posterior (see Details). A
@@ -55,15 +56,14 @@
 #' @param labels,interaction,intercept See [compare_models()]. On both paths,
 #'   an unnamed `labels` vector takes the frequentist terms first, then any
 #'   that only the Bayesian input holds. `intercept` defaults to `TRUE` here.
-#' @param facet,scales Layout controls. Because a Bayesian model almost always
-#'   carries a large intercept alongside small slopes, the comparison defaults
-#'   to a faceted, free-scaled layout (`facet = TRUE`): each term gets its own
-#'   panel and free x-axis, so every posterior and its frequentist overlay stay
-#'   legible. Pass `facet = FALSE` (or `scales = "fixed"`) for the classic
-#'   single shared-axis plot.
-#' @param note_frequentist_no_prior If `TRUE`, append "(no prior)" to the
-#'   frequentist legend label, which is helpful when the title names the
-#'   Bayesian prior.
+#' @param facet,scales Layout controls. Because a model often has a large
+#'   intercept beside small slopes, the comparison defaults to a faceted,
+#'   free-scaled layout (`facet = TRUE`): each term gets its own panel and free
+#'   x-axis, so every posterior and its frequentist overlay stay legible. Pass
+#'   `facet = FALSE` (or `scales = "fixed"`) for a single shared axis.
+#' @param note_frequentist_no_prior If `TRUE`, append `"(no prior)"` to the
+#'   frequentist legend label, which helps when the title names the Bayesian
+#'   prior.
 #' @param vertical_line_at_x Position of the vertical reference line (`NA` to
 #'   omit).
 #' @param title,subtitle,x_lab Title, subtitle and x-axis label.
@@ -75,10 +75,10 @@
 #' @return A [ggplot2::ggplot] object.
 #' @export
 #' @examples
-#' # Summary path: a tidy "Bayesian" summary as a data frame. The summary here
+#' # Summary path: a tidy 'Bayesian' summary as a data frame. The summary here
 #' # stands in for a regularised posterior, so a weakly informative prior pulls
-#' # each estimate toward zero and narrows its interval; a real posterior would
-#' # come from the model fit rather than from arithmetic on the frequentist one.
+#' # each estimate towards zero and narrows its interval. A real posterior would
+#' # come from the model fit, not from arithmetic on the frequentist one.
 #' freq <- lm(life_satisfaction ~ stress + sleep_hours + exercise_days,
 #'            data = wellbeing_survey)
 #' bayes <- tidy_estimates(freq)
@@ -90,7 +90,7 @@
 #'                           title = "Frequentist vs. Bayesian estimates")
 #'
 #' # Distribution path: simulated posterior draws (one column per term) drawn as
-#' # full posteriors with the frequentist point + CI overlaid.
+#' # full posteriors with the frequentist point and interval overlaid.
 #' set.seed(1)
 #' co <- coef(freq)
 #' draws <- as.data.frame(lapply(co, function(m) rnorm(400, m, abs(m) * 0.1 + 0.05)))

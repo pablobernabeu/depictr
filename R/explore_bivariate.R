@@ -4,8 +4,8 @@
 #'
 #' Chooses an appropriate plot for the relationship between two variables
 #' according to their types. Two numeric variables are shown as a scatter plot
-#' with a fitted trend; a numeric and a categorical variable as box plots of the
-#' numeric variable by level; and two categorical variables as a filled bar
+#' with a fitted trend, a numeric and a categorical variable as box plots of the
+#' numeric variable by level, and two categorical variables as a filled bar
 #' chart of proportions.
 #'
 #' Dates, date-times and durations (`Date`, `POSIXct` and `difftime` columns)
@@ -16,11 +16,12 @@
 #'
 #' @param data A data frame.
 #' @param x,y The two variables (string or unquoted name).
-#' @param method Smoothing method for the numeric-numeric case (passed to
-#'   [ggplot2::geom_smooth()]); `NULL` for no trend.
-#' @param palette Colours used when a fill/colour is needed; defaults to
+#' @param method Smoothing method for two numeric variables, passed to
+#'   [ggplot2::geom_smooth()], or `NULL` for no trend.
+#' @param palette Colours used when a fill or colour is needed. Defaults to
 #'   [depictr_palette()].
-#' @param title,x_lab,y_lab Title and axis labels (default to variable names).
+#' @param title,x_lab,y_lab Title and axis labels, which default to the variable
+#'   names.
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export

@@ -28,7 +28,7 @@ residuals).
 The R-squared depends on the kind of model. An \code{lm} reports the ordinary
 coefficient of determination. Every \code{glm}, including quasi-likelihood
 families and negative binomial fits from \code{MASS::glm.nb()}, reports the
-deviance R-squared, \eqn{1 - D/D_0}. Here \eqn{D} is the residual deviance
+deviance R-squared, \eqn{1 - D/D_0}. Here, \eqn{D} is the residual deviance
 of the model and \eqn{D_0} the deviance of the null model, which
 \code{\link[stats:glm]{stats::glm()}} fits to the same rows with the same prior weights and
 offset. The null model has an intercept only if the model has one. Both

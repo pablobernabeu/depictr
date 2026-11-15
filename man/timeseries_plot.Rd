@@ -46,11 +46,11 @@ count half, which centres the average on its observation, as equal weights
 over an even window cannot. It needs a series one observation longer than
 the window.}
 
-\item{forecast}{Optional forecast overlay for a single (non-grouped) series.
+\item{forecast}{Optional forecast overlay for a single, ungrouped series.
 Either an integer horizon (number of future steps) to forecast with the
 built-in STL plus random walk with drift (see \code{\link[=ts_forecast]{ts_forecast()}}), or a
 pre-computed forecast supplied as a data frame with columns \code{time}, \code{fit}
-and (optionally) \code{lwr}/\code{upr}, for instance from a fitted
+and, optionally, \code{lwr} and \code{upr}, for instance from a fitted
 \code{forecast::forecast()} object. The point forecast continues the line and a
 shaded prediction-interval ribbon is drawn behind it. The built-in
 forecast is captioned with its coverage and method, and its band widens
@@ -63,14 +63,14 @@ last observation, and a missing value inside the series is an error.}
 \item{frequency}{Number of observations per period, used only to coerce a
 numeric \code{x} to a \code{ts} when an integer \code{forecast} horizon is requested.}
 
-\item{level}{Prediction-interval coverage for the built-in forecast (a single
-number strictly between 0 and 1, e.g. \code{0.95}).}
+\item{level}{Prediction-interval coverage for the built-in forecast, a single
+number strictly between 0 and 1, such as \code{0.95}.}
 
 \item{lambda}{Optional Box-Cox transformation for the built-in forecast,
 passed to \code{\link[=ts_forecast]{ts_forecast()}}. \code{0} forecasts on the log scale, which suits a
 series whose seasonal swing grows with its level.}
 
-\item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
+\item{palette}{Colours for the groups. Defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{point}{Whether to add points as well as the line.}
 

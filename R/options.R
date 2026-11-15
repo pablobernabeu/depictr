@@ -47,20 +47,20 @@ depictr_opt <- function(name) {
 #'
 #' Called with no arguments, `depictr_options()` returns the currently resolved
 #' values (option if set, otherwise package default). Called with named
-#' arguments it sets the matching `options(depictr.<name> = )` entries and
-#' returns the *previous* resolved values invisibly, so the pattern
-#' `old <- depictr_options(...); on.exit(do.call(depictr_options, old))` restores
-#' them. Pass `NULL` for an argument to clear that option and fall back to the
-#' package default.
+#' arguments, it sets the matching `options(depictr.<name> = )` entries and
+#' returns the previous resolved values invisibly, so the pattern
+#' `old <- depictr_options(...); on.exit(do.call(depictr_options, old))`
+#' restores them. Pass `NULL` for an argument to clear that option and fall back
+#' to the package default.
 #'
 #' @param base_size Base font size in points for [theme_depictr()].
 #' @param base_family Base font family for [theme_depictr()].
 #' @param brand The depictr brand colour, used for plot titles and single-series
-#'   geoms. It coincides with the default palette's first colour but does not
-#'   alter a palette; use `palette` for that.
+#'   geoms. It matches the default palette's first colour but does not change a
+#'   palette, which `palette` sets.
 #' @param accent A secondary highlight colour, for the one element a figure
 #'   draws attention to.
-#' @param reference The colour used for reference / annotation lines.
+#' @param reference The colour used for reference and annotation lines.
 #' @param palette An optional custom qualitative palette: a character vector of
 #'   hex colours used by [depictr_palette()] (type `"qualitative"`) and the
 #'   discrete scales in place of the eight built-in colours. `NULL` restores the
@@ -70,7 +70,7 @@ depictr_opt <- function(name) {
 #'   [scale_fill_depictr()].
 #'
 #' @return A named list of the resolved option values. When setting, the
-#'   *previous* values are returned invisibly.
+#'   previous values are returned invisibly.
 #' @export
 #' @examples
 #' # Inspect the current settings

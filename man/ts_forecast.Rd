@@ -15,8 +15,8 @@ multivariate \code{ts} or a matrix with several columns is refused.}
 
 \item{h}{Forecast horizon: the number of future steps (a positive integer).}
 
-\item{frequency}{Number of observations per period; taken from \code{x} when it is
-a \code{ts}.}
+\item{frequency}{Number of observations per period. Taken from \code{x} when it
+is a \code{ts}.}
 
 \item{level}{Prediction-interval coverage (a single number strictly between 0
 and 1).}

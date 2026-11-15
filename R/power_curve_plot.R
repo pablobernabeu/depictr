@@ -4,9 +4,9 @@
 #'
 #' Draws statistical power against sample size, with a dashed line at a target
 #' power (80% by default). The input is usually a power curve produced by
-#' `simr::powerCurve()`, though a tidy data frame works equally well, allowing
-#' the plot to be redrawn without repeating a power simulation that is often
-#' slow to run.
+#' `simr::powerCurve()`, though a tidy data frame works equally well, so the
+#' plot can be redrawn without repeating a power simulation that is often slow
+#' to run.
 #'
 #' A table may hold several curves, one per effect or design, stacked by row.
 #' Each is drawn as its own line, told apart by colour and line type. The
@@ -20,9 +20,9 @@
 #'
 #' @param x A `powerCurve` object from 'simr', or a data frame with a sample
 #'   size column (`n`, `nlevels`, `x`, `sample_size` or `n_subject`), a power
-#'   column (`power`, `mean` or `p`), and optional confidence limits
-#'   (`<power>_lo`/`<power>_hi`, `lower`/`upper`, `ci_low`/`ci_high` or
-#'   `conf.low`/`conf.high`).
+#'   column (`power`, `mean` or `p`) and optional confidence limits
+#'   (`<power>_lo` and `<power>_hi`, `lower` and `upper`, `ci_low` and `ci_high`
+#'   or `conf.low` and `conf.high`).
 #' @param target Target power, drawn as a horizontal reference line. Use `NA`
 #'   to omit it.
 #' @param x_lab X-axis label.
@@ -46,7 +46,7 @@
 #' @param lower,upper Columns holding the lower and upper confidence limits.
 #'   Name both or neither. By default, they are found among the names listed
 #'   under `x`.
-#' @param y_lab Y-axis label. By default, "Power" when the power column is one
+#' @param y_lab Y-axis label. By default, 'Power' when the power column is one
 #'   of the names listed under `x`, and the column's name otherwise.
 #' @param solved A sample size solved from the curve, with its confidence
 #'   interval: a list with numeric `value`, `lo` and `hi`, as pilotr's
@@ -330,7 +330,7 @@ pick_col <- function(df, cands) {
 
 #' Extract a clean predictor name from a powerCurve `$text` string
 #'
-#' 'simr' stores the title as e.g. `"Power for predictor 'word_frequency'"`,
+#' 'simr' stores the title as, for example, `"Power for predictor 'word_frequency'"`,
 #' where the predictor name is wrapped in single quotes (or back-ticks when it
 #' is a non-syntactic name). This strips the boilerplate and any surrounding
 #' quoting on both sides, so the title does not render as `'word_frequency`.

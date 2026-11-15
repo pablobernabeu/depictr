@@ -7,7 +7,7 @@
 scree_plot(x, cols = NULL, scale = TRUE, n = NULL, title = NULL)
 }
 \arguments{
-\item{x}{A data frame, or a \code{\link[stats:prcomp]{stats::prcomp()}} object.}
+\item{x}{A data frame or a \code{\link[stats:prcomp]{stats::prcomp()}} object.}
 
 \item{cols}{When \code{x} is a data frame, the numeric columns to analyse.}
 

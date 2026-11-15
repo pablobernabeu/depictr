@@ -5,44 +5,44 @@
 #' Plots the receiver operating characteristic (ROC) curve for a binary
 #' classifier and reports the area under the curve (AUC). The input can be a
 #' fitted binomial `glm`, a pair of vectors (observed binary outcome and a
-#' continuous score), or, to compare several models, a *named list* of
-#' models or of (actual, score) pairs, which are overlaid as colour-coded curves
-#' with a legend and a per-curve AUC. An optional bootstrap confidence band can
-#' be drawn for the (single-model) curve and its AUC, and the Youden's J
+#' continuous score), or, to compare several models, a named list of models or
+#' of (actual, score) pairs, which are overlaid as colour-coded curves with a
+#' legend and a per-curve AUC. An optional bootstrap confidence band can be
+#' drawn for the curve of a single model and its AUC, and the Youden's J
 #' operating point can be marked.
 #'
-#' @param x A binomial `glm`; the vector of observed outcomes (0/1, logical or a
-#'   two-level factor with the positive class second); or a *named* list of
-#'   models / (actual, score) pairs to overlay (see Details).
+#' @param x A binomial `glm`, the vector of observed outcomes (0 and 1, logical
+#'   or a two-level factor with the positive class second) or a named list of
+#'   models or of (actual, score) pairs to overlay (see Details).
 #' @param score When `x` is an outcome vector, the matching vector of scores or
 #'   predicted probabilities. When `x` is a named list of outcome vectors, a
-#'   matching named/positional list of score vectors.
-#' @param colour Curve colour for the single-model case. Defaults to the depictr
-#'   brand blue. Ignored when several models are overlaid (the colourblind-aware
-#'   [scale_colour_depictr()] palette is used instead).
+#'   matching list of score vectors, named or in the same order.
+#' @param colour Curve colour for a single model. Defaults to the depictr brand
+#'   blue. Ignored when several models are overlaid, which take the
+#'   colourblind-aware [scale_colour_depictr()] palette.
 #' @param ci Bootstrap confidence band for a single ROC curve and its AUC.
-#'   `FALSE` (default) draws none; `TRUE` uses 2000 resamples; a positive integer
-#'   sets the number of resamples. The resamples come from the session's
+#'   `FALSE`, the default, draws none, `TRUE` uses 2000 resamples and a positive
+#'   integer sets the number of resamples. The resamples come from the session's
 #'   random-number stream, so call `set.seed()` first for a reproducible band.
 #'   Ignored when several models are overlaid.
 #' @param conf_level Confidence level for the bootstrap band, a single number
 #'   strictly between 0 and 1.
-#' @param youden Logical; if `TRUE`, mark the Youden's J operating point (the
-#'   threshold maximising sensitivity + specificity - 1) on each curve.
-#' @param legend_inside When `TRUE` (and several models are overlaid), draw the
-#'   legend inside the panel (in the bottom-right corner the curve leaves empty)
-#'   over a translucent background, instead of in a right-hand margin.
-#'   Defaults to `FALSE`.
+#' @param youden Whether to mark the Youden's J operating point, the threshold
+#'   that maximises sensitivity + specificity - 1, on each curve.
+#' @param legend_inside When `TRUE` and several models are overlaid, the legend
+#'   is drawn inside the panel, over a translucent background, in the
+#'   bottom-right corner, which the curve leaves empty. Otherwise, it is drawn in
+#'   a right-hand margin. Defaults to `FALSE`.
 #' @param title Plot title.
 #'
-#' @details
-#' A named list overlays one curve per element, e.g.
+#' @details A named list overlays one curve per element, such as
 #' `roc_curve_plot(list("Full" = fit_full, "Reduced" = fit_reduced))`. Each
-#' element may be a `glm`, a length-2 list/data frame of `(actual, score)`, or an
-#' outcome vector paired with the matching element of a `score` list.
+#' element may be a `glm`, a list or data frame of length 2 holding
+#' `(actual, score)`, or an outcome vector paired with the matching element of a
+#' `score` list.
 #'
-#' @return A [ggplot2::ggplot] object. The AUC(s) are stored in
-#'   `attr(plot, "auc")` (a named vector when several models are supplied).
+#' @return A [ggplot2::ggplot] object. The AUC is stored in `attr(plot, "auc")`,
+#'   a named vector when several models are supplied.
 #'   When `ci` draws a band, which it does for a single model, the bootstrap
 #'   interval of the AUC is stored in `attr(plot, "auc_ci")`, a vector named
 #'   `lower` and `upper`. With `youden = TRUE`, the Youden point is stored in
@@ -178,24 +178,24 @@ roc_curve_plot <- function(x, score = NULL, colour = depictr_brand(),
 #' Calibration plot
 #'
 #' Assesses how well predicted probabilities match observed frequencies. The
-#' scores are split into bins; for each bin the mean predicted probability is
-#' plotted against the observed event rate, with the diagonal marking perfect
+#' scores are split into bins, and for each bin, the mean predicted probability
+#' is plotted against the observed event rate, with the diagonal marking perfect
 #' calibration. A Wilson binomial confidence interval is drawn on each bin's
 #' observed proportion so that bins backed by few observations are not
-#' over-interpreted. Pass a *named list* of models / (actual, score) pairs to
+#' over-interpreted. Pass a named list of models or of (actual, score) pairs to
 #' overlay several colour-coded calibration curves with a legend.
 #'
-#' @param x A binomial `glm`, the vector of observed outcomes, or a *named* list
-#'   of models / (actual, score) pairs to overlay.
+#' @param x A binomial `glm`, the vector of observed outcomes or a named list of
+#'   models or of (actual, score) pairs to overlay.
 #' @param score When `x` is an outcome vector, the matching predicted
-#'   probabilities (or a list of them for the multi-model case).
-#' @param bins Number of (equal-count) bins.
-#' @param colour Point/line colour for the single-model case. Defaults to the
-#'   depictr brand blue. Ignored when several models are overlaid.
+#'   probabilities, or a list of them for several models.
+#' @param bins Number of equal-count bins.
+#' @param colour Colour of the points and lines for a single model. Defaults to
+#'   the depictr brand blue. Ignored when several models are overlaid.
 #' @param conf_level Confidence level for the per-bin Wilson interval on the
 #'   observed proportion, a single number strictly between 0 and 1. Use `NA` to
-#'   omit the intervals. Intervals are only drawn in the single-model case to
-#'   keep the overlay legible.
+#'   omit the intervals. Intervals are drawn only for a single model, to keep
+#'   the overlay legible.
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -301,10 +301,10 @@ calibration_bins <- function(actual, score, bins) {
 #'   point [roc_curve_plot()] marks), so the confusion matrix and the ROC curve
 #'   agree on the cut-off.
 #' @param normalise One of `"none"`, `"row"` (by actual class) or `"col"` (by
-#'   predicted class); controls the fill shading and the cell annotation.
+#'   predicted class). Controls the fill shading and the cell annotation.
 #' @param title Plot title.
 #'
-#' @return A [ggplot2::ggplot] object. The threshold actually used is stored in
+#' @return A [ggplot2::ggplot] object. The threshold used is stored in
 #'   `attr(plot, "threshold")`.
 #' @export
 #' @examples
@@ -401,14 +401,14 @@ confusion_matrix_plot <- function(x, predicted = NULL, threshold = 0.5,
 
 #' Wilson score interval for a binomial proportion
 #'
-#' Vectorised over `successes`/`n`. The Wilson interval is preferred to the
+#' Vectorised over `successes` and `n`. The Wilson interval is preferred to the
 #' Wald (normal-approximation) interval because it stays inside `[0, 1]` and
-#' behaves sensibly for small `n` and proportions near 0 or 1 - exactly the
+#' behaves sensibly for small `n` and proportions near 0 or 1, which is the
 #' situation in the sparsely populated tail bins of a calibration plot.
 #'
 #' @param successes Integer count of positives in each bin.
 #' @param n Integer bin size.
-#' @param conf_level Confidence level (e.g. 0.95).
+#' @param conf_level Confidence level, such as 0.95.
 #' @return A list with numeric vectors `lower` and `upper`.
 #' @noRd
 wilson_interval <- function(successes, n, conf_level = 0.95) {
@@ -422,8 +422,8 @@ wilson_interval <- function(successes, n, conf_level = 0.95) {
 
 #' Coerce an outcome vector to 0/1
 #'
-#' NA values are preserved (not coerced or rejected); complete-case filtering is
-#' handled by the callers so that `actual` and `score` are dropped pairwise.
+#' NA values are preserved, neither coerced nor rejected. The callers filter
+#' complete cases, so that `actual` and `score` are dropped pairwise.
 #'
 #' @param y A logical, two-level factor, or 0/1 numeric vector.
 #' @param positive For a factor, the level treated as the positive (1) class.
@@ -475,7 +475,7 @@ binary_inputs <- function(x, score) {
 #' Normalise the curve inputs into a named list of (actual, score) pairs
 #'
 #' This is the single entry point that lets every classification curve accept
-#' either a single model or outcome vector, or a *named list* of models or
+#' either a single model or outcome vector, or a named list of models or
 #' (actual, score) pairs to overlay. It always
 #' returns a list of `list(actual = , score = )` entries with `names()` set, plus
 #' an attribute `"multi"` recording whether more than one model was supplied (so
@@ -483,12 +483,12 @@ binary_inputs <- function(x, score) {
 #'
 #' Recognised shapes for `x`:
 #' \itemize{
-#'   \item a binomial `glm` (with `score = NULL`);
-#'   \item an outcome vector with a matching `score` vector;
-#'   \item a *named* list whose elements are each a `glm`, a length-2 list or
-#'     data frame of `(actual, score)` (named or positional), or an `actual`
-#'     vector - in which case the matching element of a parallel `score` list is
-#'     used.
+#'   \item a binomial `glm` (with `score = NULL`),
+#'   \item an outcome vector with a matching `score` vector,
+#'   \item a named list whose elements are each a `glm`, a length-2 list or
+#'     data frame of `(actual, score)` (named or positional) or an `actual`
+#'     vector, which is paired with the matching element of a parallel `score`
+#'     list.
 #' }
 #' @noRd
 as_model_list <- function(x, score = NULL) {
@@ -538,8 +538,9 @@ extract_pair <- function(el, sc = NULL) {
   binary_inputs(el, sc)
 }
 
-#' Youden's J operating point: the threshold maximising sensitivity + specificity
-#' - 1, i.e. the ROC point furthest above the chance diagonal (tpr - fpr).
+#' Youden's J operating point: the threshold maximising
+#' sensitivity + specificity - 1, that is the ROC point furthest above the
+#' chance diagonal (tpr - fpr).
 #'
 #' Returns the chosen score threshold and the (fpr, tpr) coordinates of that
 #' point on the ROC curve, computed on the collapsed distinct-threshold steps so
@@ -586,9 +587,10 @@ distinct_thresholds <- function(score) {
 
 #' Bootstrap percentile confidence band for an ROC curve and its AUC.
 #'
-#' Resamples observations with replacement `n_boot` times; for each resample the
-#' ROC is interpolated onto a common fixed FPR grid so the bands can be summarised
-#' pointwise. Returns the per-grid-point lower/upper TPR quantiles and the AUC
+#' Resamples observations with replacement `n_boot` times. For each resample,
+#' the ROC is interpolated onto a common fixed FPR grid so that the bands can be
+#' summarised pointwise. Returns the lower and upper TPR quantiles at each grid
+#' point and the AUC
 #' quantiles. Resamples that happen to contain only one class are skipped.
 #' @noRd
 roc_boot_ci <- function(actual, score, n_boot = 2000, conf_level = 0.95,
@@ -634,9 +636,9 @@ drop_incomplete <- function(actual, score) {
   list(actual = actual[keep], score = score[keep])
 }
 
-#' Accumulate TP/FP counts at each distinct score threshold
+#' Accumulate true- and false-positive counts at each distinct score threshold
 #'
-#' Collapsing tied scores into a single step makes ROC/PR/gain summaries
+#' Collapsing tied scores into a single step makes ROC, precision-recall and gain summaries
 #' independent of the input row order: the AUC then equals the Mann-Whitney
 #' statistic with ties counted as 0.5.
 #' @noRd

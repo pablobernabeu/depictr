@@ -4,12 +4,11 @@
 #'
 #' `tidy_estimates()` turns the output of a model (or an existing data frame of
 #' results) into a single standardised table with the columns `term`,
-#' `estimate`, `std.error`, `conf.low` and `conf.high`. It is the common
-#' currency used by [coefficient_plot()] and [compare_models()], but is useful
-#' on its own.
+#' `estimate`, `std.error`, `conf.low` and `conf.high`. [coefficient_plot()] and
+#' [compare_models()] build on it, and it is useful on its own.
 #'
 #' Methods are provided for `lm`, `glm` and `merMod` (mixed models fitted with
-#' 'lme4') objects, and for data frames. For any other model class the function
+#' 'lme4') objects, and for data frames. For any other model class, the function
 #' falls back to [broom::tidy()] when the 'broom' package is installed.
 #'
 #' Confidence intervals are Wald intervals, estimate +/- multiplier * standard
@@ -18,8 +17,8 @@
 #' (Gaussian, Gamma, inverse Gaussian and quasi families) gets t on the
 #' residual degrees of freedom, since [stats::summary.glm()] then tests with
 #' t. One whose dispersion is fixed (binomial, Poisson and `MASS::glm.nb()`)
-#' gets z. The choice is read from the column the summary reports, "t value"
-#' or "z value". At 12 residual degrees of freedom, the t interval is about
+#' gets z. The choice is read from the column the summary reports, `t value` or
+#' `z value`. At 12 residual degrees of freedom, the t interval is about
 #' 11% wider than the z interval, and at 100 about 1% wider. A `merMod` fit
 #' gets z, since 'lme4' gives no degrees of freedom. Supply
 #' a data frame with your own intervals (for example profiled or posterior
@@ -47,9 +46,8 @@
 #'   ratios. The `std.error` column stays on the link scale, as in
 #'   [broom::tidy()]. A data frame is read as estimates on the link scale.
 #'   Defaults to `FALSE`.
-#' @param ... Passed to methods (and to [broom::tidy()] in the fallback). The
-#'   `merMod` method additionally accepts `effects`, which currently only
-#'   supports `"fixed"`.
+#' @param ... Passed to methods, and to [broom::tidy()] in the fallback. The
+#'   `merMod` method also accepts `effects`, which supports only `"fixed"`.
 #'
 #' @return A data frame with one row per term and the columns `term`,
 #'   `estimate`, `std.error`, `conf.low` and `conf.high`.

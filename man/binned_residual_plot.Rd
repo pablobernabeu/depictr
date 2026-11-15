@@ -19,7 +19,8 @@ binned_residual_plot(
 Gaussian GLM).}
 
 \item{bins}{Number of bins. The default follows Gelman and Hill's rule of
-thumb of roughly \eqn{\sqrt{n}} bins (bounded to a sensible range).}
+thumb of about \eqn{\sqrt{n}} bins, rounded down and kept between 2 and
+half the number of observations.}
 
 \item{type}{Residual type used for the bin means: \code{"response"} (observed
 minus fitted on the response scale, the Gelman-Hill default) or
@@ -48,8 +49,8 @@ the data into equal-count bins of fitted values and plots, for each bin, the
 mean residual against the mean fitted value, inside a grey band of
 \eqn{\pm 2} standard errors of that mean. Under a well-specified model, the
 binned residuals scatter around zero, and about 95\% of them should fall
-within the band. Systematic departures (a trend, or many points outside the
-band) indicate a misspecified mean structure.
+within the band. Systematic departures, such as a trend or many points
+outside the band, indicate a misspecified mean structure.
 }
 \details{
 By default (\code{band = "model"}), the standard error is the one the fitted
@@ -65,15 +66,15 @@ bin \eqn{b} the standard error
 residual, \eqn{(y_i - \hat\mu_i) \sqrt{w_i / V(\hat\mu_i)}}, then has
 variance \eqn{\phi}, so its bin mean has standard error
 \eqn{\sqrt{\phi / n_b}}. The fit absorbs a little of each observation's
-variance, so a residual varies slightly less than this and the band errs on
-the wide side. Observations with zero prior weight take no part in the fit
-and are left out of the bins.
+variance, so a residual varies slightly less than this, and the band is
+slightly too wide. Observations with zero prior weight take no part in the
+fit and are left out of the bins.
 
 \code{band = "empirical"} draws the band that \code{arm::binnedplot()} draws: twice
 the standard deviation of the residuals in the bin, divided by
-\eqn{\sqrt{n_b}}. It collapses wherever the outcomes in
-a bin are all alike. The residuals in a logistic model's bin without events
-all lie just below zero, so its band nearly vanishes and the bin is flagged.
+\eqn{\sqrt{n_b}}. It shrinks to almost nothing wherever the outcomes in a bin
+are all alike. The residuals in a logistic model's bin without events all lie
+just below zero, so its band nearly vanishes and the bin is flagged.
 Where events are rare, such bins are what the model expects. The example
 below, a correctly specified model, has five of its seventeen bins flagged
 by that band and none by the model's.

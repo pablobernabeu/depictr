@@ -17,7 +17,8 @@ missingness_map(
 \arguments{
 \item{data}{A data frame.}
 
-\item{cols}{Optional character vector of columns to include (default: all).}
+\item{cols}{Optional character vector of columns to include (by default,
+all).}
 
 \item{sort}{Whether to order variables by their proportion of missing values.}
 
@@ -28,10 +29,10 @@ Defaults to a muted grey (\code{"grey85"}) for present cells and, for missing
 cells, the accent colour set with \code{accent} in \code{\link[=depictr_options]{depictr_options()}}, the
 colourblind-safe vermillion \verb{#d55e00} unless changed.}
 
-\item{legend_inside}{When \code{TRUE} (and \code{sort = TRUE}), draw the legend inside
-the panel, in the top-right (where the most-complete columns put a solid
-"Present" block, so it hides no "Missing" mark) instead of in a right-hand
-margin. Defaults to \code{FALSE}.}
+\item{legend_inside}{When \code{TRUE} and \code{sort = TRUE}, the legend is drawn
+inside the panel, in the top-right corner, where the most complete columns
+put a solid block of present cells, so it hides no missing cell.
+Otherwise, it is drawn in a right-hand margin. Defaults to \code{FALSE}.}
 
 \item{title}{Plot title.}
 }
@@ -42,8 +43,8 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 Draws a tile map of the data frame with one column per variable and one row
 per observation, shading the cells that are missing. The variables are
 ordered by their proportion of missing values, and that proportion is shown
-in the axis labels, making it easy to spot variables and patterns that need
-attention before modelling.
+in the axis labels, so variables and patterns that need attention before
+modelling are easy to spot.
 }
 \examples{
 missingness_map(wellbeing_survey)

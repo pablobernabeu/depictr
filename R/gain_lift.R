@@ -6,22 +6,22 @@
 #' population is targeted in order of predicted score. It is the customary chart
 #' for judging a classifier's value for ranking and targeting, as in marketing,
 #' triage and fraud detection. The diagonal marks the no-model baseline, and a
-#' second reference line marks a perfect model. Pass a *named list* of models /
-#' (actual, score) pairs to overlay several colour-coded gains curves with a
+#' second reference line marks a perfect model. Pass a named list of models or
+#' of (actual, score) pairs to overlay several colour-coded gains curves with a
 #' legend. The perfect-model line is then omitted, since it depends on the
 #' prevalence of the outcome and the overlaid models need not share one.
 #'
-#' @param x A binomial `glm`; the vector of observed outcomes (0/1, logical or a
-#'   two-level factor with the positive class second); or a *named* list of
-#'   models / (actual, score) pairs to overlay.
+#' @param x A binomial `glm`, the vector of observed outcomes (0 and 1, logical
+#'   or a two-level factor with the positive class second) or a named list of
+#'   models or of (actual, score) pairs to overlay.
 #' @param score When `x` is an outcome vector, the matching scores or predicted
-#'   probabilities (or a list of them for the multi-model case).
-#' @param colour Curve colour for the single-model case. Defaults to the depictr
-#'   brand blue. Ignored when several models are overlaid.
-#' @param legend_inside When `TRUE` (and several models are overlaid), draw the
-#'   legend inside the panel (in the bottom-right triangle the concave curve
-#'   leaves empty) over a translucent background, instead of in a right-hand
-#'   margin. Defaults to `FALSE`.
+#'   probabilities, or a list of them for several models.
+#' @param colour Curve colour for a single model. Defaults to the depictr brand
+#'   blue. Ignored when several models are overlaid.
+#' @param legend_inside When `TRUE` and several models are overlaid, the legend
+#'   is drawn inside the panel, over a translucent background, in the
+#'   bottom-right triangle, which the concave curve leaves empty. Otherwise it
+#'   is drawn in a right-hand margin. Defaults to `FALSE`.
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -99,15 +99,15 @@ gain_plot <- function(x, score = NULL, colour = depictr_brand(),
 #' Shows how many times more positive cases a classifier captures, at each depth
 #' of the score-ordered population, than random targeting would. A lift of 3 at
 #' the top 10% means that decile contains three times the baseline rate of
-#' positives. The horizontal line at 1 is the no-model baseline. Pass a *named
-#' list* of models / (actual, score) pairs to overlay several colour-coded lift
-#' curves with a legend.
+#' positives. The horizontal line at 1 is the no-model baseline. Pass a named
+#' list of models or of (actual, score) pairs to overlay several colour-coded
+#' lift curves with a legend.
 #'
 #' @inheritParams gain_plot
-#' @param legend_inside When `TRUE` (and several models are overlaid), draw the
-#'   legend inside the panel (in the top-right corner, which the decaying lift
-#'   curve leaves empty) over a translucent background, instead of in a
-#'   right-hand margin. Defaults to `FALSE`.
+#' @param legend_inside When `TRUE` and several models are overlaid, the legend
+#'   is drawn inside the panel, over a translucent background, in the top-right
+#'   corner, which the decreasing lift curve leaves empty. Otherwise, it is drawn
+#'   in a right-hand margin. Defaults to `FALSE`.
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export
@@ -178,7 +178,7 @@ lift_plot <- function(x, score = NULL, colour = depictr_brand(),
 
 # ---- internal helper -------------------------------------------------------
 
-#' Cumulative share of population vs share of positives captured
+#' Cumulative share of population against share of positives captured
 #' @noRd
 gain_table <- function(actual, score) {
   n <- length(actual)

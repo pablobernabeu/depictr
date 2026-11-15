@@ -61,10 +61,10 @@ influence_plot <- function(model, n_label = 3, colour = depictr_brand(),
 #' Normal quantile-quantile plot
 #'
 #' A normal Q-Q plot for a numeric vector or for the standardised residuals of a
-#' fitted model, with a reference line and an optional confidence band that makes
-#' departures from normality easier to judge. Points that stray outside the band
-#' are unusual under normality; under a normal sample roughly `level` of the
-#' points fall inside a pointwise band.
+#' fitted model, with a reference line and an optional confidence band that
+#' makes departures from normality easier to judge. Points outside the band are
+#' unusual under normality. In a normal sample, about `level` of the points fall
+#' inside a pointwise band.
 #'
 #' Two band constructions are offered. `"pointwise"` is analytic: it uses the
 #' large-sample standard error of the \eqn{i}-th order statistic,
@@ -83,11 +83,11 @@ influence_plot <- function(model, n_label = 3, colour = depictr_brand(),
 #' plot randomised quantile residuals (Dunn & Smyth, 1996), which are standard
 #' normal under a correct model.
 #'
-#' @param x A numeric vector, or a fitted `lm`/`glm` model (its standardised
-#'   residuals are used).
+#' @param x A numeric vector, or a fitted `lm` or `glm` model, whose
+#'   standardised residuals are used.
 #' @param colour Point colour. Defaults to the depictr brand blue.
 #' @param title,x_lab,y_lab Title and axis labels.
-#' @param band Whether to draw a confidence band/envelope.
+#' @param band Whether to draw a confidence band or envelope.
 #' @param band_type Band construction: `"pointwise"` (analytic order-statistic
 #'   standard errors, the default) or `"simulate"` (a Monte-Carlo envelope).
 #' @param level Confidence level for the band.
@@ -145,7 +145,7 @@ qq_plot <- function(x, colour = depictr_brand(), title = NULL,
 #'
 #' Returns a data frame of `theoretical` quantiles with `lower`/`upper` band
 #' limits, used by [qq_plot()]. The reference line is fitted robustly through the
-#' first and third theoretical/sample quartiles (matching
+#' first and third theoretical and sample quartiles (matching
 #' [ggplot2::stat_qq_line()]).
 #' @param vals Numeric sample (finite values only).
 #' @param type `"pointwise"` (analytic) or `"simulate"` (Monte-Carlo).

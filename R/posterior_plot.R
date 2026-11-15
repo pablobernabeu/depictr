@@ -2,24 +2,24 @@
 
 #' Plot posterior distributions
 #'
-#' Displays posterior (or, more generally, bootstrap or simulation) draws as a
-#' *distribution* per parameter, in the style of a half-eye (a density slab with
+#' Displays posterior draws, or more generally bootstrap or simulation draws, as
+#' a distribution per parameter, in the style of a half-eye (a density slab with
 #' a point-and-interval beneath it), an interval-only forest plot, a gradient
 #' interval or a dotplot. The full shape of the posterior is shown, so skew,
 #' multimodality and the relative mass on either side of a reference value are
-#' all visible, rather than a point and two limits alone. The intervals are
+#' all visible, where a point and two limits would hide them. The intervals are
 #' central (equal-tailed) quantile intervals, which leave the same share of the
 #' draws in either tail.
 #'
 #' Draws may be supplied in many shapes: a fitted Bayesian model (`brms` or
-#' `rstanarm`), a `posterior` *draws* object, a wide data frame or matrix with
+#' `rstanarm`), a `posterior` draws object, a wide data frame or matrix with
 #' one column of draws per parameter, or a long data frame with a parameter
 #' column named `parameter`, `term`, `.variable` or `variable` and a value
 #' column named `value`, `.value`, `draw` or `estimate`. In a wide data frame,
 #' the numeric columns `.chain`, `.iteration`, `.draw`, `draw`, `chain`,
 #' `iteration` and `.row` are read as sampler indices and left out. For fitted
-#' models only the fixed-effect (population)
-#' parameters are kept, with the `brms` `b_` prefix stripped. A draws object
+#' models, only the fixed-effect (population) parameters are kept, with the
+#' `brms` `b_` prefix stripped. A draws object
 #' that holds `b_` parameters, as `posterior::as_draws_df()` returns for a
 #' `brms` fit, is read the same way, with a message naming the variables it
 #' dropped. Pass it through `as.data.frame()` to keep the other variables, as a
@@ -30,14 +30,14 @@
 #' renamed with `labels`. A matrix of posterior summaries, such as
 #' `brms::fixef()` returns, holds no draws and is refused.
 #'
-#' The slab styles use the 'ggdist' package. When 'ggdist' is not installed the
-#' function falls back to the point-and-nested-interval display (equivalent to
-#' `style = "interval"`) and emits an informative message.
+#' The slab styles use the 'ggdist' package. When 'ggdist' is not installed, the
+#' function falls back to the point-and-nested-interval display (as
+#' `style = "interval"`) with an informative message.
 #'
-#' @param draws Posterior draws: a fitted model (`brms`/`rstanarm`), a
-#'   `posterior` draws object, a matrix, or a long/wide data frame (see
+#' @param draws Posterior draws: a fitted model (`brms` or `rstanarm`), a
+#'   `posterior` draws object, a matrix or a long or wide data frame (see
 #'   Details).
-#' @param style One of `"halfeye"` (density slab + interval, the default),
+#' @param style One of `"halfeye"` (density slab and interval, the default),
 #'   `"interval"` (point and two nested intervals, no slab), `"gradient"` (a
 #'   colour-graded interval) or `"dots"` (a quantile dotplot). Any other value
 #'   is an error. When 'ggdist' is missing, every style falls back to
@@ -47,36 +47,35 @@
 #'   drawn as a central (equal-tailed) quantile interval. The outer width is
 #'   used for the caption and the displayed interval mass.
 #' @param interaction Passed to [format_terms()] for the parameter labels.
-#' @param labels Optional named character vector renaming parameters, e.g.
+#' @param labels Optional named character vector renaming parameters, such as
 #'   `c(conditionunrelated = "condition")`. Unmatched parameters fall back to
 #'   [format_terms()]. For a `brms` fit, or a draws object holding `b_`
 #'   parameters, the names are given without the `b_` prefix. An unnamed vector
 #'   gives one label per parameter, in the order the parameters appear in
 #'   `draws`.
-#' @param reference_line Position of a vertical reference line, or `NULL`/`NA`
-#'   to omit it. There is no universally meaningful reference for every
-#'   parameter, so this defaults to `0` (the usual "no effect" line for
-#'   differences and slopes) but should be set or cleared deliberately.
+#' @param reference_line Position of a vertical reference line, or `NULL` or
+#'   `NA` to omit it. No reference is meaningful for every parameter, so this
+#'   defaults to `0`, the usual line of no effect for differences and slopes,
+#'   but should be set or cleared deliberately.
 #' @param rope Optional length-2 numeric `c(lo, hi)` giving a region of
 #'   practical equivalence to shade behind the distributions.
 #' @param pd If `TRUE`, annotate each parameter with its probability of
 #'   direction relative to `reference_line`, the posterior probability that
 #'   the parameter lies on its majority side of the reference (a value in
 #'   \[0.5, 1\]). Requires a finite `reference_line`.
-#' @param facet Whether to give each parameter its own panel with a free
-#'   x-axis, laid out one per row. This keeps the small parameters legible when
-#'   a large one (typically the intercept) would otherwise stretch the shared
-#'   axis and squish the rest. Defaults to `FALSE`. A convenience alias for
-#'   `scales = "free"`.
+#' @param facet Whether to give each parameter its own panel with a free x-axis,
+#'   laid out one per row. This keeps small parameters legible when a large one,
+#'   typically the intercept, would otherwise stretch the shared axis. A
+#'   shortcut for `scales = "free"`. Defaults to `FALSE`.
 #' @param scales Either `"fixed"` (the default, a single shared x-axis) or
-#'   `"free"` (one free-scaled panel per parameter). When `facet = TRUE` this is
-#'   forced to `"free"`.
-#' @param colour,fill Colours for the point/interval and for the density slab.
-#'   Default to the depictr brand blue.
+#'   `"free"` (one free-scaled panel per parameter). When `facet = TRUE`, it is
+#'   set to `"free"`.
+#' @param colour,fill Colours for the point and interval and for the density
+#'   slab. Default to the depictr brand blue.
 #' @param rope_fill,rope_alpha Fill colour and opacity of the ROPE band.
 #' @param title,x_lab Plot title and value-axis label.
-#' @param caption Plot caption. The default (`NULL`) auto-captions the interval
-#'   mass; pass `NA` to omit a caption.
+#' @param caption Plot caption. The default (`NULL`) states the interval mass in
+#'   the caption. Pass `NA` to omit a caption.
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export
@@ -94,7 +93,8 @@
 #' # A region of practical equivalence and a probability-of-direction label
 #' posterior_plot(draws, rope = c(-0.1, 0.1), pd = TRUE)
 #'
-#' # When one parameter dwarfs the others, give each its own free-scaled panel:
+#' # When one parameter is much larger than the others, give each its own
+#' # free-scaled panel:
 #' posterior_plot(draws, facet = TRUE)
 #' }
 posterior_plot <- function(draws,
@@ -254,7 +254,7 @@ posterior_plot <- function(draws,
 
 # ---- rendering helpers (ggdist) --------------------------------------------
 
-#' Build the ggdist slab/interval layer for a given style
+#' Build the ggdist slab and interval layer for a given style
 #' @noRd
 posterior_slab_layer <- function(long, style, widths, point, colour, fill) {
   point_interval <- if (point == "median") "median_qi" else "mean_qi"

@@ -15,13 +15,13 @@ silhouette_plot(
 )
 }
 \arguments{
-\item{data}{A data frame, a numeric matrix, or a \link[stats:dist]{stats::dist} object.}
+\item{data}{A data frame, a numeric matrix or a \link[stats:dist]{stats::dist} object.}
 
 \item{clusters}{A vector of cluster assignments, one per observation (per row
 of \code{data}, or matching the objects in a \code{dist}). Required.}
 
-\item{cols}{When \code{data} is a data frame, the numeric columns to use
-(default: all numeric columns).}
+\item{cols}{When \code{data} is a data frame, the numeric columns to use (by
+default, all numeric columns).}
 
 \item{scale}{Whether to scale variables to unit variance before computing the
 distances (ignored when \code{data} is a \code{dist}).}
@@ -29,7 +29,7 @@ distances (ignored when \code{data} is a \code{dist}).}
 \item{distance}{Distance measure passed to \code{\link[stats:dist]{stats::dist()}} (ignored when
 \code{data} is already a \code{dist}).}
 
-\item{palette}{Colours for the clusters; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
+\item{palette}{Colours for the clusters. Defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title}{Plot title.}
 }
@@ -42,10 +42,11 @@ assignments passed in \code{clusters}, as does each band label.
 \description{
 Draws a silhouette plot for a clustering: one horizontal bar per observation,
 grouped and sorted within cluster, with the average silhouette width shown
-per cluster and overall. The silhouette width \eqn{s(i)} compares how close an
-observation is to its own cluster against the nearest other cluster, and lies
-in \eqn{[-1, 1]} (higher is better; negative suggests the point may belong to
-another cluster). It is a standard internal measure of cluster quality.
+per cluster and overall. The silhouette width \eqn{s(i)} compares how close
+an observation is to its own cluster against the nearest other cluster, and
+lies in \eqn{[-1, 1]}. Higher is better, and a negative width suggests that
+the point may belong to another cluster. It is a standard internal measure of
+cluster quality.
 }
 \details{
 The widths are computed with \code{\link[cluster:silhouette]{cluster::silhouette()}} when the 'cluster'

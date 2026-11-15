@@ -19,9 +19,9 @@ Description: A toolkit of publication-ready plots that span the whole
     values, interactions, random effects and optimiser checks), diagnostics
     and classification (residual panels, binned residuals, influence,
     quantile-quantile, receiver operating characteristic (ROC) curves,
-    calibration, threshold tuning and confusion matrices), uncertainty and
-    power, and reporting helpers (a shared theme, colourblind-aware
-    palettes, plot composition and saving). Every plotting function returns
+    calibration, threshold tuning and confusion matrices) and uncertainty
+    and power. Reporting helpers provide a shared theme, colourblind-aware
+    palettes, plot composition and saving. Every plotting function returns
     a 'ggplot2' object, or a 'patchwork' object for composite panels.
     Heavier modelling back-ends are optional. The package includes
     reproducibly simulated datasets on which every example and vignette

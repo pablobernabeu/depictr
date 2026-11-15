@@ -19,27 +19,27 @@ interaction_plot(
 )
 }
 \arguments{
-\item{model}{A fitted model (\code{lm}, \code{glm}, \code{merMod}, ...).}
+\item{model}{A fitted model, such as an \code{lm}, \code{glm} or \code{merMod}.}
 
-\item{predictor}{Name of the focal predictor on the x-axis (string), given
-as in \code{\link[=effects_plot]{effects_plot()}}: \code{"log(rainfall)"} means \code{rainfall}.}
+\item{predictor}{Name of the focal predictor on the x-axis, as a string,
+given as in \code{\link[=effects_plot]{effects_plot()}}: \code{"log(rainfall)"} means \code{rainfall}.}
 
-\item{moderator}{Name of the moderating predictor, mapped to colour
-(string), given in the same way as \code{predictor}. It must be a different
+\item{moderator}{Name of the moderating predictor, mapped to colour, as a
+string given in the same way as \code{predictor}. It must be a different
 variable.}
 
 \item{moderator_values}{For a numeric moderator, the values to show, on the
 variable's own scale. Defaults to the 10th, 50th and 90th percentiles in
 the estimation sample.}
 
-\item{conf_level}{Confidence level for the bands/intervals, a single number
-strictly between 0 and 1.}
+\item{conf_level}{Confidence level for the bands and intervals, a single
+number strictly between 0 and 1.}
 
 \item{n}{Number of points across the range of a numeric focal predictor.}
 
-\item{band}{Whether to draw confidence bands (numeric focal predictor).}
+\item{band}{Whether to draw confidence bands for a numeric focal predictor.}
 
-\item{palette}{Colours for the moderator; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
+\item{palette}{Colours for the moderator. Defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title, x_lab, y_lab}{Title and axis labels.}
 }
@@ -48,7 +48,7 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 Shows how the predicted relationship between a focal predictor and the
-response changes across the levels (or representative values) of a second,
+response changes across the levels, or representative values, of a second,
 moderating predictor. Other predictors are held at typical values.
 }
 \details{

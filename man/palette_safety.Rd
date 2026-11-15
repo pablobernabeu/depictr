@@ -8,16 +8,16 @@ palette_safety(colours = NULL, threshold = 5, metric = c("ciede2000", "cie76"))
 }
 \arguments{
 \item{colours}{The palette to test. Defaults to the depictr qualitative
-palette. Needs at least two colours: a pairwise distance over fewer than
-two has no value, rather than an infinitely safe one.}
+palette. Needs at least two colours, since fewer than two have no pairwise
+distance.}
 
 \item{threshold}{The smallest acceptable colour difference, on the scale of
 \code{metric}.}
 
 \item{metric}{The colour difference to measure: \code{"ciede2000"}, the default,
-or \code{"cie76"}, the Euclidean distance in CIELAB. \code{"cie76"} is kept so that
-results computed with it can be reproduced, and a later release will remove
-it.}
+or \code{"cie76"}, the Euclidean distance in CIELAB. \code{"cie76"} is deprecated and
+gives a warning once per session. It is kept so that results computed with
+it can be reproduced, and a later release will remove it.}
 }
 \value{
 A list with \code{min_delta_e} (the worst case across conditions),
@@ -43,13 +43,14 @@ its pink come within 2.74 of each other in CIEDE2000.
 
 The default \code{threshold} of 5 is calibrated against the built-in palette of
 \code{\link[=depictr_palette]{depictr_palette()}}, which is based on the Okabe-Ito set with the brand blue
-and a grey in place of its blue and black. That palette's tightest pair
-(reddish purple against grey) sits at 6.43 under full deuteranopia, so the
+and a grey in place of its blue and black. That palette's closest pair
+(reddish purple against grey) is 6.43 apart under full deuteranopia, so the
 cut must lie below that to pass the built-in palette, while still flagging
-colours that become near-identical under a deficiency. The difference includes
-lightness, which survives colour-vision deficiency, so two colours that share
-a hue but differ in lightness are correctly treated as distinguishable. Full
-severity is the worst case; most colour-vision deficiency is milder.
+colours that become near-identical under a deficiency. The difference
+includes lightness, which survives colour-vision deficiency, so two colours
+that share a hue but differ in lightness are correctly treated as
+distinguishable. Full severity is the worst case, and most colour-vision
+deficiency is milder.
 
 This looks at a palette in the abstract. To audit a finished figure, which
 uses only as many colours as it has groups and has text and a background

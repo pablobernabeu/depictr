@@ -2,20 +2,20 @@
 
 #' Seasonal-subseries (cycle) plot
 #'
-#' Draws a seasonal-subseries plot (also called a cycle plot): the series is
-#' split into one small panel per season (e.g. one panel per calendar month for
-#' monthly data), and within each panel the value is drawn across successive
-#' cycles (e.g. across years). A horizontal reference line in every panel marks
-#' that season's mean. This makes the seasonal pattern (differences *between*
-#' panels) and the within-season trend over time (the slope *inside* each panel)
-#' visible at the same time, which a single overlaid line cannot show.
+#' Draws a seasonal-subseries plot, also called a cycle plot: the series is
+#' split into one small panel per season, such as one panel per calendar month
+#' for monthly data, and within each panel, the value is drawn across successive
+#' cycles, such as years. A horizontal reference line in every panel marks that
+#' season's mean. The plot shows the seasonal pattern (the differences between
+#' panels) and the within-season trend over time (the slope inside each panel)
+#' at the same time, which a single overlaid line cannot show.
 #'
-#' Two layouts are offered. With `style = "subseries"` (the default) the panels
-#' are faceted side by side, each tracing one season across cycles: the
-#' classic Cleveland cycle plot, matching `feasts::gg_subseries()`. With
-#' `style = "season"` every cycle is drawn as its own line over the seasons on a
-#' shared axis (the seasonal-plot layout of `forecast::ggseasonplot()`), which is
-#' handy for spotting an unusual year. The lines run from a mid blue for the
+#' Two layouts are offered. With `style = "subseries"` (the default), the panels
+#' are faceted side by side, each tracing one season across cycles: the classic
+#' Cleveland cycle plot, matching `feasts::gg_subseries()`. With
+#' `style = "season"`, every cycle is drawn as its own line over the seasons on
+#' a shared axis (the seasonal-plot layout of `forecast::ggseasonplot()`), which
+#' helps to spot an unusual year. The lines run from a mid blue for the
 #' first cycle to a dark blue for the last, so they read in time order. Past
 #' about six cycles, neighbouring cycles take colours too close to tell apart,
 #' and the colours then show the order of the cycles more than which is which.
@@ -26,17 +26,18 @@
 #' @param x A `ts` object, or a numeric vector (then `frequency` is required),
 #'   holding one series. A multivariate `ts` or a matrix with several columns
 #'   is refused.
-#' @param frequency Number of observations per period (e.g. 12 for monthly
-#'   data); taken from `x` when it is a `ts`. A frequency that is not a whole
+#' @param frequency Number of observations per period, such as 12 for monthly
+#'   data. Taken from `x` when it is a `ts`. A frequency that is not a whole
 #'   number, such as the 365.25 / 7 of weekly data, is rounded down to whole
 #'   seasons, as [stats::stl()] rounds it, and a message says so. The seasons
 #'   are then counted from the first observation.
 #' @param style `"subseries"` for the faceted cycle plot (one panel per season)
 #'   or `"season"` for one line per cycle across the seasons.
 #' @param season_labels Optional character vector of length `frequency` giving
-#'   the season (panel/axis) labels, e.g. `month.abb`. When `NULL` (default)
-#'   sensible labels are inferred (month abbreviations for frequency 12, quarter
-#'   labels for frequency 4, otherwise the season index).
+#'   the season labels of the panels or the axis, such as `month.abb`. When
+#'   `NULL` (the default), labels are inferred: month abbreviations for
+#'   frequency 12, quarter labels for frequency 4 and the season index
+#'   otherwise.
 #' @param means Whether to draw the per-season mean reference line
 #'   (`style = "subseries"` only).
 #' @param point Whether to add points as well as the connecting line.
@@ -123,7 +124,7 @@ seasonal_plot <- function(x, frequency = NULL,
 
 # ---- internal helpers ------------------------------------------------------
 
-#' Build a tidy season/cycle data frame from a ts-like input
+#' Build a tidy season and cycle data frame from a ts-like input
 #'
 #' Returns one row per observation with columns `value`, `season` (factor with
 #' `frequency` ordered levels), `season_idx` (1..frequency), `cycle` (numeric

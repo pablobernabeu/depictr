@@ -25,27 +25,27 @@ cluster_plot(
 \arguments{
 \item{data}{A data frame.}
 
-\item{cols}{Numeric columns to cluster on (default: all numeric).}
+\item{cols}{Numeric columns to cluster on (by default, all numeric columns).}
 
-\item{k}{Number of clusters for k-means (ignored if \code{clusters} is supplied,
-or overridden when \code{suggest_k} chooses a value).}
+\item{k}{Number of clusters for k-means. Ignored if \code{clusters} is supplied,
+and overridden when \code{suggest_k} chooses a value.}
 
-\item{clusters}{Optional vector of cluster assignments (e.g. from
-\code{\link[stats:kmeans]{stats::kmeans()}} or \code{\link[stats:cutree]{stats::cutree()}}); use this to plot a clustering you
-computed yourself. Hierarchical or PAM assignments (such as
-\code{\link[stats:cutree]{stats::cutree()}} output matching \code{\link[=dendrogram_plot]{dendrogram_plot()}}) are accepted. Must
-have exactly one entry per row of \code{data} (rows with missing values in
-\code{cols} are dropped from both before plotting).}
+\item{clusters}{Optional vector of cluster assignments, such as one from
+\code{\link[stats:kmeans]{stats::kmeans()}} or \code{\link[stats:cutree]{stats::cutree()}}, to plot a clustering computed
+beforehand. Hierarchical or PAM assignments (such as \code{\link[stats:cutree]{stats::cutree()}}
+output matching \code{\link[=dendrogram_plot]{dendrogram_plot()}}) are accepted. Must have exactly one
+entry per row of \code{data}. Rows with missing values in \code{cols} are dropped
+from both before plotting.}
 
 \item{scale}{Whether to scale variables to unit variance before clustering
-and the PCA. Columns with (near-)zero variance cannot be scaled and are
-dropped with a message, as in \code{\link[=correlation_heatmap]{correlation_heatmap()}}.}
+and the PCA. Columns with zero or near-zero variance cannot be scaled and
+are dropped with a message, as in \code{\link[=correlation_heatmap]{correlation_heatmap()}}.}
 
 \item{suggest_k}{Optionally choose \code{k} automatically with a cluster-quality
-diagnostic instead of using the supplied \code{k}. Either \code{TRUE} (uses the
+diagnostic in place of the supplied \code{k}. Either \code{TRUE} (the
 average-silhouette criterion), a string naming the criterion
-(\code{"silhouette"}, \code{"wss"} or \code{"gap"}; see \code{\link[=k_diagnostic]{k_diagnostic()}}), or \code{NULL}
-(the default) to leave \code{k} unchanged. Ignored when \code{clusters} is supplied.}
+(\code{"silhouette"}, \code{"wss"} or \code{"gap"}, see \code{\link[=k_diagnostic]{k_diagnostic()}}) or \code{NULL} (the
+default) to leave \code{k} unchanged. Ignored when \code{clusters} is supplied.}
 
 \item{k_range}{Candidate values of \code{k} searched when \code{suggest_k} is set.
 The default, \code{NULL}, searches \code{1:8} for \code{"gap"} and \code{"wss"} and \code{2:8} for
@@ -58,12 +58,12 @@ suggest a single cluster.}
 
 \item{point_alpha}{Point transparency.}
 
-\item{palette}{Colours for the clusters; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
+\item{palette}{Colours for the clusters. Defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title}{Plot title.}
 
-\item{seed}{Optional integer seed for reproducible k-means (ignored when
-\code{clusters} is supplied). It applies to this call alone, and the caller's
+\item{seed}{Optional integer seed for reproducible k-means, ignored when
+\code{clusters} is supplied. It applies to this call alone, and the caller's
 random-number state is restored afterwards. The default, \code{NULL}, takes the
 random starts of \code{\link[stats:kmeans]{stats::kmeans()}}, and any random draws of a \code{suggest_k}
 diagnostic, from the session's random-number stream, so call \code{set.seed()}
@@ -78,11 +78,11 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object. When \code{suggest_k} is used, 
 and the full diagnostic are attached as the attribute \code{"k_diagnostic"}.
 }
 \description{
-Runs k-means clustering on the numeric columns of a data frame (or uses a
-supplied cluster assignment) and plots the observations on the first two
+Runs k-means clustering on the numeric columns of a data frame, or uses a
+supplied cluster assignment, and plots the observations on the first two
 principal components, coloured by cluster, with optional convex hulls and
-labelled centroids. Projecting onto principal components means the plot works
-for any number of variables.
+labelled centroids. Because the plot uses principal components, it works for
+any number of variables.
 }
 \examples{
 cluster_plot(crop_yield, cols = c("rainfall", "fertiliser", "soil_ph",

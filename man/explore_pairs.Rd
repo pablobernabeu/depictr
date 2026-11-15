@@ -39,7 +39,7 @@ to \code{\link[stats:cor]{stats::cor()}}: \code{"pearson"}, \code{"spearman"} or
 correlation is undefined (a constant column, or too few complete cases) is
 labelled \code{n/a}, as in \code{\link[=correlation_heatmap]{correlation_heatmap()}}.}
 
-\item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
+\item{palette}{Colours for the groups. Defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title}{Overall title for the matrix.}
 }
@@ -49,8 +49,8 @@ A 'patchwork' object (printable like a \link[ggplot2:ggplot]{ggplot2::ggplot}).
 \description{
 A matrix of pairwise plots for a set of numeric variables: scatter plots
 below the diagonal, densities on the diagonal and correlation coefficients
-above the diagonal. Optionally colour everything by a grouping variable.
-Built with 'patchwork', so it shares the package theme and palette.
+above the diagonal, optionally coloured by a grouping variable. Built with
+'patchwork', so it shares the package theme and palette.
 }
 \examples{
 explore_pairs(crop_yield, cols = c("rainfall", "fertiliser", "yield"))

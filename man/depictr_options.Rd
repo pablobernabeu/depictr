@@ -20,13 +20,13 @@ depictr_options(
 \item{base_family}{Base font family for \code{\link[=theme_depictr]{theme_depictr()}}.}
 
 \item{brand}{The depictr brand colour, used for plot titles and single-series
-geoms. It coincides with the default palette's first colour but does not
-alter a palette; use \code{palette} for that.}
+geoms. It matches the default palette's first colour but does not change a
+palette, which \code{palette} sets.}
 
 \item{accent}{A secondary highlight colour, for the one element a figure
 draws attention to.}
 
-\item{reference}{The colour used for reference / annotation lines.}
+\item{reference}{The colour used for reference and annotation lines.}
 
 \item{palette}{An optional custom qualitative palette: a character vector of
 hex colours used by \code{\link[=depictr_palette]{depictr_palette()}} (type \code{"qualitative"}) and the
@@ -39,7 +39,7 @@ later plot in the contrast-first order (see \code{\link[=depictr_palette]{depict
 }
 \value{
 A named list of the resolved option values. When setting, the
-\emph{previous} values are returned invisibly.
+previous values are returned invisibly.
 }
 \description{
 depictr reads a small set of global options so that you can configure the
@@ -57,11 +57,11 @@ option when the plotting function runs, so the colours are set here.
 \details{
 Called with no arguments, \code{depictr_options()} returns the currently resolved
 values (option if set, otherwise package default). Called with named
-arguments it sets the matching \verb{options(depictr.<name> = )} entries and
-returns the \emph{previous} resolved values invisibly, so the pattern
-\verb{old <- depictr_options(...); on.exit(do.call(depictr_options, old))} restores
-them. Pass \code{NULL} for an argument to clear that option and fall back to the
-package default.
+arguments, it sets the matching \verb{options(depictr.<name> = )} entries and
+returns the previous resolved values invisibly, so the pattern
+\verb{old <- depictr_options(...); on.exit(do.call(depictr_options, old))}
+restores them. Pass \code{NULL} for an argument to clear that option and fall back
+to the package default.
 }
 \examples{
 # Inspect the current settings

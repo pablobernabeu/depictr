@@ -21,8 +21,8 @@ dumbbell_plot(
 \arguments{
 \item{data}{A data frame.}
 
-\item{category}{The categorical axis (string or unquoted name); one row of
-the plot per level.}
+\item{category}{The categorical axis (string or unquoted name), with one row
+of the plot per level.}
 
 \item{value}{The numeric value to compare (string or unquoted name).}
 
@@ -31,13 +31,13 @@ each dumbbell (string or unquoted name).}
 
 \item{sort}{How to order the categories up the axis: \code{"gap"} (by the signed
 difference between the two groups, the default), \code{"value"} (by the second
-group's value), or \code{"none"} (the data's own order: the order of the levels
+group's value) or \code{"none"} (the data's own order: the order of the levels
 when \code{category} is a factor, and otherwise the order in which the
 categories first appear).}
 
 \item{point_size}{Size of the end points.}
 
-\item{palette}{Length-2 colours for the two groups; defaults to
+\item{palette}{Length-2 colours for the two groups. Defaults to
 \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{legend_inside}{When \code{TRUE}, draw the two-group legend inside the
@@ -53,14 +53,14 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 Compares a numeric value between exactly two groups across a set of
-categories: for each category the two group values are drawn as points joined
-by a connecting segment, so the size and direction of the gap is read at a
-glance. It is a clearer alternative to paired or grouped bars for
-before/after, two-condition or two-period comparisons.
+categories: for each category, the two group values are drawn as points
+joined by a segment, so the size and direction of the gap can be read at a
+glance. It is a clearer alternative to paired or grouped bars for comparisons
+of before and after, two conditions or two periods.
 }
 \details{
-When a category has several rows per group the values are averaged. Rows with
-a missing category, value or group are dropped.
+When a category has several rows per group, the values are averaged. Rows
+with a missing category, value or group are dropped.
 }
 \examples{
 wb <- wellbeing_survey

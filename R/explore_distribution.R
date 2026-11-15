@@ -2,35 +2,35 @@
 
 #' Plot the distribution of a variable
 #'
-#' Draws a histogram, a density curve, or both, optionally split by a grouping
-#' variable. A quick first look at a continuous variable.
+#' Draws a histogram, a density curve or both, optionally split by a grouping
+#' variable, for a first look at a continuous variable.
 #'
 #' @param data A data frame.
 #' @param x The continuous variable to display. Either a string or an unquoted
 #'   column name.
 #' @param group Optional grouping variable (string or unquoted name) mapped to
-#'   colour/fill. A numeric code counts as a group, but a numeric column with
+#'   colour and fill. A numeric code counts as a group, but a numeric column
+#'   with
 #'   more than 20 distinct values is refused as continuous. Rows with a missing
 #'   group are dropped with a message, and levels without rows are left out of
 #'   the plot and its palette.
 #' @param type One of `"histogram"`, `"density"` or `"both"`.
 #' @param bins Number of histogram bins.
-#' @param alpha Fill transparency (useful when groups overlap).
-#' @param position Histogram position adjustment, e.g. `"identity"`,
-#'   `"stack"` or `"dodge"`. The default (`NULL`) chooses `"dodge"` when
-#'   `group` is set (so overlapping bars stay readable) and `"identity"`
-#'   otherwise.
-#' @param palette Colours for the groups; defaults to [depictr_palette()].
-#' @param facet When a `group` is given, draw one panel per group instead of
-#'   overlaying them. This is much clearer than an overlay once there are more
-#'   than two or three groups (overlaid histograms in particular become hard to
-#'   read). Defaults to `FALSE`. Ignored when there is no `group`.
-#' @param legend_inside When `TRUE` (and a `group` is given without `facet`),
-#'   draw the colour legend inside the panel (in the top-right corner a
-#'   unimodal histogram/density leaves empty) over a translucent background,
-#'   instead of in a right-hand margin. Defaults to `FALSE`.
-#' @param title,x_lab Plot title and x-axis label (defaults to the variable
-#'   name).
+#' @param alpha Fill transparency, which helps when groups overlap.
+#' @param position Histogram position adjustment, such as `"identity"`,
+#'   `"stack"` or `"dodge"`. The default (`NULL`) chooses `"dodge"` when `group`
+#'   is set, so that overlapping bars stay readable, and `"identity"` otherwise.
+#' @param palette Colours for the groups. Defaults to [depictr_palette()].
+#' @param facet When a `group` is given, whether to draw one panel per group in
+#'   place of an overlay, which is much clearer once there are more than two or
+#'   three groups, since overlaid histograms in particular become hard to read.
+#'   Defaults to `FALSE`. Ignored when there is no `group`.
+#' @param legend_inside When `TRUE` and a `group` is given without `facet`, the
+#'   colour legend is drawn inside the panel, over a translucent background, in
+#'   the top-right corner, which a unimodal histogram or density leaves empty.
+#'   Otherwise, it is drawn in a right-hand margin. Defaults to `FALSE`.
+#' @param title,x_lab Plot title and x-axis label, which defaults to the
+#'   variable name.
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export

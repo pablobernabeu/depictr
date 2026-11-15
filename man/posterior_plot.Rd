@@ -26,11 +26,11 @@ posterior_plot(
 )
 }
 \arguments{
-\item{draws}{Posterior draws: a fitted model (\code{brms}/\code{rstanarm}), a
-\code{posterior} draws object, a matrix, or a long/wide data frame (see
+\item{draws}{Posterior draws: a fitted model (\code{brms} or \code{rstanarm}), a
+\code{posterior} draws object, a matrix or a long or wide data frame (see
 Details).}
 
-\item{style}{One of \code{"halfeye"} (density slab + interval, the default),
+\item{style}{One of \code{"halfeye"} (density slab and interval, the default),
 \code{"interval"} (point and two nested intervals, no slab), \code{"gradient"} (a
 colour-graded interval) or \code{"dots"} (a quantile dotplot). Any other value
 is an error. When 'ggdist' is missing, every style falls back to
@@ -44,17 +44,17 @@ used for the caption and the displayed interval mass.}
 
 \item{interaction}{Passed to \code{\link[=format_terms]{format_terms()}} for the parameter labels.}
 
-\item{labels}{Optional named character vector renaming parameters, e.g.
+\item{labels}{Optional named character vector renaming parameters, such as
 \code{c(conditionunrelated = "condition")}. Unmatched parameters fall back to
 \code{\link[=format_terms]{format_terms()}}. For a \code{brms} fit, or a draws object holding \code{b_}
 parameters, the names are given without the \code{b_} prefix. An unnamed vector
 gives one label per parameter, in the order the parameters appear in
 \code{draws}.}
 
-\item{reference_line}{Position of a vertical reference line, or \code{NULL}/\code{NA}
-to omit it. There is no universally meaningful reference for every
-parameter, so this defaults to \code{0} (the usual "no effect" line for
-differences and slopes) but should be set or cleared deliberately.}
+\item{reference_line}{Position of a vertical reference line, or \code{NULL} or
+\code{NA} to omit it. No reference is meaningful for every parameter, so this
+defaults to \code{0}, the usual line of no effect for differences and slopes,
+but should be set or cleared deliberately.}
 
 \item{rope}{Optional length-2 numeric \code{c(lo, hi)} giving a region of
 practical equivalence to shade behind the distributions.}
@@ -64,49 +64,48 @@ direction relative to \code{reference_line}, the posterior probability that
 the parameter lies on its majority side of the reference (a value in
 [0.5, 1]). Requires a finite \code{reference_line}.}
 
-\item{facet}{Whether to give each parameter its own panel with a free
-x-axis, laid out one per row. This keeps the small parameters legible when
-a large one (typically the intercept) would otherwise stretch the shared
-axis and squish the rest. Defaults to \code{FALSE}. A convenience alias for
-\code{scales = "free"}.}
+\item{facet}{Whether to give each parameter its own panel with a free x-axis,
+laid out one per row. This keeps small parameters legible when a large one,
+typically the intercept, would otherwise stretch the shared axis. A
+shortcut for \code{scales = "free"}. Defaults to \code{FALSE}.}
 
 \item{scales}{Either \code{"fixed"} (the default, a single shared x-axis) or
-\code{"free"} (one free-scaled panel per parameter). When \code{facet = TRUE} this is
-forced to \code{"free"}.}
+\code{"free"} (one free-scaled panel per parameter). When \code{facet = TRUE}, it is
+set to \code{"free"}.}
 
-\item{colour, fill}{Colours for the point/interval and for the density slab.
-Default to the depictr brand blue.}
+\item{colour, fill}{Colours for the point and interval and for the density
+slab. Default to the depictr brand blue.}
 
 \item{rope_fill, rope_alpha}{Fill colour and opacity of the ROPE band.}
 
 \item{title, x_lab}{Plot title and value-axis label.}
 
-\item{caption}{Plot caption. The default (\code{NULL}) auto-captions the interval
-mass; pass \code{NA} to omit a caption.}
+\item{caption}{Plot caption. The default (\code{NULL}) states the interval mass in
+the caption. Pass \code{NA} to omit a caption.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Displays posterior (or, more generally, bootstrap or simulation) draws as a
-\emph{distribution} per parameter, in the style of a half-eye (a density slab with
+Displays posterior draws, or more generally bootstrap or simulation draws, as
+a distribution per parameter, in the style of a half-eye (a density slab with
 a point-and-interval beneath it), an interval-only forest plot, a gradient
 interval or a dotplot. The full shape of the posterior is shown, so skew,
 multimodality and the relative mass on either side of a reference value are
-all visible, rather than a point and two limits alone. The intervals are
+all visible, where a point and two limits would hide them. The intervals are
 central (equal-tailed) quantile intervals, which leave the same share of the
 draws in either tail.
 }
 \details{
 Draws may be supplied in many shapes: a fitted Bayesian model (\code{brms} or
-\code{rstanarm}), a \code{posterior} \emph{draws} object, a wide data frame or matrix with
+\code{rstanarm}), a \code{posterior} draws object, a wide data frame or matrix with
 one column of draws per parameter, or a long data frame with a parameter
 column named \code{parameter}, \code{term}, \code{.variable} or \code{variable} and a value
 column named \code{value}, \code{.value}, \code{draw} or \code{estimate}. In a wide data frame,
 the numeric columns \code{.chain}, \code{.iteration}, \code{.draw}, \code{draw}, \code{chain},
 \code{iteration} and \code{.row} are read as sampler indices and left out. For fitted
-models only the fixed-effect (population)
-parameters are kept, with the \code{brms} \code{b_} prefix stripped. A draws object
+models, only the fixed-effect (population) parameters are kept, with the
+\code{brms} \code{b_} prefix stripped. A draws object
 that holds \code{b_} parameters, as \code{posterior::as_draws_df()} returns for a
 \code{brms} fit, is read the same way, with a message naming the variables it
 dropped. Pass it through \code{as.data.frame()} to keep the other variables, as a
@@ -117,9 +116,9 @@ that would share a display label, such as the \code{b_Intercept} and centred
 renamed with \code{labels}. A matrix of posterior summaries, such as
 \code{brms::fixef()} returns, holds no draws and is refused.
 
-The slab styles use the 'ggdist' package. When 'ggdist' is not installed the
-function falls back to the point-and-nested-interval display (equivalent to
-\code{style = "interval"}) and emits an informative message.
+The slab styles use the 'ggdist' package. When 'ggdist' is not installed, the
+function falls back to the point-and-nested-interval display (as
+\code{style = "interval"}) with an informative message.
 }
 \examples{
 # Wide draws: one column per parameter
@@ -135,7 +134,8 @@ posterior_plot(draws)
 # A region of practical equivalence and a probability-of-direction label
 posterior_plot(draws, rope = c(-0.1, 0.1), pd = TRUE)
 
-# When one parameter dwarfs the others, give each its own free-scaled panel:
+# When one parameter is much larger than the others, give each its own
+# free-scaled panel:
 posterior_plot(draws, facet = TRUE)
 }
 }

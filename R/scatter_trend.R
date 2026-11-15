@@ -12,12 +12,13 @@
 #'   counts as a group, but a numeric column with more than 20 distinct values
 #'   is refused as continuous. Rows with a missing group are dropped with a
 #'   message, and levels without rows are left out of the plot and its palette.
-#' @param method Smoothing method passed to [ggplot2::geom_smooth()], e.g.
-#'   `"lm"`, `"loess"`, or `NULL` for no trend line.
+#' @param method Smoothing method passed to [ggplot2::geom_smooth()], such as
+#'   `"lm"` or `"loess"`, or `NULL` for no trend line.
 #' @param se Whether to draw the confidence band around the trend.
 #' @param point_alpha Point transparency.
-#' @param palette Colours for the groups; defaults to [depictr_palette()].
-#' @param title,x_lab,y_lab Title and axis labels (default to variable names).
+#' @param palette Colours for the groups. Defaults to [depictr_palette()].
+#' @param title,x_lab,y_lab Title and axis labels, which default to the variable
+#'   names.
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export

@@ -14,21 +14,21 @@ calibration_plot(
 )
 }
 \arguments{
-\item{x}{A binomial \code{glm}, the vector of observed outcomes, or a \emph{named} list
-of models / (actual, score) pairs to overlay.}
+\item{x}{A binomial \code{glm}, the vector of observed outcomes or a named list of
+models or of (actual, score) pairs to overlay.}
 
 \item{score}{When \code{x} is an outcome vector, the matching predicted
-probabilities (or a list of them for the multi-model case).}
+probabilities, or a list of them for several models.}
 
-\item{bins}{Number of (equal-count) bins.}
+\item{bins}{Number of equal-count bins.}
 
-\item{colour}{Point/line colour for the single-model case. Defaults to the
-depictr brand blue. Ignored when several models are overlaid.}
+\item{colour}{Colour of the points and lines for a single model. Defaults to
+the depictr brand blue. Ignored when several models are overlaid.}
 
 \item{conf_level}{Confidence level for the per-bin Wilson interval on the
 observed proportion, a single number strictly between 0 and 1. Use \code{NA} to
-omit the intervals. Intervals are only drawn in the single-model case to
-keep the overlay legible.}
+omit the intervals. Intervals are drawn only for a single model, to keep
+the overlay legible.}
 
 \item{title}{Plot title.}
 }
@@ -37,11 +37,11 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 Assesses how well predicted probabilities match observed frequencies. The
-scores are split into bins; for each bin the mean predicted probability is
-plotted against the observed event rate, with the diagonal marking perfect
+scores are split into bins, and for each bin, the mean predicted probability
+is plotted against the observed event rate, with the diagonal marking perfect
 calibration. A Wilson binomial confidence interval is drawn on each bin's
 observed proportion so that bins backed by few observations are not
-over-interpreted. Pass a \emph{named list} of models / (actual, score) pairs to
+over-interpreted. Pass a named list of models or of (actual, score) pairs to
 overlay several colour-coded calibration curves with a legend.
 }
 \examples{

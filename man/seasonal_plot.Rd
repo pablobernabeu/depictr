@@ -22,8 +22,8 @@ seasonal_plot(
 holding one series. A multivariate \code{ts} or a matrix with several columns
 is refused.}
 
-\item{frequency}{Number of observations per period (e.g. 12 for monthly
-data); taken from \code{x} when it is a \code{ts}. A frequency that is not a whole
+\item{frequency}{Number of observations per period, such as 12 for monthly
+data. Taken from \code{x} when it is a \code{ts}. A frequency that is not a whole
 number, such as the 365.25 / 7 of weekly data, is rounded down to whole
 seasons, as \code{\link[stats:stl]{stats::stl()}} rounds it, and a message says so. The seasons
 are then counted from the first observation.}
@@ -32,9 +32,10 @@ are then counted from the first observation.}
 or \code{"season"} for one line per cycle across the seasons.}
 
 \item{season_labels}{Optional character vector of length \code{frequency} giving
-the season (panel/axis) labels, e.g. \code{month.abb}. When \code{NULL} (default)
-sensible labels are inferred (month abbreviations for frequency 12, quarter
-labels for frequency 4, otherwise the season index).}
+the season labels of the panels or the axis, such as \code{month.abb}. When
+\code{NULL} (the default), labels are inferred: month abbreviations for
+frequency 12, quarter labels for frequency 4 and the season index
+otherwise.}
 
 \item{means}{Whether to draw the per-season mean reference line
 (\code{style = "subseries"} only).}
@@ -53,21 +54,21 @@ suits a fill but leaves a line close to invisible.}
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Draws a seasonal-subseries plot (also called a cycle plot): the series is
-split into one small panel per season (e.g. one panel per calendar month for
-monthly data), and within each panel the value is drawn across successive
-cycles (e.g. across years). A horizontal reference line in every panel marks
-that season's mean. This makes the seasonal pattern (differences \emph{between}
-panels) and the within-season trend over time (the slope \emph{inside} each panel)
-visible at the same time, which a single overlaid line cannot show.
+Draws a seasonal-subseries plot, also called a cycle plot: the series is
+split into one small panel per season, such as one panel per calendar month
+for monthly data, and within each panel, the value is drawn across successive
+cycles, such as years. A horizontal reference line in every panel marks that
+season's mean. The plot shows the seasonal pattern (the differences between
+panels) and the within-season trend over time (the slope inside each panel)
+at the same time, which a single overlaid line cannot show.
 }
 \details{
-Two layouts are offered. With \code{style = "subseries"} (the default) the panels
-are faceted side by side, each tracing one season across cycles: the
-classic Cleveland cycle plot, matching \code{feasts::gg_subseries()}. With
-\code{style = "season"} every cycle is drawn as its own line over the seasons on a
-shared axis (the seasonal-plot layout of \code{forecast::ggseasonplot()}), which is
-handy for spotting an unusual year. The lines run from a mid blue for the
+Two layouts are offered. With \code{style = "subseries"} (the default), the panels
+are faceted side by side, each tracing one season across cycles: the classic
+Cleveland cycle plot, matching \code{feasts::gg_subseries()}. With
+\code{style = "season"}, every cycle is drawn as its own line over the seasons on
+a shared axis (the seasonal-plot layout of \code{forecast::ggseasonplot()}), which
+helps to spot an unusual year. The lines run from a mid blue for the
 first cycle to a dark blue for the last, so they read in time order. Past
 about six cycles, neighbouring cycles take colours too close to tell apart,
 and the colours then show the order of the cycles more than which is which.

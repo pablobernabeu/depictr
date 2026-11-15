@@ -23,12 +23,12 @@ frequentist_bayesian_plot(
 )
 }
 \arguments{
-\item{frequentist}{A frequentist model (e.g. from \code{lm}, \code{glm} or
-\code{lmerTest::lmer}) or a tidy data frame of estimates.}
+\item{frequentist}{A frequentist model, such as one from \code{lm}, \code{glm} or
+\code{lmerTest::lmer}, or a tidy data frame of estimates.}
 
-\item{bayesian}{A Bayesian model, a \code{posterior} draws object, a draws
-matrix/data frame, a tidy data frame of posterior summaries or a summary
-matrix such as \code{brms::fixef()} returns.}
+\item{bayesian}{A Bayesian model, a \code{posterior} draws object, a draws matrix
+or data frame, a tidy data frame of posterior summaries or a summary matrix
+such as \code{brms::fixef()} returns.}
 
 \item{conf_level}{Level of the intervals the function computes: the
 confidence intervals of a frequentist model and, when \code{bayesian} holds
@@ -39,16 +39,15 @@ single number strictly between 0 and 1.}
 an unnamed \code{labels} vector takes the frequentist terms first, then any
 that only the Bayesian input holds. \code{intercept} defaults to \code{TRUE} here.}
 
-\item{facet, scales}{Layout controls. Because a Bayesian model almost always
-carries a large intercept alongside small slopes, the comparison defaults
-to a faceted, free-scaled layout (\code{facet = TRUE}): each term gets its own
-panel and free x-axis, so every posterior and its frequentist overlay stay
-legible. Pass \code{facet = FALSE} (or \code{scales = "fixed"}) for the classic
-single shared-axis plot.}
+\item{facet, scales}{Layout controls. Because a model often has a large
+intercept beside small slopes, the comparison defaults to a faceted,
+free-scaled layout (\code{facet = TRUE}): each term gets its own panel and free
+x-axis, so every posterior and its frequentist overlay stay legible. Pass
+\code{facet = FALSE} (or \code{scales = "fixed"}) for a single shared axis.}
 
-\item{note_frequentist_no_prior}{If \code{TRUE}, append "(no prior)" to the
-frequentist legend label, which is helpful when the title names the
-Bayesian prior.}
+\item{note_frequentist_no_prior}{If \code{TRUE}, append \code{"(no prior)"} to the
+frequentist legend label, which helps when the title names the Bayesian
+prior.}
 
 \item{vertical_line_at_x}{Position of the vertical reference line (\code{NA} to
 omit).}
@@ -71,12 +70,13 @@ brand blue for the frequentist estimates and orange for the Bayesian ones,
 whether the Bayesian side is drawn from draws or from summaries.
 }
 \details{
-When \code{bayesian} carries posterior \emph{draws} (a \code{brms}/\code{rstanarm} fit, a
-\code{posterior} draws object, a draws matrix, or a long/wide draws data frame),
-the full posterior \emph{distribution} is drawn per term (a 'ggdist' half-eye)
-and the frequentist point and confidence interval is overlaid at the same
-position. When \code{bayesian} is only a table of posterior \emph{summaries}, the
-function shows the familiar two-source forest plot via \code{\link[=compare_models]{compare_models()}}.
+When \code{bayesian} holds posterior draws (a \code{brms} or \code{rstanarm} fit, a
+\code{posterior} draws object, a draws matrix or a long or wide draws data frame),
+the full posterior distribution of each term is drawn as a 'ggdist' half-eye,
+with the frequentist point and confidence interval overlaid at the same
+position. When \code{bayesian} is only a table of posterior summaries, the
+function draws the familiar two-source forest plot through
+\code{\link[=compare_models]{compare_models()}}.
 It reads tidy columns (\code{term}, \code{estimate}, \code{conf.low}, \code{conf.high}), the
 \code{Estimate}, \code{Q2.5} and \code{Q97.5} of the matrix \code{brms::fixef()} returns, and the
 \verb{l-95\% CI} and \verb{u-95\% CI} of \code{summary(fit)$fixed}.
@@ -90,8 +90,8 @@ Any other data frame is read as summaries. The half-eyes need the 'ggdist'
 package. Without it, each posterior is drawn as its median and \code{conf_level}
 interval, with a message.
 
-Terms are aligned by their canonical display label, so the \code{brms}-style \code{b_}
-prefix is reconciled automatically against the frequentist term names. Draws
+Terms are aligned by their display label, so the \code{b_} prefix of \code{brms} is
+matched automatically against the frequentist term names. Draws
 are read as in \code{\link[=posterior_plot]{posterior_plot()}}, so a draws object holding \code{b_} parameters
 keeps only those, and two terms that would share a label are an error. With
 draws, only the terms both sides share are drawn, and a message names any
@@ -108,10 +108,10 @@ holds, at whatever level they were computed. By default, a caption names the
 level of each source's intervals or says that they are as supplied.
 }
 \examples{
-# Summary path: a tidy "Bayesian" summary as a data frame. The summary here
+# Summary path: a tidy 'Bayesian' summary as a data frame. The summary here
 # stands in for a regularised posterior, so a weakly informative prior pulls
-# each estimate toward zero and narrows its interval; a real posterior would
-# come from the model fit rather than from arithmetic on the frequentist one.
+# each estimate towards zero and narrows its interval. A real posterior would
+# come from the model fit, not from arithmetic on the frequentist one.
 freq <- lm(life_satisfaction ~ stress + sleep_hours + exercise_days,
            data = wellbeing_survey)
 bayes <- tidy_estimates(freq)
@@ -123,7 +123,7 @@ frequentist_bayesian_plot(freq, bayes,
                           title = "Frequentist vs. Bayesian estimates")
 
 # Distribution path: simulated posterior draws (one column per term) drawn as
-# full posteriors with the frequentist point + CI overlaid.
+# full posteriors with the frequentist point and interval overlaid.
 set.seed(1)
 co <- coef(freq)
 draws <- as.data.frame(lapply(co, function(m) rnorm(400, m, abs(m) * 0.1 + 0.05)))

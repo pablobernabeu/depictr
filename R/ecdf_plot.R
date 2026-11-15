@@ -2,10 +2,10 @@
 
 #' Empirical cumulative distribution function (ECDF) plot
 #'
-#' Draws the empirical CDF of a numeric variable (the proportion of
-#' observations at or below each value), optionally split by a grouping
-#' variable. Unlike a histogram it needs no bin-width choice and makes
-#' quantiles, medians and group shifts easy to read directly off the curve.
+#' Draws the empirical CDF of a numeric variable (the proportion of observations
+#' at or below each value), optionally split by a grouping variable. Unlike a
+#' histogram, it needs no choice of bin width, and quantiles, medians and group
+#' shifts can be read directly off the curve.
 #'
 #' @param data A data frame.
 #' @param x The numeric variable (string or unquoted name).
@@ -14,14 +14,14 @@
 #'   numeric column with more than 20 distinct values is refused as continuous.
 #'   Rows with a missing group are dropped with a message, and levels without
 #'   rows are left out of the plot and its palette.
-#' @param reference_quantiles Optional numeric vector of probabilities in
-#'   \[0, 1\] to mark with light horizontal guides (e.g. `c(0.25, 0.5, 0.75)`);
+#' @param reference_quantiles Optional numeric vector of probabilities in \[0,
+#'   1\] to mark with light horizontal guides, such as `c(0.25, 0.5, 0.75)`.
 #'   `NULL` (the default) draws none.
-#' @param palette Colours for the groups; defaults to [depictr_palette()].
-#' @param legend_inside When `TRUE` (and a `group` is given), draw the legend
-#'   inside the panel (in the bottom-right corner the ECDF leaves empty once it
-#'   saturates) over a translucent background, instead of in a right-hand
-#'   margin. Defaults to `FALSE`.
+#' @param palette Colours for the groups. Defaults to [depictr_palette()].
+#' @param legend_inside When `TRUE` and a `group` is given, the legend is drawn
+#'   inside the panel, over a translucent background, in the bottom-right
+#'   corner, which the ECDF leaves empty once it nears 1. Otherwise, it is drawn
+#'   in a right-hand margin. Defaults to `FALSE`.
 #' @param title,x_lab,y_lab Plot title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.

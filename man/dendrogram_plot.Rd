@@ -18,7 +18,7 @@ dendrogram_plot(
 )
 }
 \arguments{
-\item{x}{A data frame, a \code{dist} object, or an \code{hclust} object.}
+\item{x}{A data frame, a \code{dist} object or an \code{hclust} object.}
 
 \item{cols}{When \code{x} is a data frame, the numeric columns to use.}
 
@@ -26,7 +26,8 @@ dendrogram_plot(
 
 \item{method}{Linkage method passed to \code{\link[stats:hclust]{stats::hclust()}}.}
 
-\item{scale}{Whether to scale variables before computing distances (data frame input).}
+\item{scale}{Whether to scale variables before computing distances, for data
+frame input.}
 
 \item{k}{Optional number of clusters to highlight (between 1 and the number
 of leaves). The cut-height line is drawn only when \verb{2 <= k < n}.}
@@ -34,13 +35,13 @@ of leaves). The cut-height line is drawn only when \verb{2 <= k < n}.}
 \item{horizontal}{Whether to draw the tree horizontally.}
 
 \item{labels}{Whether to print the leaf labels. \code{NULL} (the default) chooses
-automatically: labels are shown for small trees (up to 40 leaves) and
-suppressed for larger ones, where they would otherwise collapse into an
-unreadable smear. \code{TRUE}/\code{FALSE} force them on or off. When labels are
-hidden and \code{k} is set, the cluster membership is instead conveyed by a
-coloured strip of leaf ticks along the bottom of the tree.}
+automatically: labels are shown for small trees (up to 40 leaves) and left
+out of larger ones, where they would overlap and be unreadable. \code{TRUE} or
+\code{FALSE} forces them on or off. When labels are hidden and \code{k} is set, a
+coloured strip of leaf ticks along the bottom of the tree shows the cluster
+membership.}
 
-\item{palette}{Colours for the \code{k} clusters; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
+\item{palette}{Colours for the \code{k} clusters. Defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title}{Plot title.}
 }
@@ -48,11 +49,11 @@ coloured strip of leaf ticks along the bottom of the tree.}
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Hierarchical-clustering dendrogram, drawn with ggplot2 so it shares the
-package theme. Accepts a data frame (the distance matrix and clustering are
-computed for you), a \link[stats:dist]{stats::dist} object, or an \link[stats:hclust]{stats::hclust} object.
-Optionally cut the tree into \code{k} clusters, colouring the leaf labels and
-drawing the cut height.
+Hierarchical-clustering dendrogram, drawn with ggplot2 so that it shares the
+package theme. Accepts a data frame (from which the distance matrix and
+clustering are computed), a \link[stats:dist]{stats::dist} object or an \link[stats:hclust]{stats::hclust}
+object. Optionally cuts the tree into \code{k} clusters, colouring the leaf labels
+and drawing the cut height.
 }
 \examples{
 # Cluster the survey regions by their wellbeing averages
