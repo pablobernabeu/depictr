@@ -300,6 +300,7 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
   .positive_scalar(min_text_pt, "min_text_pt")
   if (!is.null(max_text_pt)) .positive_scalar(max_text_pt, "max_text_pt")
   metric <- match.arg(metric)
+  if (metric == "cie76") .warn_cie76()
 
   if (composite) {
     return(.audit_composite(plot, width_cm, render_width_cm, min_delta_e,

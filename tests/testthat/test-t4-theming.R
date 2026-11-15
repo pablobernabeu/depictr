@@ -206,7 +206,9 @@ test_that("the default qualitative palette stays distinguishable under CVD", {
   expect_true(all(saf > 5),
               info = paste("min CVD distances:",
                            paste(round(saf, 2), collapse = ", ")))
-  # The 1976 distance put the same pair 7.4 apart.
+  # The 1976 distance put the same pair 7.4 apart. It is deprecated and warns
+  # once per session, which test-check-figure.R checks.
+  withr::local_options(rlib_warning_verbosity = "quiet")
   expect_equal(palette_safety(metric = "cie76")$min_delta_e, 7.4)
 
   # Cross-check the Lab conversion with an independent computation: the
@@ -278,6 +280,7 @@ test_that("interpolating past the base set warns, and the base set does not", {
   # distance passed them, at 5.84.
   nine <- suppressWarnings(depictr_palette(9))
   expect_false(palette_safety(nine)$safe)
+  withr::local_options(rlib_warning_verbosity = "quiet")
   expect_true(palette_safety(nine, metric = "cie76")$safe)
 })
 

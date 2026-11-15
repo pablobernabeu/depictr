@@ -553,6 +553,20 @@ simulate_figure <- function(plot, deficiency, severity = 1) {
   list(distance = d[[closest]], pair = pairs[closest, ])
 }
 
+#' Warn, once per session, that `metric = "cie76"` is deprecated
+#'
+#' Called by [palette_safety()] and [check_figure()] when they are asked for
+#' the 1976 distance. NEWS.md lists the option under 'Deprecated'.
+#' @noRd
+.warn_cie76 <- function() {
+  rlang::warn(
+    paste0("`metric = \"cie76\"` is deprecated, and a later release will ",
+           "remove it. Use the default, `metric = \"ciede2000\"`."),
+    .frequency = "once",
+    .frequency_id = "depictr_metric_cie76"
+  )
+}
+
 #' Check that a palette stays distinguishable under each deficiency
 #'
 #' For normal vision and each deficiency at full severity, the palette's colours
@@ -607,16 +621,16 @@ simulate_figure <- function(plot, deficiency, severity = 1) {
 #' @examples
 #' palette_safety()
 #'
-#' # Two colours a hair apart are flagged.
+#' # Two nearly identical colours are flagged.
 #' palette_safety(c("#005b96", "#015c97"))
 #'
-#' # ggplot2's default palette of five colours, which passes under CIE76.
+#' # ggplot2's default palette of five colours fails under CIEDE2000.
 #' hue5 <- c("#F8766D", "#A3A500", "#00BF7D", "#00B0F6", "#E76BF3")
 #' palette_safety(hue5)$safe
-#' palette_safety(hue5, metric = "cie76")$safe
 palette_safety <- function(colours = NULL, threshold = 5,
                            metric = c("ciede2000", "cie76")) {
   metric <- match.arg(metric)
+  if (metric == "cie76") .warn_cie76()
   # `colours %||% depictr_palette()` would have swapped in the default palette
   # for an empty vector, reporting on eight colours the caller never passed.
   colours <- if (is.null(colours)) depictr_palette() else as.character(colours)

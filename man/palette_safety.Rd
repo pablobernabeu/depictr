@@ -58,13 +58,12 @@ besides, see \code{\link[=check_figure]{check_figure()}}.
 \examples{
 palette_safety()
 
-# Two colours a hair apart are flagged.
+# Two nearly identical colours are flagged.
 palette_safety(c("#005b96", "#015c97"))
 
-# ggplot2's default palette of five colours, which passes under CIE76.
+# ggplot2's default palette of five colours fails under CIEDE2000.
 hue5 <- c("#F8766D", "#A3A500", "#00BF7D", "#00B0F6", "#E76BF3")
 palette_safety(hue5)$safe
-palette_safety(hue5, metric = "cie76")$safe
 }
 \references{
 \insertRef{okabe2008}{depictr}
