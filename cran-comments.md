@@ -23,18 +23,18 @@ urlchecker::url_check() finds the URL correct.
 
 ## Test environments
 
-GitHub Actions, run 43718544778 on 2026-11-15, started by pull request #26 at
-commit 9075cb7 on the release branch. The package sources of this submission
+GitHub Actions, run 43735418221 on 2026-11-15, started by pull request #26 at
+commit 2b2c2f3 on the release branch. The package sources of this submission
 are those of that commit. Because a pull request started the run, each job
-checked out GitHub's merge of that commit into main (feb8008), which differs
-from 9075cb7 only in one line of a workflow file under .github, a directory
-that .Rbuildignore keeps out of the tarball. Each leg built the tarball with
+checked out GitHub's merge of that commit into main (36f731e), which differs
+from 2b2c2f3 only in one workflow file under .github, a directory that
+.Rbuildignore keeps out of the tarball. Each leg built the tarball with
 `--compact-vignettes=gs+qpdf` and ran `R CMD check --as-cran --no-manual` on
 it, without the CRAN incoming checks, which r-lib/actions turns off. Each leg
 ended with 'Status: OK':
 
 * ubuntu-latest (Ubuntu 26.04.1 LTS), R 4.6.2
-* ubuntu-latest (Ubuntu 26.04.1 LTS), R-devel (2026-11-13 r90888)
+* ubuntu-latest (Ubuntu 26.04.1 LTS), R-devel (2026-11-14 r90890)
 * ubuntu-latest (Ubuntu 26.04.1 LTS), R 4.5.3
 * windows-latest (x86_64-w64-mingw32), R 4.6.2
 * windows-latest (x86_64-w64-mingw32), R-devel (2026-11-14 r90890 ucrt)
@@ -55,8 +55,10 @@ Three more checks of the same run, all on Ubuntu 26.04.1 LTS, had no failure:
 * R CMD check with `_R_CHECK_DEPENDS_ONLY_=true` on R 4.6.2, so that the
   examples and tests saw only the packages in Depends and Imports, ended with
   'Status: OK'. The tests that need a suggested package skipped.
-* The test suite ran on R 4.1.3, the floor in DESCRIPTION, with only the
-  packages in Depends and Imports installed.
+* The test suite ran on R 4.1.3, the floor in DESCRIPTION, with the packages
+  in Depends and Imports, testthat and the recommended packages that come with
+  R installed, among them survival, cluster, MASS and boot from Suggests. The
+  tests that need another suggested package skipped.
 * On the R-devel leg, the test suite ran again in a Latin-9 locale
   (en_US.iso885915) with NOT_CRAN unset, as on CRAN's
   r-devel-linux-x86_64-debian-clang flavour.
