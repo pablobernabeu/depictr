@@ -16,6 +16,11 @@ parts: 'Changed results', 'Changed interface' and 'Changed output'.
 
 0 errors | 0 warnings | 0 notes
 
+With CRAN's incoming checks turned on, the check can give one NOTE:
+https://otexts.com/fpp3/, the online edition of a textbook that two help pages
+and a vignette cite, sometimes answers with status 202 'Accepted'.
+urlchecker::url_check() finds the URL correct.
+
 ## Test environments
 
 GitHub Actions, run 42427786440 on 2026-11-08, started by pull request #26 at
