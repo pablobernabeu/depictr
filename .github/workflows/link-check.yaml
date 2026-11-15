@@ -59,15 +59,39 @@ jobs:
           TEST_URL: ${{ inputs.url }}
         run: |
           # A run started by hand with the 'url' input checks that URL alone.
+          # urlchecker reads the file that holds a failing URL to show the
+          # line, so the URL is written to url-input.txt.
           test_url <- Sys.getenv("TEST_URL")
           db <- NULL
           if (nzchar(test_url)) {
-            db <- data.frame(URL = test_url, Parent = "the 'url' input")
+            writeLines(test_url, "url-input.txt")
+            db <- data.frame(URL = test_url, Parent = "url-input.txt")
           }
 
-          # url_check() returns a table of the URLs that failed. The step
-          # reports them itself, without urlchecker's print method.
-          res <- urlchecker::url_check(".", db = db, progress = FALSE)
+          # url_check() gives a table of the URLs that failed. When a URL
+          # fails, urlchecker 2.0.0 prints the table from inside url_check()
+          # and then stops R with 'Found 1 invalid URL.' (run 42625847774).
+          # The calling handler takes the table from the call stack, where it
+          # still is when the error is signalled. An error with no such
+          # table, from a check that went wrong, still fails the step.
+          on_stack <- function() {
+            for (frame in rev(sys.frames())) {
+              for (name in ls(frame, all.names = TRUE)) {
+                value <- tryCatch(get(name, envir = frame, inherits = FALSE),
+                                  error = function(e) NULL)
+                if (inherits(value, c("urlchecker_db", "check_url_db"))) return(value)
+              }
+            }
+            NULL
+          }
+          found <- NULL
+          res <- tryCatch(
+            withCallingHandlers(
+              urlchecker::url_check(".", db = db, progress = FALSE),
+              error = function(e) if (is.null(found)) found <<- on_stack()
+            ),
+            error = function(e) if (is.null(found)) stop(e) else found
+          )
           column <- function(name) {
             if (name %in% names(res)) as.character(res[[name]]) else rep("", nrow(res))
           }
