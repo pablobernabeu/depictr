@@ -26,7 +26,7 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           fetch-depth: 0
 
@@ -45,9 +45,8 @@ jobs:
         if: ${{ env.CLAUDE_CODE_OAUTH_TOKEN != '' }}
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-        # anthropics is outside the small set of publishers whose actions this
-        # repository trusts on a floating major tag, so the action is pinned to
-        # the exact release commit named in the trailing comment.
+        # Like every action in these workflows, it is pinned to the release
+        # commit named in the trailing comment, which Dependabot keeps current.
         uses: anthropics/claude-code-action@61a9c274fa7110a66dfafc1bbbced03833eb25fe # v1.0.269
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}

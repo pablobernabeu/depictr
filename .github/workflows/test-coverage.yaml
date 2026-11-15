@@ -18,7 +18,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
         with:
@@ -37,7 +37,7 @@ jobs:
           cat(sprintf("Test coverage: %s%%\n", pct))
           summary <- Sys.getenv("GITHUB_STEP_SUMMARY")
           if (nzchar(summary)) {
-            cat(sprintf("## Test coverage: **%s%%**\n", pct),
+            cat(sprintf("## Test coverage: %s%%\n", pct),
                 file = summary, append = TRUE)
           }
           if (pct < 80) {
