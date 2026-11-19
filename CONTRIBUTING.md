@@ -47,7 +47,7 @@ the computation where it is. The prose follows British spelling.
 `devtools::check()` and CI run a spelling test that stops at any word
 found neither in the British English dictionary nor in `inst/WORDLIST`,
 and
-[`spelling::spell_check_package()`](https://docs.ropensci.org/spelling//reference/spell_check_package.html)
+[`spelling::spell_check_package()`](https://docs.ropensci.org/spelling/reference/spell_check_package.html)
 lists those words. Correct a misspelling where it occurs, and add a name
 or a term of art to the word list. CRAN and a plain `R CMD check` skip
 the test.
