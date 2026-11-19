@@ -16,40 +16,40 @@ roc_curve_plot(
 )
 }
 \arguments{
-\item{x}{A binomial \code{glm}; the vector of observed outcomes (0/1, logical or a
-two-level factor with the positive class second); or a \emph{named} list of
-models / (actual, score) pairs to overlay (see Details).}
+\item{x}{A binomial \code{glm}, the vector of observed outcomes (0 and 1, logical
+or a two-level factor with the positive class second) or a named list of
+models or of (actual, score) pairs to overlay (see Details).}
 
 \item{score}{When \code{x} is an outcome vector, the matching vector of scores or
 predicted probabilities. When \code{x} is a named list of outcome vectors, a
-matching named/positional list of score vectors.}
+matching list of score vectors, named or in the same order.}
 
-\item{colour}{Curve colour for the single-model case. Defaults to the depictr
-brand blue. Ignored when several models are overlaid (the colourblind-aware
-\code{\link[=scale_colour_depictr]{scale_colour_depictr()}} palette is used instead).}
+\item{colour}{Curve colour for a single model. Defaults to the depictr brand
+blue. Ignored when several models are overlaid, which take the
+colourblind-aware \code{\link[=scale_colour_depictr]{scale_colour_depictr()}} palette.}
 
 \item{ci}{Bootstrap confidence band for a single ROC curve and its AUC.
-\code{FALSE} (default) draws none; \code{TRUE} uses 2000 resamples; a positive integer
-sets the number of resamples. The resamples come from the session's
+\code{FALSE}, the default, draws none, \code{TRUE} uses 2000 resamples and a positive
+integer sets the number of resamples. The resamples come from the session's
 random-number stream, so call \code{set.seed()} first for a reproducible band.
 Ignored when several models are overlaid.}
 
 \item{conf_level}{Confidence level for the bootstrap band, a single number
 strictly between 0 and 1.}
 
-\item{youden}{Logical; if \code{TRUE}, mark the Youden's J operating point (the
-threshold maximising sensitivity + specificity - 1) on each curve.}
+\item{youden}{Whether to mark the Youden's J operating point, the threshold
+that maximises sensitivity + specificity - 1, on each curve.}
 
-\item{legend_inside}{When \code{TRUE} (and several models are overlaid), draw the
-legend inside the panel (in the bottom-right corner the curve leaves empty)
-over a translucent background, instead of in a right-hand margin.
-Defaults to \code{FALSE}.}
+\item{legend_inside}{When \code{TRUE} and several models are overlaid, the legend
+is drawn inside the panel, over a translucent background, in the
+bottom-right corner, which the curve leaves empty. Otherwise, it is drawn in
+a right-hand margin. Defaults to \code{FALSE}.}
 
 \item{title}{Plot title.}
 }
 \value{
-A \link[ggplot2:ggplot]{ggplot2::ggplot} object. The AUC(s) are stored in
-\code{attr(plot, "auc")} (a named vector when several models are supplied).
+A \link[ggplot2:ggplot]{ggplot2::ggplot} object. The AUC is stored in \code{attr(plot, "auc")},
+a named vector when several models are supplied.
 When \code{ci} draws a band, which it does for a single model, the bootstrap
 interval of the AUC is stored in \code{attr(plot, "auc_ci")}, a vector named
 \code{lower} and \code{upper}. With \code{youden = TRUE}, the Youden point is stored in
@@ -61,17 +61,18 @@ when several models are supplied.
 Plots the receiver operating characteristic (ROC) curve for a binary
 classifier and reports the area under the curve (AUC). The input can be a
 fitted binomial \code{glm}, a pair of vectors (observed binary outcome and a
-continuous score), or, to compare several models, a \emph{named list} of
-models or of (actual, score) pairs, which are overlaid as colour-coded curves
-with a legend and a per-curve AUC. An optional bootstrap confidence band can
-be drawn for the (single-model) curve and its AUC, and the Youden's J
+continuous score), or, to compare several models, a named list of models or
+of (actual, score) pairs, which are overlaid as colour-coded curves with a
+legend and a per-curve AUC. An optional bootstrap confidence band can be
+drawn for the curve of a single model and its AUC, and the Youden's J
 operating point can be marked.
 }
 \details{
-A named list overlays one curve per element, e.g.
+A named list overlays one curve per element, such as
 \code{roc_curve_plot(list("Full" = fit_full, "Reduced" = fit_reduced))}. Each
-element may be a \code{glm}, a length-2 list/data frame of \verb{(actual, score)}, or an
-outcome vector paired with the matching element of a \code{score} list.
+element may be a \code{glm}, a list or data frame of length 2 holding
+\verb{(actual, score)}, or an outcome vector paired with the matching element of a
+\code{score} list.
 }
 \examples{
 gfit <- glm(accuracy ~ word_frequency + condition + RT,

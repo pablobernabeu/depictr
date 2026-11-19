@@ -5,7 +5,7 @@
 #' Draws Kaplan-Meier survival curves, optionally by group, with stepwise
 #' confidence limits and censoring marks. The Kaplan-Meier estimate and its
 #' Greenwood standard error are computed with base R, so no modelling package is
-#' required; a `survfit` object from the 'survival' package is also accepted.
+#' required. A `survfit` object from the 'survival' package is also accepted.
 #'
 #' The confidence limits are pointwise. By default, they are built on the
 #' log-log scale, as
@@ -24,36 +24,36 @@
 #' `survfit()` gives with the same `conf.int` and `conf.type` (`conf_level`
 #' names the objects that keep their own).
 #'
-#' For publication-ready figures the plot offers the three annotations that
-#' define a "survminer-style" Kaplan-Meier display, each behind its own
-#' argument and off by default:
+#' For publication-ready figures, the plot offers the three annotations of a
+#' Kaplan-Meier display in the style of the 'survminer' package, each behind its
+#' own argument and off by default:
 #'
-#' * **Number-at-risk table** (`risk_table = TRUE`): a small panel composed
-#'   beneath the curves with 'patchwork', giving the number of subjects still at
-#'   risk in each group at the x-axis breaks.
-#' * **Median-survival guides** (`median_line = TRUE`): dashed reference lines
+#' * `risk_table = TRUE` adds a number-at-risk table, a small panel composed
+#'   beneath the curves with 'patchwork' that gives the number of subjects still
+#'   at risk in each group at the x-axis breaks.
+#' * `median_line = TRUE` draws median-survival guides, dashed reference lines
 #'   from the 0.5 survival level down to each group's median survival time, with
 #'   the median value labelled. The median is the time at which the curve falls
 #'   below 0.5. Where the curve stays at 0.5 until a later drop, or until its
 #'   last time, the median is the midpoint of that stretch, as in
-#'   [survival::quantile.survfit()]. Groups whose curve never reaches 0.5
-#'   (median not estimable) are skipped.
-#' * **Log-rank test** (`logrank = TRUE`): for two or more groups, the
-#'   chi-squared log-rank statistic and its p-value are added as a subtitle.
-#'   For vector or data-frame input, [survival::survdiff()] computes it when
-#'   the 'survival' package is installed. For a `survfit` object, which keeps
-#'   only its risk and event tables, or without 'survival', an equivalent
-#'   base-R log-rank test is computed from the per-group risk and event tables.
+#'   [survival::quantile.survfit()]. A group whose curve never reaches 0.5 has
+#'   no estimable median and is skipped.
+#' * `logrank = TRUE` adds a log-rank test for two or more groups, with the
+#'   chi-squared statistic and its p-value as a subtitle. For vector or
+#'   data-frame input, [survival::survdiff()] computes it when the 'survival'
+#'   package is installed. For a `survfit` object, which keeps only its risk and
+#'   event tables, or without 'survival', an equivalent base-R log-rank test is
+#'   computed from the per-group risk and event tables.
 #'
 #' @param time A numeric vector of follow-up times, a data frame with `time`,
 #'   `status` and optional `group` columns, or a `survfit` object. Every time
-#'   must be finite: a missing or infinite one is an error rather than a silent
-#'   exclusion, since dropping it would move the number at risk unannounced.
+#'   must be finite. A missing or infinite time is an error, since dropping it
+#'   would change the number at risk without notice.
 #' @param status Event indicator: a vector, or a column name when `time` is a
 #'   data frame (by default its `status` or `event` column). Either the 0/1
 #'   convention (`0` = censored, `1` = event) or the [survival::Surv()] 1/2
 #'   convention (`1` = censored, `2` = event) is accepted, read over all groups
-#'   together; logical values are also allowed. Other codings raise an error,
+#'   together. Logical values are also allowed. Other codings raise an error,
 #'   among them a code that is not a whole number and a factor or character
 #'   indicator, whose values do not say which one is the event. Observations
 #'   whose status is missing are dropped with a message, since they record
@@ -78,11 +78,11 @@
 #'   subtitle (two or more groups only). Defaults to `FALSE`.
 #' @param risk_breaks Optional numeric vector of times at which to report the
 #'   number at risk. Defaults to the curve's x-axis breaks.
-#' @param palette Colours for the groups; defaults to [depictr_palette()].
-#' @param legend_inside When `TRUE` (and there are several groups), draw the
-#'   group legend inside the panel (in the bottom-left corner a
-#'   monotone-decreasing survival curve always leaves empty) over a translucent
-#'   background, instead of in a right-hand margin. Defaults to `FALSE`.
+#' @param palette Colours for the groups. Defaults to [depictr_palette()].
+#' @param legend_inside When `TRUE` and there are several groups, the group
+#'   legend is drawn inside the panel, over a translucent background, in the
+#'   bottom-left corner, which a decreasing survival curve always leaves empty.
+#'   Otherwise, it is drawn in a right-hand margin. Defaults to `FALSE`.
 #' @param title,x_lab,y_lab Title and axis labels.
 #' @param conf_type The scale on which the confidence limits are built:
 #'   `"log-log"` (the default), `"log"` or `"plain"`, as set out under
@@ -602,7 +602,7 @@ warn_stored_limits <- function(sf, conf_level, conf_type) {
   invisible(NULL)
 }
 
-#' Replace leading/internal NAs by carrying the previous value forward
+#' Replace leading and internal NAs by carrying the previous value forward
 #' @noRd
 fill_forward <- function(x, init) {
   last <- init
@@ -727,7 +727,7 @@ risk_break_default <- function(time) {
 #'
 #' The number at risk at time `t` is the count with follow-up time \eqn{>= t}
 #' (the standard convention used by [survival::summary.survfit()] with
-#' `times =`). When the raw follow-up times are available (`all_time`) they are
+#' `times =`). When the raw follow-up times are available (`all_time`), they are
 #' counted directly. For the survfit path, which keeps the risk set at every
 #' reported time, events and censorings alike (`risk_time`, `risk_n`), the
 #' at-risk count is the risk set of the first reported time at or after `t`,
@@ -798,7 +798,7 @@ risk_table_plot <- function(natrisk, breaks, col_map, multi, x_lab) {
 #' (vector or data-frame input) and the 'survival' package is installed.
 #' Otherwise, and always for a survfit object, which keeps only its risk and
 #' event tables, it uses an equivalent base-R Mantel-Haenszel log-rank test
-#' computed from the per-group risk/event tables carried on each curve.
+#' computed from the per-group risk and event tables carried on each curve.
 #' @noRd
 logrank_test <- function(counts) {
   groups <- names(counts)
@@ -825,12 +825,12 @@ logrank_test <- function(counts) {
   base_logrank(counts)
 }
 
-#' Base-R Mantel-Haenszel / log-rank statistic from per-group count tables
+#' Base-R Mantel-Haenszel log-rank statistic from per-group count tables
 #'
 #' At every distinct event time the observed events per group are compared with
 #' their expectation under the null (no group difference), pooling the risk
 #' sets. The statistic is \eqn{(O - E)' V^{-} (O - E)} with the standard
-#' hypergeometric variance-covariance \eqn{V}; it is chi-squared on
+#' hypergeometric variance-covariance \eqn{V}. It is chi-squared on
 #' (groups - 1) degrees of freedom (Mantel, 1966).
 #' @noRd
 base_logrank <- function(counts) {

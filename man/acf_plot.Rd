@@ -18,11 +18,11 @@ acf_plot(
 \item{x}{A numeric vector or \code{ts} object holding one series. A multivariate
 \code{ts} or a matrix with several columns is refused.}
 
-\item{lag_max}{Maximum lag (passed to \code{\link[stats:acf]{stats::acf()}} / \code{\link[stats:pacf]{stats::pacf()}}).}
+\item{lag_max}{Maximum lag, passed to \code{\link[stats:acf]{stats::acf()}} or \code{\link[stats:pacf]{stats::pacf()}}.}
 
 \item{type}{\code{"correlation"} for the ACF or \code{"partial"} for the PACF.}
 
-\item{conf_level}{Confidence level for the significance bounds; a single
+\item{conf_level}{Confidence level for the significance bounds, a single
 number strictly between 0 and 1.}
 
 \item{title, x_lab, y_lab}{Title and axis labels.}
@@ -31,16 +31,14 @@ number strictly between 0 and 1.}
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Plots the autocorrelation (or partial autocorrelation) function of a series,
-with the approximate significance bounds, as a clean lollipop chart.
+Plots the autocorrelation or partial autocorrelation function of a series,
+with the approximate significance bounds, as a lollipop chart.
 }
 \details{
-A missing value inside the series is kept in its place, and the
-correlations are computed from the pairs of observations that are both
-present (\code{na.action = na.pass}), with a warning. Dropping it would join the
-observations on either side of the gap as if they were neighbours. The
-Python package refuses such a series and asks for the gap to be dropped or
-imputed first.
+A missing value inside the series is kept in its place, and the correlations
+are computed from the pairs of observations that are both present
+(\code{na.action = na.pass}), with a warning. Dropping it would join the
+observations on either side of the gap as if they were neighbours.
 }
 \examples{
 acf_plot(AirPassengers)

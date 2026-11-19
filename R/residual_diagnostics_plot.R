@@ -4,19 +4,19 @@
 #'
 #' Combines the classic regression diagnostic plots (residuals against fitted
 #' values, a normal Q-Q plot of the standardised residuals, a scale-location
-#' plot, and residuals against leverage) into a single panel using 'patchwork'.
+#' plot and residuals against leverage) into a single panel using 'patchwork'.
 #' The function works with `lm` and `glm` objects.
 #'
-#' For a `glm`, the default panels are made GLM-aware (`glm_panels = TRUE`): the
-#' "residuals vs. fitted" panel is replaced by a *binned*-residual plot
-#' (Gelman & Hill, 2007; see [binned_residual_plot()]), which is readable even
-#' for binary or count models, and the Q-Q panel uses *randomised quantile*
+#' For a `glm`, the default panels suit a GLM (`glm_panels = TRUE`): the panel
+#' of residuals against fitted values is replaced by a binned-residual plot
+#' (Gelman & Hill, 2007, see [binned_residual_plot()]), which is readable even
+#' for binary or count models, and the Q-Q panel uses randomised quantile
 #' residuals (Dunn & Smyth, 1996), which are standard normal under a correctly
-#' specified model regardless of the response family. In a Gaussian or Gamma
-#' model, prior weights enter these residuals as they enter the fit, through
-#' each observation's variance. The scale-location and
-#' leverage panels are unchanged. Set `glm_panels = FALSE` to force the classic
-#' `lm`-style panels for a `glm` as well.
+#' specified model whatever the response family. In a Gaussian or Gamma model,
+#' prior weights enter these residuals as they enter the fit, through each
+#' observation's variance. The scale-location and leverage panels are unchanged.
+#' Set `glm_panels = FALSE` to draw the classic `lm`-style panels for a `glm` as
+#' well.
 #'
 #' @param model A fitted `lm` or `glm` model.
 #' @param which Character vector choosing which panels to show, any of

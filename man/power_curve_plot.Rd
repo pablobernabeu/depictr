@@ -25,9 +25,9 @@ power_curve_plot(
 \arguments{
 \item{x}{A \code{powerCurve} object from 'simr', or a data frame with a sample
 size column (\code{n}, \code{nlevels}, \code{x}, \code{sample_size} or \code{n_subject}), a power
-column (\code{power}, \code{mean} or \code{p}), and optional confidence limits
-(\verb{<power>_lo}/\verb{<power>_hi}, \code{lower}/\code{upper}, \code{ci_low}/\code{ci_high} or
-\code{conf.low}/\code{conf.high}).}
+column (\code{power}, \code{mean} or \code{p}) and optional confidence limits
+(\verb{<power>_lo} and \verb{<power>_hi}, \code{lower} and \code{upper}, \code{ci_low} and \code{ci_high}
+or \code{conf.low} and \code{conf.high}).}
 
 \item{target}{Target power, drawn as a horizontal reference line. Use \code{NA}
 to omit it.}
@@ -62,7 +62,7 @@ such column are an error, because joining them would draw a zigzag.}
 Name both or neither. By default, they are found among the names listed
 under \code{x}.}
 
-\item{y_lab}{Y-axis label. By default, "Power" when the power column is one
+\item{y_lab}{Y-axis label. By default, 'Power' when the power column is one
 of the names listed under \code{x}, and the column's name otherwise.}
 
 \item{solved}{A sample size solved from the curve, with its confidence
@@ -78,9 +78,9 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 \description{
 Draws statistical power against sample size, with a dashed line at a target
 power (80\% by default). The input is usually a power curve produced by
-\code{simr::powerCurve()}, though a tidy data frame works equally well, allowing
-the plot to be redrawn without repeating a power simulation that is often
-slow to run.
+\code{simr::powerCurve()}, though a tidy data frame works equally well, so the
+plot can be redrawn without repeating a power simulation that is often slow
+to run.
 }
 \details{
 A table may hold several curves, one per effect or design, stacked by row.

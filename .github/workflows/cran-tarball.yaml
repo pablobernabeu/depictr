@@ -1,0 +1,220 @@
+# Builds the tarball to submit to CRAN and checks it as CRAN's incoming checks
+# do, so that a submission needs only a browser. Adding the label
+# 'cran-tarball' to a pull request starts it. The tarball is then in the run's
+# artifacts, ready to upload at https://cran.r-project.org/submit.html, and the
+# run summary gives its SHA-256, the check's Status line and every NOTE,
+# WARNING or ERROR. Remove the label after the run, so that adding it again
+# starts another one. 'Run workflow' (workflow_dispatch) works once this file
+# is on main.
+#
+# A pull request run checks out the head commit of the pull request, not
+# GitHub's merge of it into main, so the tarball holds the sources of the
+# branch itself.
+name: cran-tarball
+
+on:
+  pull_request:
+    types: [labeled]
+  workflow_dispatch:
+
+# The job only reads the repository and uploads artifacts, which needs no
+# write scope.
+permissions:
+  contents: read
+
+jobs:
+  cran-tarball:
+    # Adding any other label also starts the workflow, and the job is then
+    # skipped.
+    if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'cran-tarball'
+    runs-on: ubuntu-24.04
+    name: CRAN tarball and incoming checks
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      # The package directory, relative to the repository root.
+      PKG_DIR: .
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - uses: r-lib/actions/setup-pandoc@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
+
+      - uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
+        with:
+          r-version: 'release'
+          use-public-rspm: true
+
+      # LaTeX for the PDF manual, which CRAN builds and this check builds too.
+      - uses: r-lib/actions/setup-tinytex@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
+
+      # ghostscript and qpdf compact PDFs in the build and check their size.
+      # tidy validates the HTML manual, which the check otherwise skips with a
+      # NOTE. aspell spells the Description field, as CRAN's incoming checks
+      # do.
+      - name: Install the system tools that CRAN's checks use
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ghostscript qpdf tidy aspell aspell-en
+
+      # Every dependency, Suggests included, as on CRAN. V8 lets the check
+      # test the rendering of the mathematics in the HTML manual.
+      - uses: r-lib/actions/setup-r-dependencies@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
+        with:
+          working-directory: ${{ env.PKG_DIR }}
+          dependencies: '"all"'
+          extra-packages: any::urlchecker, any::V8
+          needs: check
+
+      # The same build as `devtools::build(args = '--compact-vignettes=gs+qpdf',
+      # manual = TRUE)`, which adds --no-resave-data, made outside the source
+      # tree so that it stays clean. R CMD build puts a PDF manual into the
+      # tarball only when a help page has an install-stage or render-stage
+      # \Sexpr. The check below builds the manual in any case, as CRAN's does.
+      # setup-r sets NOT_CRAN=true for the steps after it. CRAN leaves it
+      # unset, so the build and the check unset it, and the tests that skip on
+      # CRAN skip here too.
+      - name: Build the tarball
+        id: build
+        shell: bash
+        run: |
+          unset NOT_CRAN
+          pkg=$(Rscript -e 'cat(read.dcf(file.path(Sys.getenv("PKG_DIR"), "DESCRIPTION"), "Package"))')
+          version=$(Rscript -e 'cat(read.dcf(file.path(Sys.getenv("PKG_DIR"), "DESCRIPTION"), "Version"))')
+          tarball="${pkg}_${version}.tar.gz"
+          src=$(cd "$GITHUB_WORKSPACE/$PKG_DIR" && pwd)
+          mkdir -p "$RUNNER_TEMP/cran"
+          cd "$RUNNER_TEMP/cran"
+          R CMD build --compact-vignettes=gs+qpdf --no-resave-data "$src"
+          test -f "$tarball"
+          {
+            echo "pkg=$pkg"
+            echo "version=$version"
+            echo "tarball=$tarball"
+            echo "sha256=$(sha256sum "$tarball" | cut -d ' ' -f 1)"
+            echo "commit=$(git -C "$GITHUB_WORKSPACE" rev-parse HEAD)"
+          } >> "$GITHUB_OUTPUT"
+
+      # R CMD check exits with 0 on a WARNING, so the verdict is read from the
+      # Status line instead, after the summary and the logs are written.
+      # R_CRAN_WEB and R_CRAN_SRC point the incoming checks (the CRAN version
+      # comparison among them) at a CRAN mirror rather than at the binary
+      # repository that setup-r configures. The _R_CHECK_SYSTEM_CLOCK_=FALSE
+      # that setup-r sets stays, since the clock check tests the runner, not
+      # the package.
+      - name: Check the tarball as CRAN's incoming checks do
+        id: check
+        shell: bash
+        env:
+          _R_CHECK_CRAN_INCOMING_: 'true'
+          _R_CHECK_CRAN_INCOMING_REMOTE_: 'true'
+          R_CRAN_WEB: https://cloud.r-project.org
+          R_CRAN_SRC: https://cloud.r-project.org
+          PKG: ${{ steps.build.outputs.pkg }}
+          TARBALL: ${{ steps.build.outputs.tarball }}
+        run: |
+          unset NOT_CRAN
+          cd "$RUNNER_TEMP/cran"
+          R CMD check --as-cran "$TARBALL" || true
+          log="$PKG.Rcheck/00check.log"
+          status=$(grep '^Status:' "$log" || echo 'Status: none, the check did not finish')
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+
+      # urlchecker reads the help pages, whose Rdpack macros need the package
+      # installed, so the tarball is installed first. Neither result fails the
+      # job: the summary shows both.
+      - name: Check the URLs and list the reverse dependencies
+        if: always() && steps.build.outcome == 'success'
+        shell: bash
+        env:
+          PKG: ${{ steps.build.outputs.pkg }}
+          TARBALL: ${{ steps.build.outputs.tarball }}
+        run: |
+          out="$RUNNER_TEMP/cran"
+          R CMD INSTALL "$out/$TARBALL" > "$out/install.log" 2>&1 || cat "$out/install.log"
+          cd "$GITHUB_WORKSPACE/$PKG_DIR"
+          Rscript -e 'print(urlchecker::url_check(".", progress = FALSE))' > "$out/url-check.txt" 2>&1 \
+            || echo "url_check() failed." >> "$out/url-check.txt"
+          cat "$out/url-check.txt"
+          Rscript -e "print(tools::package_dependencies('$PKG', db = available.packages(repos = 'https://cloud.r-project.org'), reverse = TRUE, which = 'all'))" \
+            > "$out/revdeps.txt" 2>&1 \
+            || echo "The reverse-dependency query failed." >> "$out/revdeps.txt"
+          cat "$out/revdeps.txt"
+
+      # 00check.log puts each verdict at the end of its '* checking' line, that
+      # of the tests included, which the console prints on a line of its own.
+      # The summary therefore finds each NOTE, WARNING and ERROR by those lines.
+      - name: Write the summary
+        if: always() && steps.build.outcome == 'success'
+        shell: bash
+        env:
+          PKG: ${{ steps.build.outputs.pkg }}
+          TARBALL: ${{ steps.build.outputs.tarball }}
+          SHA256: ${{ steps.build.outputs.sha256 }}
+          COMMIT: ${{ steps.build.outputs.commit }}
+          STATUS: ${{ steps.check.outputs.status }}
+        run: |
+          out="$RUNNER_TEMP/cran"
+          log="$out/$PKG.Rcheck/00check.log"
+          fence='```'
+          {
+            echo "## $TARBALL"
+            echo
+            echo "- SHA-256: \`$SHA256\`"
+            echo "- Built from commit \`$COMMIT\`"
+            if [ -f "$log" ]; then
+              grep -E '^\* (using R version|using platform|running under)' "$log" | sed 's/^\* /- /' || true
+            fi
+            echo "- $STATUS"
+            echo
+            echo "### NOTEs, WARNINGs and ERRORs"
+            echo
+            if [ -f "$log" ]; then
+              awk '/^\* / { show = ($0 ~ /(NOTE|WARNING|ERROR)$/) } /^Status:/ { show = 0 } show' "$log" > "$out/problems.txt"
+            fi
+            if [ -s "$out/problems.txt" ]; then
+              echo "$fence"; cat "$out/problems.txt"; echo "$fence"
+            else
+              echo "None."
+            fi
+            echo
+            echo "### URL check"
+            echo
+            echo "$fence"; cat "$out/url-check.txt" 2>/dev/null || true; echo "$fence"
+            echo
+            echo "### Reverse dependencies on CRAN"
+            echo
+            echo "$fence"; cat "$out/revdeps.txt" 2>/dev/null || true; echo "$fence"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the check logs
+        if: always() && steps.build.outcome == 'success'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: ${{ steps.build.outputs.pkg }}_${{ steps.build.outputs.version }}-check-logs
+          path: |
+            ${{ runner.temp }}/cran/${{ steps.build.outputs.pkg }}.Rcheck/00check.log
+            ${{ runner.temp }}/cran/${{ steps.build.outputs.pkg }}.Rcheck/00install.out
+          if-no-files-found: warn
+
+      - name: Fail on an ERROR or a WARNING
+        shell: bash
+        env:
+          STATUS: ${{ steps.check.outputs.status }}
+        run: |
+          echo "$STATUS"
+          case "$STATUS" in
+            *ERROR*|*WARNING*|*'did not finish'*) exit 1 ;;
+          esac
+
+      # Only a tarball whose check gave no ERROR or WARNING is uploaded.
+      - name: Upload the tarball
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: ${{ steps.build.outputs.pkg }}_${{ steps.build.outputs.version }}-tarball
+          path: ${{ runner.temp }}/cran/${{ steps.build.outputs.tarball }}
+          if-no-files-found: error
+          compression-level: 0

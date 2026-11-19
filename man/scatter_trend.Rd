@@ -29,16 +29,17 @@ counts as a group, but a numeric column with more than 20 distinct values
 is refused as continuous. Rows with a missing group are dropped with a
 message, and levels without rows are left out of the plot and its palette.}
 
-\item{method}{Smoothing method passed to \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}, e.g.
-\code{"lm"}, \code{"loess"}, or \code{NULL} for no trend line.}
+\item{method}{Smoothing method passed to \code{\link[ggplot2:geom_smooth]{ggplot2::geom_smooth()}}, such as
+\code{"lm"} or \code{"loess"}, or \code{NULL} for no trend line.}
 
 \item{se}{Whether to draw the confidence band around the trend.}
 
 \item{point_alpha}{Point transparency.}
 
-\item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
+\item{palette}{Colours for the groups. Defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
-\item{title, x_lab, y_lab}{Title and axis labels (default to variable names).}
+\item{title, x_lab, y_lab}{Title and axis labels, which default to the variable
+names.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.

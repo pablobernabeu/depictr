@@ -30,10 +30,10 @@ centred titles and comfortable margins.
 \details{
 The default \code{base_size} and \code{base_family} come from the global options
 \code{depictr.base_size} and \code{depictr.base_family} (see \code{\link[=depictr_options]{depictr_options()}}), so
-the package-wide font size can be set once; passing the arguments explicitly
-overrides them. The title is drawn in the brand colour, the one
-\code{options(depictr.brand = )} sets and the other functions' \code{depictr_brand()}
-defaults stand for.
+the package-wide font size can be set once. Arguments passed explicitly
+override them. The title is drawn in the brand colour, which
+\code{options(depictr.brand = )} sets and which the \code{depictr_brand()} defaults of
+other functions stand for.
 }
 \examples{
 library(ggplot2)

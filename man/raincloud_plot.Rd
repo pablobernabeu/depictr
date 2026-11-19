@@ -30,7 +30,7 @@ message, and levels without rows are left out of the plot and its palette.}
 
 \item{point_alpha}{Transparency of the rain points.}
 
-\item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
+\item{palette}{Colours for the groups. Defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title, x_lab, y_lab}{Title and axis labels.}
 }
@@ -38,11 +38,11 @@ message, and levels without rows are left out of the plot and its palette.}
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-A "raincloud" combines three views of a distribution: a half-violin density
-(the cloud), a narrow boxplot, and the raw jittered points (the rain). It
-conveys the shape, the summary and the individual observations together,
-giving a fuller and more transparent picture than a boxplot alone. The plot
-is built with base R and ggplot2 alone, with no extra package dependency.
+A raincloud plot combines three views of a distribution: a half-violin
+density (the cloud), a narrow boxplot and the raw jittered points (the rain).
+It shows the shape, the summary and the individual observations together,
+which a boxplot alone does not. The plot is built with base R and ggplot2
+alone, with no extra package dependency.
 }
 \details{
 Groups with fewer than two observations cannot have a density estimated, so

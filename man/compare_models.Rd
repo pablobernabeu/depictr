@@ -28,14 +28,14 @@ compare_models(
 )
 }
 \arguments{
-\item{...}{Two or more fitted models and/or tidy data frames of estimates.
-Name the arguments to label the sources (e.g.
-\code{compare_models(Frequentist = m1, Bayesian = m2)}).}
+\item{...}{Two or more fitted models or tidy data frames of estimates, in any
+mix. Name the arguments to label the sources, as in
+\code{compare_models(Frequentist = m1, Bayesian = m2)}.}
 
-\item{names}{Optional character vector of source labels, overriding the
-names of \code{...}.}
+\item{names}{Optional character vector of source labels, overriding the names
+of \code{...}.}
 
-\item{conf_level}{Confidence/credible level for models, a single number
+\item{conf_level}{Confidence or credible level for models, a single number
 strictly between 0 and 1.}
 
 \item{intercept}{Whether to keep the intercept term. Defaults to \code{FALSE}.}
@@ -64,19 +64,19 @@ in \code{\link[=coefficient_plot]{coefficient_plot()}}, each factor level with i
 \item{reference_line}{Position of a vertical reference line. Defaults to 0,
 or to 1 when \code{exponentiate = TRUE}. Use \code{NA} to omit it.}
 
-\item{palette}{Colours for the sources; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
+\item{palette}{Colours for the sources. Defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{point_size, line_size}{Point and interval-line sizes.}
 
-\item{facet}{Whether to give each term its own panel with a free x-axis,
-laid out one per row, so that terms on very different scales (for example a
-large intercept alongside small slopes) stay legible. The source overlay
-and its single legend are preserved within the faceted layout. Defaults to
-\code{FALSE}. A convenience alias for \code{scales = "free"}.}
+\item{facet}{Whether to give each term its own panel with a free x-axis, laid
+out one per row, so that terms on very different scales, such as a large
+intercept beside small slopes, stay legible. The faceted layout keeps the
+source overlay and its single legend. A shortcut for \code{scales = "free"}.
+Defaults to \code{FALSE}.}
 
 \item{scales}{Either \code{"fixed"} (the default, a single shared x-axis) or
-\code{"free"} (one free-scaled panel per term). When \code{facet = TRUE} this is
-forced to \code{"free"}.}
+\code{"free"} (one free-scaled panel per term). When \code{facet = TRUE}, it is set
+to \code{"free"}.}
 
 \item{exponentiate}{Whether to draw every source's exponentiated estimates
 and intervals on a log10 axis, as odds or rate ratios. Each model is
@@ -87,19 +87,19 @@ Defaults to \code{FALSE}.}
 \item{legend_title, legend_ncol}{Legend title and number of columns.}
 
 \item{title, subtitle, x_lab}{Title, subtitle and x-axis label. \code{x_lab}
-defaults to "Estimate". With \code{exponentiate = TRUE} it defaults to the name
+defaults to 'Estimate'. With \code{exponentiate = TRUE}, it defaults to the name
 of the ratio, as in \code{\link[=coefficient_plot]{coefficient_plot()}}, when the fitted models agree on
-it, and to "exp(Estimate)" when they do not.}
+it, and to 'exp(Estimate)' when they do not.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Overlays the estimates from two or more models (or tidy estimate tables) on a
-single forest plot, with one colour per source. It is the general engine
-behind \code{\link[=frequentist_bayesian_plot]{frequentist_bayesian_plot()}} (frequentist against Bayesian), and
-serves equally well for comparing nested models, several optimisers, or
-estimates before and after a transformation.
+Overlays the estimates from two or more models, or tidy estimate tables, on a
+single forest plot, with one colour per source. It underlies
+\code{\link[=frequentist_bayesian_plot]{frequentist_bayesian_plot()}} (frequentist against Bayesian) and serves
+equally well for comparing nested models, several optimisers or estimates
+before and after a transformation.
 }
 \examples{
 m1 <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)
@@ -108,7 +108,7 @@ m2 <- lm(yield ~ rainfall + fertiliser + soil_ph,
 compare_models(`All fields` = m1, `Standard only` = m2,
                        title = "Estimates by subset")
 
-# Keep the intercept legible alongside the slopes:
+# Keep the intercept legible beside the slopes:
 compare_models(`All fields` = m1, `Standard only` = m2,
                intercept = TRUE, facet = TRUE)
 

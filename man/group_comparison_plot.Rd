@@ -38,19 +38,19 @@ number strictly between 0 and 1.}
 \item{point_alpha}{Transparency of the raw points.}
 
 \item{differences}{If \code{TRUE}, append a lower panel showing the pairwise mean
-difference(s) against a reference group, each with a bootstrap confidence
-interval, turning the plot into a full estimation plot via
-\code{\link[=estimation_plot]{estimation_plot()}}. The return value is then a 'patchwork' object. Defaults
-to \code{FALSE}, the plain group-means plot.}
+differences against a reference group, each with a bootstrap confidence
+interval, which turns the plot into a full estimation plot through
+\code{\link[=estimation_plot]{estimation_plot()}}. The return value is then a 'patchwork' object.
+Defaults to \code{FALSE}, the plain group-means plot.}
 
 \item{reference}{Reference group for the difference panel when
-\code{differences = TRUE}; defaults to the first level of \code{group}. Ignored
+\code{differences = TRUE}. Defaults to the first level of \code{group}. Ignored
 otherwise.}
 
 \item{n_boot}{Number of bootstrap resamples for the difference intervals when
 \code{differences = TRUE}. Ignored otherwise.}
 
-\item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
+\item{palette}{Colours for the groups. Defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title, x_lab, y_lab}{Title and axis labels. \code{x_lab} is not drawn when
 \code{differences = TRUE}, since the estimation plot names its groups on the
@@ -62,9 +62,9 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object, or a 'patchwork' object when
 }
 \description{
 An estimation-style plot of a numeric outcome across the levels of a grouping
-variable: each group's mean with a confidence interval, over a backdrop of
-the raw (jittered) data. By showing both the estimate and its uncertainty, it
-conveys whether the groups differ more faithfully than a bar chart does.
+variable: each group's mean with a confidence interval, drawn over the raw
+(jittered) data. Because it shows both the estimate and its uncertainty, it
+shows whether the groups differ more faithfully than a bar chart does.
 }
 \details{
 A group with a single observation has no degrees of freedom for a t-based

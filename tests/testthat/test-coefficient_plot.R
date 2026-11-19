@@ -288,8 +288,21 @@ test_that("frequentist_bayesian_plot() binds an unnamed `labels` vector on both 
   drawn <- p$data[!is.na(p$data$term), ]
   expect_equal(as.character(drawn$label), unname(key[drawn$term]))
 
+  set.seed(1)
+  draws <- as.data.frame(lapply(stats::coef(freq),
+                                function(m) stats::rnorm(200, m, 0.05)))
+  names(draws) <- c("b_Intercept", "b_stress", "b_sleep_hours")
+  expect_error(
+    frequentist_bayesian_plot(freq, draws, labels = want[-1]),
+    "`labels` has length 2 but the models have 3 terms to label (in the order they first appear).",
+    fixed = TRUE
+  )
+
   # The distribution path keeps the draws and the frequentist overlay in
   # separate layers, so the term-label pairs are collected from every layer.
+  # Without 'ggdist', the posteriors are drawn as summaries that carry no
+  # term column, so this part needs it.
+  skip_if_not_installed("ggdist")
   layer_labels <- function(p) {
     do.call(rbind, lapply(p$layers, function(l) {
       d <- l$data
@@ -298,10 +311,6 @@ test_that("frequentist_bayesian_plot() binds an unnamed `labels` vector on both 
       }
     }))
   }
-  set.seed(1)
-  draws <- as.data.frame(lapply(stats::coef(freq),
-                                function(m) stats::rnorm(200, m, 0.05)))
-  names(draws) <- c("b_Intercept", "b_stress", "b_sleep_hours")
   got <- layer_labels(frequentist_bayesian_plot(freq, draws, labels = want))
   expect_setequal(unique(got$term), names(key))
   expect_equal(as.character(got$label), unname(key[got$term]))
@@ -310,11 +319,6 @@ test_that("frequentist_bayesian_plot() binds an unnamed `labels` vector on both 
                                                 intercept = FALSE))
   expect_setequal(unique(got$term), names(key)[-(1:2)])
   expect_equal(as.character(got$label), unname(key[got$term]))
-  expect_error(
-    frequentist_bayesian_plot(freq, draws, labels = want[-1]),
-    "`labels` has length 2 but the models have 3 terms to label (in the order they first appear).",
-    fixed = TRUE
-  )
 })
 
 test_that("the standardise label names the x-only convention", {

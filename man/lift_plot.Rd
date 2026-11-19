@@ -13,20 +13,20 @@ lift_plot(
 )
 }
 \arguments{
-\item{x}{A binomial \code{glm}; the vector of observed outcomes (0/1, logical or a
-two-level factor with the positive class second); or a \emph{named} list of
-models / (actual, score) pairs to overlay.}
+\item{x}{A binomial \code{glm}, the vector of observed outcomes (0 and 1, logical
+or a two-level factor with the positive class second) or a named list of
+models or of (actual, score) pairs to overlay.}
 
 \item{score}{When \code{x} is an outcome vector, the matching scores or predicted
-probabilities (or a list of them for the multi-model case).}
+probabilities, or a list of them for several models.}
 
-\item{colour}{Curve colour for the single-model case. Defaults to the depictr
-brand blue. Ignored when several models are overlaid.}
+\item{colour}{Curve colour for a single model. Defaults to the depictr brand
+blue. Ignored when several models are overlaid.}
 
-\item{legend_inside}{When \code{TRUE} (and several models are overlaid), draw the
-legend inside the panel (in the top-right corner, which the decaying lift
-curve leaves empty) over a translucent background, instead of in a
-right-hand margin. Defaults to \code{FALSE}.}
+\item{legend_inside}{When \code{TRUE} and several models are overlaid, the legend
+is drawn inside the panel, over a translucent background, in the top-right
+corner, which the decreasing lift curve leaves empty. Otherwise, it is drawn
+in a right-hand margin. Defaults to \code{FALSE}.}
 
 \item{title}{Plot title.}
 }
@@ -37,9 +37,9 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 Shows how many times more positive cases a classifier captures, at each depth
 of the score-ordered population, than random targeting would. A lift of 3 at
 the top 10\% means that decile contains three times the baseline rate of
-positives. The horizontal line at 1 is the no-model baseline. Pass a \emph{named
-list} of models / (actual, score) pairs to overlay several colour-coded lift
-curves with a legend.
+positives. The horizontal line at 1 is the no-model baseline. Pass a named
+list of models or of (actual, score) pairs to overlay several colour-coded
+lift curves with a legend.
 }
 \examples{
 # Lift is measured against the base rate, so the example uses the rare

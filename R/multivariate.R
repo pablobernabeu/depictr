@@ -2,16 +2,17 @@
 
 #' PCA biplot
 #'
-#' Runs a principal component analysis on the numeric columns of a data frame
-#' (or takes an existing [stats::prcomp()] object) and draws a biplot: the
+#' Runs a principal component analysis on the numeric columns of a data frame,
+#' or takes an existing [stats::prcomp()] object, and draws a biplot: the
 #' observations projected onto two components, with the variable loadings shown
-#' as arrows. Optionally colour the observations by a grouping variable.
+#' as arrows. The observations can be coloured by a grouping variable.
 #'
 #' Each arrow is a variable's loadings on the two components, taken from the
 #' rotation matrix and multiplied by a factor that all the arrows share. The
 #' factor makes the largest coordinate of any arrow three quarters of the
-#' largest absolute score. Both axes use that one factor, as [stats::biplot()] uses one
-#' ratio for both, and the aspect ratio is fixed at 1. An arrow's angle on the
+#' largest absolute score. Both axes use that one factor, as [stats::biplot()]
+#' uses one ratio for both, and the aspect ratio is fixed at 1. An arrow's angle
+#' on the
 #' page is therefore its angle in loading space, whatever the size of the
 #' figure. The panel's height and width follow the ranges of its two axes, so a
 #' figure of another shape leaves blank space around the panel. Because the
@@ -20,9 +21,9 @@
 #' and labels are drawn in a neutral dark grey (`grey20`), which is not in the
 #' default palette, so no arrow reads as part of a group.
 #'
-#' @param x A data frame, or a [stats::prcomp()] object.
-#' @param cols When `x` is a data frame, the numeric columns to analyse
-#'   (default: all numeric).
+#' @param x A data frame or a [stats::prcomp()] object.
+#' @param cols When `x` is a data frame, the numeric columns to analyse (by
+#'   default, all numeric columns).
 #' @param group Optional grouping variable mapped to colour. When `x` is a data
 #'   frame, give a column of `x`, unquoted or as a string, or a vector with one
 #'   value per row of `x`. Rows with missing values count, although the
@@ -34,7 +35,7 @@
 #'   This is advisable when the variables are on different scales.
 #' @param loadings Whether to draw variable-loading arrows.
 #' @param point_alpha Point transparency.
-#' @param palette Colours for the groups; defaults to [depictr_palette()].
+#' @param palette Colours for the groups. Defaults to [depictr_palette()].
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -209,7 +210,7 @@ pca_group <- function(quo, data, n) {
 #' bars with a cumulative line. It is the customary aid for deciding how many
 #' components to retain.
 #'
-#' @param x A data frame, or a [stats::prcomp()] object.
+#' @param x A data frame or a [stats::prcomp()] object.
 #' @param cols When `x` is a data frame, the numeric columns to analyse.
 #' @param scale Whether to scale variables to unit variance before the PCA.
 #' @param n Maximum number of components to display.

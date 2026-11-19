@@ -26,14 +26,14 @@ same length as \code{colours}. Any alpha is dropped, whereas
 }
 \description{
 Maps each colour to the colour a reader with a given form and severity of
-colour-vision deficiency would perceive, using the physiologically-based
+colour-vision deficiency would perceive, using the physiologically based
 model of Machado, Oliveira and Fernandes (2009). The transformation is
 defined on linear-light RGB, so a colour is decoded from sRGB to linear RGB
 (the IEC 61966-2-1 transfer functions), transformed, then re-encoded.
 }
 \details{
 This is the simulator behind \code{\link[=palette_preview]{palette_preview()}}'s \code{cvd} argument, behind
-\code{\link[=palette_safety]{palette_safety()}}, and behind the colour-separability rows of
+\code{\link[=palette_safety]{palette_safety()}} and behind the colour-separability rows of
 \code{\link[=check_figure]{check_figure()}}. \code{\link[=simulate_figure]{simulate_figure()}} applies it to every colour of a
 finished figure.
 }

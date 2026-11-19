@@ -2,30 +2,30 @@
 
 #' Cluster scatter plot
 #'
-#' Runs k-means clustering on the numeric columns of a data frame (or uses a
-#' supplied cluster assignment) and plots the observations on the first two
+#' Runs k-means clustering on the numeric columns of a data frame, or uses a
+#' supplied cluster assignment, and plots the observations on the first two
 #' principal components, coloured by cluster, with optional convex hulls and
-#' labelled centroids. Projecting onto principal components means the plot works
-#' for any number of variables.
+#' labelled centroids. Because the plot uses principal components, it works for
+#' any number of variables.
 #'
 #' @param data A data frame.
-#' @param cols Numeric columns to cluster on (default: all numeric).
-#' @param k Number of clusters for k-means (ignored if `clusters` is supplied,
-#'   or overridden when `suggest_k` chooses a value).
-#' @param clusters Optional vector of cluster assignments (e.g. from
-#'   [stats::kmeans()] or [stats::cutree()]); use this to plot a clustering you
-#'   computed yourself. Hierarchical or PAM assignments (such as
-#'   [stats::cutree()] output matching [dendrogram_plot()]) are accepted. Must
-#'   have exactly one entry per row of `data` (rows with missing values in
-#'   `cols` are dropped from both before plotting).
+#' @param cols Numeric columns to cluster on (by default, all numeric columns).
+#' @param k Number of clusters for k-means. Ignored if `clusters` is supplied,
+#'   and overridden when `suggest_k` chooses a value.
+#' @param clusters Optional vector of cluster assignments, such as one from
+#'   [stats::kmeans()] or [stats::cutree()], to plot a clustering computed
+#'   beforehand. Hierarchical or PAM assignments (such as [stats::cutree()]
+#'   output matching [dendrogram_plot()]) are accepted. Must have exactly one
+#'   entry per row of `data`. Rows with missing values in `cols` are dropped
+#'   from both before plotting.
 #' @param scale Whether to scale variables to unit variance before clustering
-#'   and the PCA. Columns with (near-)zero variance cannot be scaled and are
-#'   dropped with a message, as in [correlation_heatmap()].
+#'   and the PCA. Columns with zero or near-zero variance cannot be scaled and
+#'   are dropped with a message, as in [correlation_heatmap()].
 #' @param suggest_k Optionally choose `k` automatically with a cluster-quality
-#'   diagnostic instead of using the supplied `k`. Either `TRUE` (uses the
+#'   diagnostic in place of the supplied `k`. Either `TRUE` (the
 #'   average-silhouette criterion), a string naming the criterion
-#'   (`"silhouette"`, `"wss"` or `"gap"`; see [k_diagnostic()]), or `NULL`
-#'   (the default) to leave `k` unchanged. Ignored when `clusters` is supplied.
+#'   (`"silhouette"`, `"wss"` or `"gap"`, see [k_diagnostic()]) or `NULL` (the
+#'   default) to leave `k` unchanged. Ignored when `clusters` is supplied.
 #' @param k_range Candidate values of `k` searched when `suggest_k` is set.
 #'   The default, `NULL`, searches `1:8` for `"gap"` and `"wss"` and `2:8` for
 #'   `"silhouette"`, as [k_diagnostic()] does, so the gap statistic can
@@ -33,10 +33,10 @@
 #' @param hulls Whether to draw a shaded convex hull around each cluster.
 #' @param label_centers Whether to label the cluster centroids.
 #' @param point_alpha Point transparency.
-#' @param palette Colours for the clusters; defaults to [depictr_palette()].
+#' @param palette Colours for the clusters. Defaults to [depictr_palette()].
 #' @param title Plot title.
-#' @param seed Optional integer seed for reproducible k-means (ignored when
-#'   `clusters` is supplied). It applies to this call alone, and the caller's
+#' @param seed Optional integer seed for reproducible k-means, ignored when
+#'   `clusters` is supplied. It applies to this call alone, and the caller's
 #'   random-number state is restored afterwards. The default, `NULL`, takes the
 #'   random starts of [stats::kmeans()], and any random draws of a `suggest_k`
 #'   diagnostic, from the session's random-number stream, so call `set.seed()`
@@ -181,27 +181,28 @@ cluster_plot <- function(data, cols = NULL, k = 3, clusters = NULL,
 
 #' Dendrogram
 #'
-#' Hierarchical-clustering dendrogram, drawn with ggplot2 so it shares the
-#' package theme. Accepts a data frame (the distance matrix and clustering are
-#' computed for you), a [stats::dist] object, or an [stats::hclust] object.
-#' Optionally cut the tree into `k` clusters, colouring the leaf labels and
-#' drawing the cut height.
+#' Hierarchical-clustering dendrogram, drawn with ggplot2 so that it shares the
+#' package theme. Accepts a data frame (from which the distance matrix and
+#' clustering are computed), a [stats::dist] object or an [stats::hclust]
+#' object. Optionally cuts the tree into `k` clusters, colouring the leaf labels
+#' and drawing the cut height.
 #'
-#' @param x A data frame, a `dist` object, or an `hclust` object.
+#' @param x A data frame, a `dist` object or an `hclust` object.
 #' @param cols When `x` is a data frame, the numeric columns to use.
 #' @param distance Distance measure passed to [stats::dist()].
 #' @param method Linkage method passed to [stats::hclust()].
-#' @param scale Whether to scale variables before computing distances (data frame input).
+#' @param scale Whether to scale variables before computing distances, for data
+#'   frame input.
 #' @param k Optional number of clusters to highlight (between 1 and the number
 #'   of leaves). The cut-height line is drawn only when `2 <= k < n`.
 #' @param horizontal Whether to draw the tree horizontally.
 #' @param labels Whether to print the leaf labels. `NULL` (the default) chooses
-#'   automatically: labels are shown for small trees (up to 40 leaves) and
-#'   suppressed for larger ones, where they would otherwise collapse into an
-#'   unreadable smear. `TRUE`/`FALSE` force them on or off. When labels are
-#'   hidden and `k` is set, the cluster membership is instead conveyed by a
-#'   coloured strip of leaf ticks along the bottom of the tree.
-#' @param palette Colours for the `k` clusters; defaults to [depictr_palette()].
+#'   automatically: labels are shown for small trees (up to 40 leaves) and left
+#'   out of larger ones, where they would overlap and be unreadable. `TRUE` or
+#'   `FALSE` forces them on or off. When labels are hidden and `k` is set, a
+#'   coloured strip of leaf ticks along the bottom of the tree shows the cluster
+#'   membership.
+#' @param palette Colours for the `k` clusters. Defaults to [depictr_palette()].
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.

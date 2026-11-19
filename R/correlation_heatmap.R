@@ -26,12 +26,12 @@
 #'   any correlation is undefined (`NA`).
 #' @param title Plot title.
 #'
-#' @details Columns with (near-)zero variance cannot be correlated and are
-#'   dropped automatically with an informative message, so the raw
-#'   `"the standard deviation is zero"` warning from [stats::cor()] is not
-#'   surfaced. If, after dropping them, any cells still come out `NA` (e.g. two
-#'   variables that never co-occur under `"pairwise.complete.obs"`), those cells
-#'   are rendered in grey and labelled `n/a` rather than left blank.
+#' @details Columns with zero or near-zero variance cannot be correlated and are
+#' dropped automatically with an informative message, so the warning
+#' `"the standard deviation is zero"` from [stats::cor()] does not appear. If,
+#' after dropping them, any cells still come out `NA`, such as those of two
+#' variables that never co-occur under `"pairwise.complete.obs"`, those cells
+#' are drawn in grey and labelled `n/a`, not left blank.
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export

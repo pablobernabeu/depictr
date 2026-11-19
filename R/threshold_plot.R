@@ -3,25 +3,26 @@
 #' Classification metrics versus decision threshold
 #'
 #' Sweeps the decision threshold across the full range of scores and plots the
-#' chosen classification metrics - any of sensitivity (= recall), specificity,
-#' precision and F1 - as colour-coded curves. This is the natural companion to
-#' the ROC and precision-recall curves for *choosing* an operating point: it
-#' shows directly how each metric trades off as the cut-off moves, and (by
-#' default) marks the Youden's J and maximum-F1 optimal thresholds.
+#' chosen classification metrics, any of sensitivity (recall), specificity,
+#' precision and F1, as colour-coded curves. It complements the ROC and
+#' precision-recall curves when choosing an operating point: it shows directly
+#' how each metric changes as the cut-off moves and, by default, marks the
+#' Youden's J and maximum-F1 thresholds.
 #'
-#' At threshold \eqn{t} a case is predicted positive when its score is \eqn{\ge
-#' t}. The metrics are evaluated at every distinct score (the points at which the
-#' confusion matrix can change), so the curves are exact step functions rather
-#' than a coarse grid. Between two adjacent scores, each metric keeps its value
-#' at the upper one, so each step changes at a score and runs flat below it.
+#' At threshold \eqn{t}, a case is predicted positive when its score is
+#' \eqn{\ge t}. The metrics are evaluated at every distinct score, the points at
+#' which the confusion matrix can change, so the curves are exact step functions
+#' and not a coarse grid. Between two adjacent scores, each metric keeps its
+#' value at the upper one, so each step changes at a score and runs flat below
+#' it.
 #'
-#' @param x A binomial `glm`, or the vector of observed outcomes (0/1, logical
-#'   or a two-level factor with the positive class second).
+#' @param x A binomial `glm`, or the vector of observed outcomes (0 and 1,
+#'   logical or a two-level factor with the positive class second).
 #' @param score When `x` is an outcome vector, the matching scores or predicted
 #'   probabilities.
 #' @param metrics Which metrics to draw: any subset of `"sensitivity"`,
-#'   `"specificity"`, `"precision"` and `"f1"`. (`"recall"` is accepted as an
-#'   alias for `"sensitivity"`.)
+#'   `"specificity"`, `"precision"` and `"f1"`. `"recall"` is accepted as an
+#'   alias for `"sensitivity"`.
 #' @param mark Which optimal operating points to mark with a vertical line: any
 #'   subset of `"youden"` (max sensitivity + specificity - 1), drawn dashed, and
 #'   `"f1"` (max F1), drawn dotted. Use `character(0)` or `NULL` to mark none.
@@ -35,7 +36,7 @@
 #'             data = lexical_decision, family = binomial)
 #' threshold_plot(gfit)
 #'
-#' # Sensitivity / specificity trade-off only, no markers.
+#' # The trade-off between sensitivity and specificity only, without markers.
 #' threshold_plot(gfit, metrics = c("sensitivity", "specificity"),
 #'                mark = NULL)
 threshold_plot <- function(x, score = NULL,

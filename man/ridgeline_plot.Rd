@@ -23,14 +23,14 @@ ridgeline_plot(
 \item{x}{The numeric variable whose distribution is shown (string or unquoted
 name).}
 
-\item{group}{The grouping variable (string or unquoted name); one ridge per
-level. A numeric code counts as a group, but a numeric column with more
-than 20 distinct values is refused as continuous. Rows with a missing group
-are dropped with a message, and levels without rows are left out of the
-plot and its palette.}
+\item{group}{The grouping variable (string or unquoted name), with one ridge
+per level. A numeric code counts as a group, but a numeric column with
+more than 20 distinct values is refused as continuous. Rows with a missing
+group are dropped with a message, and levels without rows are left out of
+the plot and its palette.}
 
 \item{overlap}{How far each ridge extends into the next, as a multiple of the
-row spacing. \code{1} makes the tallest ridge just touch the next baseline;
+row spacing. \code{1} makes the tallest ridge just touch the next baseline, and
 larger values overlap more. Defaults to \code{1.4}.}
 
 \item{alpha}{Fill transparency of the ridges.}
@@ -38,7 +38,7 @@ larger values overlap more. Defaults to \code{1.4}.}
 \item{scale_height}{Whether to scale every ridge to the same peak height
 (\code{TRUE}, the default) or keep the true relative densities (\code{FALSE}).}
 
-\item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
+\item{palette}{Colours for the groups. Defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title, x_lab, y_lab}{Plot title and axis labels.}
 }
@@ -49,14 +49,15 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 Shows the distribution of a numeric variable across the levels of a grouping
 variable as a column of partially overlapping density curves, one ridge per
 group, stacked up the y-axis. It compares many distributions in a compact
-space, making shifts in location and shape easy to follow, and is a clearer
-choice than many overlaid densities once there are several groups.
+space, so shifts in location and shape are easy to follow, and is clearer
+than many overlaid densities once there are several groups.
 }
 \details{
-Densities are computed with \code{\link[stats:density]{stats::density()}} and scaled to a common height;
-the \code{overlap} argument controls how far each ridge reaches into the one above.
-Groups with fewer than two non-missing values are dropped with a warning. The
-implementation is base R + ggplot2, with no extra package dependency.
+Densities are computed with \code{\link[stats:density]{stats::density()}} and scaled to a common height.
+The \code{overlap} argument controls how far each ridge reaches into the one
+above. Groups with fewer than two non-missing values are dropped with a
+warning. The plot is built with base R and ggplot2, with no extra package
+dependency.
 }
 \examples{
 ridgeline_plot(wellbeing_survey, life_satisfaction, region)

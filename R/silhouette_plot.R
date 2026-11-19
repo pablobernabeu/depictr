@@ -4,25 +4,26 @@
 #'
 #' Draws a silhouette plot for a clustering: one horizontal bar per observation,
 #' grouped and sorted within cluster, with the average silhouette width shown
-#' per cluster and overall. The silhouette width \eqn{s(i)} compares how close an
-#' observation is to its own cluster against the nearest other cluster, and lies
-#' in \eqn{[-1, 1]} (higher is better; negative suggests the point may belong to
-#' another cluster). It is a standard internal measure of cluster quality.
+#' per cluster and overall. The silhouette width \eqn{s(i)} compares how close
+#' an observation is to its own cluster against the nearest other cluster, and
+#' lies in \eqn{[-1, 1]}. Higher is better, and a negative width suggests that
+#' the point may belong to another cluster. It is a standard internal measure of
+#' cluster quality.
 #'
 #' The widths are computed with [cluster::silhouette()] when the 'cluster'
 #' package is installed, and otherwise with an equivalent base-R implementation,
 #' so the function works with no extra dependency.
 #'
-#' @param data A data frame, a numeric matrix, or a [stats::dist] object.
+#' @param data A data frame, a numeric matrix or a [stats::dist] object.
 #' @param clusters A vector of cluster assignments, one per observation (per row
 #'   of `data`, or matching the objects in a `dist`). Required.
-#' @param cols When `data` is a data frame, the numeric columns to use
-#'   (default: all numeric columns).
+#' @param cols When `data` is a data frame, the numeric columns to use (by
+#'   default, all numeric columns).
 #' @param scale Whether to scale variables to unit variance before computing the
 #'   distances (ignored when `data` is a `dist`).
 #' @param distance Distance measure passed to [stats::dist()] (ignored when
 #'   `data` is already a `dist`).
-#' @param palette Colours for the clusters; defaults to [depictr_palette()].
+#' @param palette Colours for the clusters. Defaults to [depictr_palette()].
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object. The per-observation silhouette table is
@@ -128,11 +129,11 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
 #'
 #' Computes a cluster-quality diagnostic across a range of `k` and draws the
 #' diagnostic curve, with the suggested `k` highlighted. Three criteria are
-#' available: the average silhouette width (maximised), the total within-cluster
-#' sum of squares "elbow" (the candidate farthest from the straight line joining
-#' the first and last points of the curve), and the gap statistic (the smallest
-#' `k` whose gap is within one standard error of the next, using the Tibshirani
-#' et al. heuristic).
+#' available: the average silhouette width (maximised), the elbow of the total
+#' within-cluster sum of squares (the candidate farthest from the straight line
+#' joining the first and last points of the curve) and the gap statistic (the
+#' smallest `k` whose gap is within one standard error of the next, by the
+#' heuristic of Tibshirani et al.).
 #'
 #' Only the gap statistic can conclude that the data hold no clusters, by
 #' suggesting `k = 1`, and only when the search starts at 1, as it does by
@@ -150,15 +151,14 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
 #'   default, `NULL`, searches `1:8` for `"gap"` and `"wss"` and `2:8` for
 #'   `"silhouette"`. Candidates the chosen criterion cannot evaluate are skipped
 #'   with a message naming them: `k = 1` under `"silhouette"` (a lone cluster
-#'   has no neighbouring cluster to compare against, so the width is
-#'   undefined), and any `k` at or above the number of observations under
-#'   every criterion.
+#'   has no neighbouring cluster to compare against, so the width is undefined)
+#'   and any `k` at or above the number of observations under every criterion.
 #' @param method Diagnostic: `"silhouette"`, `"wss"` (within sum of squares
 #'   elbow) or `"gap"`.
 #' @param cols When `data` is a data frame, the numeric columns to use.
 #' @param scale Whether to scale variables to unit variance first. Columns with
-#'   (near-)zero variance cannot be scaled and are dropped with a message, as in
-#'   [correlation_heatmap()].
+#'   zero or near-zero variance cannot be scaled and are dropped with a message,
+#'   as in [correlation_heatmap()].
 #' @param nstart Number of random starts for [stats::kmeans()].
 #' @param B Number of reference bootstrap samples for the gap statistic.
 #' @param title Plot title.
@@ -372,7 +372,7 @@ sil_prepare <- function(data, clusters, cols, scale, distance) {
 #'
 #' Returns a data frame with columns `cluster`, `neighbor` and `sil_width`, one
 #' row per observation, plus an `avg_width` attribute. With fewer than two
-#' distinct clusters the result has zero rows.
+#' distinct clusters, the result has zero rows.
 #' @noRd
 silhouette_widths <- function(clusters, dist) {
   clusters <- as.integer(as.factor(clusters))
@@ -398,8 +398,8 @@ silhouette_widths <- function(clusters, dist) {
 
 #' Base-R silhouette computation (Rousseeuw, 1987)
 #'
-#' For each observation i: a(i) is the mean distance to the other members of its
-#' own cluster; b(i) is the minimum, over other clusters, of the mean distance
+#' For each observation i, a(i) is the mean distance to the other members of its
+#' own cluster, and b(i) is the minimum, over other clusters, of the mean distance
 #' to that cluster's members. The silhouette is (b - a) / max(a, b), and is 0 for
 #' singleton clusters.
 #' @noRd
@@ -443,7 +443,7 @@ base_silhouette <- function(clusters, dist) {
 #'
 #' Connects the first and last (k, wss) points with a straight line and returns
 #' the k whose point is farthest from that chord, on either side, a common,
-#' parameter-free "elbow" heuristic (the Kneedle idea). Both endpoints lie on
+#' parameter-free 'elbow' heuristic (the Kneedle idea). Both endpoints lie on
 #' the chord, so with three or more candidates neither can be returned unless
 #' every point lies on the chord, when the first is.
 #' @noRd

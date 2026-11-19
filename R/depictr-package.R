@@ -10,21 +10,21 @@
 #'
 #' @section Exploring data:
 #' \itemize{
-#'   \item [explore_distribution()]: histograms / densities of one variable.
+#'   \item [explore_distribution()]: histograms and densities of one variable.
 #'   \item [ecdf_plot()]: empirical cumulative distribution, optionally by group.
 #'   \item [explore_categorical()]: bar charts of a categorical variable.
 #'   \item [explore_bivariate()]: a suitable plot for any pair of variables.
 #'   \item [explore_pairs()]: a scatter-plot matrix.
 #'   \item [correlation_heatmap()]: correlations as a heatmap.
 #'   \item [missingness_map()]: a map of missing values.
-#'   \item [outlier_plot()]: box / violin plots flagging outliers.
+#'   \item [outlier_plot()]: box and violin plots flagging outliers.
 #'   \item [raincloud_plot()]: half-violin, box and raw points together.
 #'   \item [ridgeline_plot()]: overlapping per-group densities.
 #'   \item [group_comparison_plot()]: group means with confidence intervals.
 #'   \item [estimation_plot()]: group differences with bootstrap intervals.
 #'   \item [dumbbell_plot()]: a two-group comparison across categories.
 #'   \item [scatter_trend()]: scatter plot with a fitted trend.
-#'   \item [summary_table()]: a "Table 1" style descriptive summary.
+#'   \item [summary_table()]: a descriptive summary in the style of 'Table 1'.
 #' }
 #'
 #' @section Multivariate and survival:
@@ -41,8 +41,8 @@
 #' @section Time series:
 #' \itemize{
 #'   \item [timeseries_plot()]: one or more series over time.
-#'   \item [acf_plot()]: autocorrelation / partial autocorrelation.
-#'   \item [decompose_plot()]: trend / seasonal / remainder decomposition.
+#'   \item [acf_plot()]: autocorrelation and partial autocorrelation.
+#'   \item [decompose_plot()]: trend, seasonal and remainder decomposition.
 #'   \item [seasonal_plot()]: seasonal subseries across cycles.
 #'   \item [ts_forecast()]: STL plus random walk with drift, with prediction
 #'     intervals.
@@ -51,9 +51,9 @@
 #' @section Model estimates and inference:
 #' \itemize{
 #'   \item [tidy_estimates()]: the shared tidy estimate table.
-#'   \item [coefficient_plot()]: forest / coefficient plot.
+#'   \item [coefficient_plot()]: forest plot of coefficients.
 #'   \item [compare_models()]: estimates from several models, side by side.
-#'   \item [frequentist_bayesian_plot()]: frequentist vs. Bayesian estimates.
+#'   \item [frequentist_bayesian_plot()]: frequentist and Bayesian estimates compared.
 #'   \item [effects_plot()]: predicted values for one predictor.
 #'   \item [interaction_plot()]: predicted values across two predictors.
 #'   \item [random_effects_plot()]: caterpillar plot of random effects.

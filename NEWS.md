@@ -1,4 +1,4 @@
-# depictr (development version)
+# depictr 0.4.0
 
 ## Upgrading from the previous release (0.3.0)
 
@@ -415,8 +415,9 @@
 ## Deprecated
 
 * `metric = "cie76"` in `palette_safety()` and `check_figure()`, kept to
-  reproduce colour distances computed before this release. The default,
-  `"ciede2000"`, replaces it, and a later release will remove it.
+  reproduce colour distances computed before this release, gives a warning
+  once per session. The default, `"ciede2000"`, replaces it, and a later
+  release will remove it.
 
 ## Documentation
 

@@ -2,21 +2,21 @@
 
 #' Preview the depictr palettes
 #'
-#' Displays the colours returned by [depictr_palette()] as labelled swatches.
-#' It is useful when choosing how many groups to show, selecting a palette type,
+#' Displays the colours returned by [depictr_palette()] as labelled swatches,
+#' which helps when choosing how many groups to show, selecting a palette type
 #' or documenting a figure. Each swatch's hex label is drawn in black or white,
 #' whichever has the higher WCAG contrast against that tile, so every label
 #' reaches the 4.5:1 that WCAG 2.2 asks of text.
 #'
 #' Set `cvd` to render the swatches as they would appear under a colour-vision
 #' deficiency, using the Machado et al. (2009) simulation. The tiles are
-#' recoloured to the simulated appearance while the labels keep the *original*
-#' hex code, so you can see whether two groups would still be told apart by a
-#' colourblind reader.
+#' recoloured to the simulated appearance, while the labels keep the original
+#' hex code, which shows whether a colourblind reader could still tell two
+#' groups apart.
 #'
 #' @param n Number of colours to preview.
 #' @param type Palette type to preview: `"qualitative"`, `"sequential"`,
-#'   `"diverging"`, or `"all"` to show all three, one panel each, without the
+#'   `"diverging"` or `"all"` to show all three, one panel each, without the
 #'   hex labels.
 #' @param cvd Colour-vision-deficiency simulation for the tiles: `"none"` (the
 #'   default, true colours), `"deutan"` (red-green, deuteranopia), `"protan"`
@@ -126,17 +126,17 @@ palette_preview <- function(n = 8, type = c("qualitative", "sequential",
 
 #' Compose several plots into one figure
 #'
-#' A thin, friendly wrapper around [patchwork::wrap_plots()] that adds the
-#' common finishing touches: collecting duplicate legends into one, an overall
-#' title and subtitle, and automatic panel tags (A, B, C, ...).
+#' A wrapper around [patchwork::wrap_plots()] that adds the usual finishing
+#' touches: duplicate legends collected into one, automatic panel tags (A, B, C
+#' and so on) and an overall title and subtitle.
 #'
 #' @param ... Plots to combine, or a single list of plots.
-#' @param ncol,nrow Layout dimensions (passed to patchwork).
+#' @param ncol,nrow Layout dimensions, passed to patchwork.
 #' @param guides How to treat legends: `"collect"` (merge duplicates) or
 #'   `"keep"`.
 #' @param title,subtitle Overall title and subtitle.
-#' @param tag_levels Panel tag style, e.g. `"A"`, `"1"` or `"i"`; `NULL` for no
-#'   tags.
+#' @param tag_levels Panel tag style, such as `"A"`, `"1"` or `"i"`, or `NULL`
+#'   for no tags.
 #'
 #' @return A 'patchwork' object.
 #' @export
@@ -170,12 +170,12 @@ arrange_plots <- function(..., ncol = NULL, nrow = NULL,
 
 #' Save a plot with publication-ready defaults
 #'
-#' A convenience wrapper around [ggplot2::ggsave()] with sensible defaults for
-#' figures in papers and reports: a moderate size, 300 dpi, and the output
-#' directory created if needed. The device is inferred from the file extension,
-#' and PDF, EPS and TIFF files are written to pass the technical checks
-#' journals run on submitted figures. With `check = TRUE`, the figure is also
-#' audited with [check_figure()] at the width it is saved at.
+#' A wrapper around [ggplot2::ggsave()] with defaults for figures in papers and
+#' reports: a moderate size, 300 dpi and an output directory created if needed.
+#' The device is inferred from the file extension, and PDF, EPS and TIFF files
+#' are written to pass the technical checks journals run on submitted figures.
+#' With `check = TRUE`, the figure is also audited with [check_figure()] at the
+#' width it is saved at.
 #'
 #' @section Formats journals accept:
 #' When no `device` is given, three formats are written differently from
@@ -187,9 +187,9 @@ arrange_plots <- function(..., ncol = NULL, nrow = NULL,
 #'
 #' An EPS or PostScript file is written with [grDevices::cairo_ps()], with its
 #' fonts embedded too. PostScript has no transparency, and
-#' [grDevices::postscript()] leaves every translucent layer out of the file:
-#' the points and the confidence band of the plot in the examples below
-#' vanish. `cairo_ps()` rasterises those layers, together with whatever they
+#' [grDevices::postscript()] leaves every translucent layer out of the file, so
+#' the points and the confidence band of the plot in the examples below would be
+#' missing. `cairo_ps()` rasterises those layers, together with whatever they
 #' overlap, at `fallback_resolution`, by default `max(dpi, 600)` here. A
 #' message says so when a layer of the plot, or of any panel of a patchwork, is
 #' translucent. A PDF keeps such layers as vector graphics.
@@ -223,11 +223,9 @@ arrange_plots <- function(..., ncol = NULL, nrow = NULL,
 #' layers therefore goes to Nature as a PDF. Elsevier asks for a graph sent as
 #' a TIFF at 1000 dpi, so pass `dpi = 1000` for one.
 #'
-#' The Python twin takes the plot first, as `save_plot(plot, filename)`.
-#'
-#' @param filename Output file path. The extension sets the device (e.g. `.png`,
-#'   `.pdf`, `.eps`, `.tiff`).
-#' @param plot The plot to save; defaults to the last plot drawn.
+#' @param filename Output file path. The extension sets the device, such as
+#'   `.png`, `.pdf`, `.eps` or `.tiff`.
+#' @param plot The plot to save. Defaults to the last plot drawn.
 #' @param width,height Dimensions.
 #' @param units Units for `width` and `height`.
 #' @param dpi Resolution for raster devices. An EPS rasterises its translucent
@@ -242,7 +240,7 @@ arrange_plots <- function(..., ncol = NULL, nrow = NULL,
 #'   the saved width as both widths.
 #' @param ... Passed to [ggplot2::ggsave()], which passes what it does not use
 #'   on to the device. A `device` or device argument given here overrides the
-#'   defaults described under "Formats journals accept".
+#'   defaults described under 'Formats journals accept'.
 #'
 #' @return The `filename`, invisibly. With `check = TRUE`, the audit report is
 #'   attached to it as the attribute `"check"`, which `attr(, "check")` reads.

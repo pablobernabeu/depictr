@@ -41,11 +41,11 @@ is_summary_matrix <- function(x) {
 
 #' Is `x` a recognised source of posterior draws?
 #'
-#' TRUE for fitted Bayesian models (brms/rstanarm), posterior `draws` objects,
-#' and matrices other than summary matrices. Plain data frames are *not*
-#' claimed here (a `draws_df` is, by its class), because a tidy data frame of
-#' posterior *summaries* (estimate/conf.low/...) must keep flowing down the
-#' summary path; `has_draws()` disambiguates those two data-frame cases.
+#' TRUE for fitted Bayesian models (brms or rstanarm), posterior `draws`
+#' objects and matrices other than summary matrices. Plain data frames are not claimed
+#' here (a `draws_df` is, by its class), because a tidy data frame of posterior
+#' summaries (`estimate`, `conf.low` and so on) must stay on the summary path.
+#' `has_draws()` tells those two kinds of data frame apart.
 #' @noRd
 is_draws_source <- function(x) {
   inherits(x, c("brmsfit", "stanreg", "draws", "draws_df", "draws_matrix",
@@ -62,8 +62,8 @@ is_draws_source <- function(x) {
 #' column and at least one numeric column other than the index and
 #' book-keeping columns (`.chain`, `.iteration`, `.draw`, `chain`,
 #' `iteration`, `draw` and `.row`). A summary table that [tidy_estimates()]
-#' reads (estimate + conf.low/high) is therefore treated as summaries unless it
-#' carries a sampler index column.
+#' reads (estimate, conf.low and conf.high) is therefore treated as summaries
+#' unless it carries a sampler index column.
 #' @noRd
 has_draws <- function(x) {
   if (is_draws_source(x)) return(TRUE)
@@ -285,7 +285,7 @@ wide_to_long_draws <- function(df) {
   )
 }
 
-#' Drop NA values and guarantee the canonical column order / types
+#' Drop NA values and guarantee the canonical column order and types
 #' @noRd
 finalise_draws <- function(long) {
   long <- long[!is.na(long$.value), c("term", ".value", ".draw"), drop = FALSE]

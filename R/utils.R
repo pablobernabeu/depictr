@@ -105,8 +105,8 @@ constant_columns <- function(data, cols) {
 #' Matrix counterpart of `constant_columns()`, for the clustering path where the
 #' data has already been coerced to a matrix of complete cases. [scale()] turns
 #' a constant column into `NaN`, which [stats::kmeans()] rejects with the raw
-#' "NA/NaN/Inf in foreign function call" error; dropping the column with a
-#' message keeps the diagnostic in the package's own voice, as
+#' error `"NA/NaN/Inf in foreign function call"`. Dropping the column with a
+#' message gives the package's own diagnostic, as
 #' [correlation_heatmap()] already does for the same input.
 #' @param mat A numeric matrix.
 #' @param what Name of the calling function, used in the message.

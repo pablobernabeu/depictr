@@ -3,9 +3,9 @@
 #' Plot fixed effects across optimisers
 #'
 #' Visualises how the fixed-effect estimates of a mixed model vary across the
-#' optimisers tried by [lme4::allFit()]. It offers a quick check that a model
-#' has settled on a stable solution: tight clusters of points indicate
-#' agreement between optimisers, whereas scatter signals a fragile fit.
+#' optimisers tried by [lme4::allFit()]. It checks that a model has reached a
+#' stable solution: tight clusters of points indicate agreement between
+#' optimisers, whereas scattered points signal a fragile fit.
 #'
 #' Each fixed effect occupies its own panel, with its own y-axis. The function
 #' also accepts a plain data frame, so it can be used without 'lme4'.
@@ -16,22 +16,22 @@
 #'   `fixed_effect`, `parameter` or `Var2`) and a value column (`value`,
 #'   `estimate` or `Estimate`).
 #' @param intercept Whether to keep the intercept panel. Defaults to `TRUE`.
-#' @param select_terms Optional character vector of terms to display (the
-#'   intercept is always kept when `intercept = TRUE`).
+#' @param select_terms Optional character vector of terms to display. The
+#'   intercept is always kept when `intercept = TRUE`.
 #' @param interaction Passed to [format_terms()] for the panel titles.
-#' @param labels Optional named character vector renaming the term panels, e.g.
-#'   `c(conditionunrelated = "Unrelated priming")`. When `x` is a raw
+#' @param labels Optional named character vector renaming the term panels, such
+#'   as `c(conditionunrelated = "Unrelated priming")`. When `x` is a raw
 #'   [lme4::allFit()] object, a factor's coefficients are labelled with the
-#'   variable and the level automatically (e.g. `conditionunrelated` becomes
-#'   `condition: unrelated`) and these labels override that default.
-#' @param number_optimizers Whether to prefix each optimiser name with a
-#'   number, so that the legend doubles as an index.
+#'   variable and the level automatically (`conditionunrelated` becomes
+#'   `condition: unrelated`), and these labels override that default.
+#' @param number_optimizers Whether to prefix each optimiser name with a number,
+#'   so that the legend also serves as an index.
 #' @param free_y Whether to give each panel its own y-axis range. This is
 #'   advisable, because the intercept and the slopes usually occupy very
 #'   different scales.
 #' @param ncol Number of facet columns. If `NULL`, chosen automatically.
 #' @param point_size Point size.
-#' @param palette Colours for the optimisers; defaults to [depictr_palette()].
+#' @param palette Colours for the optimisers. Defaults to [depictr_palette()].
 #' @param y_lab,title Axis label and plot title.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -203,8 +203,8 @@ allfit_to_long <- function(x) {
 #'
 #' Returns two rows per panel (a low and a high limit) suitable for feeding to
 #' [ggplot2::geom_blank()], so that each free y-axis spans at least a readable
-#' window. When optimisers agree to several decimals the natural spread is a
-#' handful of floating-point ULPs; without a floor on the range, the axis zooms
+#' window. When optimisers agree to several decimals, the natural spread is a
+#' handful of floating-point ULPs. Without a floor on the range, the axis zooms
 #' in until every break carries the same rounded label. The window is centred
 #' on the panel's values and sized to the larger of the observed spread and a
 #' small fraction of the magnitude (falling back to an absolute floor near

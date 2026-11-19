@@ -19,14 +19,14 @@ qq_plot(
 )
 }
 \arguments{
-\item{x}{A numeric vector, or a fitted \code{lm}/\code{glm} model (its standardised
-residuals are used).}
+\item{x}{A numeric vector, or a fitted \code{lm} or \code{glm} model, whose
+standardised residuals are used.}
 
 \item{colour}{Point colour. Defaults to the depictr brand blue.}
 
 \item{title, x_lab, y_lab}{Title and axis labels.}
 
-\item{band}{Whether to draw a confidence band/envelope.}
+\item{band}{Whether to draw a confidence band or envelope.}
 
 \item{band_type}{Band construction: \code{"pointwise"} (analytic order-statistic
 standard errors, the default) or \code{"simulate"} (a Monte-Carlo envelope).}
@@ -45,10 +45,10 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 A normal Q-Q plot for a numeric vector or for the standardised residuals of a
-fitted model, with a reference line and an optional confidence band that makes
-departures from normality easier to judge. Points that stray outside the band
-are unusual under normality; under a normal sample roughly \code{level} of the
-points fall inside a pointwise band.
+fitted model, with a reference line and an optional confidence band that
+makes departures from normality easier to judge. Points outside the band are
+unusual under normality. In a normal sample, about \code{level} of the points fall
+inside a pointwise band.
 }
 \details{
 Two band constructions are offered. \code{"pointwise"} is analytic: it uses the

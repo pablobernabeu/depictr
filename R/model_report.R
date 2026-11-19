@@ -5,9 +5,8 @@
 #' Assembles a compact, consistent overview of a fitted model in a single
 #' figure: the coefficient estimates, the predicted effect of a focal predictor,
 #' a residual panel and a normal Q-Q plot, with a subtitle of key fit
-#' statistics. It is a convenience wrapper that composes several depictr
-#' plots with [arrange_plots()], and serves well for a rapid model review or a
-#' report appendix.
+#' statistics. It composes several depictr plots with [arrange_plots()] and
+#' suits a quick model review or a report appendix.
 #'
 #' For an `lm`, the residual panel plots the residuals against the fitted
 #' values, and the Q-Q panel is [qq_plot()] of the standardised residuals. A
@@ -28,9 +27,9 @@
 #'
 #' @param model A fitted `lm` or `glm` model.
 #' @param predictor Focal predictor for the effect panel, given as in
-#'   [effects_plot()]. If `NULL`, the first numeric variable in the formula (or,
-#'   failing that, the first variable) is used, so a model with
-#'   `log(rainfall)` shows the effect of `rainfall`.
+#'   [effects_plot()]. If `NULL`, the first numeric variable in the formula, or
+#'   failing that the first variable, is used, so a model with `log(rainfall)`
+#'   shows the effect of `rainfall`.
 #' @param standardise Whether the coefficient panel scales each continuous
 #'   predictor's coefficient by that predictor's standard deviation, leaving
 #'   factor and binary contrasts in the outcome's units, as described for
