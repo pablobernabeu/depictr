@@ -54,7 +54,7 @@ available: the average silhouette width (maximised), the elbow of the total
 within-cluster sum of squares (the candidate farthest from the straight line
 joining the first and last points of the curve) and the gap statistic (the
 smallest \code{k} whose gap is within one standard error of the next, by the
-heuristic of Tibshirani et al.).
+heuristic of Tibshirani et al., 2001).
 }
 \details{
 Only the gap statistic can conclude that the data hold no clusters, by

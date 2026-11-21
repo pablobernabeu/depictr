@@ -121,7 +121,7 @@ PLOS ONE. Figures. \url{https://journals.plos.org/plosone/s/figures}
 Nature. Guide to preparing final artwork.
 \url{https://www.nature.com/documents/nature-final-artwork.pdf}
 
-Nature research figure guide. Preparing figures: our specifications.
+Nature research figure guide. Preparing figures: Our specifications.
 \url{https://research-figure-guide.nature.com/figures/preparing-figures-our-specifications/}
 
 Elsevier. Artwork overview.

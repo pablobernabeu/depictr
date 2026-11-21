@@ -465,6 +465,19 @@
 * `vignette("depictr")` shows a figure drawn by `simulate_figure()` and covers
   four publishers' text floors, Nature's ceiling, the contrast-first palette
   order and how the audit treats a continuous colour scale.
+* Citations were checked against their published records. The reference to
+  Greenwood (1926) gives the report's full title, 'A report on the natural
+  duration of cancer'. WCAG 2.2 is dated 2024, where it was dated 2023, since
+  its address serves the Recommendation of 12 December 2024. The help page of
+  `check_figure()` and `vignette("depictr")` cite Crameri et al. (2020) for
+  preferring a perceptually uniform map, such as viridis, to a rainbow, and no
+  longer for depictr's own ramps. The help page of `depictr_palette()` no
+  longer calls the Okabe-Ito set 'widely recommended', and that of
+  `model_fit_table()` credits Cameron and Windmeijer (1997) with the
+  Kullback-Leibler R-squared for exponential-family models only. The help page
+  of `save_plot()` capitalises the word after the colon in the title of
+  Nature's figure guide, and that of `k_diagnostic()` gives the year of its
+  citation of Tibshirani et al. (2001).
 
 # depictr 0.3.0
 

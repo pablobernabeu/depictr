@@ -111,9 +111,9 @@ along a ramp, and none of the colour rows audits it. When nothing else in the
 figure encodes by colour, each of them abstains with a \code{detail} that says so.
 Whether a ramp reads in order, to a reader with a colour-vision deficiency
 and in greyscale as well, depends on how evenly its lightness changes, which
-the audit does not measure. A perceptually ordered map, such as viridis or
-depictr's sequential and diverging ramps, is preferable to a rainbow (Crameri
-et al., 2020).
+the audit does not measure. A perceptually uniform map, such as viridis, is
+preferable to a rainbow (Crameri et al., 2020). depictr's own sequential and
+diverging ramps are perceptually ordered.
 
 \code{greyscale_separability} is the smallest difference in CIE lightness between
 those same colours, which is what survives printing in black and white. It

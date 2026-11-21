@@ -285,8 +285,9 @@ subset(check_figure(p8), check == "greyscale_separability")
 The audit does not measure a continuous colour or fill scale, such as that of
 a heatmap. When nothing else in the figure encodes by colour, its colour rows
 report no result and give the reason. A ramp is read by its lightness, so
-prefer one whose lightness changes evenly, such as viridis or depictr's
-sequential and diverging ramps, over a rainbow [@crameri2020].
+prefer one whose lightness changes evenly. A perceptually uniform map, such as
+viridis, is preferable to a rainbow [@crameri2020]. depictr's own sequential
+and diverging ramps are perceptually ordered.
 
 Set the look once for a whole script with `depictr_options()`. It holds the
 base size and family, the brand, accent and reference-line colours, a custom

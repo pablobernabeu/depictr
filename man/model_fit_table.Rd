@@ -33,13 +33,13 @@ of the model and \eqn{D_0} the deviance of the null model, which
 \code{\link[stats:glm]{stats::glm()}} fits to the same rows with the same prior weights and
 offset. The null model has an intercept only if the model has one. Both
 deviances are stored with the fit, so nothing is refitted. The value is the
-share of the null deviance that the predictors explain, the
-Kullback-Leibler R-squared of Cameron and Windmeijer (1997). It equals the
-ordinary R-squared for a Gaussian model with the identity link and
-McFadden's (1974) pseudo-R-squared for binary logistic regression. For
-Poisson, grouped binomial, Gamma and other models, the two measures differ.
-Mixed models (\code{merMod}) report an R-squared of \code{NA}, since no single
-definition is standard for them.
+share of the null deviance that the predictors explain. For
+exponential-family models, it is the Kullback-Leibler R-squared of Cameron
+and Windmeijer (1997). It equals the ordinary R-squared for a Gaussian
+model with the identity link and McFadden's (1974) pseudo-R-squared for
+binary logistic regression. For Poisson, grouped binomial, Gamma and other
+models, the two measures differ. Mixed models (\code{merMod}) report an R-squared
+of \code{NA}, since no single definition is standard for them.
 
 A linear mixed model fitted with \code{\link[lme4:lmer]{lme4::lmer()}} by restricted maximum
 likelihood (REML, its default) is refitted by maximum likelihood with

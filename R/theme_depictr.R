@@ -3,9 +3,9 @@
 #' The depictr colour palettes
 #'
 #' Colourblind-aware palettes shared by every depictr plot. The qualitative
-#' palette is based on the Okabe-Ito set (Okabe & Ito, 2008), a widely
-#' recommended categorical palette that stays distinguishable under the common
-#' forms of colour-vision deficiency. It keeps six of that set's eight colours.
+#' palette is based on the Okabe-Ito set (Okabe & Ito, 2008), a categorical
+#' palette that stays distinguishable under the common forms of colour-vision
+#' deficiency. It keeps six of that set's eight colours.
 #' The depictr brand blue (`#005b96`) takes the place of its blue (`#0072b2`)
 #' and leads the palette, and a grey (`#999999`) takes the place of its black.
 #' The sequential and diverging palettes are perceptually ordered single-hue

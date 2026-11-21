@@ -133,7 +133,7 @@ silhouette_plot <- function(data, clusters, cols = NULL, scale = TRUE,
 #' within-cluster sum of squares (the candidate farthest from the straight line
 #' joining the first and last points of the curve) and the gap statistic (the
 #' smallest `k` whose gap is within one standard error of the next, by the
-#' heuristic of Tibshirani et al.).
+#' heuristic of Tibshirani et al., 2001).
 #'
 #' Only the gap statistic can conclude that the data hold no clusters, by
 #' suggesting `k = 1`, and only when the search starts at 1, as it does by
