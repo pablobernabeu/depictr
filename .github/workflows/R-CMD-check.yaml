@@ -142,10 +142,14 @@ jobs:
           r-version: '4.1'
           use-public-rspm: true
 
+      # ggplot2 is pinned to its declared floor. Its releases from 4.0.0 import
+      # S7, whose current release needs R 4.2, so pak cannot resolve the newest
+      # ggplot2 on R 4.1, whereas 3.5.2 does not use S7 and still installs there.
+      # Drop the pin when the R floor in DESCRIPTION rises to 4.2.
       - uses: r-lib/actions/setup-r-dependencies@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05  # v2.14.0
         with:
           dependencies: '"hard"'
-          extra-packages: any::testthat, any::pkgload
+          extra-packages: any::testthat, any::pkgload, ggplot2@3.5.2
 
       - name: Tests
         shell: Rscript {0}
