@@ -23,21 +23,21 @@ urlchecker::url_check() finds the URL correct.
 
 ## Test environments
 
-GitHub Actions, run 43735418221 on 2026-11-15, started by pull request #26 at
-commit 2b2c2f3 on the release branch. The package sources of this submission
+GitHub Actions, run 44942007539 on 2026-11-21, started by pull request #26 at
+commit 9fbd80e on the release branch. The package sources of this submission
 are those of that commit. Because a pull request started the run, each job
-checked out GitHub's merge of that commit into main (36f731e), which differs
-from 2b2c2f3 only in one workflow file under .github, a directory that
+checked out GitHub's merge of that commit into main (aa5b03d), which differs
+from 9fbd80e only in one workflow file under .github, a directory that
 .Rbuildignore keeps out of the tarball. Each leg built the tarball with
 `--compact-vignettes=gs+qpdf` and ran `R CMD check --as-cran --no-manual` on
 it, without the CRAN incoming checks, which r-lib/actions turns off. Each leg
 ended with 'Status: OK':
 
 * ubuntu-latest (Ubuntu 26.04.1 LTS), R 4.6.2
-* ubuntu-latest (Ubuntu 26.04.1 LTS), R-devel (2026-11-14 r90890)
+* ubuntu-latest (Ubuntu 26.04.1 LTS), R-devel (2026-11-20 r90953)
 * ubuntu-latest (Ubuntu 26.04.1 LTS), R 4.5.3
 * windows-latest (x86_64-w64-mingw32), R 4.6.2
-* windows-latest (x86_64-w64-mingw32), R-devel (2026-11-14 r90890 ucrt)
+* windows-latest (x86_64-w64-mingw32), R-devel (2026-11-17 r90926 ucrt)
 * macos-latest (macOS Tahoe 26.7.2, aarch64-apple-darwin23), R 4.6.2
 
 The test suite passed in every leg, with no failures or warnings. Four tests
@@ -57,8 +57,10 @@ Three more checks of the same run, all on Ubuntu 26.04.1 LTS, had no failure:
   'Status: OK'. The tests that need a suggested package skipped.
 * The test suite ran on R 4.1.3, the floor in DESCRIPTION, with the packages
   in Depends and Imports, testthat and the recommended packages that come with
-  R installed, among them survival, cluster, MASS and boot from Suggests. The
-  tests that need another suggested package skipped.
+  R installed, among them survival, cluster, MASS and boot from Suggests.
+  ggplot2 was pinned to its floor, 3.5.2, because later releases import S7,
+  whose current release requires R 4.2. The tests that need another suggested
+  package skipped.
 * On the R-devel leg, the test suite ran again in a Latin-9 locale
   (en_US.iso885915) with NOT_CRAN unset, as on CRAN's
   r-devel-linux-x86_64-debian-clang flavour.
