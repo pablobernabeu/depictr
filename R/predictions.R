@@ -3,9 +3,9 @@
 #' Plot predicted values for one predictor
 #'
 #' Shows the values a model predicts as one focal predictor varies, holding the
-#' other predictors at typical values (the mean for numeric predictors, the most
-#' frequent level for factors). A confidence band (numeric predictor) or
-#' confidence intervals (factor predictor) convey uncertainty.
+#' other predictors at typical values (the mean for numeric predictors and the
+#' most frequent level for factors). A confidence band for a numeric predictor,
+#' or confidence intervals for a factor, show the uncertainty.
 #'
 #' The prediction grid holds the variables the formula names, on their own
 #' scale, and [stats::predict()] re-applies each transformation to it. A model
@@ -27,21 +27,21 @@
 #' count at the geometric-mean exposure. The offset stays at its mean when the
 #' focal predictor enters it too, as in `log(exposure) + offset(log(exposure))`,
 #' so the line then shows the predictor's effect beyond the offset. The y-axis
-#' label ends in "at the mean offset".
+#' label ends in 'at the mean offset'.
 #'
-#' Predictions and standard errors come from [stats::predict()]; `glm`
+#' Predictions and standard errors come from [stats::predict()]. `glm`
 #' predictions are formed on the link scale and back-transformed, so a binomial
 #' model shows predicted probabilities. The band uses the multiplier of the
 #' model's own tests, as [tidy_estimates()] does. An `lm`, and a `glm` whose
 #' dispersion is estimated, get t on the residual degrees of freedom, so a
-#' Gaussian `glm` draws the band of the same `lm`. Binomial and Poisson fits
-#' and mixed models get z. Mixed models fitted with
-#' [lme4::lmer()]/[lme4::glmer()] are supported too: predictions use only the
-#' fixed effects (as `re.form = NA` does) and standard errors come from the
-#' fixed-effect design matrix and `vcov()`. Works with `lm`, `glm` and
-#' `merMod`; other model classes are attempted on a best-effort basis.
+#' Gaussian `glm` draws the band of the same `lm`. Binomial and Poisson fits and
+#' mixed models get z. Mixed models fitted with [lme4::lmer()] or
+#' [lme4::glmer()] are supported too. Their predictions use only the fixed
+#' effects, as `re.form = NA` does, and their standard errors come from the
+#' fixed-effect design matrix and `vcov()`. Works with `lm`, `glm` and `merMod`.
+#' Other model classes are attempted without a guarantee.
 #'
-#' @param model A fitted model (`lm`, `glm`, `merMod`, ...).
+#' @param model A fitted model, such as an `lm`, `glm` or `merMod`.
 #' @param predictor Name of the focal predictor (string): a variable in the
 #'   model's formula, or a model-frame name such as `"log(rainfall)"`, which
 #'   stands for the one variable it transforms. A term built from several
@@ -49,8 +49,9 @@
 #' @param conf_level Confidence level for the interval, a single number strictly
 #'   between 0 and 1.
 #' @param n Number of points across the range of a numeric predictor.
-#' @param rug Whether to add a rug of the observed predictor values (numeric predictors).
-#' @param colour Colour for the line/points and band. Defaults to the depictr
+#' @param rug Whether to add a rug of the observed values of a numeric
+#'   predictor.
+#' @param colour Colour for the line, points and band. Defaults to the depictr
 #'   brand blue.
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
@@ -105,27 +106,27 @@ effects_plot <- function(model, predictor, conf_level = 0.95, n = 100,
 #' Plot a two-way interaction of predicted values
 #'
 #' Shows how the predicted relationship between a focal predictor and the
-#' response changes across the levels (or representative values) of a second,
+#' response changes across the levels, or representative values, of a second,
 #' moderating predictor. Other predictors are held at typical values.
 #'
 #' The grid is built as in [effects_plot()]. It holds the raw variables, so
 #' transformed terms are predicted as fitted. Typical values come from the
 #' estimation sample, and an offset is held at its mean on the link scale.
 #'
-#' @param model A fitted model (`lm`, `glm`, `merMod`, ...).
-#' @param predictor Name of the focal predictor on the x-axis (string), given
-#'   as in [effects_plot()]: `"log(rainfall)"` means `rainfall`.
-#' @param moderator Name of the moderating predictor, mapped to colour
-#'   (string), given in the same way as `predictor`. It must be a different
+#' @param model A fitted model, such as an `lm`, `glm` or `merMod`.
+#' @param predictor Name of the focal predictor on the x-axis, as a string,
+#'   given as in [effects_plot()]: `"log(rainfall)"` means `rainfall`.
+#' @param moderator Name of the moderating predictor, mapped to colour, as a
+#'   string given in the same way as `predictor`. It must be a different
 #'   variable.
 #' @param moderator_values For a numeric moderator, the values to show, on the
 #'   variable's own scale. Defaults to the 10th, 50th and 90th percentiles in
 #'   the estimation sample.
-#' @param conf_level Confidence level for the bands/intervals, a single number
-#'   strictly between 0 and 1.
+#' @param conf_level Confidence level for the bands and intervals, a single
+#'   number strictly between 0 and 1.
 #' @param n Number of points across the range of a numeric focal predictor.
-#' @param band Whether to draw confidence bands (numeric focal predictor).
-#' @param palette Colours for the moderator; defaults to [depictr_palette()].
+#' @param band Whether to draw confidence bands for a numeric focal predictor.
+#' @param palette Colours for the moderator. Defaults to [depictr_palette()].
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.

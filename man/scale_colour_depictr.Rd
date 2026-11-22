@@ -32,11 +32,11 @@ scale_fill_depictr(
 }
 \arguments{
 \item{n}{Optional number of colours to draw from \code{\link[=depictr_palette]{depictr_palette()}}. By
-default ggplot2 requests exactly as many colours as there are groups; pass
-\code{n} only to force a fixed slice of the palette. More than eight groups
-means the built-in qualitative palette is interpolated, which loses the
-colour-vision-deficiency guarantee and warns at draw time; facet the groups
-or use a sequential scale when there are that many.}
+default, ggplot2 requests exactly as many colours as there are groups, so
+pass \code{n} only to force a fixed slice of the palette. With more than eight
+groups, the built-in qualitative palette is interpolated, which loses the
+colour-vision-deficiency guarantee and warns when the plot is drawn. Facet
+the groups or use a sequential scale when there are that many.}
 
 \item{palette}{Optional palette override: a function of one argument (the
 number of colours) returning a character vector of colours. Defaults to
@@ -56,10 +56,10 @@ warn at draw time. It cannot be combined with \code{palette}.}
 A ggplot2 scale that can be added to a plot.
 }
 \description{
-Discrete ggplot2 scales using \code{\link[=depictr_palette]{depictr_palette()}}. These are the canonical
-colour and fill scales used throughout the package. They honour the global
-\code{options(depictr.palette = )} (via \code{\link[=depictr_palette]{depictr_palette()}}) and
-\code{options(depictr.na_value = )} settings; see \code{\link[=depictr_options]{depictr_options()}}.
+Discrete ggplot2 scales using \code{\link[=depictr_palette]{depictr_palette()}}. These are the colour and
+fill scales used throughout the package. They honour the global
+\code{options(depictr.palette = )} (through \code{\link[=depictr_palette]{depictr_palette()}}) and
+\code{options(depictr.na_value = )} settings (see \code{\link[=depictr_options]{depictr_options()}}).
 }
 \examples{
 library(ggplot2)

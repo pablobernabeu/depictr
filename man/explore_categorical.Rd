@@ -40,22 +40,22 @@ are left out of the plot and its palette.}
 \item{horizontal}{Whether to draw horizontal bars, which helps when there
 are many levels or long labels.}
 
-\item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
+\item{palette}{Colours for the groups. Defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
-\item{title, x_lab}{Plot title and category-axis label (defaults to the
-variable name).}
+\item{title, x_lab}{Plot title and category-axis label, which defaults to the
+variable name.}
 }
 \value{
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Counts (or proportions) of the levels of a categorical variable, optionally
+Counts or proportions of the levels of a categorical variable, optionally
 split by a grouping variable.
 }
 \details{
 A continuous numeric column (more than 20 distinct values) is rejected with
-an error, since coercing it to a factor would draw one bar per value; use
-\code{\link[=explore_distribution]{explore_distribution()}} for such variables instead.
+an error, since coercing it to a factor would draw one bar per value. Use
+\code{\link[=explore_distribution]{explore_distribution()}} for such variables.
 }
 \examples{
 explore_categorical(wellbeing_survey, region)

@@ -1,10 +1,10 @@
 # Outlier plot ---------------------------------------------------------------
 
-#' Box / violin plot highlighting outliers
+#' Box and violin plots highlighting outliers
 #'
-#' Shows the distribution of a numeric variable (optionally by group) as a box
-#' and/or violin plot, with points beyond the 1.5 * IQR fences highlighted so
-#' that outliers are easy to spot before modelling.
+#' Shows the distribution of a numeric variable, optionally by group, as a box
+#' plot, a violin plot or both, with points beyond the 1.5 * IQR fences
+#' highlighted so that outliers are easy to spot before modelling.
 #'
 #' @param data A data frame.
 #' @param y The numeric variable (string or unquoted name).
@@ -15,7 +15,7 @@
 #' @param type One of `"box"`, `"violin"` or `"both"`.
 #' @param flag Whether to highlight outliers (points beyond 1.5 * IQR).
 #' @param outlier_colour Colour for highlighted outliers.
-#' @param palette Colours for the groups; defaults to [depictr_palette()].
+#' @param palette Colours for the groups. Defaults to [depictr_palette()].
 #' @param title,y_lab Plot title and value-axis label.
 #'
 #' @return A [ggplot2::ggplot] object.

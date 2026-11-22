@@ -1,6 +1,6 @@
 # Descriptive summary table ("Table 1") --------------------------------------
 
-#' A "Table 1" style descriptive summary
+#' A descriptive summary in the style of 'Table 1'
 #'
 #' Builds the kind of descriptive table that opens many empirical papers:
 #' numeric variables are summarised as mean (SD), categorical variables as
@@ -9,9 +9,9 @@
 #' [knitr::kable()] or a table package.
 #'
 #' The first row of the table always reports the sample size (`N`) overall and
-#' per group. By default each variable is also followed by a `Missing, n (%)`
-#' row whenever it contains missing values; set `missing = FALSE` to suppress
-#' these.
+#' per group. By default, each variable is also followed by a `Missing, n (%)`
+#' row whenever it contains missing values. Set `missing = FALSE` to leave these
+#' out.
 #'
 #' A date or date-time column (`Date`, `POSIXct`) gets a single `Range` row,
 #' written as `<earliest> to <latest>` in each column. The cells give the date
@@ -20,11 +20,11 @@
 #' is summarised as mean (SD) in its own units, which the statistic names, as
 #' in `Mean (SD), days`.
 #'
-#' When `vars` is `NULL`, high-cardinality character/factor columns (those whose
-#' number of distinct levels approaches the number of rows, e.g. identifier
-#' columns) are skipped automatically, with a message, rather than being
+#' When `vars` is `NULL`, high-cardinality character or factor columns, whose
+#' number of distinct levels approaches the number of rows, such as identifier
+#' columns, are skipped automatically, with a message, so that they are not
 #' expanded into hundreds of one-per-row entries. Pass such a column explicitly
-#' via `vars` to override this.
+#' in `vars` to override this.
 #'
 #' @param data A data frame.
 #' @param vars Names of the columns to summarise, as a character vector. If
@@ -38,8 +38,8 @@
 #' @param digits Number of decimal places for numeric summaries.
 #' @param missing Whether to add a `Missing, n (%)` row for variables that
 #'   contain missing values. Defaults to `TRUE`.
-#' @param max_levels When `vars` is `NULL`, character/factor columns whose
-#'   distinct-level count is at least `max_levels` *and* exceeds half the number
+#' @param max_levels When `vars` is `NULL`, character or factor columns whose
+#'   distinct-level count is at least `max_levels` and exceeds half the number
 #'   of rows are treated as identifiers and skipped. Defaults to `20`.
 #'
 #' @return A data frame with columns `variable`, `statistic`, `Overall`, one

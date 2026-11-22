@@ -9,8 +9,8 @@
 #' mean residual against the mean fitted value, inside a grey band of
 #' \eqn{\pm 2} standard errors of that mean. Under a well-specified model, the
 #' binned residuals scatter around zero, and about 95% of them should fall
-#' within the band. Systematic departures (a trend, or many points outside the
-#' band) indicate a misspecified mean structure.
+#' within the band. Systematic departures, such as a trend or many points
+#' outside the band, indicate a misspecified mean structure.
 #'
 #' By default (`band = "model"`), the standard error is the one the fitted
 #' model implies. The model gives the response \eqn{y_i} the variance
@@ -25,15 +25,15 @@
 #' residual, \eqn{(y_i - \hat\mu_i) \sqrt{w_i / V(\hat\mu_i)}}, then has
 #' variance \eqn{\phi}, so its bin mean has standard error
 #' \eqn{\sqrt{\phi / n_b}}. The fit absorbs a little of each observation's
-#' variance, so a residual varies slightly less than this and the band errs on
-#' the wide side. Observations with zero prior weight take no part in the fit
-#' and are left out of the bins.
+#' variance, so a residual varies slightly less than this, and the band is
+#' slightly too wide. Observations with zero prior weight take no part in the
+#' fit and are left out of the bins.
 #'
 #' `band = "empirical"` draws the band that `arm::binnedplot()` draws: twice
 #' the standard deviation of the residuals in the bin, divided by
-#' \eqn{\sqrt{n_b}}. It collapses wherever the outcomes in
-#' a bin are all alike. The residuals in a logistic model's bin without events
-#' all lie just below zero, so its band nearly vanishes and the bin is flagged.
+#' \eqn{\sqrt{n_b}}. It shrinks to almost nothing wherever the outcomes in a bin
+#' are all alike. The residuals in a logistic model's bin without events all lie
+#' just below zero, so its band nearly vanishes and the bin is flagged.
 #' Where events are rare, such bins are what the model expects. The example
 #' below, a correctly specified model, has five of its seventeen bins flagged
 #' by that band and none by the model's.
@@ -41,7 +41,8 @@
 #' @param model A fitted `glm` object (an `lm` is also accepted and treated as a
 #'   Gaussian GLM).
 #' @param bins Number of bins. The default follows Gelman and Hill's rule of
-#'   thumb of roughly \eqn{\sqrt{n}} bins (bounded to a sensible range).
+#'   thumb of about \eqn{\sqrt{n}} bins, rounded down and kept between 2 and
+#'   half the number of observations.
 #' @param type Residual type used for the bin means: `"response"` (observed
 #'   minus fitted on the response scale, the Gelman-Hill default) or
 #'   `"pearson"`.
@@ -116,7 +117,7 @@ binned_residual_plot <- function(model, bins = NULL,
 #' Hill, 2007). The standard error comes from the fitted model or from the
 #' residuals in the bin, as `band` says. Used by [binned_residual_plot()] and
 #' re-used by [residual_diagnostics_plot()].
-#' @param model A fitted `lm`/`glm`.
+#' @param model A fitted `lm` or `glm`.
 #' @param bins Number of bins, or `NULL` for the \eqn{\sqrt{n}} default.
 #' @param type Residual type, `"response"` or `"pearson"`.
 #' @param band `"model"` for the standard error the model implies, or
@@ -215,7 +216,7 @@ binned_residual_data <- function(model, bins = NULL,
 #' Computes randomised quantile residuals (Dunn & Smyth, 1996): the residual for
 #' observation \eqn{i} is \eqn{\Phi^{-1}(u_i)} where, for a continuous response,
 #' \eqn{u_i = F(y_i;\hat\theta_i)} is the fitted CDF at the observation, and for
-#' a discrete response \eqn{u_i} is drawn uniformly on
+#' a discrete response, \eqn{u_i} is drawn uniformly on
 #' \eqn{(F(y_i - 1), F(y_i)]}. For a correctly specified model these residuals
 #' are i.i.d. standard normal (equivalently, the \eqn{u_i} are uniform on
 #' \eqn{(0,1)}), regardless of the response distribution, which makes the normal

@@ -25,20 +25,20 @@ a Unicode multiplication sign), \code{"asterisk"}, \code{"colon"} (unchanged) or
 \item{tidy_intercept}{Whether to replace \code{(Intercept)} with \code{"Intercept"}.}
 
 \item{wrap}{Optional integer width at which to wrap long labels onto new
-lines (see \code{\link[base:strwrap]{base::strwrap()}}). \code{NULL} (default) leaves labels unwrapped.}
+lines (see \code{\link[base:strwrap]{base::strwrap()}}). \code{NULL}, the default, leaves labels
+unwrapped.}
 }
 \value{
 A character vector the same length as \code{x}, with \code{NA} preserved.
 }
 \description{
-Cleans up the term names produced by modelling functions so that they read
-well on a plot: the intercept is renamed, an optional \code{b_}/\code{bs_} Bayesian
-prefix is stripped, interaction colons are converted to a chosen symbol, and
-underscores are shown as spaces (e.g. \code{word_frequency} becomes
-\code{"word frequency"}). The \code{b_}/\code{bs_} prefix is stripped from \emph{each} component
-of an interaction (e.g. \code{b_x:b_y}), not just the leading term. Missing values
-(\code{NA}) are kept as \code{NA} rather than being rendered as the literal text
-\code{"NA"}.
+Tidies the term names produced by modelling functions so that they read
+well on a plot: the intercept is renamed, an optional Bayesian prefix \code{b_} or
+\code{bs_} is stripped, interaction colons are converted to a chosen symbol and
+underscores are shown as spaces, so \code{word_frequency} becomes
+\code{"word frequency"}. The prefix is stripped from every component of an
+interaction, such as \code{b_x:b_y}, and not only from the leading term. Missing
+values (\code{NA}) stay \code{NA} and are not rendered as the text \code{"NA"}.
 }
 \examples{
 format_terms(c("(Intercept)", "b_conditionB", "freq:condition"))

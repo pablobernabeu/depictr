@@ -3,30 +3,28 @@
 #' The depictr colour palettes
 #'
 #' Colourblind-aware palettes shared by every depictr plot. The qualitative
-#' palette is based on the Okabe-Ito set (Okabe & Ito, 2008), a widely
-#' recommended categorical palette that stays distinguishable under the common
-#' forms of colour-vision deficiency. It keeps six of that set's eight colours.
+#' palette is based on the Okabe-Ito set (Okabe & Ito, 2008), a categorical
+#' palette that stays distinguishable under the common forms of colour-vision
+#' deficiency. It keeps six of that set's eight colours.
 #' The depictr brand blue (`#005b96`) takes the place of its blue (`#0072b2`)
 #' and leads the palette, and a grey (`#999999`) takes the place of its black.
 #' The sequential and diverging palettes are perceptually ordered single-hue
 #' and red-blue ramps.
 #'
-#' The guarantee belongs to the eight built-in colours themselves, not to any
-#' number of colours: past eight the qualitative palette has to interpolate
-#' between them, and the interpolated colours sit close enough together to fail
-#' the package's own colour-distance check. That case warns rather than handing
-#' back colours under a guarantee it cannot keep.
+#' The guarantee covers the eight built-in colours only. Past eight, the
+#' qualitative palette interpolates between them, and the interpolated colours
+#' are close enough to fail the package's own colour-distance check, so the
+#' palette warns.
 #'
 #' @param n Number of colours to return. If `NULL` (the default), the
 #'   qualitative palette returns all of its base colours, the eight built-in
-#'   colours unless `options(depictr.palette = )` supplies another set, and
-#'   the sequential and diverging ramps return seven. For the qualitative
-#'   palette an `n` larger than the available base colours is interpolated;
-#'   the sequential and diverging palettes are ramps and accept any `n`.
-#'   Interpolating the built-in
-#'   qualitative palette beyond its eight base colours loses the
-#'   colour-vision-deficiency guarantee and warns, so facet the groups or use
-#'   the sequential ramp when many groups are needed.
+#'   colours unless `options(depictr.palette = )` supplies another set, and the
+#'   sequential and diverging ramps return seven. For the qualitative palette,
+#'   an `n` larger than the available base colours is interpolated. The
+#'   sequential and diverging palettes are ramps and accept any `n`.
+#'   Interpolating the built-in qualitative palette beyond its eight base
+#'   colours loses the colour-vision-deficiency guarantee and warns, so facet
+#'   the groups or use the sequential ramp when many groups are needed.
 #' @param type Palette type: `"qualitative"` (categorical groups),
 #'   `"sequential"` (ordered low-to-high) or `"diverging"` (a midpoint with two
 #'   directions).
@@ -35,10 +33,10 @@
 #'   an order of their own and refuse `"contrast"`.
 #'
 #' @details The qualitative palette can be overridden globally with
-#'   `options(depictr.palette = )` (see [depictr_options()]); when set, that
-#'   custom palette replaces the eight built-in colours and is interpolated when
-#'   more colours are requested than it provides. The sequential and diverging
-#'   ramps are unaffected.
+#' `options(depictr.palette = )` (see [depictr_options()]). When set, that
+#' custom palette replaces the eight built-in colours and is interpolated when
+#' more colours are requested than it provides. The sequential and diverging
+#' ramps are unaffected.
 #'
 #' @section The contrast-first order:
 #' In the default order the second colour is the orange (`#e69f00`), at 2.25:1
@@ -158,17 +156,17 @@ depictr_palette <- function(n = NULL, type = c("qualitative", "sequential",
 
 #' depictr colour and fill scales
 #'
-#' Discrete ggplot2 scales using [depictr_palette()]. These are the canonical
-#' colour and fill scales used throughout the package. They honour the global
-#' `options(depictr.palette = )` (via [depictr_palette()]) and
-#' `options(depictr.na_value = )` settings; see [depictr_options()].
+#' Discrete ggplot2 scales using [depictr_palette()]. These are the colour and
+#' fill scales used throughout the package. They honour the global
+#' `options(depictr.palette = )` (through [depictr_palette()]) and
+#' `options(depictr.na_value = )` settings (see [depictr_options()]).
 #'
 #' @param n Optional number of colours to draw from [depictr_palette()]. By
-#'   default ggplot2 requests exactly as many colours as there are groups; pass
-#'   `n` only to force a fixed slice of the palette. More than eight groups
-#'   means the built-in qualitative palette is interpolated, which loses the
-#'   colour-vision-deficiency guarantee and warns at draw time; facet the groups
-#'   or use a sequential scale when there are that many.
+#'   default, ggplot2 requests exactly as many colours as there are groups, so
+#'   pass `n` only to force a fixed slice of the palette. With more than eight
+#'   groups, the built-in qualitative palette is interpolated, which loses the
+#'   colour-vision-deficiency guarantee and warns when the plot is drawn. Facet
+#'   the groups or use a sequential scale when there are that many.
 #' @param palette Optional palette override: a function of one argument (the
 #'   number of colours) returning a character vector of colours. Defaults to
 #'   [depictr_palette()].
@@ -249,10 +247,10 @@ depictr_scale_palette <- function(n, palette, order) {
 #'
 #' The default `base_size` and `base_family` come from the global options
 #' `depictr.base_size` and `depictr.base_family` (see [depictr_options()]), so
-#' the package-wide font size can be set once; passing the arguments explicitly
-#' overrides them. The title is drawn in the brand colour, the one
-#' `options(depictr.brand = )` sets and the other functions' `depictr_brand()`
-#' defaults stand for.
+#' the package-wide font size can be set once. Arguments passed explicitly
+#' override them. The title is drawn in the brand colour, which
+#' `options(depictr.brand = )` sets and which the `depictr_brand()` defaults of
+#' other functions stand for.
 #'
 #' @param base_size Base font size, in points. Defaults to the
 #'   `depictr.base_size` option.
@@ -336,14 +334,13 @@ legend_inside_theme <- function(position = c(0.98, 0.02),
 
 #' Tidy raw coefficient names for display
 #'
-#' Cleans up the term names produced by modelling functions so that they read
-#' well on a plot: the intercept is renamed, an optional `b_`/`bs_` Bayesian
-#' prefix is stripped, interaction colons are converted to a chosen symbol, and
-#' underscores are shown as spaces (e.g. `word_frequency` becomes
-#' `"word frequency"`). The `b_`/`bs_` prefix is stripped from *each* component
-#' of an interaction (e.g. `b_x:b_y`), not just the leading term. Missing values
-#' (`NA`) are kept as `NA` rather than being rendered as the literal text
-#' `"NA"`.
+#' Tidies the term names produced by modelling functions so that they read
+#' well on a plot: the intercept is renamed, an optional Bayesian prefix `b_` or
+#' `bs_` is stripped, interaction colons are converted to a chosen symbol and
+#' underscores are shown as spaces, so `word_frequency` becomes
+#' `"word frequency"`. The prefix is stripped from every component of an
+#' interaction, such as `b_x:b_y`, and not only from the leading term. Missing
+#' values (`NA`) stay `NA` and are not rendered as the text `"NA"`.
 #'
 #' @param x Character vector of term names.
 #' @param interaction How to render interaction colons: `"times"` (the default,
@@ -353,7 +350,8 @@ legend_inside_theme <- function(position = c(0.98, 0.02),
 #'   'brms') from each interaction component.
 #' @param tidy_intercept Whether to replace `(Intercept)` with `"Intercept"`.
 #' @param wrap Optional integer width at which to wrap long labels onto new
-#'   lines (see [base::strwrap()]). `NULL` (default) leaves labels unwrapped.
+#'   lines (see [base::strwrap()]). `NULL`, the default, leaves labels
+#'   unwrapped.
 #'
 #' @return A character vector the same length as `x`, with `NA` preserved.
 #' @export

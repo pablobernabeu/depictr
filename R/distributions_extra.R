@@ -2,11 +2,11 @@
 
 #' Raincloud plot
 #'
-#' A "raincloud" combines three views of a distribution: a half-violin density
-#' (the cloud), a narrow boxplot, and the raw jittered points (the rain). It
-#' conveys the shape, the summary and the individual observations together,
-#' giving a fuller and more transparent picture than a boxplot alone. The plot
-#' is built with base R and ggplot2 alone, with no extra package dependency.
+#' A raincloud plot combines three views of a distribution: a half-violin
+#' density (the cloud), a narrow boxplot and the raw jittered points (the rain).
+#' It shows the shape, the summary and the individual observations together,
+#' which a boxplot alone does not. The plot is built with base R and ggplot2
+#' alone, with no extra package dependency.
 #'
 #' Groups with fewer than two observations cannot have a density estimated, so
 #' their half-violin is omitted (the points and box are still drawn) and a
@@ -20,7 +20,7 @@
 #'   message, and levels without rows are left out of the plot and its palette.
 #' @param width Maximum width of the half-violin.
 #' @param point_alpha Transparency of the rain points.
-#' @param palette Colours for the groups; defaults to [depictr_palette()].
+#' @param palette Colours for the groups. Defaults to [depictr_palette()].
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
 #' @return A [ggplot2::ggplot] object.
@@ -124,9 +124,9 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
 #' Compare group means with confidence intervals
 #'
 #' An estimation-style plot of a numeric outcome across the levels of a grouping
-#' variable: each group's mean with a confidence interval, over a backdrop of
-#' the raw (jittered) data. By showing both the estimate and its uncertainty, it
-#' conveys whether the groups differ more faithfully than a bar chart does.
+#' variable: each group's mean with a confidence interval, drawn over the raw
+#' (jittered) data. Because it shows both the estimate and its uncertainty, it
+#' shows whether the groups differ more faithfully than a bar chart does.
 #'
 #' A group with a single observation has no degrees of freedom for a t-based
 #' interval, so only its mean is drawn (no interval) and a warning is issued.
@@ -142,16 +142,16 @@ raincloud_plot <- function(data, y, group = NULL, width = 0.4,
 #' @param show_points Whether to draw the raw data behind the means.
 #' @param point_alpha Transparency of the raw points.
 #' @param differences If `TRUE`, append a lower panel showing the pairwise mean
-#'   difference(s) against a reference group, each with a bootstrap confidence
-#'   interval, turning the plot into a full estimation plot via
-#'   [estimation_plot()]. The return value is then a 'patchwork' object. Defaults
-#'   to `FALSE`, the plain group-means plot.
+#'   differences against a reference group, each with a bootstrap confidence
+#'   interval, which turns the plot into a full estimation plot through
+#'   [estimation_plot()]. The return value is then a 'patchwork' object.
+#'   Defaults to `FALSE`, the plain group-means plot.
 #' @param reference Reference group for the difference panel when
-#'   `differences = TRUE`; defaults to the first level of `group`. Ignored
+#'   `differences = TRUE`. Defaults to the first level of `group`. Ignored
 #'   otherwise.
 #' @param n_boot Number of bootstrap resamples for the difference intervals when
 #'   `differences = TRUE`. Ignored otherwise.
-#' @param palette Colours for the groups; defaults to [depictr_palette()].
+#' @param palette Colours for the groups. Defaults to [depictr_palette()].
 #' @param title,x_lab,y_lab Title and axis labels. `x_lab` is not drawn when
 #'   `differences = TRUE`, since the estimation plot names its groups on the
 #'   axis alone.

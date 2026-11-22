@@ -2,7 +2,7 @@
 % Please edit documentation in R/summary_table.R
 \name{summary_table}
 \alias{summary_table}
-\title{A "Table 1" style descriptive summary}
+\title{A descriptive summary in the style of 'Table 1'}
 \usage{
 summary_table(
   data,
@@ -31,8 +31,8 @@ overall column. Records whose group value is missing get a trailing
 \item{missing}{Whether to add a \verb{Missing, n (\%)} row for variables that
 contain missing values. Defaults to \code{TRUE}.}
 
-\item{max_levels}{When \code{vars} is \code{NULL}, character/factor columns whose
-distinct-level count is at least \code{max_levels} \emph{and} exceeds half the number
+\item{max_levels}{When \code{vars} is \code{NULL}, character or factor columns whose
+distinct-level count is at least \code{max_levels} and exceeds half the number
 of rows are treated as identifiers and skipped. Defaults to \code{20}.}
 }
 \value{
@@ -49,9 +49,9 @@ grouping variable. The result is a plain data frame, ready to pass to
 }
 \details{
 The first row of the table always reports the sample size (\code{N}) overall and
-per group. By default each variable is also followed by a \verb{Missing, n (\%)}
-row whenever it contains missing values; set \code{missing = FALSE} to suppress
-these.
+per group. By default, each variable is also followed by a \verb{Missing, n (\%)}
+row whenever it contains missing values. Set \code{missing = FALSE} to leave these
+out.
 
 A date or date-time column (\code{Date}, \code{POSIXct}) gets a single \code{Range} row,
 written as \verb{<earliest> to <latest>} in each column. The cells give the date
@@ -60,11 +60,11 @@ minute, or to the second when any time has seconds. A duration (\code{difftime})
 is summarised as mean (SD) in its own units, which the statistic names, as
 in \verb{Mean (SD), days}.
 
-When \code{vars} is \code{NULL}, high-cardinality character/factor columns (those whose
-number of distinct levels approaches the number of rows, e.g. identifier
-columns) are skipped automatically, with a message, rather than being
+When \code{vars} is \code{NULL}, high-cardinality character or factor columns, whose
+number of distinct levels approaches the number of rows, such as identifier
+columns, are skipped automatically, with a message, so that they are not
 expanded into hundreds of one-per-row entries. Pass such a column explicitly
-via \code{vars} to override this.
+in \code{vars} to override this.
 }
 \examples{
 summary_table(crop_yield, vars = c("yield", "rainfall", "treatment"))

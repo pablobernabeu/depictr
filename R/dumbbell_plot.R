@@ -3,27 +3,27 @@
 #' Dumbbell plot
 #'
 #' Compares a numeric value between exactly two groups across a set of
-#' categories: for each category the two group values are drawn as points joined
-#' by a connecting segment, so the size and direction of the gap is read at a
-#' glance. It is a clearer alternative to paired or grouped bars for
-#' before/after, two-condition or two-period comparisons.
+#' categories: for each category, the two group values are drawn as points
+#' joined by a segment, so the size and direction of the gap can be read at a
+#' glance. It is a clearer alternative to paired or grouped bars for comparisons
+#' of before and after, two conditions or two periods.
 #'
-#' When a category has several rows per group the values are averaged. Rows with
-#' a missing category, value or group are dropped.
+#' When a category has several rows per group, the values are averaged. Rows
+#' with a missing category, value or group are dropped.
 #'
 #' @param data A data frame.
-#' @param category The categorical axis (string or unquoted name); one row of
-#'   the plot per level.
+#' @param category The categorical axis (string or unquoted name), with one row
+#'   of the plot per level.
 #' @param value The numeric value to compare (string or unquoted name).
 #' @param group The two-level grouping variable whose levels are the two ends of
 #'   each dumbbell (string or unquoted name).
 #' @param sort How to order the categories up the axis: `"gap"` (by the signed
 #'   difference between the two groups, the default), `"value"` (by the second
-#'   group's value), or `"none"` (the data's own order: the order of the levels
+#'   group's value) or `"none"` (the data's own order: the order of the levels
 #'   when `category` is a factor, and otherwise the order in which the
 #'   categories first appear).
 #' @param point_size Size of the end points.
-#' @param palette Length-2 colours for the two groups; defaults to
+#' @param palette Length-2 colours for the two groups. Defaults to
 #'   [depictr_palette()].
 #' @param legend_inside When `TRUE`, draw the two-group legend inside the
 #'   panel, in the top-right corner, over a translucent background, instead of

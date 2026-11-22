@@ -16,10 +16,10 @@ save_plot(
 )
 }
 \arguments{
-\item{filename}{Output file path. The extension sets the device (e.g. \code{.png},
-\code{.pdf}, \code{.eps}, \code{.tiff}).}
+\item{filename}{Output file path. The extension sets the device, such as
+\code{.png}, \code{.pdf}, \code{.eps} or \code{.tiff}.}
 
-\item{plot}{The plot to save; defaults to the last plot drawn.}
+\item{plot}{The plot to save. Defaults to the last plot drawn.}
 
 \item{width, height}{Dimensions.}
 
@@ -39,19 +39,19 @@ the saved width as both widths.}
 
 \item{...}{Passed to \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}, which passes what it does not use
 on to the device. A \code{device} or device argument given here overrides the
-defaults described under "Formats journals accept".}
+defaults described under 'Formats journals accept'.}
 }
 \value{
 The \code{filename}, invisibly. With \code{check = TRUE}, the audit report is
 attached to it as the attribute \code{"check"}, which \code{attr(, "check")} reads.
 }
 \description{
-A convenience wrapper around \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}} with sensible defaults for
-figures in papers and reports: a moderate size, 300 dpi, and the output
-directory created if needed. The device is inferred from the file extension,
-and PDF, EPS and TIFF files are written to pass the technical checks
-journals run on submitted figures. With \code{check = TRUE}, the figure is also
-audited with \code{\link[=check_figure]{check_figure()}} at the width it is saved at.
+A wrapper around \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}} with defaults for figures in papers and
+reports: a moderate size, 300 dpi and an output directory created if needed.
+The device is inferred from the file extension, and PDF, EPS and TIFF files
+are written to pass the technical checks journals run on submitted figures.
+With \code{check = TRUE}, the figure is also audited with \code{\link[=check_figure]{check_figure()}} at the
+width it is saved at.
 }
 \section{Formats journals accept}{
 
@@ -64,9 +64,9 @@ them.
 
 An EPS or PostScript file is written with \code{\link[grDevices:cairo_ps]{grDevices::cairo_ps()}}, with its
 fonts embedded too. PostScript has no transparency, and
-\code{\link[grDevices:postscript]{grDevices::postscript()}} leaves every translucent layer out of the file:
-the points and the confidence band of the plot in the examples below
-vanish. \code{cairo_ps()} rasterises those layers, together with whatever they
+\code{\link[grDevices:postscript]{grDevices::postscript()}} leaves every translucent layer out of the file, so
+the points and the confidence band of the plot in the examples below would be
+missing. \code{cairo_ps()} rasterises those layers, together with whatever they
 overlap, at \code{fallback_resolution}, by default \code{max(dpi, 600)} here. A
 message says so when a layer of the plot, or of any panel of a patchwork, is
 translucent. A PDF keeps such layers as vector graphics.
@@ -99,8 +99,6 @@ Nature also asks for fonts embedded as TrueType 2 or 42, never Type 3, and
 for line art and text that are not rasterised. A figure with translucent
 layers therefore goes to Nature as a PDF. Elsevier asks for a graph sent as
 a TIFF at 1000 dpi, so pass \code{dpi = 1000} for one.
-
-The Python twin takes the plot first, as \code{save_plot(plot, filename)}.
 }
 
 \examples{
@@ -123,7 +121,7 @@ PLOS ONE. Figures. \url{https://journals.plos.org/plosone/s/figures}
 Nature. Guide to preparing final artwork.
 \url{https://www.nature.com/documents/nature-final-artwork.pdf}
 
-Nature research figure guide. Preparing figures: our specifications.
+Nature research figure guide. Preparing figures: Our specifications.
 \url{https://research-figure-guide.nature.com/figures/preparing-figures-our-specifications/}
 
 Elsevier. Artwork overview.

@@ -18,6 +18,9 @@ test_that("CIEDE2000 reproduces the 34 pairs Sharma, Wu and Dalal published", {
 })
 
 test_that("the 1976 distance overstates differences between saturated colours", {
+  # The 1976 distance is deprecated and warns once per session, which the
+  # test of that warning checks.
+  withr::local_options(rlib_warning_verbosity = "quiet")
   # Two blues a reader can barely tell apart, measured both ways. The Python
   # suite pins the same numbers.
   blues <- c("#005b96", "#0060a8")
@@ -27,6 +30,9 @@ test_that("the 1976 distance overstates differences between saturated colours", 
 })
 
 test_that("ggplot2's default five colours pass under CIE76 and fail under CIEDE2000", {
+  # The 1976 distance is deprecated and warns once per session, which the
+  # test of that warning checks.
+  withr::local_options(rlib_warning_verbosity = "quiet")
   # Under deuteranopia the sky blue and the pink become #709df5 and #80a3ef,
   # 7.35 apart by the 1976 distance, which certified the palette as safe, and
   # 2.74 apart in CIEDE2000.

@@ -1,5 +1,10 @@
 # check_figure(): the accessibility and honesty audit -------------------------
 
+# This file is among the slowest of the suite. CRAN's check of the whole
+# package must stay under ten minutes, so the file skips on CRAN and runs in
+# CI, where NOT_CRAN is set, on Linux, Windows and macOS.
+skip_on_cran()
+
 library(ggplot2)
 
 # Two reference figures with known answers. The good one is separable under
@@ -287,14 +292,38 @@ test_that("a figure in ggplot2's five colours fails the deuteranopia row", {
   expect_identical(report$verdict[1:4], c("pass", "pass", "fail", "pass"))
   expect_identical(detail_for(report, "colour_separability_deutan"),
                    "Closest pair #00b0f6 and #e76bf3 of 5 encoding colours.")
+  withr::local_options(rlib_warning_verbosity = "quiet")
   old <- check_figure(p, metric = "cie76")
   expect_equal(old$measured[1:4], c(60.58, 16.87, 7.35, 12.87))
   expect_identical(old$verdict[1:4], rep("pass", 4))
 })
 
+test_that("metric = \"cie76\" warns once per session that it is deprecated", {
+  # NEWS.md lists the option under 'Deprecated'. The warning is given the
+  # first time either function is asked for it in a session.
+  withr::local_options(rlib_warning_verbosity = "default")
+  rlang::reset_warning_verbosity("depictr_metric_cie76")
+  withr::defer(rlang::reset_warning_verbosity("depictr_metric_cie76"))
+  deprecated <- paste0("^`metric = \"cie76\"` is deprecated, and a later ",
+                       "release will remove it\\. Use the default, ",
+                       "`metric = \"ciede2000\"`\\.")
+  expect_warning(palette_safety(metric = "cie76"), deprecated)
+  expect_no_warning(palette_safety(metric = "cie76"))
+  expect_no_warning(check_figure(good_figure(), metric = "cie76"))
+  rlang::reset_warning_verbosity("depictr_metric_cie76")
+  expect_warning(check_figure(good_figure(), metric = "cie76"), deprecated)
+  expect_no_warning(palette_safety(metric = "cie76"))
+  # The default measure gives no warning.
+  rlang::reset_warning_verbosity("depictr_metric_cie76")
+  expect_no_warning(palette_safety())
+  expect_no_warning(check_figure(good_figure()))
+  expect_no_warning(palette_safety(metric = "ciede2000"))
+})
+
 test_that("metric = \"cie76\" restores the 1976 distance", {
   # The numbers the audit reported before it measured CIEDE2000, pinned in the
   # Python suite as well. Only the four colour rows depend on the metric.
+  withr::local_options(rlib_warning_verbosity = "quiet")
   eight <- data.frame(g = factor(letters[1:8]), x = 1:8, y = 1:8)
   p <- ggplot(eight, aes(x, y, colour = g)) + geom_point() +
     scale_colour_depictr() + theme_depictr()

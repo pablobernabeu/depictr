@@ -42,20 +42,20 @@ A 'patchwork' object (printable like a \link[ggplot2:ggplot]{ggplot2::ggplot}).
 \description{
 Combines the classic regression diagnostic plots (residuals against fitted
 values, a normal Q-Q plot of the standardised residuals, a scale-location
-plot, and residuals against leverage) into a single panel using 'patchwork'.
+plot and residuals against leverage) into a single panel using 'patchwork'.
 The function works with \code{lm} and \code{glm} objects.
 }
 \details{
-For a \code{glm}, the default panels are made GLM-aware (\code{glm_panels = TRUE}): the
-"residuals vs. fitted" panel is replaced by a \emph{binned}-residual plot
-(Gelman & Hill, 2007; see \code{\link[=binned_residual_plot]{binned_residual_plot()}}), which is readable even
-for binary or count models, and the Q-Q panel uses \emph{randomised quantile}
+For a \code{glm}, the default panels suit a GLM (\code{glm_panels = TRUE}): the panel
+of residuals against fitted values is replaced by a binned-residual plot
+(Gelman & Hill, 2007, see \code{\link[=binned_residual_plot]{binned_residual_plot()}}), which is readable even
+for binary or count models, and the Q-Q panel uses randomised quantile
 residuals (Dunn & Smyth, 1996), which are standard normal under a correctly
-specified model regardless of the response family. In a Gaussian or Gamma
-model, prior weights enter these residuals as they enter the fit, through
-each observation's variance. The scale-location and
-leverage panels are unchanged. Set \code{glm_panels = FALSE} to force the classic
-\code{lm}-style panels for a \code{glm} as well.
+specified model whatever the response family. In a Gaussian or Gamma model,
+prior weights enter these residuals as they enter the fit, through each
+observation's variance. The scale-location and leverage panels are unchanged.
+Set \code{glm_panels = FALSE} to draw the classic \code{lm}-style panels for a \code{glm} as
+well.
 }
 \examples{
 fit <- lm(yield ~ rainfall + fertiliser + soil_ph, data = crop_yield)

@@ -25,12 +25,12 @@ point \code{\link[=roc_curve_plot]{roc_curve_plot()}} marks), so the confusion m
 agree on the cut-off.}
 
 \item{normalise}{One of \code{"none"}, \code{"row"} (by actual class) or \code{"col"} (by
-predicted class); controls the fill shading and the cell annotation.}
+predicted class). Controls the fill shading and the cell annotation.}
 
 \item{title}{Plot title.}
 }
 \value{
-A \link[ggplot2:ggplot]{ggplot2::ggplot} object. The threshold actually used is stored in
+A \link[ggplot2:ggplot]{ggplot2::ggplot} object. The threshold used is stored in
 \code{attr(plot, "threshold")}.
 }
 \description{

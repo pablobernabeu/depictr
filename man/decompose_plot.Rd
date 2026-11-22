@@ -21,8 +21,8 @@ holding one series. A multivariate \code{ts} or a matrix with several columns
 is refused. Missing values at either end are trimmed, and a missing value
 inside the series is an error.}
 
-\item{frequency}{Number of observations per period (e.g. 12 for monthly
-data); taken from \code{x} when it is a \code{ts}.}
+\item{frequency}{Number of observations per period, such as 12 for monthly
+data. Taken from \code{x} when it is a \code{ts}.}
 
 \item{method}{\code{"stl"} (loess-based, Cleveland et al., 1990) or
 \code{"classical"} (\code{\link[stats:decompose]{stats::decompose()}}). STL needs more than two full cycles
@@ -30,8 +30,8 @@ of data, and classical decomposition at least two.}
 
 \item{robust}{For \code{method = "stl"}, whether to fit a robust STL
 (\code{\link[stats:stl]{stats::stl()}} with \code{robust = TRUE}), which down-weights outliers in the
-loess fits so that an unusual point bleeds less into the trend and seasonal
-components. Ignored for the classical method.}
+loess fits so that an unusual point has less influence on the trend and
+seasonal components. Ignored for the classical method.}
 
 \item{s_window}{For \code{method = "stl"}, the seasonal window, passed to
 \code{\link[stats:stl]{stats::stl()}} as \code{s.window}. The default, \code{"periodic"}, estimates one
@@ -61,8 +61,8 @@ components and shows them, with the original series, as stacked panels.
 The trend confidence ribbon is a pragmatic normal-approximation band:
 \verb{trend +/- z * sd(remainder)}, where \code{z = qnorm((1 + level) / 2)} and the
 remainder standard deviation is computed on the non-missing remainder values.
-It conveys the scale of the unexplained variation around the smoothed trend
-rather than a formal sampling-distribution interval.
+It shows the scale of the unexplained variation around the smoothed trend and
+is not a formal sampling-distribution interval.
 }
 \examples{
 decompose_plot(AirPassengers)

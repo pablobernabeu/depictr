@@ -2,39 +2,39 @@
 
 #' Cumming estimation plot
 #'
-#' An estimation plot puts the *effect size* and its uncertainty at the centre
-#' of the comparison, rather than a p-value. The upper panel shows each group's
+#' An estimation plot puts the effect size and its uncertainty, not a p-value,
+#' at the centre of the comparison. The upper panel shows each group's
 #' raw data (jittered) with its mean and confidence interval. The lower panel
 #' shows the difference between each other group's mean and a reference group's
 #' mean, with a bootstrap confidence interval. Each difference is drawn in its
 #' group's column, beneath that group's data. The two panels are stacked with
 #' 'patchwork', and each has its own outcome axis.
 #'
-#' This stacked layout is the *Cumming* estimation plot (Cumming, 2012; Ho et
-#' al., 2019), with two groups as with more. Each difference is annotated with a
-#' standardised effect size: Cohen's *d* or, by default, the small-sample
-#' corrected Hedges' *g* (Hedges, 1981). The Gardner-Altman plot (Gardner &
+#' This stacked layout is the Cumming estimation plot (Cumming, 2012, and Ho et al.,
+#' 2019), with two groups as with more. Each difference is annotated with a
+#' standardised effect size: Cohen's d or, by default, the small-sample
+#' corrected Hedges' g (Hedges, 1981). The Gardner-Altman plot (Gardner &
 #' Altman, 1986) is a different layout, which sets a single difference beside
 #' the two groups on a floating axis whose zero is level with the reference
 #' group's mean.
 #'
-#' The lower-panel interval is a non-parametric *bootstrap* of the mean
-#' difference: the two groups are resampled with replacement `n_boot` times and
+#' The lower-panel interval is a non-parametric bootstrap of the mean
+#' difference: the two groups are resampled with replacement `n_boot` times, and
 #' the requested percentile interval is read off the resampled differences. This
 #' makes no normality assumption about the sampling distribution of the
-#' difference. The bootstrap uses base R only; set a seed beforehand for
-#' reproducibility.
+#' difference. The bootstrap uses base R only. Call `set.seed()` first for
+#' reproducible intervals.
 #'
 #' A group with fewer than two observations has no estimable spread, so its
-#' confidence interval is omitted (the mean is still drawn) and a difference
-#' involving it is shown as a point without a bootstrap interval; a warning is
+#' confidence interval is omitted (the mean is still drawn), and a difference
+#' involving it is shown as a point without a bootstrap interval. A warning is
 #' issued in both cases.
 #'
 #' @param data A data frame.
 #' @param y The numeric outcome (string or unquoted name).
 #' @param group The grouping variable (string or unquoted name).
 #' @param reference The reference (control) group that the others are compared
-#'   with; defaults to the first level of `group`. The reference is drawn first
+#'   with. Defaults to the first level of `group`. The reference is drawn first
 #'   in the upper panel and has an empty column in the lower panel, where the
 #'   dashed line marks a difference of zero.
 #' @param conf_level Confidence level for both the group intervals (t-based) and
@@ -42,13 +42,12 @@
 #'   and 1.
 #' @param n_boot Number of bootstrap resamples for the difference intervals.
 #' @param effsize Standardised effect size annotated beside each difference:
-#'   `"hedges_g"` (the default, small-sample corrected), `"cohens_d"`, or
+#'   `"hedges_g"` (the default, small-sample corrected), `"cohens_d"` or
 #'   `"none"` to omit it. Every contrast against the reference is labelled, so
-#'   the standardised effect is shown for both the two-group and multi-group
-#'   cases.
+#'   the standardised effect is shown for two groups and for more.
 #' @param show_points Whether to draw the raw data behind the group means.
 #' @param point_alpha Transparency of the raw points.
-#' @param palette Colours for the groups; defaults to [depictr_palette()].
+#' @param palette Colours for the groups. Defaults to [depictr_palette()].
 #' @param title,y_lab Title and outcome-axis label.
 #' @param heights Relative heights of the upper (raw data) and lower
 #'   (difference) panels, passed to [patchwork::plot_layout()].
@@ -72,11 +71,11 @@
 #' @export
 #' @examples
 #' set.seed(1)
-#' # n_boot is kept small here for speed; use the default for real work.
+#' # n_boot is kept small here for speed. Use the default for real work.
 #' estimation_plot(lexical_decision, RT, condition, n_boot = 1000)
 #' \donttest{
 #' estimation_plot(crop_yield, yield, treatment)
-#' # More than two groups: differences vs a chosen reference
+#' # More than two groups: differences from a chosen reference
 #' estimation_plot(wellbeing_survey, life_satisfaction, region,
 #'                 reference = "North")
 #' }

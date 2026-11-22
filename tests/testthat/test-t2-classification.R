@@ -4,6 +4,11 @@
 # matrix fill sourced from the canonical sequential palette (no ad-hoc hex);
 # and the new per-bin Wilson confidence intervals on calibration_plot().
 
+# This file is among the slowest of the suite. CRAN's check of the whole
+# package must stay under ten minutes, so the file skips on CRAN and runs in
+# CI, where NOT_CRAN is set, on Linux, Windows and macOS.
+skip_on_cran()
+
 # A small, well-separated binary problem reused across the plot tests.
 make_glm <- function(n = 200, seed = 1) {
   withr::local_seed(seed)

@@ -22,23 +22,21 @@
 
 #' Audit a finished figure for accessibility and honesty
 #'
-#' Checks a figure as it will be submitted, rather than the palette it was built
-#' from. [palette_safety()] can promise that the eight colours depictr ships
-#' stay apart under colour-vision deficiency, but it knows nothing about the
-#' figure in front of you: how many of those colours it uses, what you replaced
-#' them with, how small the text will be once the figure is squeezed into a
-#' journal column, or whether the only thing separating two groups is their
-#' colour. `check_figure()` reads the built plot and answers those
-#' questions with numbers.
+#' Checks a finished figure as it will be submitted. [palette_safety()] shows
+#' that the eight colours depictr ships stay apart under colour-vision
+#' deficiency, but not how many of them a figure uses, what replaced them, how
+#' small the text will be once the figure is reduced to a journal column or
+#' whether colour alone separates two groups. `check_figure()` reads the built
+#' plot and answers those questions with numbers.
 #'
-#' Every row carries the value it measured next to the threshold it was measured
-#' against, so a verdict can be argued with rather than merely accepted. A check
-#' passes when the measured value is at least the threshold. The one exception
-#' is `text_size_max`, a ceiling added when `max_text_pt` is given, which
-#' passes when the measured value is at most its threshold. A check that has
-#' nothing to measure, such as colour separability on a figure that encodes
-#' nothing by colour, reports `NA` and a verdict of `"not applicable"` instead
-#' of a free pass.
+#' Every row gives the value it measured next to the threshold it was measured
+#' against, so that each verdict can be weighed. A check passes when the
+#' measured value is at least the threshold. The one exception is
+#' `text_size_max`, a ceiling added when `max_text_pt` is given, which passes
+#' when the measured value is at most its threshold. A check that has nothing to
+#' measure, such as colour separability on a figure that encodes nothing by
+#' colour, reports `NA` and the verdict `"not applicable"`, which does not count
+#' as a pass.
 #'
 #' @section What each check measures:
 #' Colours and text are measured as drawn. A translucent colour is composited
@@ -73,14 +71,14 @@
 #' therefore never compared with its own fill, nor a group with itself as
 #' another layer draws it.
 #'
-#' A continuous colour or fill scale, such as that of a heatmap, is a smooth
-#' ramp rather than a set of codes, and none of the colour rows audits it. When
-#' nothing else in the figure encodes by colour, each of them abstains with a
-#' `detail` that says so. Whether a ramp reads in order, to a reader with a
-#' colour-vision deficiency and in greyscale as well, depends on how evenly its
-#' lightness changes, which the audit does not measure. Prefer a perceptually
-#' ordered map, such as viridis or depictr's sequential and diverging ramps,
-#' over a rainbow (Crameri et al., 2020).
+#' A continuous colour or fill scale, such as that of a heatmap, encodes values
+#' along a ramp, and none of the colour rows audits it. When nothing else in the
+#' figure encodes by colour, each of them abstains with a `detail` that says so.
+#' Whether a ramp reads in order, to a reader with a colour-vision deficiency
+#' and in greyscale as well, depends on how evenly its lightness changes, which
+#' the audit does not measure. A perceptually uniform map, such as viridis, is
+#' preferable to a rainbow (Crameri et al., 2020). depictr's own sequential and
+#' diverging ramps are perceptually ordered.
 #'
 #' `greyscale_separability` is the smallest difference in CIE lightness between
 #' those same colours, which is what survives printing in black and white. It
@@ -95,8 +93,9 @@
 #'
 #' `text_contrast` is the WCAG 2.2 contrast ratio of the text that falls
 #' furthest short of its own threshold. Each text is measured against the
-#' background it is drawn on: a facet strip's fill for strip text, the legend
-#' box's fill for legend text, and the plot background for the rest. A
+#' background it is drawn on. Strip text is measured against the facet strip's
+#' fill, legend text against the legend box's fill and other text against the
+#' plot background. A
 #' translucent fill is measured as the colour it shows over what lies beneath
 #' it, and so is text drawn with an alpha. Text that is large at its printed
 #' size, 18 pt or 14 pt in bold, is held to 3:1, and other text to 4.5:1, as
@@ -112,22 +111,20 @@
 #' translucent colour, the `detail` names the colour, its alpha and the colour
 #' it is drawn as.
 #'
-#' `redundant_encoding` counts how many of shape and line type also vary
-#' across the layers that draw the encoding colours. They are gathered as the
-#' colours are. A layer contributes the values it maps to a discrete scale, or
-#' the two or more it draws, and a shape or line type set as a constant is left
-#' out. Zero means the distinction between groups is carried by colour alone,
-#' which is the single most common way an otherwise careful figure becomes
-#' unreadable.
+#' `redundant_encoding` counts how many of shape and line type also vary across
+#' the layers that draw the encoding colours. They are gathered as the colours
+#' are. A layer contributes the values it maps to a discrete scale, or the two
+#' or more it draws, and a shape or line type set as a constant is left out.
+#' Zero means that colour alone tells the groups apart.
 #'
 #' `annotation_text_size` is the smallest point size of the text drawn inside
 #' the panel, scaled as `text_size` is and held to the same `min_text_pt`. That
 #' text comes from layers such as [ggplot2::geom_text()] and
-#' [ggplot2::geom_label()], from annotations, and from depictr's own cell values
-#' and labels. Its contrast is not measured, since it sits on the marks rather
-#' than on one background. A label that a layer builds only when the figure is
-#' drawn, as ggrepel builds its repelled labels, is not yet in the built plot,
-#' so it is not measured either.
+#' [ggplot2::geom_label()], from annotations and from depictr's own cell values
+#' and labels. Its contrast is not measured, since it sits on the marks, which
+#' give it no single background. A label that a layer builds only when the
+#' figure is drawn, as ggrepel builds its repelled labels, is not yet in the
+#' built plot, so it is not measured either.
 #'
 #' `text_size_max` is reported only when `max_text_pt` is given, as the last
 #' row. It is the largest point size of all the text measured, around the
@@ -136,15 +133,14 @@
 #'
 #' @section Limitations of the default palette:
 #' The eight-colour qualitative palette clears the colour-separability checks
-#' comfortably and fails `greyscale_separability`: its orange (`#e69f00`) and
+#' with a margin but fails `greyscale_separability`: its orange (`#e69f00`) and
 #' sky blue (`#56b4e9`) differ by only 0.79 in lightness, so they print as the
-#' same grey. The colourblind-safety guarantee depictr makes is about hue
-#' confusion, and it was never a claim about greyscale. A figure that may be
-#' printed in black and white should use fewer groups, or a sequential palette,
-#' or add a redundant shape or line type; the four leading colours of the
-#' palette are also not safe in greyscale, since the bluish green and the
-#' vermillion differ by 3.55. The threshold is not lowered to let the package's
-#' own defaults through.
+#' same grey. depictr's colourblind-safety guarantee covers hue confusion only.
+#' A figure that may be printed in black and white should use fewer groups or a
+#' sequential palette, or add a redundant shape or line type. The first four
+#' colours of the palette are not safe in greyscale either, since the bluish
+#' green and the vermillion differ by 3.55. The threshold is not lowered to let
+#' the package's own defaults pass.
 #'
 #' The palette falls short on contrast as well. Four of its eight colours are
 #' below the 3:1 against white that WCAG asks of a graphical object: the orange
@@ -202,7 +198,7 @@
 #'
 #' @param plot A plot, as returned by any depictr plotting function, including
 #'   one extended afterwards with `+`, or a multi-panel composite (see
-#'   "Composites").
+#'   'Composites').
 #' @param width_cm The width, in centimetres, that the figure will occupy in the
 #'   finished document. Defaults to 17.78 cm, the seven inches [save_plot()]
 #'   draws at, which means no scaling.
@@ -213,17 +209,17 @@
 #'   of `metric`, for the colour separability checks, and the smallest
 #'   acceptable difference in lightness for the greyscale check. Defaults to 5,
 #'   matching [palette_safety()].
-#' @param min_text_pt The smallest acceptable printed text size, in points,
-#'   for the text around the panel and the text inside it alike. Defaults to
-#'   6, below the floor most journals set (see "Auditing at the printed
-#'   size").
+#' @param min_text_pt The smallest acceptable printed text size, in points, for
+#'   the text around the panel and the text inside it alike. Defaults to 6,
+#'   below the floor most journals set (see 'Auditing at the printed size').
 #' @param metric The colour difference the colour separability checks measure:
 #'   `"ciede2000"`, the default, or `"cie76"`, the Euclidean distance in CIELAB.
-#'   `"cie76"` is kept so that results computed with it can be reproduced, and
-#'   a later release will remove it.
+#'   `"cie76"` is deprecated and gives a warning once per session. It is kept so
+#'   that results computed with it can be reproduced, and a later release will
+#'   remove it.
 #' @param max_text_pt The largest acceptable printed text size, in points, or
 #'   `NULL`, the default, for no ceiling. When given, a `text_size_max` row is
-#'   appended (see "What each check measures").
+#'   appended (see 'What each check measures').
 #'
 #' @return A data frame with one row per check and columns `check`, `measured`,
 #'   `threshold`, `verdict` (`"pass"`, `"fail"` or `"not applicable"`) and
@@ -257,7 +253,7 @@
 #' library(ggplot2)
 #'
 #' # A figure that clears every check it can be held to: two well-separated
-#' # colours, a redundant shape, and text left at the size it was drawn. It
+#' # colours, a redundant shape and text left at the size it was drawn. It
 #' # draws no text inside the panel, so that row is not applicable.
 #' good <- ggplot(crop_yield, aes(rainfall, yield, colour = treatment,
 #'                                shape = treatment)) +
@@ -300,6 +296,7 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
   .positive_scalar(min_text_pt, "min_text_pt")
   if (!is.null(max_text_pt)) .positive_scalar(max_text_pt, "max_text_pt")
   metric <- match.arg(metric)
+  if (metric == "cie76") .warn_cie76()
 
   if (composite) {
     return(.audit_composite(plot, width_cm, render_width_cm, min_delta_e,
@@ -439,7 +436,7 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #'
 #' Written this way rather than as a literal `ggplot2::complete_theme` because
 #' the literal is a missing export against the declared ggplot2 floor, which
-#' `R CMD check` reports as such under "checking dependencies in R code". This
+#' `R CMD check` reports as such under 'checking dependencies in R code'. This
 #' reaches exports only, so it is not the `:::` that would also reach internals.
 #' @noRd
 .ggplot2_export <- function(name) {
@@ -736,13 +733,14 @@ check_figure <- function(plot, width_cm = 17.78, render_width_cm = 17.78,
 #' plot that maps nothing to it does not. The Python twin applies the same rule
 #' through plotnine's own `is_empty()`.
 #'
-#' @return A list with `sets`, the drawn colours of the colour and of the fill
-#'   aesthetic across all layers (each a data frame of `drawn` and `declared`,
-#'   sorted so that a tie between two equally close pairs resolves the same way
-#'   in both engines, and absent when nothing encodes by it), `marks`, one
-#'   drawn colour per encoded group for the geometry check, `redundant`, the
-#'   names of the non-colour channels that vary alongside them, and `abstain`,
-#'   the detail the colour rows give when nothing encodes.
+#' @return A list of four elements. `sets` holds the drawn colours of the
+#'   colour and of the fill aesthetic across all layers, each a data frame of
+#'   `drawn` and `declared`, sorted so that a tie between two equally close
+#'   pairs resolves the same way in both engines, and absent when nothing
+#'   encodes by it. `marks` holds one drawn colour per encoded group for the
+#'   geometry check. `redundant` names the non-colour channels that vary
+#'   alongside them. `abstain` is the detail the colour rows give when nothing
+#'   encodes.
 #' @noRd
 .figure_colour_encoding <- function(built, background) {
   continuous <- character(0)

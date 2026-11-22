@@ -4,8 +4,8 @@
 #'
 #' A matrix of pairwise plots for a set of numeric variables: scatter plots
 #' below the diagonal, densities on the diagonal and correlation coefficients
-#' above the diagonal. Optionally colour everything by a grouping variable.
-#' Built with 'patchwork', so it shares the package theme and palette.
+#' above the diagonal, optionally coloured by a grouping variable. Built with
+#' 'patchwork', so it shares the package theme and palette.
 #'
 #' @param data A data frame.
 #' @param cols Numeric columns to include, which cannot include `group`. If
@@ -24,7 +24,7 @@
 #'   to [stats::cor()]: `"pearson"`, `"spearman"` or `"kendall"`. A pair whose
 #'   correlation is undefined (a constant column, or too few complete cases) is
 #'   labelled `n/a`, as in [correlation_heatmap()].
-#' @param palette Colours for the groups; defaults to [depictr_palette()].
+#' @param palette Colours for the groups. Defaults to [depictr_palette()].
 #' @param title Overall title for the matrix.
 #'
 #' @return A 'patchwork' object (printable like a [ggplot2::ggplot]).

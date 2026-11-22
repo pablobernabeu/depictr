@@ -25,14 +25,14 @@ survival_plot(
 \arguments{
 \item{time}{A numeric vector of follow-up times, a data frame with \code{time},
 \code{status} and optional \code{group} columns, or a \code{survfit} object. Every time
-must be finite: a missing or infinite one is an error rather than a silent
-exclusion, since dropping it would move the number at risk unannounced.}
+must be finite. A missing or infinite time is an error, since dropping it
+would change the number at risk without notice.}
 
 \item{status}{Event indicator: a vector, or a column name when \code{time} is a
 data frame (by default its \code{status} or \code{event} column). Either the 0/1
 convention (\code{0} = censored, \code{1} = event) or the \code{\link[survival:Surv]{survival::Surv()}} 1/2
 convention (\code{1} = censored, \code{2} = event) is accepted, read over all groups
-together; logical values are also allowed. Other codings raise an error,
+together. Logical values are also allowed. Other codings raise an error,
 among them a code that is not a whole number and a factor or character
 indicator, whose values do not say which one is the event. Observations
 whose status is missing are dropped with a message, since they record
@@ -65,12 +65,12 @@ subtitle (two or more groups only). Defaults to \code{FALSE}.}
 \item{risk_breaks}{Optional numeric vector of times at which to report the
 number at risk. Defaults to the curve's x-axis breaks.}
 
-\item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
+\item{palette}{Colours for the groups. Defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
-\item{legend_inside}{When \code{TRUE} (and there are several groups), draw the
-group legend inside the panel (in the bottom-left corner a
-monotone-decreasing survival curve always leaves empty) over a translucent
-background, instead of in a right-hand margin. Defaults to \code{FALSE}.}
+\item{legend_inside}{When \code{TRUE} and there are several groups, the group
+legend is drawn inside the panel, over a translucent background, in the
+bottom-left corner, which a decreasing survival curve always leaves empty.
+Otherwise, it is drawn in a right-hand margin. Defaults to \code{FALSE}.}
 
 \item{title, x_lab, y_lab}{Title and axis labels.}
 
@@ -86,7 +86,7 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object or, when \code{risk_table = TRUE
 Draws Kaplan-Meier survival curves, optionally by group, with stepwise
 confidence limits and censoring marks. The Kaplan-Meier estimate and its
 Greenwood standard error are computed with base R, so no modelling package is
-required; a \code{survfit} object from the 'survival' package is also accepted.
+required. A \code{survfit} object from the 'survival' package is also accepted.
 }
 \details{
 The confidence limits are pointwise. By default, they are built on the
@@ -106,26 +106,26 @@ standard errors at \code{conf_level} and \code{conf_type}, so they equal those t
 \code{survfit()} gives with the same \code{conf.int} and \code{conf.type} (\code{conf_level}
 names the objects that keep their own).
 
-For publication-ready figures the plot offers the three annotations that
-define a "survminer-style" Kaplan-Meier display, each behind its own
-argument and off by default:
+For publication-ready figures, the plot offers the three annotations of a
+Kaplan-Meier display in the style of the 'survminer' package, each behind its
+own argument and off by default:
 \itemize{
-\item \strong{Number-at-risk table} (\code{risk_table = TRUE}): a small panel composed
-beneath the curves with 'patchwork', giving the number of subjects still at
-risk in each group at the x-axis breaks.
-\item \strong{Median-survival guides} (\code{median_line = TRUE}): dashed reference lines
+\item \code{risk_table = TRUE} adds a number-at-risk table, a small panel composed
+beneath the curves with 'patchwork' that gives the number of subjects still
+at risk in each group at the x-axis breaks.
+\item \code{median_line = TRUE} draws median-survival guides, dashed reference lines
 from the 0.5 survival level down to each group's median survival time, with
 the median value labelled. The median is the time at which the curve falls
 below 0.5. Where the curve stays at 0.5 until a later drop, or until its
 last time, the median is the midpoint of that stretch, as in
-\code{\link[survival:quantile.survfit]{survival::quantile.survfit()}}. Groups whose curve never reaches 0.5
-(median not estimable) are skipped.
-\item \strong{Log-rank test} (\code{logrank = TRUE}): for two or more groups, the
-chi-squared log-rank statistic and its p-value are added as a subtitle.
-For vector or data-frame input, \code{\link[survival:survdiff]{survival::survdiff()}} computes it when
-the 'survival' package is installed. For a \code{survfit} object, which keeps
-only its risk and event tables, or without 'survival', an equivalent
-base-R log-rank test is computed from the per-group risk and event tables.
+\code{\link[survival:quantile.survfit]{survival::quantile.survfit()}}. A group whose curve never reaches 0.5 has
+no estimable median and is skipped.
+\item \code{logrank = TRUE} adds a log-rank test for two or more groups, with the
+chi-squared statistic and its p-value as a subtitle. For vector or
+data-frame input, \code{\link[survival:survdiff]{survival::survdiff()}} computes it when the 'survival'
+package is installed. For a \code{survfit} object, which keeps only its risk and
+event tables, or without 'survival', an equivalent base-R log-rank test is
+computed from the per-group risk and event tables.
 }
 }
 \examples{

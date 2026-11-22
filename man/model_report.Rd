@@ -18,9 +18,9 @@ model_report(
 \item{model}{A fitted \code{lm} or \code{glm} model.}
 
 \item{predictor}{Focal predictor for the effect panel, given as in
-\code{\link[=effects_plot]{effects_plot()}}. If \code{NULL}, the first numeric variable in the formula (or,
-failing that, the first variable) is used, so a model with
-\code{log(rainfall)} shows the effect of \code{rainfall}.}
+\code{\link[=effects_plot]{effects_plot()}}. If \code{NULL}, the first numeric variable in the formula, or
+failing that the first variable, is used, so a model with \code{log(rainfall)}
+shows the effect of \code{rainfall}.}
 
 \item{standardise}{Whether the coefficient panel scales each continuous
 predictor's coefficient by that predictor's standard deviation, leaving
@@ -50,9 +50,8 @@ A 'patchwork' object (printable like a \link[ggplot2:ggplot]{ggplot2::ggplot}).
 Assembles a compact, consistent overview of a fitted model in a single
 figure: the coefficient estimates, the predicted effect of a focal predictor,
 a residual panel and a normal Q-Q plot, with a subtitle of key fit
-statistics. It is a convenience wrapper that composes several depictr
-plots with \code{\link[=arrange_plots]{arrange_plots()}}, and serves well for a rapid model review or a
-report appendix.
+statistics. It composes several depictr plots with \code{\link[=arrange_plots]{arrange_plots()}} and
+suits a quick model review or a report appendix.
 }
 \details{
 For an \code{lm}, the residual panel plots the residuals against the fitted

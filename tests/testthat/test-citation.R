@@ -40,7 +40,7 @@ cff_comment_above <- function(lines, field) {
 }
 
 # The earliest day each released version was public on any channel.
-first_public <- c("0.3.0" = "2026-08-27")
+first_public <- c("0.3.0" = "2026-08-27", "0.4.0" = "2026-11-22")
 
 test_that("citation('depictr') gives the author's ORCID iD", {
   cit <- utils::readCitationFile(system.file("CITATION", package = "depictr"),

@@ -27,11 +27,11 @@
 #'   count half, which centres the average on its observation, as equal weights
 #'   over an even window cannot. It needs a series one observation longer than
 #'   the window.
-#' @param forecast Optional forecast overlay for a single (non-grouped) series.
+#' @param forecast Optional forecast overlay for a single, ungrouped series.
 #'   Either an integer horizon (number of future steps) to forecast with the
 #'   built-in STL plus random walk with drift (see [ts_forecast()]), or a
 #'   pre-computed forecast supplied as a data frame with columns `time`, `fit`
-#'   and (optionally) `lwr`/`upr`, for instance from a fitted
+#'   and, optionally, `lwr` and `upr`, for instance from a fitted
 #'   `forecast::forecast()` object. The point forecast continues the line and a
 #'   shaded prediction-interval ribbon is drawn behind it. The built-in
 #'   forecast is captioned with its coverage and method, and its band widens
@@ -42,12 +42,12 @@
 #'   last observation, and a missing value inside the series is an error.
 #' @param frequency Number of observations per period, used only to coerce a
 #'   numeric `x` to a `ts` when an integer `forecast` horizon is requested.
-#' @param level Prediction-interval coverage for the built-in forecast (a single
-#'   number strictly between 0 and 1, e.g. `0.95`).
+#' @param level Prediction-interval coverage for the built-in forecast, a single
+#'   number strictly between 0 and 1, such as `0.95`.
 #' @param lambda Optional Box-Cox transformation for the built-in forecast,
 #'   passed to [ts_forecast()]. `0` forecasts on the log scale, which suits a
 #'   series whose seasonal swing grows with its level.
-#' @param palette Colours for the groups; defaults to [depictr_palette()].
+#' @param palette Colours for the groups. Defaults to [depictr_palette()].
 #' @param point Whether to add points as well as the line.
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
@@ -210,24 +210,22 @@ timeseries_plot <- function(x, time = NULL, value = NULL, group = NULL,
 
 #' Autocorrelation plot
 #'
-#' Plots the autocorrelation (or partial autocorrelation) function of a series,
-#' with the approximate significance bounds, as a clean lollipop chart.
+#' Plots the autocorrelation or partial autocorrelation function of a series,
+#' with the approximate significance bounds, as a lollipop chart.
 #'
 #' @param x A numeric vector or `ts` object holding one series. A multivariate
 #'   `ts` or a matrix with several columns is refused.
-#' @param lag_max Maximum lag (passed to [stats::acf()] / [stats::pacf()]).
+#' @param lag_max Maximum lag, passed to [stats::acf()] or [stats::pacf()].
 #' @param type `"correlation"` for the ACF or `"partial"` for the PACF.
-#' @param conf_level Confidence level for the significance bounds; a single
+#' @param conf_level Confidence level for the significance bounds, a single
 #'   number strictly between 0 and 1.
 #' @param title,x_lab,y_lab Title and axis labels.
 #'
 #' @details
-#' A missing value inside the series is kept in its place, and the
-#' correlations are computed from the pairs of observations that are both
-#' present (`na.action = na.pass`), with a warning. Dropping it would join the
-#' observations on either side of the gap as if they were neighbours. The
-#' Python package refuses such a series and asks for the gap to be dropped or
-#' imputed first.
+#' A missing value inside the series is kept in its place, and the correlations
+#' are computed from the pairs of observations that are both present
+#' (`na.action = na.pass`), with a warning. Dropping it would join the
+#' observations on either side of the gap as if they were neighbours.
 #'
 #' @return A [ggplot2::ggplot] object.
 #' @export
@@ -283,15 +281,15 @@ acf_plot <- function(x, lag_max = NULL, type = c("correlation", "partial"),
 #'   holding one series. A multivariate `ts` or a matrix with several columns
 #'   is refused. Missing values at either end are trimmed, and a missing value
 #'   inside the series is an error.
-#' @param frequency Number of observations per period (e.g. 12 for monthly
-#'   data); taken from `x` when it is a `ts`.
+#' @param frequency Number of observations per period, such as 12 for monthly
+#'   data. Taken from `x` when it is a `ts`.
 #' @param method `"stl"` (loess-based, Cleveland et al., 1990) or
 #'   `"classical"` ([stats::decompose()]). STL needs more than two full cycles
 #'   of data, and classical decomposition at least two.
 #' @param robust For `method = "stl"`, whether to fit a robust STL
 #'   ([stats::stl()] with `robust = TRUE`), which down-weights outliers in the
-#'   loess fits so that an unusual point bleeds less into the trend and seasonal
-#'   components. Ignored for the classical method.
+#'   loess fits so that an unusual point has less influence on the trend and
+#'   seasonal components. Ignored for the classical method.
 #' @param s_window For `method = "stl"`, the seasonal window, passed to
 #'   [stats::stl()] as `s.window`. The default, `"periodic"`, estimates one
 #'   seasonal value per position in the cycle and repeats it in every cycle, as
@@ -310,8 +308,8 @@ acf_plot <- function(x, lag_max = NULL, type = c("correlation", "partial"),
 #' The trend confidence ribbon is a pragmatic normal-approximation band:
 #' `trend +/- z * sd(remainder)`, where `z = qnorm((1 + level) / 2)` and the
 #' remainder standard deviation is computed on the non-missing remainder values.
-#' It conveys the scale of the unexplained variation around the smoothed trend
-#' rather than a formal sampling-distribution interval.
+#' It shows the scale of the unexplained variation around the smoothed trend and
+#' is not a formal sampling-distribution interval.
 #'
 #' @return A 'patchwork' object (printable like a [ggplot2::ggplot]).
 #' @references
@@ -459,8 +457,8 @@ decompose_plot <- function(x, frequency = NULL,
 #'   last observation, and a missing value inside the series is an error. A
 #'   multivariate `ts` or a matrix with several columns is refused.
 #' @param h Forecast horizon: the number of future steps (a positive integer).
-#' @param frequency Number of observations per period; taken from `x` when it is
-#'   a `ts`.
+#' @param frequency Number of observations per period. Taken from `x` when it
+#'   is a `ts`.
 #' @param level Prediction-interval coverage (a single number strictly between 0
 #'   and 1).
 #' @param lambda Optional Box-Cox transformation parameter. `NULL`, the default,
@@ -789,10 +787,10 @@ inv_box_cox <- function(z, lambda) {
 
 #' Reconcile forecast times with the class of the historical time axis
 #'
-#' The built-in forecaster returns decimal-year numbers (e.g. 2024.083). When
+#' The built-in forecaster returns decimal-year numbers, such as 2024.083. When
 #' the history is plotted from a `Date` or `POSIXct` column, those numbers must
 #' be coerced to the same class so the overlay lands on the historical axis
-#' rather than being read as days/seconds since the epoch. Times that are
+#' rather than being read as days or seconds since the epoch. Times that are
 #' already on the right class (or where the history is plain numeric) are
 #' returned unchanged.
 #' @noRd
@@ -807,7 +805,7 @@ reconcile_forecast_time <- function(fc_time, hist_time) {
   fc_time
 }
 
-#' Convert decimal years (e.g. 2024.5) to calendar `Date`s
+#' Convert decimal years, such as 2024.5, to calendar `Date`s
 #'
 #' Maps each value to a day within its year using the fractional part, handling
 #' leap years by interpolating between successive 1 January boundaries.

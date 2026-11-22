@@ -17,21 +17,21 @@ conventions.
 \section{Exploring data}{
 
 \itemize{
-\item \code{\link[=explore_distribution]{explore_distribution()}}: histograms / densities of one variable.
+\item \code{\link[=explore_distribution]{explore_distribution()}}: histograms and densities of one variable.
 \item \code{\link[=ecdf_plot]{ecdf_plot()}}: empirical cumulative distribution, optionally by group.
 \item \code{\link[=explore_categorical]{explore_categorical()}}: bar charts of a categorical variable.
 \item \code{\link[=explore_bivariate]{explore_bivariate()}}: a suitable plot for any pair of variables.
 \item \code{\link[=explore_pairs]{explore_pairs()}}: a scatter-plot matrix.
 \item \code{\link[=correlation_heatmap]{correlation_heatmap()}}: correlations as a heatmap.
 \item \code{\link[=missingness_map]{missingness_map()}}: a map of missing values.
-\item \code{\link[=outlier_plot]{outlier_plot()}}: box / violin plots flagging outliers.
+\item \code{\link[=outlier_plot]{outlier_plot()}}: box and violin plots flagging outliers.
 \item \code{\link[=raincloud_plot]{raincloud_plot()}}: half-violin, box and raw points together.
 \item \code{\link[=ridgeline_plot]{ridgeline_plot()}}: overlapping per-group densities.
 \item \code{\link[=group_comparison_plot]{group_comparison_plot()}}: group means with confidence intervals.
 \item \code{\link[=estimation_plot]{estimation_plot()}}: group differences with bootstrap intervals.
 \item \code{\link[=dumbbell_plot]{dumbbell_plot()}}: a two-group comparison across categories.
 \item \code{\link[=scatter_trend]{scatter_trend()}}: scatter plot with a fitted trend.
-\item \code{\link[=summary_table]{summary_table()}}: a "Table 1" style descriptive summary.
+\item \code{\link[=summary_table]{summary_table()}}: a descriptive summary in the style of 'Table 1'.
 }
 }
 
@@ -52,8 +52,8 @@ conventions.
 
 \itemize{
 \item \code{\link[=timeseries_plot]{timeseries_plot()}}: one or more series over time.
-\item \code{\link[=acf_plot]{acf_plot()}}: autocorrelation / partial autocorrelation.
-\item \code{\link[=decompose_plot]{decompose_plot()}}: trend / seasonal / remainder decomposition.
+\item \code{\link[=acf_plot]{acf_plot()}}: autocorrelation and partial autocorrelation.
+\item \code{\link[=decompose_plot]{decompose_plot()}}: trend, seasonal and remainder decomposition.
 \item \code{\link[=seasonal_plot]{seasonal_plot()}}: seasonal subseries across cycles.
 \item \code{\link[=ts_forecast]{ts_forecast()}}: STL plus random walk with drift, with prediction
 intervals.
@@ -64,9 +64,9 @@ intervals.
 
 \itemize{
 \item \code{\link[=tidy_estimates]{tidy_estimates()}}: the shared tidy estimate table.
-\item \code{\link[=coefficient_plot]{coefficient_plot()}}: forest / coefficient plot.
+\item \code{\link[=coefficient_plot]{coefficient_plot()}}: forest plot of coefficients.
 \item \code{\link[=compare_models]{compare_models()}}: estimates from several models, side by side.
-\item \code{\link[=frequentist_bayesian_plot]{frequentist_bayesian_plot()}}: frequentist vs. Bayesian estimates.
+\item \code{\link[=frequentist_bayesian_plot]{frequentist_bayesian_plot()}}: frequentist and Bayesian estimates compared.
 \item \code{\link[=effects_plot]{effects_plot()}}: predicted values for one predictor.
 \item \code{\link[=interaction_plot]{interaction_plot()}}: predicted values across two predictors.
 \item \code{\link[=random_effects_plot]{random_effects_plot()}}: caterpillar plot of random effects.

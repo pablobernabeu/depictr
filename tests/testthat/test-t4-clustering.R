@@ -1,3 +1,8 @@
+# This file is among the slowest of the suite. CRAN's check of the whole
+# package must stay under ten minutes, so the file skips on CRAN and runs in
+# CI, where NOT_CRAN is set, on Linux, Windows and macOS.
+skip_on_cran()
+
 cols <- c("rainfall", "fertiliser", "soil_ph", "yield")
 
 test_that("silhouette_plot() returns a ggplot that builds cleanly", {

@@ -22,9 +22,8 @@ k_diagnostic(
 default, \code{NULL}, searches \code{1:8} for \code{"gap"} and \code{"wss"} and \code{2:8} for
 \code{"silhouette"}. Candidates the chosen criterion cannot evaluate are skipped
 with a message naming them: \code{k = 1} under \code{"silhouette"} (a lone cluster
-has no neighbouring cluster to compare against, so the width is
-undefined), and any \code{k} at or above the number of observations under
-every criterion.}
+has no neighbouring cluster to compare against, so the width is undefined)
+and any \code{k} at or above the number of observations under every criterion.}
 
 \item{method}{Diagnostic: \code{"silhouette"}, \code{"wss"} (within sum of squares
 elbow) or \code{"gap"}.}
@@ -32,8 +31,8 @@ elbow) or \code{"gap"}.}
 \item{cols}{When \code{data} is a data frame, the numeric columns to use.}
 
 \item{scale}{Whether to scale variables to unit variance first. Columns with
-(near-)zero variance cannot be scaled and are dropped with a message, as in
-\code{\link[=correlation_heatmap]{correlation_heatmap()}}.}
+zero or near-zero variance cannot be scaled and are dropped with a message,
+as in \code{\link[=correlation_heatmap]{correlation_heatmap()}}.}
 
 \item{nstart}{Number of random starts for \code{\link[stats:kmeans]{stats::kmeans()}}.}
 
@@ -51,11 +50,11 @@ with one row per \code{k}), \code{attr(p, "suggested")} (the chosen \code{k}) an
 \description{
 Computes a cluster-quality diagnostic across a range of \code{k} and draws the
 diagnostic curve, with the suggested \code{k} highlighted. Three criteria are
-available: the average silhouette width (maximised), the total within-cluster
-sum of squares "elbow" (the candidate farthest from the straight line joining
-the first and last points of the curve), and the gap statistic (the smallest
-\code{k} whose gap is within one standard error of the next, using the Tibshirani
-et al. heuristic).
+available: the average silhouette width (maximised), the elbow of the total
+within-cluster sum of squares (the candidate farthest from the straight line
+joining the first and last points of the curve) and the gap statistic (the
+smallest \code{k} whose gap is within one standard error of the next, by the
+heuristic of Tibshirani et al., 2001).
 }
 \details{
 Only the gap statistic can conclude that the data hold no clusters, by

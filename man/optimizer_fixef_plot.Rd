@@ -28,19 +28,19 @@ frame with one row per optimiser-by-term combination: an optimiser column
 
 \item{intercept}{Whether to keep the intercept panel. Defaults to \code{TRUE}.}
 
-\item{select_terms}{Optional character vector of terms to display (the
-intercept is always kept when \code{intercept = TRUE}).}
+\item{select_terms}{Optional character vector of terms to display. The
+intercept is always kept when \code{intercept = TRUE}.}
 
 \item{interaction}{Passed to \code{\link[=format_terms]{format_terms()}} for the panel titles.}
 
-\item{labels}{Optional named character vector renaming the term panels, e.g.
-\code{c(conditionunrelated = "Unrelated priming")}. When \code{x} is a raw
+\item{labels}{Optional named character vector renaming the term panels, such
+as \code{c(conditionunrelated = "Unrelated priming")}. When \code{x} is a raw
 \code{\link[lme4:allFit]{lme4::allFit()}} object, a factor's coefficients are labelled with the
-variable and the level automatically (e.g. \code{conditionunrelated} becomes
-\code{condition: unrelated}) and these labels override that default.}
+variable and the level automatically (\code{conditionunrelated} becomes
+\code{condition: unrelated}), and these labels override that default.}
 
-\item{number_optimizers}{Whether to prefix each optimiser name with a
-number, so that the legend doubles as an index.}
+\item{number_optimizers}{Whether to prefix each optimiser name with a number,
+so that the legend also serves as an index.}
 
 \item{free_y}{Whether to give each panel its own y-axis range. This is
 advisable, because the intercept and the slopes usually occupy very
@@ -50,7 +50,7 @@ different scales.}
 
 \item{point_size}{Point size.}
 
-\item{palette}{Colours for the optimisers; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
+\item{palette}{Colours for the optimisers. Defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{y_lab, title}{Axis label and plot title.}
 }
@@ -59,9 +59,9 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 Visualises how the fixed-effect estimates of a mixed model vary across the
-optimisers tried by \code{\link[lme4:allFit]{lme4::allFit()}}. It offers a quick check that a model
-has settled on a stable solution: tight clusters of points indicate
-agreement between optimisers, whereas scatter signals a fragile fit.
+optimisers tried by \code{\link[lme4:allFit]{lme4::allFit()}}. It checks that a model has reached a
+stable solution: tight clusters of points indicate agreement between
+optimisers, whereas scattered points signal a fragile fit.
 }
 \details{
 Each fixed effect occupies its own panel, with its own y-axis. The function

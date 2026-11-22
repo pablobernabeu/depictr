@@ -17,7 +17,7 @@ effects_plot(
 )
 }
 \arguments{
-\item{model}{A fitted model (\code{lm}, \code{glm}, \code{merMod}, ...).}
+\item{model}{A fitted model, such as an \code{lm}, \code{glm} or \code{merMod}.}
 
 \item{predictor}{Name of the focal predictor (string): a variable in the
 model's formula, or a model-frame name such as \code{"log(rainfall)"}, which
@@ -29,9 +29,10 @@ between 0 and 1.}
 
 \item{n}{Number of points across the range of a numeric predictor.}
 
-\item{rug}{Whether to add a rug of the observed predictor values (numeric predictors).}
+\item{rug}{Whether to add a rug of the observed values of a numeric
+predictor.}
 
-\item{colour}{Colour for the line/points and band. Defaults to the depictr
+\item{colour}{Colour for the line, points and band. Defaults to the depictr
 brand blue.}
 
 \item{title, x_lab, y_lab}{Title and axis labels.}
@@ -41,9 +42,9 @@ A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
 Shows the values a model predicts as one focal predictor varies, holding the
-other predictors at typical values (the mean for numeric predictors, the most
-frequent level for factors). A confidence band (numeric predictor) or
-confidence intervals (factor predictor) convey uncertainty.
+other predictors at typical values (the mean for numeric predictors and the
+most frequent level for factors). A confidence band for a numeric predictor,
+or confidence intervals for a factor, show the uncertainty.
 }
 \details{
 The prediction grid holds the variables the formula names, on their own
@@ -66,19 +67,19 @@ Poisson rate model with \code{offset(log(exposure))}, the line is the expected
 count at the geometric-mean exposure. The offset stays at its mean when the
 focal predictor enters it too, as in \code{log(exposure) + offset(log(exposure))},
 so the line then shows the predictor's effect beyond the offset. The y-axis
-label ends in "at the mean offset".
+label ends in 'at the mean offset'.
 
-Predictions and standard errors come from \code{\link[stats:predict]{stats::predict()}}; \code{glm}
+Predictions and standard errors come from \code{\link[stats:predict]{stats::predict()}}. \code{glm}
 predictions are formed on the link scale and back-transformed, so a binomial
 model shows predicted probabilities. The band uses the multiplier of the
 model's own tests, as \code{\link[=tidy_estimates]{tidy_estimates()}} does. An \code{lm}, and a \code{glm} whose
 dispersion is estimated, get t on the residual degrees of freedom, so a
-Gaussian \code{glm} draws the band of the same \code{lm}. Binomial and Poisson fits
-and mixed models get z. Mixed models fitted with
-\code{\link[lme4:lmer]{lme4::lmer()}}/\code{\link[lme4:glmer]{lme4::glmer()}} are supported too: predictions use only the
-fixed effects (as \code{re.form = NA} does) and standard errors come from the
-fixed-effect design matrix and \code{vcov()}. Works with \code{lm}, \code{glm} and
-\code{merMod}; other model classes are attempted on a best-effort basis.
+Gaussian \code{glm} draws the band of the same \code{lm}. Binomial and Poisson fits and
+mixed models get z. Mixed models fitted with \code{\link[lme4:lmer]{lme4::lmer()}} or
+\code{\link[lme4:glmer]{lme4::glmer()}} are supported too. Their predictions use only the fixed
+effects, as \code{re.form = NA} does, and their standard errors come from the
+fixed-effect design matrix and \code{vcov()}. Works with \code{lm}, \code{glm} and \code{merMod}.
+Other model classes are attempted without a guarantee.
 }
 \examples{
 fit <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)

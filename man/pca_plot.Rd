@@ -17,10 +17,10 @@ pca_plot(
 )
 }
 \arguments{
-\item{x}{A data frame, or a \code{\link[stats:prcomp]{stats::prcomp()}} object.}
+\item{x}{A data frame or a \code{\link[stats:prcomp]{stats::prcomp()}} object.}
 
-\item{cols}{When \code{x} is a data frame, the numeric columns to analyse
-(default: all numeric).}
+\item{cols}{When \code{x} is a data frame, the numeric columns to analyse (by
+default, all numeric columns).}
 
 \item{group}{Optional grouping variable mapped to colour. When \code{x} is a data
 frame, give a column of \code{x}, unquoted or as a string, or a vector with one
@@ -38,7 +38,7 @@ This is advisable when the variables are on different scales.}
 
 \item{point_alpha}{Point transparency.}
 
-\item{palette}{Colours for the groups; defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
+\item{palette}{Colours for the groups. Defaults to \code{\link[=depictr_palette]{depictr_palette()}}.}
 
 \item{title}{Plot title.}
 }
@@ -46,17 +46,18 @@ This is advisable when the variables are on different scales.}
 A \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Runs a principal component analysis on the numeric columns of a data frame
-(or takes an existing \code{\link[stats:prcomp]{stats::prcomp()}} object) and draws a biplot: the
+Runs a principal component analysis on the numeric columns of a data frame,
+or takes an existing \code{\link[stats:prcomp]{stats::prcomp()}} object, and draws a biplot: the
 observations projected onto two components, with the variable loadings shown
-as arrows. Optionally colour the observations by a grouping variable.
+as arrows. The observations can be coloured by a grouping variable.
 }
 \details{
 Each arrow is a variable's loadings on the two components, taken from the
 rotation matrix and multiplied by a factor that all the arrows share. The
 factor makes the largest coordinate of any arrow three quarters of the
-largest absolute score. Both axes use that one factor, as \code{\link[stats:biplot]{stats::biplot()}} uses one
-ratio for both, and the aspect ratio is fixed at 1. An arrow's angle on the
+largest absolute score. Both axes use that one factor, as \code{\link[stats:biplot]{stats::biplot()}}
+uses one ratio for both, and the aspect ratio is fixed at 1. An arrow's angle
+on the
 page is therefore its angle in loading space, whatever the size of the
 figure. The panel's height and width follow the ranges of its two axes, so a
 figure of another shape leaves blank space around the panel. Because the

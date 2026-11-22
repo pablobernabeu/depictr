@@ -18,9 +18,9 @@
 #' depictr brand blue
 #'
 #' The primary brand colour, used for single-series geoms, titles and the
-#' default point colour on forest/caterpillar plots. Equal to
+#' default point colour on forest and caterpillar plots. Equal to
 #' `depictr_palette(1)[1]` (the leading colour of the qualitative palette) when
-#' no custom palette/brand option is set. Honours `options(depictr.brand = )`.
+#' no custom palette or brand option is set. Honours `options(depictr.brand = )`.
 #'
 #' @return A single hex colour string.
 #' @keywords internal
@@ -246,13 +246,13 @@ depictr_reference <- function() depictr_opt("reference")
 #' Simulate how colours appear under a colour-vision deficiency
 #'
 #' Maps each colour to the colour a reader with a given form and severity of
-#' colour-vision deficiency would perceive, using the physiologically-based
+#' colour-vision deficiency would perceive, using the physiologically based
 #' model of Machado, Oliveira and Fernandes (2009). The transformation is
 #' defined on linear-light RGB, so a colour is decoded from sRGB to linear RGB
 #' (the IEC 61966-2-1 transfer functions), transformed, then re-encoded.
 #'
 #' This is the simulator behind [palette_preview()]'s `cvd` argument, behind
-#' [palette_safety()], and behind the colour-separability rows of
+#' [palette_safety()] and behind the colour-separability rows of
 #' [check_figure()]. [simulate_figure()] applies it to every colour of a
 #' finished figure.
 #'
@@ -323,9 +323,7 @@ simulate_cvd <- function(colours, deficiency, severity = 1) {
 #' the data before it is built would leave the legend keys and any colourbar
 #' in their original colours, so the legend would no longer match the figure.
 #'
-#' The figure stays vector graphics, so it can be saved at any size. The Python
-#' twin's `simulate_figure()` uses the same matrices but rasterises the figure
-#' and simulates its pixels, so it returns an image.
+#' The figure stays vector graphics, so it can be saved at any size.
 #'
 #' @param plot A ggplot or a patchwork, as it would be saved.
 #' @inheritParams simulate_cvd
@@ -553,6 +551,20 @@ simulate_figure <- function(plot, deficiency, severity = 1) {
   list(distance = d[[closest]], pair = pairs[closest, ])
 }
 
+#' Warn, once per session, that `metric = "cie76"` is deprecated
+#'
+#' Called by [palette_safety()] and [check_figure()] when they are asked for
+#' the 1976 distance. NEWS.md lists the option under 'Deprecated'.
+#' @noRd
+.warn_cie76 <- function() {
+  rlang::warn(
+    paste0("`metric = \"cie76\"` is deprecated, and a later release will ",
+           "remove it. Use the default, `metric = \"ciede2000\"`."),
+    .frequency = "once",
+    .frequency_id = "depictr_metric_cie76"
+  )
+}
+
 #' Check that a palette stays distinguishable under each deficiency
 #'
 #' For normal vision and each deficiency at full severity, the palette's colours
@@ -570,27 +582,28 @@ simulate_figure <- function(plot, deficiency, severity = 1) {
 #'
 #' The default `threshold` of 5 is calibrated against the built-in palette of
 #' [depictr_palette()], which is based on the Okabe-Ito set with the brand blue
-#' and a grey in place of its blue and black. That palette's tightest pair
-#' (reddish purple against grey) sits at 6.43 under full deuteranopia, so the
+#' and a grey in place of its blue and black. That palette's closest pair
+#' (reddish purple against grey) is 6.43 apart under full deuteranopia, so the
 #' cut must lie below that to pass the built-in palette, while still flagging
-#' colours that become near-identical under a deficiency. The difference includes
-#' lightness, which survives colour-vision deficiency, so two colours that share
-#' a hue but differ in lightness are correctly treated as distinguishable. Full
-#' severity is the worst case; most colour-vision deficiency is milder.
+#' colours that become near-identical under a deficiency. The difference
+#' includes lightness, which survives colour-vision deficiency, so two colours
+#' that share a hue but differ in lightness are correctly treated as
+#' distinguishable. Full severity is the worst case, and most colour-vision
+#' deficiency is milder.
 #'
 #' This looks at a palette in the abstract. To audit a finished figure, which
 #' uses only as many colours as it has groups and has text and a background
 #' besides, see [check_figure()].
 #'
 #' @param colours The palette to test. Defaults to the depictr qualitative
-#'   palette. Needs at least two colours: a pairwise distance over fewer than
-#'   two has no value, rather than an infinitely safe one.
+#'   palette. Needs at least two colours, since fewer than two have no pairwise
+#'   distance.
 #' @param threshold The smallest acceptable colour difference, on the scale of
 #'   `metric`.
 #' @param metric The colour difference to measure: `"ciede2000"`, the default,
-#'   or `"cie76"`, the Euclidean distance in CIELAB. `"cie76"` is kept so that
-#'   results computed with it can be reproduced, and a later release will remove
-#'   it.
+#'   or `"cie76"`, the Euclidean distance in CIELAB. `"cie76"` is deprecated and
+#'   gives a warning once per session. It is kept so that results computed with
+#'   it can be reproduced, and a later release will remove it.
 #'
 #' @return A list with `min_delta_e` (the worst case across conditions),
 #'   `by_condition` (a named numeric vector, one minimum colour difference for
@@ -607,16 +620,16 @@ simulate_figure <- function(plot, deficiency, severity = 1) {
 #' @examples
 #' palette_safety()
 #'
-#' # Two colours a hair apart are flagged.
+#' # Two nearly identical colours are flagged.
 #' palette_safety(c("#005b96", "#015c97"))
 #'
-#' # ggplot2's default palette of five colours, which passes under CIE76.
+#' # ggplot2's default palette of five colours fails under CIEDE2000.
 #' hue5 <- c("#F8766D", "#A3A500", "#00BF7D", "#00B0F6", "#E76BF3")
 #' palette_safety(hue5)$safe
-#' palette_safety(hue5, metric = "cie76")$safe
 palette_safety <- function(colours = NULL, threshold = 5,
                            metric = c("ciede2000", "cie76")) {
   metric <- match.arg(metric)
+  if (metric == "cie76") .warn_cie76()
   # `colours %||% depictr_palette()` would have swapped in the default palette
   # for an empty vector, reporting on eight colours the caller never passed.
   colours <- if (is.null(colours)) depictr_palette() else as.character(colours)

@@ -8,27 +8,27 @@
 [![DOI 10.32614/CRAN.package.depictr](https://img.shields.io/badge/DOI-10.32614%2FCRAN.package.depictr-blue.svg)](https://doi.org/10.32614/CRAN.package.depictr)
 <!-- badges: end -->
 
-depictr is a single, consistent toolkit of publication-ready plots that span
-the whole analysis workflow, from a first look at the data, through model
-estimates and predictions, to diagnostics, uncertainty and reporting. Most
-packages address one part of this work, whereas depictr aims to cover it from end
-to end with one theme, one palette and one set of label conventions. Every
-plotting function returns a [ggplot2](https://ggplot2.tidyverse.org) object (or a
-[patchwork](https://patchwork.data-imaginist.com) for composite panels), so a
-plot can be refined further with the usual `+` syntax.
+depictr is a toolkit of publication-ready plots for the analysis workflow, from
+a first look at the data, through model estimates and predictions, to
+diagnostics, uncertainty and reporting. Most packages address one part of this
+work. depictr aims to cover all of it with one theme, one palette and one set of
+label conventions. Every plotting function returns a
+[ggplot2](https://ggplot2.tidyverse.org) object, or a
+[patchwork](https://patchwork.data-imaginist.com) object for composite panels,
+and the result can be refined further with the usual `+` syntax.
 
-This is the R half of a sibling pair. [The Python
-package](https://pablobernabeu.github.io/depictr-py/) of the same name covers
-most of the same workflow on top of [plotnine](https://plotnine.org). Its README
-lists the handful of functions that have yet to be ported and the differences
-that change what a figure shows, many of them arguments the Python functions do
-not yet take.
+This is the R sibling of [the Python
+package](https://pablobernabeu.github.io/depictr-py/) of the same name, which
+covers most of the same workflow and is built on [plotnine](https://plotnine.org).
+The Python package's README lists the few functions that have yet to be ported
+and the differences that change what a figure shows. Many of those differences
+are arguments the Python functions do not yet take.
 
 ## Gallery
 
-A grouped density (the default palette is a colourblind-safe set based on
-Okabe-Ito) and Kaplan-Meier survival curves with confidence bands and a
-number-at-risk table, each from a single function call:
+The figures below, each from a single function call, show a grouped density in
+the default palette and Kaplan-Meier survival curves with confidence bands and a
+number-at-risk table.
 
 ![Grouped density of response times by priming condition, in the default palette](man/figures/README-distribution.png)
 
@@ -42,18 +42,22 @@ depictr is on [CRAN](https://CRAN.R-project.org/package=depictr):
 install.packages("depictr")
 ```
 
-The development version installs from GitHub:
+The heavier modelling back-ends, `lme4`, `broom` and `simr`, are optional. They
+are listed in `Suggests` and used only when installed. The core functions,
+examples, tests and vignettes run on base `lm`/`glm` and the bundled data alone.
+
+The development version can be installed from GitHub:
 
 ```r
 # install.packages("remotes")
 remotes::install_github("pablobernabeu/depictr")
 ```
 
-## What's in the box
+## Function families
 
 The functions fall into seven families that follow the analysis workflow.
-Exploratory plots and a descriptive summary table open it. The model-estimate
-views come next (forest plots, model comparison, predictions, interactions and
+Exploratory plots and a descriptive summary table come first. The model-estimate
+plots follow (forest plots, model comparison, predictions, interactions and
 random effects), then residual diagnostics with the standard classification
 curves, and then posterior summaries and power curves. Further families cover
 principal components, clustering and survival, time series, and the shared theme
@@ -61,28 +65,24 @@ with the accessibility checks, composition, saving and reporting helpers. The
 [reference](https://pablobernabeu.github.io/depictr/reference/index.html) lists
 every function by family.
 
-Heavier modelling back-ends (`lme4`, `broom`, `simr`) are optional (in
-`Suggests`) and used only when present. The core functions, examples, tests and
-vignettes run on base `lm`/`glm` and the bundled data alone.
-
 ## Measured accessibility
 
-The default palette is based on the Okabe-Ito set, and that choice is checked.
-The package ships a simulator of colour-vision deficiency based on the model of
+The default palette is based on the Okabe-Ito set. To test that choice, the
+package provides a simulator of colour-vision deficiency based on the model of
 Machado, Oliveira and Fernandes (2009), and `palette_safety()` measures how far
 apart the palette's colours stay under each deficiency.
 
-A safe palette is not a safe figure, though, so `check_figure()` audits the plot
-you are about to submit. It measures how separable the encoding colours are under
-each dichromacy and in greyscale, how small the text becomes at a stated output
-width, how well text and geometry contrast with their backgrounds under WCAG, and
-whether any distinction rests on colour alone. The size check covers the text
-drawn inside the panel as well as around it, and the contrast check covers the
-text around it alone. Each row reports the value it measured next to the
-threshold, so a verdict can be argued with. For a figure saved at its final
-width, give that width as both `width_cm` and `render_width_cm`, or neither, or
-let `save_plot(check = TRUE)` audit it at the width it saves. A journal that
-caps text size, as Nature does at 7 pt, can be held to its cap with
+`check_figure()` audits the plot you are about to submit, which the palette's
+guarantee does not cover. It measures the separability of the encoding
+colours under each dichromacy and in greyscale, the smallest text size at the
+printed width, the WCAG contrast of text and geometry against their
+backgrounds, and whether any distinction rests on colour alone. The size check
+covers the text drawn inside the panel and around it, and the contrast check
+covers only the text around it. Each row of the result reports the measured
+value next to its threshold. For a figure saved at its final width, give that
+width as both `width_cm` and `render_width_cm`, leave both at their defaults
+or let `save_plot(check = TRUE)` audit the figure at the width it saves. For a
+journal that caps text size, as Nature does at 7 pt, pass the cap as
 `max_text_pt`.
 
 ```r
@@ -90,26 +90,29 @@ check_figure(explore_distribution(lexical_decision, RT, group = condition),
              width_cm = 8.9)
 ```
 
-The audit leaves continuous colour scales alone, and the colour rows of a
-heatmap say so. For those, prefer a perceptually ordered map such as viridis or
-the package's sequential and diverging ramps.
+The audit does not check continuous colour scales, and the colour rows of a
+heatmap state this. For continuous scales, prefer a perceptually ordered map
+such as viridis or the package's sequential and diverging ramps.
 
-Three limits of the palette are worth knowing. The colourblind-safety guarantee
-covers the eight base colours, and past those the palette interpolates, with a
-warning from `depictr_palette()`. The guarantee is also confined to hue
-confusion: in greyscale the palette's orange and sky blue differ by only 0.79 in
-CIE lightness, so they print as the same grey. A figure that may be printed in
-black and white wants fewer groups, a sequential palette, or a redundant shape or
-line type. The palette also falls short on contrast. Four of the eight colours
-fall below the 3:1 against white that WCAG asks of a graphical object. The orange
-is one of them, and it is the second colour, so every default figure that
-colours two or more groups uses it. The example above therefore fails
-`geometry_contrast`, as well as `redundant_encoding` and, at 8.9 cm, `text_size`.
-Opaque marks, the vermillion `#d55e00` in the orange's place and a redundant
-shape or line type clear the two colour rows.
-`scale_colour_depictr(order = "contrast")` puts the vermillion there for one
-plot, and `depictr_options(palette = depictr_palette(order = "contrast"))` does
-so for every later one.
+The colourblind-safety guarantee covers the eight built-in colours. For more
+than eight groups, the palette interpolates, with a warning from
+`depictr_palette()`. The guarantee also covers only hue confusion. In
+greyscale, the palette's orange and sky blue differ by only 0.79 in CIE
+lightness, so they print as the same grey. A figure that may be printed in
+black and white should use fewer groups, a sequential palette, or a redundant
+shape or line type.
+
+The palette also falls short on contrast. Four of the eight colours fall below
+the 3:1 contrast against white that WCAG asks of a graphical object. The orange
+is one of them. As the second colour, it appears in every default figure that
+colours two or more groups. The example above therefore fails
+`geometry_contrast`, as well as `redundant_encoding` and, at 8.9 cm,
+`text_size`. With opaque marks, the vermillion `#d55e00` in the orange's place
+and a redundant shape or line type, the figure passes `geometry_contrast` and
+`redundant_encoding`. `scale_colour_depictr(order = "contrast")` makes that
+substitution for one plot, and
+`depictr_options(palette = depictr_palette(order = "contrast"))` does so for
+every plot made afterwards.
 
 ## A first plot
 
@@ -121,23 +124,21 @@ coefficient_plot(fit, order = "descending")
 ```
 
 The [Get started](https://pablobernabeu.github.io/depictr/articles/depictr.html)
-article walks through the whole workflow, from exploration to diagnostics and
+article covers the whole workflow, from exploration to diagnostics and
 reporting.
 
 ## Bundled data
 
-Five reproducibly simulated datasets (`lexical_decision`, `wellbeing_survey`,
-`crop_yield`, `clinical_trial` and `monthly_sales`) ship with the package and
-power every example and vignette. Each is documented under its own name and
-described in the [Get started](https://pablobernabeu.github.io/depictr/articles/depictr.html)
-article, and all are generated by
-[`data-raw/generate_datasets.R`](https://github.com/pablobernabeu/depictr/blob/main/data-raw/generate_datasets.R)
-with fixed seeds.
+The package includes five reproducibly simulated datasets (`lexical_decision`,
+`wellbeing_survey`, `crop_yield`, `clinical_trial` and `monthly_sales`), which
+are used in every example and vignette. Each is documented under its own name
+and described in the [Get started](https://pablobernabeu.github.io/depictr/articles/depictr.html)
+article. All five are generated with fixed seeds by
+[`data-raw/generate_datasets.R`](https://github.com/pablobernabeu/depictr/blob/main/data-raw/generate_datasets.R).
 
 ## Learn more
 
-Each vignette takes one stretch of the workflow and works through it on the
-bundled data.
+Each vignette works through one part of the workflow on the bundled data.
 
 * `vignette("depictr")`: getting started
 * `vignette("exploring-data")`: exploratory plots, estimation statistics and tables
@@ -148,9 +149,9 @@ bundled data.
 
 ## How depictr relates to other packages
 
-depictr aims for breadth and consistency across the workflow, and it complements
-the specialised packages. Several of those remain the better choice for a deeper
-treatment of any one area, among them
+depictr aims for breadth and consistency across the workflow and complements
+the specialised packages. For a deeper treatment of any one area, several of
+those remain the better choice, among them
 [`ggstatsplot`](https://www.indrapatil.com/ggstatsplot/) (statistical
 details on plots), [`sjPlot`](https://strengejacke.github.io/sjPlot/) and the
 [easystats](https://easystats.github.io/easystats/) family (`see`, `parameters`,
@@ -162,30 +163,30 @@ details on plots), [`sjPlot`](https://strengejacke.github.io/sjPlot/) and the
 [`feasts`](https://feasts.tidyverts.org) / `ggfortify` (time series),
 [`ggdist`](https://mjskay.github.io/ggdist/) / `dabestr` (distributions and
 estimation) and [`bayesplot`](https://mc-stan.org/bayesplot/) / `tidybayes`
-(Bayesian). depictr offers one consistent default for all of these tasks within
-a single package.
+(Bayesian).
 
 ## Automated maintenance
 
-depictr draws on a number of plotting and modelling packages, so scheduled
-GitHub Actions keep it healthy between releases. A daily job checks the package
-and its full test suite against both the current and the development versions of
-its dependencies, and a weekly job checks every URL in the documentation. On top
-of those, `R CMD check` runs across Linux, macOS and Windows on every push to
-`main` and on every pull request into it.
+Because depictr depends on a number of plotting and modelling packages,
+scheduled GitHub Actions check it between releases. A daily job checks the
+package and its full test suite against the current and the development
+versions of its dependencies, and a weekly job checks every URL in the
+documentation. In addition, `R CMD check` runs on Linux, macOS and Windows on
+every push to `main` and on every pull request into it.
 
 ## Citation
 
-`citation("depictr")` gives the preferred reference. The DOI that CRAN
-assigned to the package is <https://doi.org/10.32614/CRAN.package.depictr>, and
-it covers every version. The [About
-page](https://pablobernabeu.github.io/depictr/articles/about.html) carries the
+`citation("depictr")` gives the preferred reference. CRAN assigned the package
+the DOI <https://doi.org/10.32614/CRAN.package.depictr>, which covers every
+version. The [About
+page](https://pablobernabeu.github.io/depictr/articles/about.html) shows the
 same citation with a BibTeX entry and a short note on the developer, and the
-repository ships
+repository includes
 [`CITATION.cff`](https://github.com/pablobernabeu/depictr/blob/main/CITATION.cff)
-for the *Cite this repository* button on GitHub. The methods the package
-implements are cited in the relevant help pages and vignettes, drawing on a
-single bibliography at [`inst/REFERENCES.bib`](https://github.com/pablobernabeu/depictr/blob/main/inst/REFERENCES.bib).
+for the *Cite this repository* button on GitHub.
+
+The relevant help pages and vignettes cite the methods the package implements,
+drawing on a single bibliography at [`inst/REFERENCES.bib`](https://github.com/pablobernabeu/depictr/blob/main/inst/REFERENCES.bib).
 
 ## Licence
 
@@ -196,6 +197,6 @@ MIT (c) Pablo Bernabeu. See the
 
 Issues and pull requests are welcome. The [contributing
 guide](https://github.com/pablobernabeu/depictr/blob/main/.github/CONTRIBUTING.md)
-describes the development setup and the conventions the package follows, and
-everyone taking part is asked to honour the [Code of
+describes the development setup and the conventions the package follows.
+Everyone taking part is asked to honour the [Code of
 Conduct](https://github.com/pablobernabeu/depictr/blob/main/.github/CODE_OF_CONDUCT.md).

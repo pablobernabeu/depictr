@@ -1,5 +1,10 @@
 # simulate_figure(): a finished figure as a reader with a CVD sees it -------
 
+# This file is among the slowest of the suite. CRAN's check of the whole
+# package must stay under ten minutes, so the file skips on CRAN and runs in
+# CI, where NOT_CRAN is set, on Linux, Windows and macOS.
+skip_on_cran()
+
 # Every grob of class `cls` in a grob tree, depth first. A gtable keeps its
 # grobs in `grobs`, and any other gTree in `children`.
 grobs_of_class <- function(g, cls) {

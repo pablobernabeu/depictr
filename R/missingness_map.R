@@ -5,21 +5,22 @@
 #' Draws a tile map of the data frame with one column per variable and one row
 #' per observation, shading the cells that are missing. The variables are
 #' ordered by their proportion of missing values, and that proportion is shown
-#' in the axis labels, making it easy to spot variables and patterns that need
-#' attention before modelling.
+#' in the axis labels, so variables and patterns that need attention before
+#' modelling are easy to spot.
 #'
 #' @param data A data frame.
-#' @param cols Optional character vector of columns to include (default: all).
+#' @param cols Optional character vector of columns to include (by default,
+#'   all).
 #' @param sort Whether to order variables by their proportion of missing values.
 #' @param show_pct Whether to append the percentage missing to each variable label.
 #' @param colours Length-2 vector: colours for present and missing cells.
 #'   Defaults to a muted grey (`"grey85"`) for present cells and, for missing
 #'   cells, the accent colour set with `accent` in [depictr_options()], the
 #'   colourblind-safe vermillion `#d55e00` unless changed.
-#' @param legend_inside When `TRUE` (and `sort = TRUE`), draw the legend inside
-#'   the panel, in the top-right (where the most-complete columns put a solid
-#'   "Present" block, so it hides no "Missing" mark) instead of in a right-hand
-#'   margin. Defaults to `FALSE`.
+#' @param legend_inside When `TRUE` and `sort = TRUE`, the legend is drawn
+#'   inside the panel, in the top-right corner, where the most complete columns
+#'   put a solid block of present cells, so it hides no missing cell.
+#'   Otherwise, it is drawn in a right-hand margin. Defaults to `FALSE`.
 #' @param title Plot title.
 #'
 #' @return A [ggplot2::ggplot] object.

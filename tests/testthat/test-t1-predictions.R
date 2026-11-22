@@ -5,6 +5,11 @@
 #   (2) lm intervals used a Normal (qnorm) multiplier instead of the t multiplier
 #       with residual df, so bands did not match predict.lm()/confint().
 
+# This file is among the slowest of the suite. CRAN's check of the whole
+# package must stay under ten minutes, so the file skips on CRAN and runs in
+# CI, where NOT_CRAN is set, on Linux, Windows and macOS.
+skip_on_cran()
+
 test_that("lm prediction bands use a t multiplier and match predict.lm()", {
   fit <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
 
