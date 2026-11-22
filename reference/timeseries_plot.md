@@ -66,12 +66,13 @@ timeseries_plot(
 
 - forecast:
 
-  Optional forecast overlay for a single (non-grouped) series. Either an
+  Optional forecast overlay for a single, ungrouped series. Either an
   integer horizon (number of future steps) to forecast with the built-in
   STL plus random walk with drift (see
   [`ts_forecast()`](https://pablobernabeu.github.io/depictr/reference/ts_forecast.md)),
   or a pre-computed forecast supplied as a data frame with columns
-  `time`, `fit` and (optionally) `lwr`/`upr`, for instance from a fitted
+  `time`, `fit` and, optionally, `lwr` and `upr`, for instance from a
+  fitted
   [`forecast::forecast()`](https://generics.r-lib.org/reference/forecast.html)
   object. The point forecast continues the line and a shaded
   prediction-interval ribbon is drawn behind it. The built-in forecast
@@ -90,8 +91,8 @@ timeseries_plot(
 
 - level:
 
-  Prediction-interval coverage for the built-in forecast (a single
-  number strictly between 0 and 1, e.g. `0.95`).
+  Prediction-interval coverage for the built-in forecast, a single
+  number strictly between 0 and 1, such as `0.95`.
 
 - lambda:
 
@@ -102,7 +103,7 @@ timeseries_plot(
 
 - palette:
 
-  Colours for the groups; defaults to
+  Colours for the groups. Defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
 
 - point:

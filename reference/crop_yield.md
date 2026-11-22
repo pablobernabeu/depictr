@@ -1,14 +1,14 @@
 # Simulated crop-yield field trial
 
 A reproducibly simulated agronomy field trial relating crop yield to
-rainfall, fertiliser, soil pH and a management treatment. Used for the
+rainfall, fertiliser, soil pH and a management treatment, for the
 regression, coefficient-plot, scatter-trend and interaction examples.
-The data-generating process contains a genuine fertiliser-by-treatment
+The data-generating process contains a fertiliser-by-treatment
 interaction: fertiliser raises yield far more under the `enhanced`
 treatment than under `standard`, so
 `interaction_plot(lm(yield ~ fertiliser * treatment + ..., crop_yield), "fertiliser", "treatment")`
-shows real, diverging slopes rather than noise. The main effects
-(rainfall, fertiliser, soil pH and treatment) are retained.
+shows diverging slopes that are not noise. The main effects (rainfall,
+fertiliser, soil pH and treatment) are retained.
 
 ## Usage
 
@@ -46,7 +46,7 @@ A data frame with 200 rows and 6 variables:
 
 ## Source
 
-Simulated; see `data-raw/generate_datasets.R`.
+Simulated by `data-raw/generate_datasets.R` in the source repository.
 
 ## Details
 

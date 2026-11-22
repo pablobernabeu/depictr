@@ -1,10 +1,10 @@
 # Cluster scatter plot
 
-Runs k-means clustering on the numeric columns of a data frame (or uses
-a supplied cluster assignment) and plots the observations on the first
+Runs k-means clustering on the numeric columns of a data frame, or uses
+a supplied cluster assignment, and plots the observations on the first
 two principal components, coloured by cluster, with optional convex
-hulls and labelled centroids. Projecting onto principal components means
-the plot works for any number of variables.
+hulls and labelled centroids. Because the plot uses principal
+components, it works for any number of variables.
 
 ## Usage
 
@@ -36,40 +36,39 @@ cluster_plot(
 
 - cols:
 
-  Numeric columns to cluster on (default: all numeric).
+  Numeric columns to cluster on (by default, all numeric columns).
 
 - k:
 
-  Number of clusters for k-means (ignored if `clusters` is supplied, or
-  overridden when `suggest_k` chooses a value).
+  Number of clusters for k-means. Ignored if `clusters` is supplied, and
+  overridden when `suggest_k` chooses a value.
 
 - clusters:
 
-  Optional vector of cluster assignments (e.g. from
+  Optional vector of cluster assignments, such as one from
   [`stats::kmeans()`](https://rdrr.io/r/stats/kmeans.html) or
-  [`stats::cutree()`](https://rdrr.io/r/stats/cutree.html)); use this to
-  plot a clustering you computed yourself. Hierarchical or PAM
-  assignments (such as
-  [`stats::cutree()`](https://rdrr.io/r/stats/cutree.html) output
+  [`stats::cutree()`](https://rdrr.io/r/stats/cutree.html), to plot a
+  clustering computed beforehand. Hierarchical or PAM assignments (such
+  as [`stats::cutree()`](https://rdrr.io/r/stats/cutree.html) output
   matching
   [`dendrogram_plot()`](https://pablobernabeu.github.io/depictr/reference/dendrogram_plot.md))
-  are accepted. Must have exactly one entry per row of `data` (rows with
-  missing values in `cols` are dropped from both before plotting).
+  are accepted. Must have exactly one entry per row of `data`. Rows with
+  missing values in `cols` are dropped from both before plotting.
 
 - scale:
 
   Whether to scale variables to unit variance before clustering and the
-  PCA. Columns with (near-)zero variance cannot be scaled and are
+  PCA. Columns with zero or near-zero variance cannot be scaled and are
   dropped with a message, as in
   [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md).
 
 - suggest_k:
 
   Optionally choose `k` automatically with a cluster-quality diagnostic
-  instead of using the supplied `k`. Either `TRUE` (uses the
-  average-silhouette criterion), a string naming the criterion
-  (`"silhouette"`, `"wss"` or `"gap"`; see
-  [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)),
+  in place of the supplied `k`. Either `TRUE` (the average-silhouette
+  criterion), a string naming the criterion (`"silhouette"`, `"wss"` or
+  `"gap"`, see
+  [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md))
   or `NULL` (the default) to leave `k` unchanged. Ignored when
   `clusters` is supplied.
 
@@ -95,7 +94,7 @@ cluster_plot(
 
 - palette:
 
-  Colours for the clusters; defaults to
+  Colours for the clusters. Defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
 
 - title:
@@ -104,8 +103,8 @@ cluster_plot(
 
 - seed:
 
-  Optional integer seed for reproducible k-means (ignored when
-  `clusters` is supplied). It applies to this call alone, and the
+  Optional integer seed for reproducible k-means, ignored when
+  `clusters` is supplied. It applies to this call alone, and the
   caller's random-number state is restored afterwards. The default,
   `NULL`, takes the random starts of
   [`stats::kmeans()`](https://rdrr.io/r/stats/kmeans.html), and any

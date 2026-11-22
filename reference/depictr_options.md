@@ -45,8 +45,8 @@ depictr_options(
 - brand:
 
   The depictr brand colour, used for plot titles and single-series
-  geoms. It coincides with the default palette's first colour but does
-  not alter a palette; use `palette` for that.
+  geoms. It matches the default palette's first colour but does not
+  change a palette, which `palette` sets.
 
 - accent:
 
@@ -55,7 +55,7 @@ depictr_options(
 
 - reference:
 
-  The colour used for reference / annotation lines.
+  The colour used for reference and annotation lines.
 
 - palette:
 
@@ -77,15 +77,15 @@ depictr_options(
 
 ## Value
 
-A named list of the resolved option values. When setting, the *previous*
+A named list of the resolved option values. When setting, the previous
 values are returned invisibly.
 
 ## Details
 
 Called with no arguments, `depictr_options()` returns the currently
 resolved values (option if set, otherwise package default). Called with
-named arguments it sets the matching `options(depictr.<name> = )`
-entries and returns the *previous* resolved values invisibly, so the
+named arguments, it sets the matching `options(depictr.<name> = )`
+entries and returns the previous resolved values invisibly, so the
 pattern
 `old <- depictr_options(...); on.exit(do.call(depictr_options, old))`
 restores them. Pass `NULL` for an argument to clear that option and fall
@@ -121,7 +121,7 @@ depictr_options()
 # Set a larger base size and a different accent, then restore
 old <- depictr_options(base_size = 14, accent = "#e69f00")
 theme_depictr()              # now uses base_size 14
-#> <theme> List of 144
+#> <theme>List of 144
 #>  $ line                            : <ggplot2::element_line>
 #>   ..@ colour       : chr "black"
 #>   ..@ linewidth    : num 0.636
@@ -150,7 +150,8 @@ theme_depictr()              # now uses base_size 14
 #>   ..@ vjust        : num 0.5
 #>   ..@ angle        : num 0
 #>   ..@ lineheight   : num 0.9
-#>   ..@ margin       : <ggplot2::margin> num [1:4] 0 0 0 0
+#>   ..@ margin       : <ggplot2::margin> 'simpleUnit' num [1:4] 0points 0points 0points 0points
+#>  .. .. - attr(*, "unit")= int 8
 #>   ..@ debug        : logi FALSE
 #>   ..@ inherit.blank: logi TRUE
 #>  $ title                           : <ggplot2::element_text>
@@ -198,7 +199,8 @@ theme_depictr()              # now uses base_size 14
 #>   ..@ fill       : NULL
 #>  $ spacing                         : 'simpleUnit' num 7points
 #>   ..- attr(*, "unit")= int 8
-#>  $ margins                         : <ggplot2::margin> num [1:4] 7 7 7 7
+#>  $ margins                         : <ggplot2::margin> 'simpleUnit' num [1:4] 7points 7points 7points 7points
+#>  .. - attr(*, "unit")= int 8
 #>  $ aspect.ratio                    : NULL
 #>  $ axis.title                      : NULL
 #>  $ axis.title.x                    : <ggplot2::element_text>
@@ -213,7 +215,8 @@ theme_depictr()              # now uses base_size 14
 #>   ..@ vjust        : num 1
 #>   ..@ angle        : NULL
 #>   ..@ lineheight   : NULL
-#>   ..@ margin       : <ggplot2::margin> num [1:4] 8.4 0 0 0
+#>   ..@ margin       : <ggplot2::margin> 'simpleUnit' num [1:4] 8.4points 0points 0points 0points
+#>  .. .. - attr(*, "unit")= int 8
 #>   ..@ debug        : NULL
 #>   ..@ inherit.blank: logi FALSE
 #>  $ axis.title.x.top                : <ggplot2::element_text>
@@ -228,7 +231,8 @@ theme_depictr()              # now uses base_size 14
 #>   ..@ vjust        : num 0
 #>   ..@ angle        : NULL
 #>   ..@ lineheight   : NULL
-#>   ..@ margin       : <ggplot2::margin> num [1:4] 0 0 3.5 0
+#>   ..@ margin       : <ggplot2::margin> 'simpleUnit' num [1:4] 0points 0points 3.5points 0points
+#>  .. .. - attr(*, "unit")= int 8
 #>   ..@ debug        : NULL
 #>   ..@ inherit.blank: logi TRUE
 #>  $ axis.title.x.bottom             : NULL
@@ -244,7 +248,8 @@ theme_depictr()              # now uses base_size 14
 #>   ..@ vjust        : num 1
 #>   ..@ angle        : num 90
 #>   ..@ lineheight   : NULL
-#>   ..@ margin       : <ggplot2::margin> num [1:4] 0 8.4 0 0
+#>   ..@ margin       : <ggplot2::margin> 'simpleUnit' num [1:4] 0points 8.4points 0points 0points
+#>  .. .. - attr(*, "unit")= int 8
 #>   ..@ debug        : NULL
 #>   ..@ inherit.blank: logi FALSE
 #>  $ axis.title.y.left               : NULL
@@ -260,7 +265,8 @@ theme_depictr()              # now uses base_size 14
 #>   ..@ vjust        : num 1
 #>   ..@ angle        : num -90
 #>   ..@ lineheight   : NULL
-#>   ..@ margin       : <ggplot2::margin> num [1:4] 0 0 0 3.5
+#>   ..@ margin       : <ggplot2::margin> 'simpleUnit' num [1:4] 0points 0points 0points 3.5points
+#>  .. .. - attr(*, "unit")= int 8
 #>   ..@ debug        : NULL
 #>   ..@ inherit.blank: logi TRUE
 #>  $ axis.text                       : <ggplot2::element_text>
@@ -290,7 +296,8 @@ theme_depictr()              # now uses base_size 14
 #>   ..@ vjust        : num 1
 #>   ..@ angle        : NULL
 #>   ..@ lineheight   : NULL
-#>   ..@ margin       : <ggplot2::margin> num [1:4] 2.8 0 0 0
+#>   ..@ margin       : <ggplot2::margin> 'simpleUnit' num [1:4] 2.8points 0points 0points 0points
+#>  .. .. - attr(*, "unit")= int 8
 #>   ..@ debug        : NULL
 #>   ..@ inherit.blank: logi TRUE
 #>  $ axis.text.x.top                 : <ggplot2::element_text>
@@ -305,7 +312,8 @@ theme_depictr()              # now uses base_size 14
 #>   ..@ vjust        : NULL
 #>   ..@ angle        : NULL
 #>   ..@ lineheight   : NULL
-#>   ..@ margin       : <ggplot2::margin> num [1:4] 0 0 6.3 0
+#>   ..@ margin       : <ggplot2::margin> 'simpleUnit' num [1:4] 0points 0points 6.3points 0points
+#>  .. .. - attr(*, "unit")= int 8
 #>   ..@ debug        : NULL
 #>   ..@ inherit.blank: logi TRUE
 #>  $ axis.text.x.bottom              : <ggplot2::element_text>
@@ -320,7 +328,8 @@ theme_depictr()              # now uses base_size 14
 #>   ..@ vjust        : NULL
 #>   ..@ angle        : NULL
 #>   ..@ lineheight   : NULL
-#>   ..@ margin       : <ggplot2::margin> num [1:4] 6.3 0 0 0
+#>   ..@ margin       : <ggplot2::margin> 'simpleUnit' num [1:4] 6.3points 0points 0points 0points
+#>  .. .. - attr(*, "unit")= int 8
 #>   ..@ debug        : NULL
 #>   ..@ inherit.blank: logi TRUE
 #>  $ axis.text.y                     : <ggplot2::element_text>
@@ -335,7 +344,8 @@ theme_depictr()              # now uses base_size 14
 #>   ..@ vjust        : NULL
 #>   ..@ angle        : NULL
 #>   ..@ lineheight   : NULL
-#>   ..@ margin       : <ggplot2::margin> num [1:4] 0 2.8 0 0
+#>   ..@ margin       : <ggplot2::margin> 'simpleUnit' num [1:4] 0points 2.8points 0points 0points
+#>  .. .. - attr(*, "unit")= int 8
 #>   ..@ debug        : NULL
 #>   ..@ inherit.blank: logi TRUE
 #>  $ axis.text.y.left                : <ggplot2::element_text>
@@ -350,7 +360,8 @@ theme_depictr()              # now uses base_size 14
 #>   ..@ vjust        : NULL
 #>   ..@ angle        : NULL
 #>   ..@ lineheight   : NULL
-#>   ..@ margin       : <ggplot2::margin> num [1:4] 0 6.3 0 0
+#>   ..@ margin       : <ggplot2::margin> 'simpleUnit' num [1:4] 0points 6.3points 0points 0points
+#>  .. .. - attr(*, "unit")= int 8
 #>   ..@ debug        : NULL
 #>   ..@ inherit.blank: logi TRUE
 #>  $ axis.text.y.right               : <ggplot2::element_text>
@@ -365,7 +376,8 @@ theme_depictr()              # now uses base_size 14
 #>   ..@ vjust        : NULL
 #>   ..@ angle        : NULL
 #>   ..@ lineheight   : NULL
-#>   ..@ margin       : <ggplot2::margin> num [1:4] 0 0 0 6.3
+#>   ..@ margin       : <ggplot2::margin> 'simpleUnit' num [1:4] 0points 0points 0points 6.3points
+#>  .. .. - attr(*, "unit")= int 8
 #>   ..@ debug        : NULL
 #>   ..@ inherit.blank: logi TRUE
 #>  $ axis.text.theta                 : NULL
@@ -381,7 +393,8 @@ theme_depictr()              # now uses base_size 14
 #>   ..@ vjust        : NULL
 #>   ..@ angle        : NULL
 #>   ..@ lineheight   : NULL
-#>   ..@ margin       : <ggplot2::margin> num [1:4] 0 2.8 0 2.8
+#>   ..@ margin       : <ggplot2::margin> 'simpleUnit' num [1:4] 0points 2.8points 0points 2.8points
+#>  .. .. - attr(*, "unit")= int 8
 #>   ..@ debug        : NULL
 #>   ..@ inherit.blank: logi TRUE
 #>  $ axis.ticks                      : <ggplot2::element_blank>
@@ -493,6 +506,7 @@ theme_depictr()              # now uses base_size 14
 #>  $ legend.justification.right      : NULL
 #>  $ legend.justification.inside     : NULL
 #>   [list output truncated]
+#>  - attr(*, "class")= chr "gg"
 #>  @ complete: logi TRUE
 #>  @ validate: logi TRUE
 do.call(depictr_options, old)

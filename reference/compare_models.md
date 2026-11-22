@@ -1,11 +1,10 @@
 # Compare estimates from several models or sources
 
-Overlays the estimates from two or more models (or tidy estimate tables)
-on a single forest plot, with one colour per source. It is the general
-engine behind
+Overlays the estimates from two or more models, or tidy estimate tables,
+on a single forest plot, with one colour per source. It underlies
 [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md)
-(frequentist against Bayesian), and serves equally well for comparing
-nested models, several optimisers, or estimates before and after a
+(frequentist against Bayesian) and serves equally well for comparing
+nested models, several optimisers or estimates before and after a
 transformation.
 
 ## Usage
@@ -39,9 +38,9 @@ compare_models(
 
 - ...:
 
-  Two or more fitted models and/or tidy data frames of estimates. Name
-  the arguments to label the sources (e.g.
-  `compare_models(Frequentist = m1, Bayesian = m2)`).
+  Two or more fitted models or tidy data frames of estimates, in
+  any mix. Name the arguments to label the sources, as in
+  `compare_models(Frequentist = m1, Bayesian = m2)`.
 
 - names:
 
@@ -50,8 +49,8 @@ compare_models(
 
 - conf_level:
 
-  Confidence/credible level for models, a single number strictly between
-  0 and 1.
+  Confidence or credible level for models, a single number strictly
+  between 0 and 1.
 
 - intercept:
 
@@ -97,7 +96,7 @@ compare_models(
 
 - palette:
 
-  Colours for the sources; defaults to
+  Colours for the sources. Defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
 
 - point_size, line_size:
@@ -107,16 +106,16 @@ compare_models(
 - facet:
 
   Whether to give each term its own panel with a free x-axis, laid out
-  one per row, so that terms on very different scales (for example a
-  large intercept alongside small slopes) stay legible. The source
-  overlay and its single legend are preserved within the faceted layout.
-  Defaults to `FALSE`. A convenience alias for `scales = "free"`.
+  one per row, so that terms on very different scales, such as a large
+  intercept beside small slopes, stay legible. The faceted layout keeps
+  the source overlay and its single legend. A shortcut for
+  `scales = "free"`. Defaults to `FALSE`.
 
 - scales:
 
   Either `"fixed"` (the default, a single shared x-axis) or `"free"`
-  (one free-scaled panel per term). When `facet = TRUE` this is forced
-  to `"free"`.
+  (one free-scaled panel per term). When `facet = TRUE`, it is set to
+  `"free"`.
 
 - exponentiate:
 
@@ -133,10 +132,10 @@ compare_models(
 
 - title, subtitle, x_lab:
 
-  Title, subtitle and x-axis label. `x_lab` defaults to "Estimate". With
-  `exponentiate = TRUE` it defaults to the name of the ratio, as in
+  Title, subtitle and x-axis label. `x_lab` defaults to 'Estimate'. With
+  `exponentiate = TRUE`, it defaults to the name of the ratio, as in
   [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md),
-  when the fitted models agree on it, and to "exp(Estimate)" when they
+  when the fitted models agree on it, and to 'exp(Estimate)' when they
   do not.
 
 ## Value
@@ -154,7 +153,7 @@ compare_models(`All fields` = m1, `Standard only` = m2,
                        title = "Estimates by subset")
 
 
-# Keep the intercept legible alongside the slopes:
+# Keep the intercept legible beside the slopes:
 compare_models(`All fields` = m1, `Standard only` = m2,
                intercept = TRUE, facet = TRUE)
 

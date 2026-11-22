@@ -3,9 +3,9 @@
 Shows the distribution of a numeric variable across the levels of a
 grouping variable as a column of partially overlapping density curves,
 one ridge per group, stacked up the y-axis. It compares many
-distributions in a compact space, making shifts in location and shape
-easy to follow, and is a clearer choice than many overlaid densities
-once there are several groups.
+distributions in a compact space, so shifts in location and shape are
+easy to follow, and is clearer than many overlaid densities once there
+are several groups.
 
 ## Usage
 
@@ -37,16 +37,16 @@ ridgeline_plot(
 
 - group:
 
-  The grouping variable (string or unquoted name); one ridge per level.
-  A numeric code counts as a group, but a numeric column with more than
-  20 distinct values is refused as continuous. Rows with a missing group
-  are dropped with a message, and levels without rows are left out of
-  the plot and its palette.
+  The grouping variable (string or unquoted name), with one ridge per
+  level. A numeric code counts as a group, but a numeric column with
+  more than 20 distinct values is refused as continuous. Rows with a
+  missing group are dropped with a message, and levels without rows are
+  left out of the plot and its palette.
 
 - overlap:
 
   How far each ridge extends into the next, as a multiple of the row
-  spacing. `1` makes the tallest ridge just touch the next baseline;
+  spacing. `1` makes the tallest ridge just touch the next baseline, and
   larger values overlap more. Defaults to `1.4`.
 
 - alpha:
@@ -60,7 +60,7 @@ ridgeline_plot(
 
 - palette:
 
-  Colours for the groups; defaults to
+  Colours for the groups. Defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
 
 - title, x_lab, y_lab:
@@ -76,9 +76,9 @@ object.
 
 Densities are computed with
 [`stats::density()`](https://rdrr.io/r/stats/density.html) and scaled to
-a common height; the `overlap` argument controls how far each ridge
+a common height. The `overlap` argument controls how far each ridge
 reaches into the one above. Groups with fewer than two non-missing
-values are dropped with a warning. The implementation is base R +
+values are dropped with a warning. The plot is built with base R and
 ggplot2, with no extra package dependency.
 
 ## Examples

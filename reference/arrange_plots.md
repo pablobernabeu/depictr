@@ -1,10 +1,10 @@
 # Compose several plots into one figure
 
-A thin, friendly wrapper around
+A wrapper around
 [`patchwork::wrap_plots()`](https://patchwork.data-imaginist.com/reference/wrap_plots.html)
-that adds the common finishing touches: collecting duplicate legends
-into one, an overall title and subtitle, and automatic panel tags (A, B,
-C, ...).
+that adds the usual finishing touches: duplicate legends collected into
+one, automatic panel tags (A, B, C and so on) and an overall title and
+subtitle.
 
 ## Usage
 
@@ -28,7 +28,7 @@ arrange_plots(
 
 - ncol, nrow:
 
-  Layout dimensions (passed to patchwork).
+  Layout dimensions, passed to patchwork.
 
 - guides:
 
@@ -40,7 +40,7 @@ arrange_plots(
 
 - tag_levels:
 
-  Panel tag style, e.g. `"A"`, `"1"` or `"i"`; `NULL` for no tags.
+  Panel tag style, such as `"A"`, `"1"` or `"i"`, or `NULL` for no tags.
 
 ## Value
 

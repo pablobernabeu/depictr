@@ -1,13 +1,14 @@
 # Plot posterior distributions
 
-Displays posterior (or, more generally, bootstrap or simulation) draws
-as a *distribution* per parameter, in the style of a half-eye (a density
-slab with a point-and-interval beneath it), an interval-only forest
-plot, a gradient interval or a dotplot. The full shape of the posterior
-is shown, so skew, multimodality and the relative mass on either side of
-a reference value are all visible, rather than a point and two limits
-alone. The intervals are central (equal-tailed) quantile intervals,
-which leave the same share of the draws in either tail.
+Displays posterior draws, or more generally bootstrap or simulation
+draws, as a distribution per parameter, in the style of a half-eye (a
+density slab with a point-and-interval beneath it), an interval-only
+forest plot, a gradient interval or a dotplot. The full shape of the
+posterior is shown, so skew, multimodality and the relative mass on
+either side of a reference value are all visible, where a point and two
+limits would hide them. The intervals are central (equal-tailed)
+quantile intervals, which leave the same share of the draws in either
+tail.
 
 ## Usage
 
@@ -38,12 +39,12 @@ posterior_plot(
 
 - draws:
 
-  Posterior draws: a fitted model (`brms`/`rstanarm`), a `posterior`
-  draws object, a matrix, or a long/wide data frame (see Details).
+  Posterior draws: a fitted model (`brms` or `rstanarm`), a `posterior`
+  draws object, a matrix or a long or wide data frame (see Details).
 
 - style:
 
-  One of `"halfeye"` (density slab + interval, the default),
+  One of `"halfeye"` (density slab and interval, the default),
   `"interval"` (point and two nested intervals, no slab), `"gradient"`
   (a colour-graded interval) or `"dots"` (a quantile dotplot). Any other
   value is an error. When 'ggdist' is missing, every style falls back to
@@ -67,7 +68,7 @@ posterior_plot(
 
 - labels:
 
-  Optional named character vector renaming parameters, e.g.
+  Optional named character vector renaming parameters, such as
   `c(conditionunrelated = "condition")`. Unmatched parameters fall back
   to
   [`format_terms()`](https://pablobernabeu.github.io/depictr/reference/format_terms.md).
@@ -77,10 +78,10 @@ posterior_plot(
 
 - reference_line:
 
-  Position of a vertical reference line, or `NULL`/`NA` to omit it.
-  There is no universally meaningful reference for every parameter, so
-  this defaults to `0` (the usual "no effect" line for differences and
-  slopes) but should be set or cleared deliberately.
+  Position of a vertical reference line, or `NULL` or `NA` to omit it.
+  No reference is meaningful for every parameter, so this defaults to
+  `0`, the usual line of no effect for differences and slopes, but
+  should be set or cleared deliberately.
 
 - rope:
 
@@ -97,21 +98,20 @@ posterior_plot(
 - facet:
 
   Whether to give each parameter its own panel with a free x-axis, laid
-  out one per row. This keeps the small parameters legible when a large
-  one (typically the intercept) would otherwise stretch the shared axis
-  and squish the rest. Defaults to `FALSE`. A convenience alias for
-  `scales = "free"`.
+  out one per row. This keeps small parameters legible when a large one,
+  typically the intercept, would otherwise stretch the shared axis. A
+  shortcut for `scales = "free"`. Defaults to `FALSE`.
 
 - scales:
 
   Either `"fixed"` (the default, a single shared x-axis) or `"free"`
-  (one free-scaled panel per parameter). When `facet = TRUE` this is
-  forced to `"free"`.
+  (one free-scaled panel per parameter). When `facet = TRUE`, it is set
+  to `"free"`.
 
 - colour, fill:
 
-  Colours for the point/interval and for the density slab. Default to
-  the depictr brand blue.
+  Colours for the point and interval and for the density slab. Default
+  to the depictr brand blue.
 
 - rope_fill, rope_alpha:
 
@@ -123,8 +123,8 @@ posterior_plot(
 
 - caption:
 
-  Plot caption. The default (`NULL`) auto-captions the interval mass;
-  pass `NA` to omit a caption.
+  Plot caption. The default (`NULL`) states the interval mass in the
+  caption. Pass `NA` to omit a caption.
 
 ## Value
 
@@ -134,13 +134,13 @@ object.
 ## Details
 
 Draws may be supplied in many shapes: a fitted Bayesian model (`brms` or
-`rstanarm`), a `posterior` *draws* object, a wide data frame or matrix
+`rstanarm`), a `posterior` draws object, a wide data frame or matrix
 with one column of draws per parameter, or a long data frame with a
 parameter column named `parameter`, `term`, `.variable` or `variable`
 and a value column named `value`, `.value`, `draw` or `estimate`. In a
 wide data frame, the numeric columns `.chain`, `.iteration`, `.draw`,
 `draw`, `chain`, `iteration` and `.row` are read as sampler indices and
-left out. For fitted models only the fixed-effect (population)
+left out. For fitted models, only the fixed-effect (population)
 parameters are kept, with the `brms` `b_` prefix stripped. A draws
 object that holds `b_` parameters, as
 [`posterior::as_draws_df()`](https://mc-stan.org/posterior/reference/draws_df.html)
@@ -155,9 +155,9 @@ such as the `b_Intercept` and centred `Intercept` of a plain table of
 of posterior summaries, such as `brms::fixef()` returns, holds no draws
 and is refused.
 
-The slab styles use the 'ggdist' package. When 'ggdist' is not installed
-the function falls back to the point-and-nested-interval display
-(equivalent to `style = "interval"`) and emits an informative message.
+The slab styles use the 'ggdist' package. When 'ggdist' is not
+installed, the function falls back to the point-and-nested-interval
+display (as `style = "interval"`) with an informative message.
 
 ## Examples
 
@@ -177,7 +177,8 @@ posterior_plot(draws)
 posterior_plot(draws, rope = c(-0.1, 0.1), pd = TRUE)
 
 
-# When one parameter dwarfs the others, give each its own free-scaled panel:
+# When one parameter is much larger than the others, give each its own
+# free-scaled panel:
 posterior_plot(draws, facet = TRUE)
 
 # }

@@ -5,7 +5,7 @@
 If you use depictr in published work, please cite it.
 
 > Bernabeu, P. (2026). depictr: A unified toolkit for visualising
-> statistical models and data. R package version 0.3.0. Comprehensive R
+> statistical models and data. R package version 0.4.0. Comprehensive R
 > Archive Network (CRAN).
 > <https://doi.org/10.32614/CRAN.package.depictr>
 
@@ -15,28 +15,27 @@ If you use depictr in published work, please cite it.
   author = {Pablo Bernabeu},
   year   = {2026},
   publisher = {Comprehensive R Archive Network (CRAN)},
-  note   = {R package version 0.3.0},
+  note   = {R package version 0.4.0},
   doi    = {10.32614/CRAN.package.depictr},
   url    = {https://CRAN.R-project.org/package=depictr},
 }
 ```
 
 Copy BibTeX [Download
-.bib](data:application/x-bibtex;charset=utf-8,%40Manual%7Bdepictr%2C%0A%20%20title%20%20%3D%20%7B%7Bdepictr%7D%3A%20A%20unified%20toolkit%20for%20visualising%20statistical%20models%20and%20data%7D%2C%0A%20%20author%20%3D%20%7BPablo%20Bernabeu%7D%2C%0A%20%20year%20%20%20%3D%20%7B2026%7D%2C%0A%20%20publisher%20%3D%20%7BComprehensive%20R%20Archive%20Network%20%28CRAN%29%7D%2C%0A%20%20note%20%20%20%3D%20%7BR%20package%20version%200.3.0%7D%2C%0A%20%20doi%20%20%20%20%3D%20%7B10.32614%2FCRAN.package.depictr%7D%2C%0A%20%20url%20%20%20%20%3D%20%7Bhttps%3A%2F%2FCRAN.R-project.org%2Fpackage%3Ddepictr%7D%2C%0A%7D)
+.bib](data:application/x-bibtex;charset=utf-8,%40Manual%7Bdepictr%2C%0A%20%20title%20%20%3D%20%7B%7Bdepictr%7D%3A%20A%20unified%20toolkit%20for%20visualising%20statistical%20models%20and%20data%7D%2C%0A%20%20author%20%3D%20%7BPablo%20Bernabeu%7D%2C%0A%20%20year%20%20%20%3D%20%7B2026%7D%2C%0A%20%20publisher%20%3D%20%7BComprehensive%20R%20Archive%20Network%20%28CRAN%29%7D%2C%0A%20%20note%20%20%20%3D%20%7BR%20package%20version%200.4.0%7D%2C%0A%20%20doi%20%20%20%20%3D%20%7B10.32614%2FCRAN.package.depictr%7D%2C%0A%20%20url%20%20%20%20%3D%20%7Bhttps%3A%2F%2FCRAN.R-project.org%2Fpackage%3Ddepictr%7D%2C%0A%7D)
 
-R users can also retrieve this citation directly with
-`citation("depictr")`.
+R users can also retrieve this citation with `citation("depictr")`.
 
 ## The developer
 
 depictr is developed by Pablo Bernabeu, a researcher in the Department
 of Education at the University of Oxford. His work spans cognitive
 psychology and neuroscience, linguistics, education and digital
-technologies, drawing on a range of methods that include behavioural and
-EEG experiments, corpus analysis and computational modelling. He is a
-Fellow of the Software Sustainability Institute (2020), recognised for
-his work on R-based tools for data presentation, and holds a PhD in
-Psychology from Lancaster University.
+technologies. His methods include behavioural and EEG experiments,
+corpus analysis and computational modelling. He is a Fellow of the
+Software Sustainability Institute (2020), recognised for his work on
+R-based tools for data presentation, and holds a PhD in Psychology from
+Lancaster University.
 
 More about his work is on [his
 website](https://pablobernabeu.github.io), on
@@ -48,11 +47,12 @@ available on PyPI, shares the same design.
 
 ## Licence
 
-depictr is released under the [MIT
-licence](https://pablobernabeu.github.io/depictr/LICENSE.md), a short
-permissive licence that allows use, modification and redistribution in
-both open and closed projects, provided the copyright notice is
-retained. The full text is on the site’s licence page.
+depictr is released under the MIT licence, whose full text is on the
+site’s [licence
+page](https://pablobernabeu.github.io/depictr/LICENSE.md). This short
+permissive licence allows use, modification and redistribution in open
+and closed projects, provided the copyright and permission notices are
+included with the code.
 
 ## Versioning and archival
 
@@ -63,9 +63,9 @@ identifies the release used. Releases are also tagged on
 [GitHub](https://github.com/pablobernabeu/depictr/releases) and archived
 on Zenodo, where the concept DOI
 <https://doi.org/10.5281/zenodo.21266308> resolves to the latest
-archived release and each release has a DOI of its own. What changed in
-each release is recorded in the
-[changelog](https://pablobernabeu.github.io/depictr/news/index.md).
+archived release and each release has a DOI of its own. The
+[changelog](https://pablobernabeu.github.io/depictr/news/index.md)
+records what changed in each release.
 
 ## Contributing and support
 

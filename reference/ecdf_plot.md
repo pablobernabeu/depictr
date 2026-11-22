@@ -2,8 +2,8 @@
 
 Draws the empirical CDF of a numeric variable (the proportion of
 observations at or below each value), optionally split by a grouping
-variable. Unlike a histogram it needs no bin-width choice and makes
-quantiles, medians and group shifts easy to read directly off the curve.
+variable. Unlike a histogram, it needs no choice of bin width, and
+quantiles, medians and group shifts can be read directly off the curve.
 
 ## Usage
 
@@ -42,20 +42,20 @@ ecdf_plot(
 - reference_quantiles:
 
   Optional numeric vector of probabilities in \[0, 1\] to mark with
-  light horizontal guides (e.g. `c(0.25, 0.5, 0.75)`); `NULL` (the
+  light horizontal guides, such as `c(0.25, 0.5, 0.75)`. `NULL` (the
   default) draws none.
 
 - palette:
 
-  Colours for the groups; defaults to
+  Colours for the groups. Defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
 
 - legend_inside:
 
-  When `TRUE` (and a `group` is given), draw the legend inside the panel
-  (in the bottom-right corner the ECDF leaves empty once it saturates)
-  over a translucent background, instead of in a right-hand margin.
-  Defaults to `FALSE`.
+  When `TRUE` and a `group` is given, the legend is drawn inside the
+  panel, over a translucent background, in the bottom-right corner,
+  which the ECDF leaves empty once it nears 1. Otherwise, it is drawn in
+  a right-hand margin. Defaults to `FALSE`.
 
 - title, x_lab, y_lab:
 

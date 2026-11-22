@@ -1,10 +1,10 @@
 # Compare group means with confidence intervals
 
 An estimation-style plot of a numeric outcome across the levels of a
-grouping variable: each group's mean with a confidence interval, over a
-backdrop of the raw (jittered) data. By showing both the estimate and
-its uncertainty, it conveys whether the groups differ more faithfully
-than a bar chart does.
+grouping variable: each group's mean with a confidence interval, drawn
+over the raw (jittered) data. Because it shows both the estimate and its
+uncertainty, it shows whether the groups differ more faithfully than a
+bar chart does.
 
 ## Usage
 
@@ -59,17 +59,17 @@ group_comparison_plot(
 
 - differences:
 
-  If `TRUE`, append a lower panel showing the pairwise mean
-  difference(s) against a reference group, each with a bootstrap
-  confidence interval, turning the plot into a full estimation plot via
+  If `TRUE`, append a lower panel showing the pairwise mean differences
+  against a reference group, each with a bootstrap confidence interval,
+  which turns the plot into a full estimation plot through
   [`estimation_plot()`](https://pablobernabeu.github.io/depictr/reference/estimation_plot.md).
   The return value is then a 'patchwork' object. Defaults to `FALSE`,
   the plain group-means plot.
 
 - reference:
 
-  Reference group for the difference panel when `differences = TRUE`;
-  defaults to the first level of `group`. Ignored otherwise.
+  Reference group for the difference panel when `differences = TRUE`.
+  Defaults to the first level of `group`. Ignored otherwise.
 
 - n_boot:
 
@@ -78,7 +78,7 @@ group_comparison_plot(
 
 - palette:
 
-  Colours for the groups; defaults to
+  Colours for the groups. Defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
 
 - title, x_lab, y_lab:

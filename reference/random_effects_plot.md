@@ -1,8 +1,8 @@
 # Caterpillar plot of random effects
 
-Displays the conditional modes ("BLUPs") of a mixed model's random
-effects as a sorted point-and-interval ("caterpillar") plot. It is the
-usual way to inspect by-group departures from the average, and to
+Displays the conditional modes (BLUPs) of a mixed model's random effects
+as a sorted point-and-interval plot, known as a caterpillar plot. It is
+the usual way to inspect by-group departures from the average and to
 identify unusual groups. When the plot holds more than 30 distinct level
 names across all its panels, the names and their tick marks are left off
 the y-axis, since they would overlap. Add
@@ -27,16 +27,17 @@ random_effects_plot(
 - x:
 
   Either a mixed model fitted with 'lme4' (`merMod`), or a data frame
-  with one row per group level and columns such as `level`/`group`,
-  `estimate`, and either `conf.low`/`conf.high` or `std.error`. An
-  optional `term` column facets the plot. A model may have several
-  grouping factors and several terms per factor, correlated or not. The
-  forms `(1 + x | g)`, `(1 + x || g)` and `(1 | g) + (0 + x | g)` are
-  all drawn. The intervals are the conditional modes plus or minus the
-  normal quantile times the conditional standard deviations that
+  with one row per group level and columns such as `level` or `group`
+  for the level, `estimate` for the estimate and either `conf.low` and
+  `conf.high` or `std.error` for the interval. An optional `term` column
+  facets the plot. A model may have several grouping factors and several
+  terms per factor, correlated or not. The forms `(1 + x | g)`,
+  `(1 + x || g)` and `(1 | g) + (0 + x | g)` are all drawn. The
+  intervals are the conditional modes plus or minus the normal quantile
+  times the conditional standard deviations that
   `lme4::ranef(condVar = TRUE)` reports. A model with one term in all is
-  drawn in a single panel labelled "Random effect", and otherwise each
-  term has a panel labelled "factor: term".
+  drawn in a single panel labelled 'Random effect', and otherwise each
+  term has a panel labelled 'factor: term'.
 
 - conf_level:
 

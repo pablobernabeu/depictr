@@ -29,7 +29,7 @@ decompose_plot(
 
 - frequency:
 
-  Number of observations per period (e.g. 12 for monthly data); taken
+  Number of observations per period, such as 12 for monthly data. Taken
   from `x` when it is a `ts`.
 
 - method:
@@ -44,7 +44,7 @@ decompose_plot(
   For `method = "stl"`, whether to fit a robust STL
   ([`stats::stl()`](https://rdrr.io/r/stats/stl.html) with
   `robust = TRUE`), which down-weights outliers in the loess fits so
-  that an unusual point bleeds less into the trend and seasonal
+  that an unusual point has less influence on the trend and seasonal
   components. Ignored for the classical method.
 
 - s_window:
@@ -83,9 +83,8 @@ A 'patchwork' object (printable like a
 The trend confidence ribbon is a pragmatic normal-approximation band:
 `trend +/- z * sd(remainder)`, where `z = qnorm((1 + level) / 2)` and
 the remainder standard deviation is computed on the non-missing
-remainder values. It conveys the scale of the unexplained variation
-around the smoothed trend rather than a formal sampling-distribution
-interval.
+remainder values. It shows the scale of the unexplained variation around
+the smoothed trend and is not a formal sampling-distribution interval.
 
 ## References
 

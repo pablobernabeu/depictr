@@ -7,9 +7,9 @@ instead splits the data into equal-count bins of fitted values and
 plots, for each bin, the mean residual against the mean fitted value,
 inside a grey band of \\\pm 2\\ standard errors of that mean. Under a
 well-specified model, the binned residuals scatter around zero, and
-about 95% of them should fall within the band. Systematic departures (a
-trend, or many points outside the band) indicate a misspecified mean
-structure.
+about 95% of them should fall within the band. Systematic departures,
+such as a trend or many points outside the band, indicate a misspecified
+mean structure.
 
 ## Usage
 
@@ -35,7 +35,8 @@ binned_residual_plot(
 - bins:
 
   Number of bins. The default follows Gelman and Hill's rule of thumb of
-  roughly \\\sqrt{n}\\ bins (bounded to a sensible range).
+  about \\\sqrt{n}\\ bins, rounded down and kept between 2 and half the
+  number of observations.
 
 - type:
 
@@ -79,17 +80,17 @@ the \\n_b\\ residuals in bin \\b\\ the standard error \\\sqrt{\sum\_{i
 \hat\mu_i) \sqrt{w_i / V(\hat\mu_i)}\\, then has variance \\\phi\\, so
 its bin mean has standard error \\\sqrt{\phi / n_b}\\. The fit absorbs a
 little of each observation's variance, so a residual varies slightly
-less than this and the band errs on the wide side. Observations with
+less than this, and the band is slightly too wide. Observations with
 zero prior weight take no part in the fit and are left out of the bins.
 
 `band = "empirical"` draws the band that `arm::binnedplot()` draws:
 twice the standard deviation of the residuals in the bin, divided by
-\\\sqrt{n_b}\\. It collapses wherever the outcomes in a bin are all
-alike. The residuals in a logistic model's bin without events all lie
-just below zero, so its band nearly vanishes and the bin is flagged.
-Where events are rare, such bins are what the model expects. The example
-below, a correctly specified model, has five of its seventeen bins
-flagged by that band and none by the model's.
+\\\sqrt{n_b}\\. It shrinks to almost nothing wherever the outcomes in a
+bin are all alike. The residuals in a logistic model's bin without
+events all lie just below zero, so its band nearly vanishes and the bin
+is flagged. Where events are rare, such bins are what the model expects.
+The example below, a correctly specified model, has five of its
+seventeen bins flagged by that band and none by the model's.
 
 ## References
 

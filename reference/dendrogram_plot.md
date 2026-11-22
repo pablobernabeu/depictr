@@ -1,11 +1,11 @@
 # Dendrogram
 
-Hierarchical-clustering dendrogram, drawn with ggplot2 so it shares the
-package theme. Accepts a data frame (the distance matrix and clustering
-are computed for you), a
-[stats::dist](https://rdrr.io/r/stats/dist.html) object, or an
+Hierarchical-clustering dendrogram, drawn with ggplot2 so that it shares
+the package theme. Accepts a data frame (from which the distance matrix
+and clustering are computed), a
+[stats::dist](https://rdrr.io/r/stats/dist.html) object or an
 [stats::hclust](https://rdrr.io/r/stats/hclust.html) object. Optionally
-cut the tree into `k` clusters, colouring the leaf labels and drawing
+cuts the tree into `k` clusters, colouring the leaf labels and drawing
 the cut height.
 
 ## Usage
@@ -29,7 +29,7 @@ dendrogram_plot(
 
 - x:
 
-  A data frame, a `dist` object, or an `hclust` object.
+  A data frame, a `dist` object or an `hclust` object.
 
 - cols:
 
@@ -47,8 +47,8 @@ dendrogram_plot(
 
 - scale:
 
-  Whether to scale variables before computing distances (data frame
-  input).
+  Whether to scale variables before computing distances, for data frame
+  input.
 
 - k:
 
@@ -63,14 +63,14 @@ dendrogram_plot(
 
   Whether to print the leaf labels. `NULL` (the default) chooses
   automatically: labels are shown for small trees (up to 40 leaves) and
-  suppressed for larger ones, where they would otherwise collapse into
-  an unreadable smear. `TRUE`/`FALSE` force them on or off. When labels
-  are hidden and `k` is set, the cluster membership is instead conveyed
-  by a coloured strip of leaf ticks along the bottom of the tree.
+  left out of larger ones, where they would overlap and be unreadable.
+  `TRUE` or `FALSE` forces them on or off. When labels are hidden and
+  `k` is set, a coloured strip of leaf ticks along the bottom of the
+  tree shows the cluster membership.
 
 - palette:
 
-  Colours for the `k` clusters; defaults to
+  Colours for the `k` clusters. Defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
 
 - title:

@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">depictr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,19 +86,19 @@
 
     
     
-<p>depictr provides a small, consistent set of time-series plots. The
-examples use the bundled <code>monthly_sales</code> dataset: two product
-lines (<code>indoor</code> and <code>outdoor</code>), each with six
-years of monthly observations carrying a trend, a twelve-month seasonal
-cycle and noise.</p>
+<p>depictr provides a small set of time-series plots. The examples use
+the bundled <code>monthly_sales</code> dataset: two product lines
+(<code>indoor</code> and <code>outdoor</code>), each with six years of
+monthly observations carrying a trend, a twelve-month seasonal cycle and
+noise.</p>
 <div class="section level2">
 <h2 id="plotting-one-or-several-series">Plotting one or several series<a class="anchor" aria-label="anchor" href="#plotting-one-or-several-series"></a>
 </h2>
 <p><code><a href="../reference/timeseries_plot.html">timeseries_plot()</a></code> accepts a <code>ts</code> object, a
 numeric vector or a data frame with time, value and (optionally) group
 columns. Passing the long-form data frame with a grouping column draws
-both series at once, each in its own colour, and a moving-average
-overlay is one argument away.</p>
+both series at once, each in its own colour, and the
+<code>rolling</code> argument adds a moving-average overlay.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/timeseries_plot.html">timeseries_plot</a></span><span class="op">(</span><span class="va">monthly_sales</span>, time <span class="op">=</span> <span class="va">date</span>, value <span class="op">=</span> <span class="va">sales</span>, group <span class="op">=</span> <span class="va">series</span>,</span>
 <span>                rolling <span class="op">=</span> <span class="fl">12</span>, title <span class="op">=</span> <span class="st">"Monthly sales by product line"</span>,</span>
@@ -109,7 +109,7 @@ average that the caption names <span class="citation">(<a href="#ref-hyndman2021
 3.3</a>)</span>. It is a twelve-month average followed by a two-month
 one, which centres it on each month.</p>
 <p>For the single-series views (decomposition, autocorrelation, the
-seasonal plot and forecasting) we extract one line as a monthly
+seasonal plot and forecasting), we extract one line as a monthly
 <code>ts</code> object of frequency 12.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">indoor</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">monthly_sales</span>, <span class="va">series</span> <span class="op">==</span> <span class="st">"indoor"</span><span class="op">)</span></span>
@@ -122,9 +122,9 @@ seasonal plot and forecasting) we extract one line as a monthly
 <p><code><a href="../reference/decompose_plot.html">decompose_plot()</a></code> separates a seasonal series into trend,
 seasonal and remainder components. Use <code>method = "stl"</code> (the
 default, loess-based) or <code>method = "classical"</code>. Setting
-<code>confidence = TRUE</code> shades a band around the smoothed trend,
-from the spread of the remainder, so the scale of the unexplained
-variation is visible rather than implied by the line alone.</p>
+<code>confidence = TRUE</code> shades a band around the smoothed trend.
+The band’s width comes from the spread of the remainder and shows the
+scale of the unexplained variation.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/decompose_plot.html">decompose_plot</a></span><span class="op">(</span><span class="va">indoor_ts</span>, confidence <span class="op">=</span> <span class="cn">TRUE</span>, title <span class="op">=</span> <span class="st">"Indoor sales, decomposed"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="time-series_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="672"></p>
@@ -150,10 +150,12 @@ of passengers.</p>
 <div class="section level2">
 <h2 id="autocorrelation">Autocorrelation<a class="anchor" aria-label="anchor" href="#autocorrelation"></a>
 </h2>
-<p><code><a href="../reference/acf_plot.html">acf_plot()</a></code> draws the autocorrelation (or, with
-<code>type = "partial"</code>, the partial autocorrelation) function,
-with approximate significance bounds. The spikes at multiples of twelve
-are the annual seasonality.</p>
+<p><code><a href="../reference/acf_plot.html">acf_plot()</a></code> draws the autocorrelation function or, with
+<code>type = "partial"</code>, the partial autocorrelation function,
+each with approximate significance bounds. For the 72-month indoor
+series, the default lags run from 1 to 18. The annual seasonality shows
+as a wave in the autocorrelation, which dips near lag six and rises
+again near lag twelve, the only multiple of twelve in that range.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/acf_plot.html">acf_plot</a></span><span class="op">(</span><span class="va">indoor_ts</span><span class="op">)</span></span></code></pre></div>
 <p><img src="time-series_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="672"></p>
@@ -166,16 +168,15 @@ are the annual seasonality.</p>
 </h2>
 <p><code><a href="../reference/seasonal_plot.html">seasonal_plot()</a></code> draws a seasonal-subseries (cycle) plot:
 one small panel per month, with the value traced across successive years
-and a reference line at each month’s mean. This shows the seasonal shape
-(differences <em>between</em> panels) and the year-on-year trend within
-each month (the slope <em>inside</em> each panel) at the same time,
-something a single overlaid line cannot do.</p>
+and a reference line at each month’s mean. The differences between
+panels show the seasonal shape, and the slope inside each panel shows
+the year-on-year trend within that month. A single overlaid line cannot
+show both at once.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/seasonal_plot.html">seasonal_plot</a></span><span class="op">(</span><span class="va">indoor_ts</span>, title <span class="op">=</span> <span class="st">"Indoor sales: monthly subseries"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="time-series_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="672"></p>
-<p>With <code>style = "season"</code> every year becomes its own line
-over the months on a shared axis, which is handy for spotting an unusual
-year.</p>
+<p>For spotting an unusual year, <code>style = "season"</code> draws
+every year as its own line over the months on a shared axis.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/seasonal_plot.html">seasonal_plot</a></span><span class="op">(</span><span class="va">indoor_ts</span>, style <span class="op">=</span> <span class="st">"season"</span>,</span>
 <span>              title <span class="op">=</span> <span class="st">"Indoor sales: one line per year"</span><span class="op">)</span></span></code></pre></div>
@@ -201,10 +202,10 @@ widen with the horizon <span class="citation">(<a href="#ref-hyndman2021">Hyndma
 4 2024.250 359.1704 308.6539 409.6869
 5 2024.333 351.7003 294.8458 408.5547
 6 2024.417 346.0037 283.3144 408.6930</code></pre>
-<p>Passing an integer horizon straight to <code><a href="../reference/timeseries_plot.html">timeseries_plot()</a></code>
-overlays that forecast on the history: the point forecast continues the
-line and the shaded ribbon shows the (growing) 90% prediction interval,
-named in the caption.</p>
+<p>Passing an integer horizon to <code><a href="../reference/timeseries_plot.html">timeseries_plot()</a></code> overlays
+that forecast on the history. The point forecast continues the line, and
+the shaded ribbon shows the widening 90% prediction interval that the
+caption names.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/timeseries_plot.html">timeseries_plot</a></span><span class="op">(</span><span class="va">indoor_ts</span>, forecast <span class="op">=</span> <span class="fl">18</span>, level <span class="op">=</span> <span class="fl">0.9</span>,</span>
 <span>                title <span class="op">=</span> <span class="st">"Indoor sales with an 18-month forecast"</span>,</span>
@@ -218,19 +219,19 @@ their level, the nominal 95% band covered 92% of one-step-ahead
 outcomes. From three to 12 steps ahead, it covered 99%. The band
 therefore runs somewhat narrow at the shortest horizons and wide further
 out, where the uncertainty of a random walk keeps growing while these
-series stay close to their trend. When the swing does grow with the
-level, as it does for <code>AirPassengers</code>, set
-<code>lambda = 0</code> to forecast the logarithm. The forecast comes
-back on the original scale, where the point forecast is the median of
-the forecast distribution <span class="citation">(<a href="#ref-hyndman2021">Hyndman &amp; Athanasopoulos, 2021, Section
-5.6</a>)</span>.</p>
+series stay close to their trend.</p>
+<p>When the swing does grow with the level, as it does for
+<code>AirPassengers</code>, set <code>lambda = 0</code> to forecast the
+logarithm. The forecast comes back on the original scale, where the
+point forecast is the median of the forecast distribution <span class="citation">(<a href="#ref-hyndman2021">Hyndman &amp;
+Athanasopoulos, 2021, Section 5.6</a>)</span>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/timeseries_plot.html">timeseries_plot</a></span><span class="op">(</span><span class="va">AirPassengers</span>, forecast <span class="op">=</span> <span class="fl">24</span>, level <span class="op">=</span> <span class="fl">0.9</span>, lambda <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>                title <span class="op">=</span> <span class="st">"Air passengers with a 24-month forecast"</span>,</span>
 <span>                y_lab <span class="op">=</span> <span class="st">"Passengers"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="time-series_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="672"></p>
-<p>For a different model, fit it yourself (for example with
-<code><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast::forecast()</a></code>) and pass the resulting
+<p>For a different model, fit it yourself, for example with
+<code><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast::forecast()</a></code>, and pass the resulting
 <code>time</code>/<code>fit</code>/<code>lwr</code>/<code>upr</code>
 columns to <code>timeseries_plot(forecast = )</code> as a data
 frame.</p>

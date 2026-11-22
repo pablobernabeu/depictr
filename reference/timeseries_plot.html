@@ -15,7 +15,7 @@ several columns gives one series per column, named after its column."><meta prop
 
     <a class="navbar-brand me-2" href="../index.html">depictr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -123,11 +123,11 @@ the window.</p></dd>
 
 
 <dt id="arg-forecast">forecast<a class="anchor" aria-label="anchor" href="#arg-forecast"></a></dt>
-<dd><p>Optional forecast overlay for a single (non-grouped) series.
+<dd><p>Optional forecast overlay for a single, ungrouped series.
 Either an integer horizon (number of future steps) to forecast with the
 built-in STL plus random walk with drift (see <code><a href="ts_forecast.html">ts_forecast()</a></code>), or a
 pre-computed forecast supplied as a data frame with columns <code>time</code>, <code>fit</code>
-and (optionally) <code>lwr</code>/<code>upr</code>, for instance from a fitted
+and, optionally, <code>lwr</code> and <code>upr</code>, for instance from a fitted
 <code><a href="https://generics.r-lib.org/reference/forecast.html" class="external-link">forecast::forecast()</a></code> object. The point forecast continues the line and a
 shaded prediction-interval ribbon is drawn behind it. The built-in
 forecast is captioned with its coverage and method, and its band widens
@@ -144,8 +144,8 @@ numeric <code>x</code> to a <code>ts</code> when an integer <code>forecast</code
 
 
 <dt id="arg-level">level<a class="anchor" aria-label="anchor" href="#arg-level"></a></dt>
-<dd><p>Prediction-interval coverage for the built-in forecast (a single
-number strictly between 0 and 1, e.g. <code>0.95</code>).</p></dd>
+<dd><p>Prediction-interval coverage for the built-in forecast, a single
+number strictly between 0 and 1, such as <code>0.95</code>.</p></dd>
 
 
 <dt id="arg-lambda">lambda<a class="anchor" aria-label="anchor" href="#arg-lambda"></a></dt>
@@ -155,7 +155,7 @@ series whose seasonal swing grows with its level.</p></dd>
 
 
 <dt id="arg-palette">palette<a class="anchor" aria-label="anchor" href="#arg-palette"></a></dt>
-<dd><p>Colours for the groups; defaults to <code><a href="depictr_palette.html">depictr_palette()</a></code>.</p></dd>
+<dd><p>Colours for the groups. Defaults to <code><a href="depictr_palette.html">depictr_palette()</a></code>.</p></dd>
 
 
 <dt id="arg-point">point<a class="anchor" aria-label="anchor" href="#arg-point"></a></dt>

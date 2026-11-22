@@ -1,6 +1,6 @@
 # Bar chart of a categorical variable
 
-Counts (or proportions) of the levels of a categorical variable,
+Counts or proportions of the levels of a categorical variable,
 optionally split by a grouping variable.
 
 ## Usage
@@ -59,12 +59,13 @@ explore_categorical(
 
 - palette:
 
-  Colours for the groups; defaults to
+  Colours for the groups. Defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
 
 - title, x_lab:
 
-  Plot title and category-axis label (defaults to the variable name).
+  Plot title and category-axis label, which defaults to the variable
+  name.
 
 ## Value
 
@@ -75,9 +76,9 @@ object.
 
 A continuous numeric column (more than 20 distinct values) is rejected
 with an error, since coercing it to a factor would draw one bar per
-value; use
+value. Use
 [`explore_distribution()`](https://pablobernabeu.github.io/depictr/reference/explore_distribution.md)
-for such variables instead.
+for such variables.
 
 ## Examples
 

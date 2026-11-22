@@ -1,8 +1,7 @@
 # Multivariate analysis and survival
 
-Beyond regression, depictr covers three staples of applied data
-analysis: principal component analysis, clustering (with quality
-diagnostics) and survival curves.
+Beyond regression, depictr covers principal component analysis,
+clustering (with quality diagnostics) and survival curves.
 
 ## Principal component analysis
 
@@ -44,9 +43,9 @@ pca_plot(pc, components = c(1, 3))
 ## Clustering
 
 [`cluster_plot()`](https://pablobernabeu.github.io/depictr/reference/cluster_plot.md)
-runs k-means and shows the clusters on the first two principal
-components (so it works for any number of variables), with convex hulls
-and labelled centroids.
+runs k-means and shows the clusters, with convex hulls and labelled
+centroids, on the first two principal components, so it works for any
+number of variables.
 [`dendrogram_plot()`](https://pablobernabeu.github.io/depictr/reference/dendrogram_plot.md)
 draws a hierarchical-clustering tree and can cut it into `k` groups.
 
@@ -72,12 +71,12 @@ dendrogram_plot(region_means[-1], k = 2, title = "Regions clustered")
 
 ## Choosing the number of clusters
 
-Choosing `k` should not be guesswork.
 [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
 evaluates a cluster-quality criterion across a range of `k` and suggests
-a value, using the average silhouette width (the default, after
-[Rousseeuw, 1987](#ref-rousseeuw1987)), the within-sum-of-squares elbow
-or the gap statistic ([Tibshirani et al., 2001](#ref-tibshirani2001)).
+a value. The criterion is the average silhouette width (the default,
+after [Rousseeuw, 1987](#ref-rousseeuw1987)), the within-sum-of-squares
+elbow or the gap statistic ([Tibshirani et al.,
+2001](#ref-tibshirani2001)).
 
 ``` r
 
@@ -110,14 +109,14 @@ knitr::kable(attr(kd, "k_table"), digits = 3)
 |   5 |          0.227 |
 |   6 |          0.213 |
 
-The gap statistic compares the within-cluster dispersion against a null
-reference, so unlike the other two criteria it can also support `k = 1`,
-and its default search starts there. The elbow’s default search starts
-at 1 as well. The elbow is the candidate farthest from the line joining
-the first and last points of the curve, though, so it never picks either
-end of the range. The silhouette width is undefined for a single
-cluster, and its search starts at 2. The reference samples are drawn at
-random, so the chunk is seeded for a reproducible build.
+The silhouette width is undefined for a single cluster, and its search
+starts at 2. The elbow’s default search starts at 1. Because the elbow
+is the candidate farthest from the line joining the first and last
+points of the curve, it never picks either end of the range. The gap
+statistic compares the within-cluster dispersion against a null
+reference, so, unlike the other two criteria, it can also support
+`k = 1`, and its default search starts there. It draws its reference
+samples at random, so the chunk is seeded for a reproducible build.
 
 ``` r
 
@@ -127,16 +126,17 @@ k_diagnostic(crop_yield, cols = num, method = "gap")
 
 ![](multivariate-and-survival_files/figure-html/unnamed-chunk-8-1.png)
 
-The verdict is `k = 1`, which is worth taking seriously: the
-three-cluster partition drawn above is a description imposed on the data
-rather than evidence of groups within it.
+The gap statistic suggests `k = 1`, so the three-cluster partition drawn
+above is a description imposed on the data rather than evidence of
+groups within it.
 
 [`silhouette_plot()`](https://pablobernabeu.github.io/depictr/reference/silhouette_plot.md)
-then shows the quality of an actual clustering, one bar per observation
-grouped by cluster, with the average silhouette width per cluster and
-overall (the dashed line). Wide positive bars are well-placed
-observations, and a bar below zero marks an observation that sits closer
-to a neighbouring cluster than to its own.
+shows the quality of a given clustering, with one bar per observation
+grouped by cluster. It labels the average silhouette width of each
+cluster and draws the overall average as a dashed line. Wide positive
+bars are well-placed observations, and a bar below zero marks an
+observation that may belong to a neighbouring cluster, because it sits
+closer to that cluster than to its own.
 
 ``` r
 
@@ -153,8 +153,8 @@ The overall average here is 0.24, and only six of the two hundred bars
 fall below zero, none of them by much. Kaufman and Rousseeuw’s
 ([1990](#ref-kaufman1990)) rough guide treats an average at or below
 0.25 as no substantial structure, so this figure agrees with the gap
-statistic: k-means returns clusters whether or not the data contains
-any, and the silhouette is one way of asking which case you are in.
+statistic. Since k-means returns clusters whether or not the data
+contains any, the silhouette is one way of asking which case you are in.
 
 The same diagnostics apply to the numeric profile of the wellbeing
 survey:
@@ -191,12 +191,12 @@ frame or a
 [`survival::survfit`](https://rdrr.io/pkg/survival/man/survfit.html)
 object, whose limits are recomputed at the requested `conf_level`.
 
-The `clinical_trial` dataset has two arms with a real survival
-difference (the treatment arm has a lower hazard), so the curves
-separate. Turning on the three publication annotations gives a
-survminer-style figure: a number-at-risk table beneath the curves, the
-log-rank test of the difference as a subtitle and dashed guides to the
-median survival of each arm whose curve reaches 0.5. A survival curve is
+In the `clinical_trial` dataset, the treatment arm has a lower hazard
+than the placebo arm, so the curves separate. Turning on the three
+publication annotations gives a survminer-style figure. The annotations
+are a number-at-risk table beneath the curves, the log-rank test of the
+difference as a subtitle and dashed guides to the median survival of
+each arm whose curve reaches 0.5. A survival curve is
 monotone-decreasing, so its bottom-left corner is always empty, and
 `legend_inside = TRUE` puts the group legend there.
 
@@ -215,7 +215,7 @@ The log-rank p-value is tiny. Median survival on placebo is 18.2 months,
 while the treatment arm’s curve stays above 0.5 to the 36-month study
 end, so its median is not reached and it gets no guide. Because its
 event times are longer, that arm is also more often right-censored at
-the study end, visible as the denser run of censoring marks.
+the study end, and its curve shows a denser run of censoring marks.
 
 ## References
 
@@ -223,8 +223,8 @@ Borgan, Ø., & Liestøl, K. (1990). A note on confidence intervals and
 bands for the survival function based on transformations. *Scandinavian
 Journal of Statistics*, *17*(1), 35–41.
 
-Greenwood, M. (1926). *The natural duration of cancer* (Vol. 33, pp.
-1–26). His Majesty’s Stationery Office.
+Greenwood, M. (1926). *A report on the natural duration of cancer* (Vol.
+33, pp. 1–26). His Majesty’s Stationery Office.
 
 Kaplan, E. L., & Meier, P. (1958). Nonparametric estimation from
 incomplete observations. *Journal of the American Statistical

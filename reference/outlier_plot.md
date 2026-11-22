@@ -1,8 +1,8 @@
-# Box / violin plot highlighting outliers
+# Box and violin plots highlighting outliers
 
-Shows the distribution of a numeric variable (optionally by group) as a
-box and/or violin plot, with points beyond the 1.5 \* IQR fences
-highlighted so that outliers are easy to spot before modelling.
+Shows the distribution of a numeric variable, optionally by group, as a
+box plot, a violin plot or both, with points beyond the 1.5 \* IQR
+fences highlighted so that outliers are easy to spot before modelling.
 
 ## Usage
 
@@ -52,7 +52,7 @@ outlier_plot(
 
 - palette:
 
-  Colours for the groups; defaults to
+  Colours for the groups. Defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
 
 - title, y_lab:

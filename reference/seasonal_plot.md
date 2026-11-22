@@ -1,13 +1,13 @@
 # Seasonal-subseries (cycle) plot
 
-Draws a seasonal-subseries plot (also called a cycle plot): the series
-is split into one small panel per season (e.g. one panel per calendar
-month for monthly data), and within each panel the value is drawn across
-successive cycles (e.g. across years). A horizontal reference line in
-every panel marks that season's mean. This makes the seasonal pattern
-(differences *between* panels) and the within-season trend over time
-(the slope *inside* each panel) visible at the same time, which a single
-overlaid line cannot show.
+Draws a seasonal-subseries plot, also called a cycle plot: the series is
+split into one small panel per season, such as one panel per calendar
+month for monthly data, and within each panel, the value is drawn across
+successive cycles, such as years. A horizontal reference line in every
+panel marks that season's mean. The plot shows the seasonal pattern (the
+differences between panels) and the within-season trend over time (the
+slope inside each panel) at the same time, which a single overlaid line
+cannot show.
 
 ## Usage
 
@@ -36,7 +36,7 @@ seasonal_plot(
 
 - frequency:
 
-  Number of observations per period (e.g. 12 for monthly data); taken
+  Number of observations per period, such as 12 for monthly data. Taken
   from `x` when it is a `ts`. A frequency that is not a whole number,
   such as the 365.25 / 7 of weekly data, is rounded down to whole
   seasons, as [`stats::stl()`](https://rdrr.io/r/stats/stl.html) rounds
@@ -51,9 +51,9 @@ seasonal_plot(
 - season_labels:
 
   Optional character vector of length `frequency` giving the season
-  (panel/axis) labels, e.g. `month.abb`. When `NULL` (default) sensible
-  labels are inferred (month abbreviations for frequency 12, quarter
-  labels for frequency 4, otherwise the season index).
+  labels of the panels or the axis, such as `month.abb`. When `NULL`
+  (the default), labels are inferred: month abbreviations for frequency
+  12, quarter labels for frequency 4 and the season index otherwise.
 
 - means:
 
@@ -85,17 +85,17 @@ object.
 
 ## Details
 
-Two layouts are offered. With `style = "subseries"` (the default) the
+Two layouts are offered. With `style = "subseries"` (the default), the
 panels are faceted side by side, each tracing one season across cycles:
 the classic Cleveland cycle plot, matching `feasts::gg_subseries()`.
-With `style = "season"` every cycle is drawn as its own line over the
+With `style = "season"`, every cycle is drawn as its own line over the
 seasons on a shared axis (the seasonal-plot layout of
 [`forecast::ggseasonplot()`](https://pkg.robjhyndman.com/forecast/reference/seasonplot.html)),
-which is handy for spotting an unusual year. The lines run from a mid
-blue for the first cycle to a dark blue for the last, so they read in
-time order. Past about six cycles, neighbouring cycles take colours too
-close to tell apart, and the colours then show the order of the cycles
-more than which is which. When individual cycles must be told apart, use
+which helps to spot an unusual year. The lines run from a mid blue for
+the first cycle to a dark blue for the last, so they read in time order.
+Past about six cycles, neighbouring cycles take colours too close to
+tell apart, and the colours then show the order of the cycles more than
+which is which. When individual cycles must be told apart, use
 `style = "subseries"`, where each cycle keeps its own place on the axis
 of every panel, or plot fewer cycles.
 

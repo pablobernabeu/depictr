@@ -1,9 +1,11 @@
 # NA
 
-**What does this change do?** A short description, and a link to the
-issue it addresses if there is one.
+### What does this change do?
 
-**Checklist**
+A short description, and a link to the issue it addresses if there is
+one.
+
+### Checklist
 
 `devtools::document()` has been run if the roxygen comments changed.
 

@@ -1,7 +1,7 @@
 # Plot a two-way interaction of predicted values
 
 Shows how the predicted relationship between a focal predictor and the
-response changes across the levels (or representative values) of a
+response changes across the levels, or representative values, of a
 second, moderating predictor. Other predictors are held at typical
 values.
 
@@ -27,18 +27,18 @@ interaction_plot(
 
 - model:
 
-  A fitted model (`lm`, `glm`, `merMod`, ...).
+  A fitted model, such as an `lm`, `glm` or `merMod`.
 
 - predictor:
 
-  Name of the focal predictor on the x-axis (string), given as in
+  Name of the focal predictor on the x-axis, as a string, given as in
   [`effects_plot()`](https://pablobernabeu.github.io/depictr/reference/effects_plot.md):
   `"log(rainfall)"` means `rainfall`.
 
 - moderator:
 
-  Name of the moderating predictor, mapped to colour (string), given in
-  the same way as `predictor`. It must be a different variable.
+  Name of the moderating predictor, mapped to colour, as a string given
+  in the same way as `predictor`. It must be a different variable.
 
 - moderator_values:
 
@@ -48,7 +48,7 @@ interaction_plot(
 
 - conf_level:
 
-  Confidence level for the bands/intervals, a single number strictly
+  Confidence level for the bands and intervals, a single number strictly
   between 0 and 1.
 
 - n:
@@ -57,11 +57,11 @@ interaction_plot(
 
 - band:
 
-  Whether to draw confidence bands (numeric focal predictor).
+  Whether to draw confidence bands for a numeric focal predictor.
 
 - palette:
 
-  Colours for the moderator; defaults to
+  Colours for the moderator. Defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
 
 - title, x_lab, y_lab:

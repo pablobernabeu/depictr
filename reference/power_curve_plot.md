@@ -4,8 +4,8 @@ Draws statistical power against sample size, with a dashed line at a
 target power (80% by default). The input is usually a power curve
 produced by
 [`simr::powerCurve()`](https://rdrr.io/pkg/simr/man/powerCurve.html),
-though a tidy data frame works equally well, allowing the plot to be
-redrawn without repeating a power simulation that is often slow to run.
+though a tidy data frame works equally well, so the plot can be redrawn
+without repeating a power simulation that is often slow to run.
 
 ## Usage
 
@@ -35,9 +35,9 @@ power_curve_plot(
 
   A `powerCurve` object from 'simr', or a data frame with a sample size
   column (`n`, `nlevels`, `x`, `sample_size` or `n_subject`), a power
-  column (`power`, `mean` or `p`), and optional confidence limits
-  (`<power>_lo`/`<power>_hi`, `lower`/`upper`, `ci_low`/`ci_high` or
-  `conf.low`/`conf.high`).
+  column (`power`, `mean` or `p`) and optional confidence limits
+  (`<power>_lo` and `<power>_hi`, `lower` and `upper`, `ci_low` and
+  `ci_high` or `conf.low` and `conf.high`).
 
 - target:
 
@@ -94,7 +94,7 @@ power_curve_plot(
 
 - y_lab:
 
-  Y-axis label. By default, "Power" when the power column is one of the
+  Y-axis label. By default, 'Power' when the power column is one of the
   names listed under `x`, and the column's name otherwise.
 
 - solved:

@@ -19,8 +19,8 @@ palette_safety(colours = NULL, threshold = 5, metric = c("ciede2000", "cie76"))
 - colours:
 
   The palette to test. Defaults to the depictr qualitative palette.
-  Needs at least two colours: a pairwise distance over fewer than two
-  has no value, rather than an infinitely safe one.
+  Needs at least two colours, since fewer than two have no pairwise
+  distance.
 
 - threshold:
 
@@ -29,9 +29,10 @@ palette_safety(colours = NULL, threshold = 5, metric = c("ciede2000", "cie76"))
 - metric:
 
   The colour difference to measure: `"ciede2000"`, the default, or
-  `"cie76"`, the Euclidean distance in CIELAB. `"cie76"` is kept so that
-  results computed with it can be reproduced, and a later release will
-  remove it.
+  `"cie76"`, the Euclidean distance in CIELAB. `"cie76"` is deprecated
+  and gives a warning once per session. It is kept so that results
+  computed with it can be reproduced, and a later release will remove
+  it.
 
 ## Value
 
@@ -54,13 +55,13 @@ The default `threshold` of 5 is calibrated against the built-in palette
 of
 [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md),
 which is based on the Okabe-Ito set with the brand blue and a grey in
-place of its blue and black. That palette's tightest pair (reddish
-purple against grey) sits at 6.43 under full deuteranopia, so the cut
-must lie below that to pass the built-in palette, while still flagging
-colours that become near-identical under a deficiency. The difference
-includes lightness, which survives colour-vision deficiency, so two
-colours that share a hue but differ in lightness are correctly treated
-as distinguishable. Full severity is the worst case; most colour-vision
+place of its blue and black. That palette's closest pair (reddish purple
+against grey) is 6.43 apart under full deuteranopia, so the cut must lie
+below that to pass the built-in palette, while still flagging colours
+that become near-identical under a deficiency. The difference includes
+lightness, which survives colour-vision deficiency, so two colours that
+share a hue but differ in lightness are correctly treated as
+distinguishable. Full severity is the worst case, and most colour-vision
 deficiency is milder.
 
 This looks at a palette in the abstract. To audit a finished figure,
@@ -108,7 +109,7 @@ palette_safety()
 #> [1] 5
 #> 
 
-# Two colours a hair apart are flagged.
+# Two nearly identical colours are flagged.
 palette_safety(c("#005b96", "#015c97"))
 #> $min_delta_e
 #> [1] 0.34
@@ -130,10 +131,8 @@ palette_safety(c("#005b96", "#015c97"))
 #> [1] 5
 #> 
 
-# ggplot2's default palette of five colours, which passes under CIE76.
+# ggplot2's default palette of five colours fails under CIEDE2000.
 hue5 <- c("#F8766D", "#A3A500", "#00BF7D", "#00B0F6", "#E76BF3")
 palette_safety(hue5)$safe
 #> [1] FALSE
-palette_safety(hue5, metric = "cie76")$safe
-#> [1] TRUE
 ```

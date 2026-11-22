@@ -3,10 +3,9 @@
 Assembles a compact, consistent overview of a fitted model in a single
 figure: the coefficient estimates, the predicted effect of a focal
 predictor, a residual panel and a normal Q-Q plot, with a subtitle of
-key fit statistics. It is a convenience wrapper that composes several
-depictr plots with
-[`arrange_plots()`](https://pablobernabeu.github.io/depictr/reference/arrange_plots.md),
-and serves well for a rapid model review or a report appendix.
+key fit statistics. It composes several depictr plots with
+[`arrange_plots()`](https://pablobernabeu.github.io/depictr/reference/arrange_plots.md)
+and suits a quick model review or a report appendix.
 
 ## Usage
 
@@ -32,9 +31,9 @@ model_report(
 
   Focal predictor for the effect panel, given as in
   [`effects_plot()`](https://pablobernabeu.github.io/depictr/reference/effects_plot.md).
-  If `NULL`, the first numeric variable in the formula (or, failing
-  that, the first variable) is used, so a model with `log(rainfall)`
-  shows the effect of `rainfall`.
+  If `NULL`, the first numeric variable in the formula, or failing that
+  the first variable, is used, so a model with `log(rainfall)` shows the
+  effect of `rainfall`.
 
 - standardise:
 

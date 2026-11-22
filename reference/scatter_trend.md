@@ -44,7 +44,7 @@ scatter_trend(
 
   Smoothing method passed to
   [`ggplot2::geom_smooth()`](https://ggplot2.tidyverse.org/reference/geom_smooth.html),
-  e.g. `"lm"`, `"loess"`, or `NULL` for no trend line.
+  such as `"lm"` or `"loess"`, or `NULL` for no trend line.
 
 - se:
 
@@ -56,12 +56,12 @@ scatter_trend(
 
 - palette:
 
-  Colours for the groups; defaults to
+  Colours for the groups. Defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
 
 - title, x_lab, y_lab:
 
-  Title and axis labels (default to variable names).
+  Title and axis labels, which default to the variable names.
 
 ## Value
 

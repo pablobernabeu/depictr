@@ -33,7 +33,7 @@ ts_forecast(x, h = 12, frequency = NULL, level = 0.95, lambda = NULL)
 
 - frequency:
 
-  Number of observations per period; taken from `x` when it is a `ts`.
+  Number of observations per period. Taken from `x` when it is a `ts`.
 
 - level:
 

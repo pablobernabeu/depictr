@@ -59,9 +59,7 @@ the data before it is built would leave the legend keys and any
 colourbar in their original colours, so the legend would no longer match
 the figure.
 
-The figure stays vector graphics, so it can be saved at any size. The
-Python twin's `simulate_figure()` uses the same matrices but rasterises
-the figure and simulates its pixels, so it returns an image.
+The figure stays vector graphics, so it can be saved at any size.
 
 ## References
 

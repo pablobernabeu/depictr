@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">depictr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,11 +48,11 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="depictr-development-version">depictr (development version)<a class="anchor" aria-label="anchor" href="#depictr-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.4.0" id="depictr-040">depictr 0.4.0<a class="anchor" aria-label="anchor" href="#depictr-040"></a></h2><p class="text-muted">CRAN release: 2026-11-22</p>
 <div class="section level3">
-<h3 id="upgrading-from-the-previous-release-development-version">Upgrading from the previous release (0.3.0)<a class="anchor" aria-label="anchor" href="#upgrading-from-the-previous-release-development-version"></a></h3>
+<h3 id="upgrading-from-the-previous-release-0-4-0">Upgrading from the previous release (0.3.0)<a class="anchor" aria-label="anchor" href="#upgrading-from-the-previous-release-0-4-0"></a></h3>
 <div class="section level4">
-<h4 id="changed-results-development-version">Changed results<a class="anchor" aria-label="anchor" href="#changed-results-development-version"></a></h4>
+<h4 id="changed-results-0-4-0">Changed results<a class="anchor" aria-label="anchor" href="#changed-results-0-4-0"></a></h4>
 <ul><li>Confidence intervals for a <code>glm</code> whose dispersion is estimated (Gaussian, Gamma, inverse Gaussian and quasi families) use the t distribution, as <code><a href="https://rdrr.io/r/stats/summary.glm.html" class="external-link">summary.glm()</a></code> does, where they used z and were too narrow. They widen wherever depictr reports or draws them.</li>
 <li>
 <code>coefficient_plot(standardise = TRUE)</code>, and so <code><a href="../reference/model_report.html">model_report()</a></code>, scales continuous inputs by their standard deviation and an interaction through its continuous inputs, leaving factor, logical and two-valued inputs unscaled (Gelman, 2008), where it scaled every model-matrix column, so a contrast depended on group balance.</li>
@@ -128,7 +128,7 @@
 <code><a href="../reference/check_figure.html">check_figure()</a></code> adds a tenth row, <code>annotation_text_size</code>, which holds the text inside the panel, such as annotations, <code><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text()</a></code> labels and the cell values of depictr’s plots, to the size floor, so a figure that passed can fail.</li>
 </ul></div>
 <div class="section level4">
-<h4 id="changed-interface-development-version">Changed interface<a class="anchor" aria-label="anchor" href="#changed-interface-development-version"></a></h4>
+<h4 id="changed-interface-0-4-0">Changed interface<a class="anchor" aria-label="anchor" href="#changed-interface-0-4-0"></a></h4>
 <ul><li>depictr requires ggplot2 3.5.2 or later, where it declared 3.5.0, with which the current patchwork cannot load, and suggests lme4 1.1-19 or later.</li>
 <li>
 <code><a href="../reference/coefficient_plot.html">coefficient_plot()</a></code>, <code><a href="../reference/timeseries_plot.html">timeseries_plot()</a></code> and <code><a href="../reference/decompose_plot.html">decompose_plot()</a></code> take new arguments before <code>title</code>, <code>palette</code> and <code>confidence</code> respectively, so those arguments and the ones after them must be passed by name.</li>
@@ -163,7 +163,7 @@
 <code><a href="../reference/pca_plot.html">pca_plot()</a></code> refuses a misspelt <code>group</code> column, a <code>group</code> vector of the wrong length and a column name passed with a <code>prcomp</code> object, which it read as one level or padded with <code>NA</code>.</li>
 </ul></div>
 <div class="section level4">
-<h4 id="changed-output-development-version">Changed output<a class="anchor" aria-label="anchor" href="#changed-output-development-version"></a></h4>
+<h4 id="changed-output-0-4-0">Changed output<a class="anchor" aria-label="anchor" href="#changed-output-0-4-0"></a></h4>
 <ul><li>
 <code><a href="../reference/coefficient_plot.html">coefficient_plot()</a></code>, <code><a href="../reference/compare_models.html">compare_models()</a></code>, <code><a href="../reference/frequentist_bayesian_plot.html">frequentist_bayesian_plot()</a></code>, <code><a href="../reference/optimizer_fixef_plot.html">optimizer_fixef_plot()</a></code> and the coefficient panel of <code><a href="../reference/model_report.html">model_report()</a></code> label a two-level factor or logical input with its level, as in <code>treatment: enhanced</code>, where they showed <code>treatment</code>. Except in <code><a href="../reference/model_report.html">model_report()</a></code>, <code>labels = c(treatmentenhanced = "treatment")</code> restores an old label.</li>
 <li>In an interaction row, the same functions name the variable and level of every factor, as in <code>rainfall × treatment: enhanced</code>, where they showed <code>rainfall × treatmentenhanced</code>. Except in <code><a href="../reference/model_report.html">model_report()</a></code>, a <code>labels</code> entry for the raw term restores it.</li>
@@ -224,7 +224,7 @@
 </ul></div>
 </div>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-0-4-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-4-0"></a></h3>
 <ul><li>
 <code><a href="../reference/simulate_figure.html">simulate_figure()</a></code> shows a finished ggplot or patchwork, legend and colourbar included, as a reader with a colour-vision deficiency sees it, and returns a gtable to draw or save.</li>
 <li>
@@ -245,7 +245,7 @@
 <code><a href="../reference/ts_forecast.html">ts_forecast()</a></code> and <code><a href="../reference/timeseries_plot.html">timeseries_plot()</a></code> gain <code>lambda</code>, for a Box-Cox or log transformation, and <code><a href="../reference/decompose_plot.html">decompose_plot()</a></code> gains <code>s_window</code>, the STL seasonal window.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="minor-improvements-development-version">Minor improvements<a class="anchor" aria-label="anchor" href="#minor-improvements-development-version"></a></h3>
+<h3 id="minor-improvements-0-4-0">Minor improvements<a class="anchor" aria-label="anchor" href="#minor-improvements-0-4-0"></a></h3>
 <ul><li>
 <code><a href="../reference/posterior_plot.html">posterior_plot()</a></code> and <code><a href="../reference/frequentist_bayesian_plot.html">frequentist_bayesian_plot()</a></code> format each parameter’s label once, and <code><a href="../reference/format_terms.html">format_terms()</a></code> is much faster on long vectors, so a draws object with many draws no longer takes minutes to plot.</li>
 <li>
@@ -260,7 +260,7 @@
 <code><a href="../reference/decompose_plot.html">decompose_plot()</a></code> and <code><a href="../reference/ts_forecast.html">ts_forecast()</a></code> refuse a missing value inside the series with a message that names <code>x</code>, and a series of exactly two cycles gets the package’s own message.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="fixes-development-version">Fixes<a class="anchor" aria-label="anchor" href="#fixes-development-version"></a></h3>
+<h3 id="fixes-0-4-0">Fixes<a class="anchor" aria-label="anchor" href="#fixes-0-4-0"></a></h3>
 <ul><li>
 <code><a href="../reference/estimation_plot.html">estimation_plot()</a></code> and <code>group_comparison_plot(differences = TRUE)</code> work in a fresh R session, where they failed unless patchwork had been loaded.</li>
 <li>
@@ -285,12 +285,12 @@
 <li>On ggplot2 3.5.x, the reference lines of <code><a href="../reference/coefficient_plot.html">coefficient_plot()</a></code>, <code><a href="../reference/frequentist_bayesian_plot.html">frequentist_bayesian_plot()</a></code> and <code><a href="../reference/posterior_plot.html">posterior_plot()</a></code> no longer warn about an unknown <code>inherit.aes</code>.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="deprecated-development-version">Deprecated<a class="anchor" aria-label="anchor" href="#deprecated-development-version"></a></h3>
+<h3 id="deprecated-0-4-0">Deprecated<a class="anchor" aria-label="anchor" href="#deprecated-0-4-0"></a></h3>
 <ul><li>
-<code>metric = "cie76"</code> in <code><a href="../reference/palette_safety.html">palette_safety()</a></code> and <code><a href="../reference/check_figure.html">check_figure()</a></code>, kept to reproduce colour distances computed before this release. The default, <code>"ciede2000"</code>, replaces it, and a later release will remove it.</li>
+<code>metric = "cie76"</code> in <code><a href="../reference/palette_safety.html">palette_safety()</a></code> and <code><a href="../reference/check_figure.html">check_figure()</a></code>, kept to reproduce colour distances computed before this release, gives a warning once per session. The default, <code>"ciede2000"</code>, replaces it, and a later release will remove it.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>
+<h3 id="documentation-0-4-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-4-0"></a></h3>
 <ul><li>The README and the help pages of <code><a href="../reference/depictr_palette.html">depictr_palette()</a></code>, <code><a href="../reference/depictr_options.html">depictr_options()</a></code> and <code><a href="../reference/palette_safety.html">palette_safety()</a></code> no longer call the built-in palette the Okabe-Ito set. The help page of <code><a href="../reference/depictr_palette.html">depictr_palette()</a></code> says that it keeps six of that set’s eight colours, with the brand blue and a grey in place of its blue and black.</li>
 <li>The README points to the Python README’s list of the differences between the twins, where it said that they differ in a few places.</li>
 <li>Help pages that described behaviour the code does not have now match it. <code><a href="../reference/explore_pairs.html">explore_pairs()</a></code> refuses columns beyond <code>max_cols</code>, <code><a href="../reference/posterior_plot.html">posterior_plot()</a></code> refuses an unknown <code>style</code> and <code>depictr_palette(n = NULL)</code> gives seven colours for a ramp. <code><a href="../reference/depictr_options.html">depictr_options()</a></code> and <code><a href="../reference/theme_depictr.html">theme_depictr()</a></code> no longer present <code>depictr_brand()</code>, <code>depictr_accent()</code> and <code>depictr_reference()</code> as functions to call, since the package does not export them. <code>cluster_plot(seed = NULL)</code> draws from the session’s random-number stream, <code><a href="../reference/coefficient_plot.html">coefficient_plot()</a></code> applies <code>interaction</code> to the terms a named <code>labels</code> vector leaves out and <code><a href="../reference/survival_plot.html">survival_plot()</a></code> tests a <code>survfit</code> object with the base-R log-rank test. <code><a href="../reference/missingness_map.html">missingness_map()</a></code> takes its missing-cell colour from the accent, <code><a href="../reference/k_diagnostic.html">k_diagnostic()</a></code> takes the elbow farthest from the chord, <code><a href="../reference/dumbbell_plot.html">dumbbell_plot()</a></code> puts the shortest dumbbell at the top only when every difference is negative and <code><a href="../reference/estimation_plot.html">estimation_plot()</a></code> no longer says that zero lines up with the reference group’s mean.</li>
@@ -299,6 +299,7 @@
 <li>The help page of <code><a href="../reference/check_figure.html">check_figure()</a></code> gains a section on auditing a figure at the width it is printed at, with the text floors of four publishers, where it called 6 pt a common publisher floor, and says that four colours of the default palette fall below 3:1 against white. The help page of <code><a href="../reference/save_plot.html">save_plot()</a></code> describes the formats that three publishers accept.</li>
 <li>
 <code><a href="../articles/depictr.html">vignette("depictr")</a></code> shows a figure drawn by <code><a href="../reference/simulate_figure.html">simulate_figure()</a></code> and covers four publishers’ text floors, Nature’s ceiling, the contrast-first palette order and how the audit treats a continuous colour scale.</li>
+<li>Citations were checked against their published records. The reference to Greenwood (1926) gives the report’s full title, ‘A report on the natural duration of cancer’. WCAG 2.2 is dated 2024, where it was dated 2023, since its address serves the Recommendation of 12 December 2024. The help page of <code><a href="../reference/check_figure.html">check_figure()</a></code> and <code><a href="../articles/depictr.html">vignette("depictr")</a></code> cite Crameri et al. (2020) for preferring a perceptually uniform map, such as viridis, to a rainbow, and no longer for depictr’s own ramps. The help page of <code><a href="../reference/depictr_palette.html">depictr_palette()</a></code> no longer calls the Okabe-Ito set ‘widely recommended’, and that of <code><a href="../reference/model_fit_table.html">model_fit_table()</a></code> credits Cameron and Windmeijer (1997) with the Kullback-Leibler R-squared for exponential-family models only. The help page of <code><a href="../reference/save_plot.html">save_plot()</a></code> capitalises the word after the colon in the title of Nature’s figure guide, and that of <code><a href="../reference/k_diagnostic.html">k_diagnostic()</a></code> gives the year of its citation of Tibshirani et al. (2001).</li>
 </ul></div>
 </div>
     <div class="section level2">

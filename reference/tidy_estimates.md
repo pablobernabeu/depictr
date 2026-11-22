@@ -2,12 +2,11 @@
 
 `tidy_estimates()` turns the output of a model (or an existing data
 frame of results) into a single standardised table with the columns
-`term`, `estimate`, `std.error`, `conf.low` and `conf.high`. It is the
-common currency used by
+`term`, `estimate`, `std.error`, `conf.low` and `conf.high`.
 [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)
 and
-[`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md),
-but is useful on its own.
+[`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md)
+build on it, and it is useful on its own.
 
 ## Usage
 
@@ -38,10 +37,10 @@ tidy_estimates(x, conf_level = 0.95, exponentiate = FALSE, ...)
 
 - ...:
 
-  Passed to methods (and to
+  Passed to methods, and to
   [`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html) in
-  the fallback). The `merMod` method additionally accepts `effects`,
-  which currently only supports `"fixed"`.
+  the fallback. The `merMod` method also accepts `effects`, which
+  supports only `"fixed"`.
 
 ## Value
 
@@ -51,8 +50,8 @@ A data frame with one row per term and the columns `term`, `estimate`,
 ## Details
 
 Methods are provided for `lm`, `glm` and `merMod` (mixed models fitted
-with 'lme4') objects, and for data frames. For any other model class the
-function falls back to
+with 'lme4') objects, and for data frames. For any other model class,
+the function falls back to
 [`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html) when
 the 'broom' package is installed.
 
@@ -65,9 +64,9 @@ quasi families) gets t on the residual degrees of freedom, since
 [`stats::summary.glm()`](https://rdrr.io/r/stats/summary.glm.html) then
 tests with t. One whose dispersion is fixed (binomial, Poisson and
 [`MASS::glm.nb()`](https://rdrr.io/pkg/MASS/man/glm.nb.html)) gets z.
-The choice is read from the column the summary reports, "t value" or "z
-value". At 12 residual degrees of freedom, the t interval is about 11%
-wider than the z interval, and at 100 about 1% wider. A `merMod` fit
+The choice is read from the column the summary reports, `t value` or
+`z value`. At 12 residual degrees of freedom, the t interval is about
+11% wider than the z interval, and at 100 about 1% wider. A `merMod` fit
 gets z, since 'lme4' gives no degrees of freedom. Supply a data frame
 with your own intervals (for example profiled or posterior intervals) to
 override this.

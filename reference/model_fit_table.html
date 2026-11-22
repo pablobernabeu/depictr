@@ -19,7 +19,7 @@ residuals)."><meta property="og:image" content="https://pablobernabeu.github.io/
 
     <a class="navbar-brand me-2" href="../index.html">depictr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -97,18 +97,18 @@ residuals).</p>
     <p>The R-squared depends on the kind of model. An <code>lm</code> reports the ordinary
 coefficient of determination. Every <code>glm</code>, including quasi-likelihood
 families and negative binomial fits from <code><a href="https://rdrr.io/pkg/MASS/man/glm.nb.html" class="external-link">MASS::glm.nb()</a></code>, reports the
-deviance R-squared, \(1 - D/D_0\). Here \(D\) is the residual deviance
+deviance R-squared, \(1 - D/D_0\). Here, \(D\) is the residual deviance
 of the model and \(D_0\) the deviance of the null model, which
 <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">stats::glm()</a></code> fits to the same rows with the same prior weights and
 offset. The null model has an intercept only if the model has one. Both
 deviances are stored with the fit, so nothing is refitted. The value is the
-share of the null deviance that the predictors explain, the
-Kullback-Leibler R-squared of Cameron and Windmeijer (1997). It equals the
-ordinary R-squared for a Gaussian model with the identity link and
-McFadden's (1974) pseudo-R-squared for binary logistic regression. For
-Poisson, grouped binomial, Gamma and other models, the two measures differ.
-Mixed models (<code>merMod</code>) report an R-squared of <code>NA</code>, since no single
-definition is standard for them.</p>
+share of the null deviance that the predictors explain. For
+exponential-family models, it is the Kullback-Leibler R-squared of Cameron
+and Windmeijer (1997). It equals the ordinary R-squared for a Gaussian
+model with the identity link and McFadden's (1974) pseudo-R-squared for
+binary logistic regression. For Poisson, grouped binomial, Gamma and other
+models, the two measures differ. Mixed models (<code>merMod</code>) report an R-squared
+of <code>NA</code>, since no single definition is standard for them.</p>
 <p>A linear mixed model fitted with <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lme4::lmer()</a></code> by restricted maximum
 likelihood (REML, its default) is refitted by maximum likelihood with
 <code><a href="https://rdrr.io/pkg/lme4/man/refitML.html" class="external-link">lme4::refitML()</a></code>. Its AIC, BIC and log-likelihood come from the refit, and

@@ -20,7 +20,7 @@ summaries.
 - [`missingness_map()`](https://pablobernabeu.github.io/depictr/reference/missingness_map.md)
   : Map the missing values in a data frame
 - [`outlier_plot()`](https://pablobernabeu.github.io/depictr/reference/outlier_plot.md)
-  : Box / violin plot highlighting outliers
+  : Box and violin plots highlighting outliers
 - [`raincloud_plot()`](https://pablobernabeu.github.io/depictr/reference/raincloud_plot.md)
   : Raincloud plot
 - [`ridgeline_plot()`](https://pablobernabeu.github.io/depictr/reference/ridgeline_plot.md)
@@ -34,7 +34,7 @@ summaries.
 - [`scatter_trend()`](https://pablobernabeu.github.io/depictr/reference/scatter_trend.md)
   : Scatter plot with a fitted trend
 - [`summary_table()`](https://pablobernabeu.github.io/depictr/reference/summary_table.md)
-  : A "Table 1" style descriptive summary
+  : A descriptive summary in the style of 'Table 1'
 
 ## Multivariate, clustering and survival
 
@@ -98,7 +98,7 @@ effects and goodness-of-fit, built on a shared tidy estimate table.
 
 ## Diagnostics and classification
 
-Residual diagnostics, influence, and the standard classification curves
+Residual diagnostics, influence and the standard classification curves
 and tables.
 
 - [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)

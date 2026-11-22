@@ -36,18 +36,19 @@ The R-squared depends on the kind of model. An `lm` reports the ordinary
 coefficient of determination. Every `glm`, including quasi-likelihood
 families and negative binomial fits from
 [`MASS::glm.nb()`](https://rdrr.io/pkg/MASS/man/glm.nb.html), reports
-the deviance R-squared, \\1 - D/D_0\\. Here \\D\\ is the residual
+the deviance R-squared, \\1 - D/D_0\\. Here, \\D\\ is the residual
 deviance of the model and \\D_0\\ the deviance of the null model, which
 [`stats::glm()`](https://rdrr.io/r/stats/glm.html) fits to the same rows
 with the same prior weights and offset. The null model has an intercept
 only if the model has one. Both deviances are stored with the fit, so
 nothing is refitted. The value is the share of the null deviance that
-the predictors explain, the Kullback-Leibler R-squared of Cameron and
-Windmeijer (1997). It equals the ordinary R-squared for a Gaussian model
-with the identity link and McFadden's (1974) pseudo-R-squared for binary
-logistic regression. For Poisson, grouped binomial, Gamma and other
-models, the two measures differ. Mixed models (`merMod`) report an
-R-squared of `NA`, since no single definition is standard for them.
+the predictors explain. For exponential-family models, it is the
+Kullback-Leibler R-squared of Cameron and Windmeijer (1997). It equals
+the ordinary R-squared for a Gaussian model with the identity link and
+McFadden's (1974) pseudo-R-squared for binary logistic regression. For
+Poisson, grouped binomial, Gamma and other models, the two measures
+differ. Mixed models (`merMod`) report an R-squared of `NA`, since no
+single definition is standard for them.
 
 A linear mixed model fitted with
 [`lme4::lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html) by restricted

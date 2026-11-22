@@ -11,7 +11,7 @@ the correlation values."><meta property="og:image" content="https://pablobernabe
 
     <a class="navbar-brand me-2" href="../index.html">depictr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -129,12 +129,12 @@ any correlation is undefined (<code>NA</code>).</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Columns with (near-)zero variance cannot be correlated and are
-dropped automatically with an informative message, so the raw
-<code>"the standard deviation is zero"</code> warning from <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">stats::cor()</a></code> is not
-surfaced. If, after dropping them, any cells still come out <code>NA</code> (e.g. two
-variables that never co-occur under <code>"pairwise.complete.obs"</code>), those cells
-are rendered in grey and labelled <code>n/a</code> rather than left blank.</p>
+    <p>Columns with zero or near-zero variance cannot be correlated and are
+dropped automatically with an informative message, so the warning
+<code>"the standard deviation is zero"</code> from <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">stats::cor()</a></code> does not appear. If,
+after dropping them, any cells still come out <code>NA</code>, such as those of two
+variables that never co-occur under <code>"pairwise.complete.obs"</code>, those cells
+are drawn in grey and labelled <code>n/a</code>, not left blank.</p>
     </div>
 
     <div class="section level2">

@@ -1,10 +1,10 @@
 # Simulate how colours appear under a colour-vision deficiency
 
 Maps each colour to the colour a reader with a given form and severity
-of colour-vision deficiency would perceive, using the
-physiologically-based model of Machado, Oliveira and Fernandes (2009).
-The transformation is defined on linear-light RGB, so a colour is
-decoded from sRGB to linear RGB (the IEC 61966-2-1 transfer functions),
+of colour-vision deficiency would perceive, using the physiologically
+based model of Machado, Oliveira and Fernandes (2009). The
+transformation is defined on linear-light RGB, so a colour is decoded
+from sRGB to linear RGB (the IEC 61966-2-1 transfer functions),
 transformed, then re-encoded.
 
 ## Usage
@@ -46,7 +46,7 @@ keeps it.
 This is the simulator behind
 [`palette_preview()`](https://pablobernabeu.github.io/depictr/reference/palette_preview.md)'s
 `cvd` argument, behind
-[`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md),
+[`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
 and behind the colour-separability rows of
 [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md).
 [`simulate_figure()`](https://pablobernabeu.github.io/depictr/reference/simulate_figure.md)

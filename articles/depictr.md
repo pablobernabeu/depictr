@@ -1,12 +1,11 @@
 # Getting started with depictr
 
-depictr is a single, consistent toolkit of plots that span the whole
-analysis workflow, from a first look at the data, through model
-estimates and predictions, to diagnostics, uncertainty and reporting.
-Every plotting function returns a `ggplot2` object ([Wickham,
-2016](#ref-wickham2016)) (or a `patchwork` for composite panels), so you
-can keep customising with the usual `+` syntax, and every plot shares
-one theme, one palette and one set of label conventions.
+depictr is a toolkit of plots that cover the analysis workflow, from a
+first look at the data, through model estimates and predictions, to
+diagnostics, uncertainty and reporting. Every plotting function returns
+a `ggplot2` object ([Wickham, 2016](#ref-wickham2016)), or a `patchwork`
+for composite panels, so you can customise it further with the usual `+`
+syntax. All plots use the same theme, palette and label conventions.
 
 ``` r
 
@@ -22,10 +21,10 @@ library(depictr)
 
 ## Five datasets to explore
 
-The package ships with five reproducibly simulated datasets, each chosen
-to exercise a different family of plots. They are documented under their
-names
-(e.g. [`?lexical_decision`](https://pablobernabeu.github.io/depictr/reference/lexical_decision.md))
+The package includes five reproducibly simulated datasets, each chosen
+to illustrate a different family of plots. They are documented under
+their own names, as in
+[`?lexical_decision`](https://pablobernabeu.github.io/depictr/reference/lexical_decision.md),
 and load with [`data()`](https://rdrr.io/r/utils/data.html):
 
 - `lexical_decision`: a counterbalanced, crossed reaction-time/accuracy
@@ -45,7 +44,7 @@ and load with [`data()`](https://rdrr.io/r/utils/data.html):
 
 ## A tour by task
 
-Begin with the data.
+For a first look at the data,
 [`explore_bivariate()`](https://pablobernabeu.github.io/depictr/reference/explore_bivariate.md)
 chooses a suitable plot for any pair of variables, here a scatter with a
 trend because both are numeric.
@@ -57,9 +56,9 @@ explore_bivariate(crop_yield, fertiliser, yield)
 
 ![](depictr_files/figure-html/unnamed-chunk-2-1.png)
 
-Turn next to the model. After fitting it,
+Once a model is fitted,
 [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md)
-draws a forest plot of the estimates.
+draws a forest plot of its estimates.
 
 ``` r
 
@@ -95,7 +94,7 @@ For uncertainty,
 [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
 summarises posterior or simulation draws as a distribution per
 parameter. These are the fixed-effect posterior draws from a Bayesian
-fit of the lexical-decision model, shipped with the package.
+fit of the lexical-decision model, included with the package.
 
 ``` r
 
@@ -111,14 +110,14 @@ posterior_plot(draws[c("conditionunrelated", "modalityauditory",
 
 ![](depictr_files/figure-html/unnamed-chunk-6-1.png)
 
-## The shared spine: `tidy_estimates()`
+## A standard estimate table: `tidy_estimates()`
 
-Most of the model functions rest on
+Most of the model functions use
 [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md),
 which turns a model, or a data frame of pre-computed estimates, into one
-standard table. Because the plotting functions also accept that table,
-estimates from any source (Bayesian posteriors, bootstrap intervals, or
-figures taken from a paper) can be supplied directly.
+standard table. The plotting functions also accept that table, so
+estimates from any source, such as Bayesian posteriors, bootstrap
+intervals or figures taken from a paper, can be supplied directly.
 
 ``` r
 
@@ -152,7 +151,7 @@ ggplot(crop_yield, aes(fertiliser, yield, colour = treatment)) +
 ![](depictr_files/figure-html/unnamed-chunk-8-1.png)
 
 [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
-returns the underlying hex colours directly, ready to feed
+returns the palette’s hex colours for use in
 [`scale_fill_manual()`](https://ggplot2.tidyverse.org/reference/scale_manual.html)
 or a base-graphics `col =` argument:
 
@@ -165,8 +164,10 @@ depictr_palette(4)
 
 The qualitative palette is based on the Okabe-Ito set ([Okabe & Ito,
 2008](#ref-okabe2008)), which stays distinguishable under the common
-forms of colour-vision deficiency, and sequential and diverging variants
-are available too. Preview them with:
+forms of colour-vision deficiency. Sequential and diverging variants are
+also available, and
+[`palette_preview()`](https://pablobernabeu.github.io/depictr/reference/palette_preview.md)
+can draw all three:
 
 ``` r
 
@@ -176,8 +177,8 @@ palette_preview(type = "all")
 ![](depictr_files/figure-html/unnamed-chunk-10-1.png)
 
 [`palette_preview()`](https://pablobernabeu.github.io/depictr/reference/palette_preview.md)
-can also *simulate* a colour-vision deficiency, so you can check a
-palette as a deuteranope (red-green) would see it:
+can also simulate a colour-vision deficiency and show a palette as a
+deuteranope (red-green) would see it:
 
 ``` r
 
@@ -190,11 +191,12 @@ The simulation is available on its own as
 [`simulate_cvd()`](https://pablobernabeu.github.io/depictr/reference/simulate_cvd.md),
 and
 [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
-turns it into a verdict: for normal vision and each deficiency at full
-severity it reports the smallest perceptual distance between any two
-colours in a palette, the CIEDE2000 colour difference ([Sharma et al.,
-2005](#ref-sharma2005)), so the accessibility claim comes with a number
-attached.
+uses it to give a verdict. For normal vision and each deficiency at full
+severity,
+[`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
+reports the smallest perceptual distance between any two colours in a
+palette, the CIEDE2000 colour difference ([Sharma et al.,
+2005](#ref-sharma2005)).
 
 ``` r
 
@@ -221,13 +223,13 @@ palette_safety()
     [1] 5
 
 [`simulate_figure()`](https://pablobernabeu.github.io/depictr/reference/simulate_figure.md)
-applies the same simulation to a whole figure. Every colour the figure
-draws goes through it, in the legend keys, the text and any colourbar as
-well as in the data. The result is a gtable that
+applies the same simulation to a whole figure. It covers every colour
+the figure draws, in the data, the legend keys, the text and any
+colourbar. The result is a gtable that
 [`grid::grid.draw()`](https://rdrr.io/r/grid/grid.draw.html) draws and
 [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
-saves. Here is the scatter plot from the start of this section as a
-reader with deuteranopia sees it:
+saves. The example draws the scatter plot from the start of this section
+as a reader with deuteranopia sees it:
 
 ``` r
 
@@ -244,13 +246,12 @@ grid::grid.draw(simulate_figure(by_treatment, "deutan"))
 
 ## Auditing the figure you are about to submit
 
-A safe palette is not a safe figure. Once a plot has been extended with
-your own scale, shrunk to fit a journal column, or asked to distinguish
-groups by colour alone, the palette’s guarantee no longer describes what
-a reader will see.
+Once a plot has been extended with your own scale, shrunk to fit a
+journal column or made to distinguish groups by colour alone, the
+palette’s guarantee no longer describes what a reader will see.
 [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
-reads a built plot and reports what it measured, next to the threshold
-it was measured against, so each verdict can be argued with.
+reads a built plot and reports each value it measured next to the
+threshold it was measured against.
 
 ``` r
 
@@ -285,15 +286,14 @@ check_figure(grouped)
     9                                       Colour alone distinguishes the groups.
     10                                  The figure draws no text inside the panel.
 
-Two rows are worth dwelling on. `geometry_contrast` measures each
-encoding colour, as it is drawn, against the panel background. The
-palette’s orange falls below the 3:1 that WCAG asks of a graphical
-object ([World Wide Web Consortium, 2023](#ref-wcag22)) even when
-opaque, at 2.25:1, and further when drawn translucent, as these points
-are. `redundant_encoding` is zero because nothing but colour tells the
-two treatments apart. Mapping shape as well, letting the darker
-vermillion do the second colour’s work and drawing the points opaque
-clears both:
+`geometry_contrast` measures each encoding colour, as it is drawn,
+against the panel background. Even when opaque, the palette’s orange
+falls below the 3:1 that WCAG asks of a graphical object ([World Wide
+Web Consortium, 2024](#ref-wcag22)), at 2.25:1, and it falls further
+when drawn translucent, as these points are. `redundant_encoding` is
+zero because nothing but colour tells the two treatments apart. Both
+rows pass once shape is mapped as well, the darker vermillion is used as
+the second colour and the points are drawn opaque:
 
 ``` r
 
@@ -322,19 +322,19 @@ The vermillion need not be typed by hand.
 `scale_colour_depictr(order = "contrast")` draws the groups in the
 contrast-first order of
 [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
-It leads with the brand blue, the vermillion and the reddish purple, the
-only three of the eight colours that clear every colour row together.
+It starts with the brand blue, the vermillion and the reddish purple,
+the only three of the eight colours that pass every colour row together.
 The bluish green comes fourth, and with it four groups still keep 3:1
 against white.
 `depictr_options(palette = depictr_palette(order = "contrast"))` makes
-that order the default for every later plot. Under it, the second group
-takes the vermillion, which depictr also uses as its accent for single
-highlights.
+that order the default for every later plot. Under that default, the
+second group takes the vermillion, which depictr also uses as its accent
+for single highlights.
 
-The audit also takes a stated output width, which is where most figure
-text quietly fails. Text is drawn in points, so a figure saved seven
-inches wide and then printed in an 8.9 cm column arrives at half the
-size it looked on screen:
+The audit also takes a stated output width, because most figure text
+fails unnoticed at its printed width. Text is drawn in points, so the
+text of a figure saved seven inches wide and then printed in an 8.9 cm
+column is half the size it was on screen:
 
 ``` r
 
@@ -348,30 +348,28 @@ subset(check_figure(grouped, width_cm = 8.9), check == "text_size")
 
 A figure saved at the size it will be printed is drawn at that size, so
 give the saved width as both `width_cm` and `render_width_cm`, or leave
-both at their defaults. Text drawn inside the panel, such as an
-annotation, a label or a cell value, has a row of its own,
-`annotation_text_size`, held to the same floor. That floor defaults to 6
-pt, which is lenient. As their guidelines stood on 30 September 2026,
-PLOS and APA Style asked for at least 8 pt, Elsevier for 7 pt and Nature
-for 5 to 7 pt, and
+both at their defaults. `save_plot(check = TRUE)` runs the audit as it
+saves, at the width it saves at, and warns about each check the figure
+fails.
+
+Text drawn inside the panel, such as an annotation, a label or a cell
+value, has a row of its own, `annotation_text_size`, held to the same
+floor as `text_size`. That floor defaults to 6 pt, which is lenient. As
+their guidelines stood on 30 September 2026, PLOS and APA Style asked
+for at least 8 pt, Elsevier for 7 pt and Nature for 5 to 7 pt, and
 [`?check_figure`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
-links all four.
+links all four. Nature’s range also has a ceiling, since no text but the
+panel labels may exceed 7 pt. Passing `max_text_pt = 7` adds a row,
+`text_size_max`, that holds a figure to that ceiling.
 
-Nature’s range has a ceiling as well as a floor, since no text but the
-panel labels may exceed 7 pt. Passing `max_text_pt = 7` holds a figure
-to it in a row of its own, `text_size_max`. `save_plot(check = TRUE)`
-runs the audit as it saves, at the width it saves at, and warns about
-each check the figure fails.
-
-One limitation belongs here, beside the claim it qualifies, since the
-package is the one making that claim. The eight-colour qualitative
-palette clears every colour-vision check and fails the greyscale check:
-its orange and its sky blue differ by 0.79 in CIE lightness, so a
-black-and-white printer renders them as the same grey. The Okabe-Ito
-guarantee is about hue confusion and was never a claim about greyscale.
-The threshold stays where it is, and the check reports the number. A
-figure that may be printed in black and white wants fewer groups, a
-sequential palette, or a redundant shape or line type.
+The eight-colour qualitative palette passes every colour-vision check
+and fails the greyscale check. The Okabe-Ito guarantee covers hue
+confusion alone. The palette’s orange and sky blue differ by 0.79 in CIE
+lightness, so a black-and-white printer renders them as the same grey.
+The greyscale check holds the package’s own palette to the same
+threshold as any other and reports the measured difference. A figure
+that may be printed in black and white should use fewer groups or a
+sequential palette, or add a redundant shape or line type.
 
 ``` r
 
@@ -390,16 +388,18 @@ subset(check_figure(p8), check == "greyscale_separability")
     5 Closest pair #56b4e9 and #e69f00 in CIE lightness.
 
 The audit does not measure a continuous colour or fill scale, such as
-that of a heatmap: its colour rows abstain and say why. A ramp is read
-by its lightness, so prefer one whose lightness runs evenly from end to
-end, such as viridis or depictr’s sequential and diverging ramps, over a
-rainbow ([Crameri et al., 2020](#ref-crameri2020)).
+that of a heatmap. When nothing else in the figure encodes by colour,
+its colour rows report no result and give the reason. A ramp is read by
+its lightness, so prefer one whose lightness changes evenly. A
+perceptually uniform map, such as viridis, is preferable to a rainbow
+([Crameri et al., 2020](#ref-crameri2020)). depictr’s own sequential and
+diverging ramps are perceptually ordered.
 
 Set the look once for a whole script with
 [`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md).
-It carries the base size and family, the brand and accent colours and a
-custom palette, so the same arguments need not travel with every call.
-Called with no arguments it reports the current settings:
+It holds the base size and family, the brand, accent and reference-line
+colours, a custom palette and the colour of `NA` levels. Called with no
+arguments, it reports the current settings:
 
 ``` r
 
@@ -451,8 +451,8 @@ covers distributions, categories, bivariate plots, scatter-plot
 matrices, correlations, missingness, outliers, summary tables and the
 estimation plots.
 [`vignette("model-estimates")`](https://pablobernabeu.github.io/depictr/articles/model-estimates.md)
-is the flagship: forest plots, model comparison, predicted values,
-interactions, random effects, optimiser checks and the
+covers forest plots, model comparison, predicted values, interactions,
+random effects, optimiser checks and the
 frequentist-over-Bayesian-posterior overlay.
 [`vignette("diagnostics-and-uncertainty")`](https://pablobernabeu.github.io/depictr/articles/diagnostics-and-uncertainty.md)
 covers residuals, GLM-appropriate binned residuals, the classification
@@ -481,5 +481,5 @@ and mathematical observations. *Color Research & Application*, *30*(1),
 Wickham, H. (2016). *ggplot2: Elegant graphics for data analysis* (2nd
 ed.). Springer. <https://doi.org/10.1007/978-3-319-24277-4>
 
-World Wide Web Consortium. (2023). *Web Content Accessibility Guidelines
+World Wide Web Consortium. (2024). *Web Content Accessibility Guidelines
 (WCAG) 2.2*. W3C Recommendation, <https://www.w3.org/TR/WCAG22/>.

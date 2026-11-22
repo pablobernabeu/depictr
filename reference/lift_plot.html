@@ -3,13 +3,13 @@
 of the score-ordered population, than random targeting would. A lift of 3 at
 the top 10% means that decile contains three times the baseline rate of
 positives. The horizontal line at 1 is the no-model baseline. Pass a named
-list of models / (actual, score) pairs to overlay several colour-coded lift
-curves with a legend."><meta property="og:description" content="Shows how many times more positive cases a classifier captures, at each depth
+list of models or of (actual, score) pairs to overlay several colour-coded
+lift curves with a legend."><meta property="og:description" content="Shows how many times more positive cases a classifier captures, at each depth
 of the score-ordered population, than random targeting would. A lift of 3 at
 the top 10% means that decile contains three times the baseline rate of
 positives. The horizontal line at 1 is the no-model baseline. Pass a named
-list of models / (actual, score) pairs to overlay several colour-coded lift
-curves with a legend."><meta property="og:image" content="https://pablobernabeu.github.io/depictr/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Spectral:ital,wght@0,500;0,600;1,400&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"></head><body>
+list of models or of (actual, score) pairs to overlay several colour-coded
+lift curves with a legend."><meta property="og:image" content="https://pablobernabeu.github.io/depictr/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Spectral:ital,wght@0,500;0,600;1,400&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -17,7 +17,7 @@ curves with a legend."><meta property="og:image" content="https://pablobernabeu.
 
     <a class="navbar-brand me-2" href="../index.html">depictr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,9 +62,9 @@ curves with a legend."><meta property="og:image" content="https://pablobernabeu.
     <p>Shows how many times more positive cases a classifier captures, at each depth
 of the score-ordered population, than random targeting would. A lift of 3 at
 the top 10% means that decile contains three times the baseline rate of
-positives. The horizontal line at 1 is the no-model baseline. Pass a <em>named
-list</em> of models / (actual, score) pairs to overlay several colour-coded lift
-curves with a legend.</p>
+positives. The horizontal line at 1 is the no-model baseline. Pass a named
+list of models or of (actual, score) pairs to overlay several colour-coded
+lift curves with a legend.</p>
     </div>
 
     <div class="section level2">
@@ -83,26 +83,26 @@ curves with a legend.</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A binomial <code>glm</code>; the vector of observed outcomes (0/1, logical or a
-two-level factor with the positive class second); or a <em>named</em> list of
-models / (actual, score) pairs to overlay.</p></dd>
+<dd><p>A binomial <code>glm</code>, the vector of observed outcomes (0 and 1, logical
+or a two-level factor with the positive class second) or a named list of
+models or of (actual, score) pairs to overlay.</p></dd>
 
 
 <dt id="arg-score">score<a class="anchor" aria-label="anchor" href="#arg-score"></a></dt>
 <dd><p>When <code>x</code> is an outcome vector, the matching scores or predicted
-probabilities (or a list of them for the multi-model case).</p></dd>
+probabilities, or a list of them for several models.</p></dd>
 
 
 <dt id="arg-colour">colour<a class="anchor" aria-label="anchor" href="#arg-colour"></a></dt>
-<dd><p>Curve colour for the single-model case. Defaults to the depictr
-brand blue. Ignored when several models are overlaid.</p></dd>
+<dd><p>Curve colour for a single model. Defaults to the depictr brand
+blue. Ignored when several models are overlaid.</p></dd>
 
 
 <dt id="arg-legend-inside">legend_inside<a class="anchor" aria-label="anchor" href="#arg-legend-inside"></a></dt>
-<dd><p>When <code>TRUE</code> (and several models are overlaid), draw the
-legend inside the panel (in the top-right corner, which the decaying lift
-curve leaves empty) over a translucent background, instead of in a
-right-hand margin. Defaults to <code>FALSE</code>.</p></dd>
+<dd><p>When <code>TRUE</code> and several models are overlaid, the legend
+is drawn inside the panel, over a translucent background, in the top-right
+corner, which the decreasing lift curve leaves empty. Otherwise, it is drawn
+in a right-hand margin. Defaults to <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>

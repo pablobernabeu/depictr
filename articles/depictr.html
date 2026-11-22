@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">depictr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,13 +86,13 @@
 
     
     
-<p>depictr is a single, consistent toolkit of plots that span the whole
-analysis workflow, from a first look at the data, through model
-estimates and predictions, to diagnostics, uncertainty and reporting.
-Every plotting function returns a <code>ggplot2</code> object <span class="citation">(<a href="#ref-wickham2016">Wickham, 2016</a>)</span>
-(or a <code>patchwork</code> for composite panels), so you can keep
-customising with the usual <code>+</code> syntax, and every plot shares
-one theme, one palette and one set of label conventions.</p>
+<p>depictr is a toolkit of plots that cover the analysis workflow, from
+a first look at the data, through model estimates and predictions, to
+diagnostics, uncertainty and reporting. Every plotting function returns
+a <code>ggplot2</code> object <span class="citation">(<a href="#ref-wickham2016">Wickham, 2016</a>)</span>, or a
+<code>patchwork</code> for composite panels, so you can customise it
+further with the usual <code>+</code> syntax. All plots use the same
+theme, palette and label conventions.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pablobernabeu.github.io/depictr/">depictr</a></span><span class="op">)</span></span></code></pre></div>
 <pre><code>
@@ -103,10 +103,10 @@ Attaching package: 'depictr'</code></pre>
 <div class="section level2">
 <h2 id="five-datasets-to-explore">Five datasets to explore<a class="anchor" aria-label="anchor" href="#five-datasets-to-explore"></a>
 </h2>
-<p>The package ships with five reproducibly simulated datasets, each
-chosen to exercise a different family of plots. They are documented
-under their names (e.g. <code><a href="../reference/lexical_decision.html">?lexical_decision</a></code>) and load with
-<code><a href="https://rdrr.io/r/utils/data.html" class="external-link">data()</a></code>:</p>
+<p>The package includes five reproducibly simulated datasets, each
+chosen to illustrate a different family of plots. They are documented
+under their own names, as in <code><a href="../reference/lexical_decision.html">?lexical_decision</a></code>, and load
+with <code><a href="https://rdrr.io/r/utils/data.html" class="external-link">data()</a></code>:</p>
 <ul>
 <li>
 <code>lexical_decision</code>: a counterbalanced, crossed
@@ -134,15 +134,14 @@ imbalanced classification.</li>
 <div class="section level2">
 <h2 id="a-tour-by-task">A tour by task<a class="anchor" aria-label="anchor" href="#a-tour-by-task"></a>
 </h2>
-<p>Begin with the data. <code><a href="../reference/explore_bivariate.html">explore_bivariate()</a></code> chooses a
-suitable plot for any pair of variables, here a scatter with a trend
-because both are numeric.</p>
+<p>For a first look at the data, <code><a href="../reference/explore_bivariate.html">explore_bivariate()</a></code>
+chooses a suitable plot for any pair of variables, here a scatter with a
+trend because both are numeric.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/explore_bivariate.html">explore_bivariate</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="va">fertiliser</span>, <span class="va">yield</span><span class="op">)</span></span></code></pre></div>
 <p><img src="depictr_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" alt="" width="672"></p>
-<p>Turn next to the model. After fitting it,
-<code><a href="../reference/coefficient_plot.html">coefficient_plot()</a></code> draws a forest plot of the
-estimates.</p>
+<p>Once a model is fitted, <code><a href="../reference/coefficient_plot.html">coefficient_plot()</a></code> draws a
+forest plot of its estimates.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">rainfall</span> <span class="op">+</span> <span class="va">fertiliser</span> <span class="op">+</span> <span class="va">soil_ph</span> <span class="op">+</span> <span class="va">treatment</span>,</span>
 <span>          data <span class="op">=</span> <span class="va">crop_yield</span><span class="op">)</span></span>
@@ -161,7 +160,7 @@ the fit into one panel.</p>
 <p>For uncertainty, <code><a href="../reference/posterior_plot.html">posterior_plot()</a></code> summarises posterior
 or simulation draws as a distribution per parameter. These are the
 fixed-effect posterior draws from a Bayesian fit of the lexical-decision
-model, shipped with the package.</p>
+model, included with the package.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"lexdec_draws.rds"</span>,</span>
 <span>                             package <span class="op">=</span> <span class="st">"depictr"</span><span class="op">)</span><span class="op">)</span></span>
@@ -174,13 +173,13 @@ model, shipped with the package.</p>
 <p><img src="depictr_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
-<h2 id="the-shared-spine-tidy_estimates">The shared spine: <code>tidy_estimates()</code><a class="anchor" aria-label="anchor" href="#the-shared-spine-tidy_estimates"></a>
+<h2 id="a-standard-estimate-table-tidy_estimates">A standard estimate table: <code>tidy_estimates()</code><a class="anchor" aria-label="anchor" href="#a-standard-estimate-table-tidy_estimates"></a>
 </h2>
-<p>Most of the model functions rest on <code><a href="../reference/tidy_estimates.html">tidy_estimates()</a></code>,
-which turns a model, or a data frame of pre-computed estimates, into one
-standard table. Because the plotting functions also accept that table,
-estimates from any source (Bayesian posteriors, bootstrap intervals, or
-figures taken from a paper) can be supplied directly.</p>
+<p>Most of the model functions use <code><a href="../reference/tidy_estimates.html">tidy_estimates()</a></code>, which
+turns a model, or a data frame of pre-computed estimates, into one
+standard table. The plotting functions also accept that table, so
+estimates from any source, such as Bayesian posteriors, bootstrap
+intervals or figures taken from a paper, can be supplied directly.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidy_estimates.html">tidy_estimates</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <pre><code>               term     estimate    std.error     conf.low    conf.high
@@ -202,31 +201,32 @@ figures taken from a paper) can be supplied directly.</p>
 <span>  <span class="fu"><a href="../reference/scale_colour_depictr.html">scale_colour_depictr</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/theme_depictr.html">theme_depictr</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="depictr_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="672"></p>
-<p><code><a href="../reference/depictr_palette.html">depictr_palette()</a></code> returns the underlying hex colours
-directly, ready to feed <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual()</a></code> or a
-base-graphics <code>col =</code> argument:</p>
+<p><code><a href="../reference/depictr_palette.html">depictr_palette()</a></code> returns the palette’s hex colours for
+use in <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual()</a></code> or a base-graphics
+<code>col =</code> argument:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/depictr_palette.html">depictr_palette</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span></span></code></pre></div>
 <pre><code>[1] "#005b96" "#e69f00" "#009e73" "#d55e00"</code></pre>
 <p>The qualitative palette is based on the Okabe-Ito set <span class="citation">(<a href="#ref-okabe2008">Okabe &amp; Ito,
 2008</a>)</span>, which stays distinguishable under the common forms of
-colour-vision deficiency, and sequential and diverging variants are
-available too. Preview them with:</p>
+colour-vision deficiency. Sequential and diverging variants are also
+available, and <code><a href="../reference/palette_preview.html">palette_preview()</a></code> can draw all three:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/palette_preview.html">palette_preview</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="depictr_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="672"></p>
-<p><code><a href="../reference/palette_preview.html">palette_preview()</a></code> can also <em>simulate</em> a
-colour-vision deficiency, so you can check a palette as a deuteranope
-(red-green) would see it:</p>
+<p><code><a href="../reference/palette_preview.html">palette_preview()</a></code> can also simulate a colour-vision
+deficiency and show a palette as a deuteranope (red-green) would see
+it:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/palette_preview.html">palette_preview</a></span><span class="op">(</span>cvd <span class="op">=</span> <span class="st">"deutan"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="depictr_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="672"></p>
 <p>The simulation is available on its own as
-<code><a href="../reference/simulate_cvd.html">simulate_cvd()</a></code>, and <code><a href="../reference/palette_safety.html">palette_safety()</a></code> turns it
-into a verdict: for normal vision and each deficiency at full severity
-it reports the smallest perceptual distance between any two colours in a
-palette, the CIEDE2000 colour difference <span class="citation">(<a href="#ref-sharma2005">Sharma et al., 2005</a>)</span>, so the
-accessibility claim comes with a number attached.</p>
+<code><a href="../reference/simulate_cvd.html">simulate_cvd()</a></code>, and <code><a href="../reference/palette_safety.html">palette_safety()</a></code> uses it
+to give a verdict. For normal vision and each deficiency at full
+severity, <code><a href="../reference/palette_safety.html">palette_safety()</a></code> reports the smallest perceptual
+distance between any two colours in a palette, the CIEDE2000 colour
+difference <span class="citation">(<a href="#ref-sharma2005">Sharma et
+al., 2005</a>)</span>.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/palette_safety.html">palette_safety</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code>$min_delta_e
@@ -248,11 +248,11 @@ $safe
 $threshold
 [1] 5</code></pre>
 <p><code><a href="../reference/simulate_figure.html">simulate_figure()</a></code> applies the same simulation to a whole
-figure. Every colour the figure draws goes through it, in the legend
-keys, the text and any colourbar as well as in the data. The result is a
-gtable that <code><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid::grid.draw()</a></code> draws and
-<code><a href="../reference/save_plot.html">save_plot()</a></code> saves. Here is the scatter plot from the start
-of this section as a reader with deuteranopia sees it:</p>
+figure. It covers every colour the figure draws, in the data, the legend
+keys, the text and any colourbar. The result is a gtable that
+<code><a href="https://rdrr.io/r/grid/grid.draw.html" class="external-link">grid::grid.draw()</a></code> draws and <code><a href="../reference/save_plot.html">save_plot()</a></code> saves.
+The example draws the scatter plot from the start of this section as a
+reader with deuteranopia sees it:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">by_treatment</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">fertiliser</span>, <span class="va">yield</span>, colour <span class="op">=</span> <span class="va">treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span></span>
@@ -266,12 +266,11 @@ of this section as a reader with deuteranopia sees it:</p>
 <div class="section level2">
 <h2 id="auditing-the-figure-you-are-about-to-submit">Auditing the figure you are about to submit<a class="anchor" aria-label="anchor" href="#auditing-the-figure-you-are-about-to-submit"></a>
 </h2>
-<p>A safe palette is not a safe figure. Once a plot has been extended
-with your own scale, shrunk to fit a journal column, or asked to
-distinguish groups by colour alone, the palette’s guarantee no longer
-describes what a reader will see. <code><a href="../reference/check_figure.html">check_figure()</a></code> reads a
-built plot and reports what it measured, next to the threshold it was
-measured against, so each verdict can be argued with.</p>
+<p>Once a plot has been extended with your own scale, shrunk to fit a
+journal column or made to distinguish groups by colour alone, the
+palette’s guarantee no longer describes what a reader will see.
+<code><a href="../reference/check_figure.html">check_figure()</a></code> reads a built plot and reports each value it
+measured next to the threshold it was measured against.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">grouped</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">fertiliser</span>, <span class="va">yield</span>, colour <span class="op">=</span> <span class="va">treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span></span>
@@ -301,16 +300,14 @@ measured against, so each verdict can be argued with.</p>
 8  Lowest-contrast colour #e69f00 at alpha 0.70, drawn as #eebc4d, on #ffffff.
 9                                       Colour alone distinguishes the groups.
 10                                  The figure draws no text inside the panel.</code></pre>
-<p>Two rows are worth dwelling on. <code>geometry_contrast</code>
-measures each encoding colour, as it is drawn, against the panel
-background. The palette’s orange falls below the 3:1 that WCAG asks of a
-graphical object <span class="citation">(<a href="#ref-wcag22">World
-Wide Web Consortium, 2023</a>)</span> even when opaque, at 2.25:1, and
-further when drawn translucent, as these points are.
-<code>redundant_encoding</code> is zero because nothing but colour tells
-the two treatments apart. Mapping shape as well, letting the darker
-vermillion do the second colour’s work and drawing the points opaque
-clears both:</p>
+<p><code>geometry_contrast</code> measures each encoding colour, as it
+is drawn, against the panel background. Even when opaque, the palette’s
+orange falls below the 3:1 that WCAG asks of a graphical object <span class="citation">(<a href="#ref-wcag22">World Wide Web Consortium,
+2024</a>)</span>, at 2.25:1, and it falls further when drawn
+translucent, as these points are. <code>redundant_encoding</code> is
+zero because nothing but colour tells the two treatments apart. Both
+rows pass once shape is mapped as well, the darker vermillion is used as
+the second colour and the points are drawn opaque:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mended</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">crop_yield</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">fertiliser</span>, <span class="va">yield</span>, colour <span class="op">=</span> <span class="va">treatment</span>,</span>
 <span>                                 shape <span class="op">=</span> <span class="va">treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -332,19 +329,19 @@ clears both:</p>
 10       annotation_text_size       NA       6.0 not applicable</code></pre>
 <p>The vermillion need not be typed by hand.
 <code>scale_colour_depictr(order = "contrast")</code> draws the groups
-in the contrast-first order of <code><a href="../reference/depictr_palette.html">depictr_palette()</a></code>. It leads
+in the contrast-first order of <code><a href="../reference/depictr_palette.html">depictr_palette()</a></code>. It starts
 with the brand blue, the vermillion and the reddish purple, the only
-three of the eight colours that clear every colour row together. The
+three of the eight colours that pass every colour row together. The
 bluish green comes fourth, and with it four groups still keep 3:1
 against white.
 <code>depictr_options(palette = depictr_palette(order = "contrast"))</code>
-makes that order the default for every later plot. Under it, the second
-group takes the vermillion, which depictr also uses as its accent for
-single highlights.</p>
-<p>The audit also takes a stated output width, which is where most
-figure text quietly fails. Text is drawn in points, so a figure saved
-seven inches wide and then printed in an 8.9 cm column arrives at half
-the size it looked on screen:</p>
+makes that order the default for every later plot. Under that default,
+the second group takes the vermillion, which depictr also uses as its
+accent for single highlights.</p>
+<p>The audit also takes a stated output width, because most figure text
+fails unnoticed at its printed width. Text is drawn in points, so the
+text of a figure saved seven inches wide and then printed in an 8.9 cm
+column is half the size it was on screen:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="fu"><a href="../reference/check_figure.html">check_figure</a></span><span class="op">(</span><span class="va">grouped</span>, width_cm <span class="op">=</span> <span class="fl">8.9</span><span class="op">)</span>, <span class="va">check</span> <span class="op">==</span> <span class="st">"text_size"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>      check measured threshold verdict
@@ -353,27 +350,26 @@ the size it looked on screen:</p>
 6 Smallest text 8.80 pt, drawn at 17.78 cm and printed at 8.90 cm.</code></pre>
 <p>A figure saved at the size it will be printed is drawn at that size,
 so give the saved width as both <code>width_cm</code> and
-<code>render_width_cm</code>, or leave both at their defaults. Text
-drawn inside the panel, such as an annotation, a label or a cell value,
-has a row of its own, <code>annotation_text_size</code>, held to the
-same floor. That floor defaults to 6 pt, which is lenient. As their
-guidelines stood on 30 September 2026, PLOS and APA Style asked for at
-least 8 pt, Elsevier for 7 pt and Nature for 5 to 7 pt, and
-<code><a href="../reference/check_figure.html">?check_figure</a></code> links all four.</p>
-<p>Nature’s range has a ceiling as well as a floor, since no text but
-the panel labels may exceed 7 pt. Passing <code>max_text_pt = 7</code>
-holds a figure to it in a row of its own, <code>text_size_max</code>.
+<code>render_width_cm</code>, or leave both at their defaults.
 <code>save_plot(check = TRUE)</code> runs the audit as it saves, at the
 width it saves at, and warns about each check the figure fails.</p>
-<p>One limitation belongs here, beside the claim it qualifies, since the
-package is the one making that claim. The eight-colour qualitative
-palette clears every colour-vision check and fails the greyscale check:
-its orange and its sky blue differ by 0.79 in CIE lightness, so a
-black-and-white printer renders them as the same grey. The Okabe-Ito
-guarantee is about hue confusion and was never a claim about greyscale.
-The threshold stays where it is, and the check reports the number. A
-figure that may be printed in black and white wants fewer groups, a
-sequential palette, or a redundant shape or line type.</p>
+<p>Text drawn inside the panel, such as an annotation, a label or a cell
+value, has a row of its own, <code>annotation_text_size</code>, held to
+the same floor as <code>text_size</code>. That floor defaults to 6 pt,
+which is lenient. As their guidelines stood on 30 September 2026, PLOS
+and APA Style asked for at least 8 pt, Elsevier for 7 pt and Nature for
+5 to 7 pt, and <code><a href="../reference/check_figure.html">?check_figure</a></code> links all four. Nature’s range
+also has a ceiling, since no text but the panel labels may exceed 7
+pt. Passing <code>max_text_pt = 7</code> adds a row,
+<code>text_size_max</code>, that holds a figure to that ceiling.</p>
+<p>The eight-colour qualitative palette passes every colour-vision check
+and fails the greyscale check. The Okabe-Ito guarantee covers hue
+confusion alone. The palette’s orange and sky blue differ by 0.79 in CIE
+lightness, so a black-and-white printer renders them as the same grey.
+The greyscale check holds the package’s own palette to the same
+threshold as any other and reports the measured difference. A figure
+that may be printed in black and white should use fewer groups or a
+sequential palette, or add a redundant shape or line type.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">eight</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>g <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">]</span><span class="op">)</span>, x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, y <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">)</span></span>
 <span><span class="va">p8</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">eight</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, colour <span class="op">=</span> <span class="va">g</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -387,16 +383,18 @@ sequential palette, or a redundant shape or line type.</p>
                                               detail
 5 Closest pair #56b4e9 and #e69f00 in CIE lightness.</code></pre>
 <p>The audit does not measure a continuous colour or fill scale, such as
-that of a heatmap: its colour rows abstain and say why. A ramp is read
-by its lightness, so prefer one whose lightness runs evenly from end to
-end, such as viridis or depictr’s sequential and diverging ramps, over a
-rainbow <span class="citation">(<a href="#ref-crameri2020">Crameri et
-al., 2020</a>)</span>.</p>
+that of a heatmap. When nothing else in the figure encodes by colour,
+its colour rows report no result and give the reason. A ramp is read by
+its lightness, so prefer one whose lightness changes evenly. A
+perceptually uniform map, such as viridis, is preferable to a rainbow
+<span class="citation">(<a href="#ref-crameri2020">Crameri et al.,
+2020</a>)</span>. depictr’s own sequential and diverging ramps are
+perceptually ordered.</p>
 <p>Set the look once for a whole script with
-<code><a href="../reference/depictr_options.html">depictr_options()</a></code>. It carries the base size and family, the
-brand and accent colours and a custom palette, so the same arguments
-need not travel with every call. Called with no arguments it reports the
-current settings:</p>
+<code><a href="../reference/depictr_options.html">depictr_options()</a></code>. It holds the base size and family, the
+brand, accent and reference-line colours, a custom palette and the
+colour of <code>NA</code> levels. Called with no arguments, it reports
+the current settings:</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/depictr_options.html">depictr_options</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code>$base_size
@@ -435,9 +433,9 @@ previous values, so you can put the look back afterwards:</p>
 <code><a href="../articles/exploring-data.html">vignette("exploring-data")</a></code> covers distributions,
 categories, bivariate plots, scatter-plot matrices, correlations,
 missingness, outliers, summary tables and the estimation plots.
-<code><a href="../articles/model-estimates.html">vignette("model-estimates")</a></code> is the flagship: forest plots,
-model comparison, predicted values, interactions, random effects,
-optimiser checks and the frequentist-over-Bayesian-posterior overlay.
+<code><a href="../articles/model-estimates.html">vignette("model-estimates")</a></code> covers forest plots, model
+comparison, predicted values, interactions, random effects, optimiser
+checks and the frequentist-over-Bayesian-posterior overlay.
 <code><a href="../articles/diagnostics-and-uncertainty.html">vignette("diagnostics-and-uncertainty")</a></code> covers residuals,
 GLM-appropriate binned residuals, the classification suite (ROC, PR,
 gains, lift, calibration, thresholds) on an imbalanced outcome, and
@@ -472,7 +470,7 @@ Wickham, H. (2016). <em><span class="nocase">ggplot2</span>:
 Springer. <a href="https://doi.org/10.1007/978-3-319-24277-4" class="external-link">https://doi.org/10.1007/978-3-319-24277-4</a>
 </div>
 <div id="ref-wcag22" class="csl-entry">
-World Wide Web Consortium. (2023). <em><span>Web Content Accessibility
+World Wide Web Consortium. (2024). <em><span>Web Content Accessibility
 Guidelines</span> (<span>WCAG</span>) 2.2</em>. W3C Recommendation, <a href="https://www.w3.org/TR/WCAG22/" class="external-link uri">https://www.w3.org/TR/WCAG22/</a>.
 </div>
 </div>

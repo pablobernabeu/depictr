@@ -13,7 +13,7 @@ whether the Bayesian side is drawn from draws or from summaries."><meta property
 
     <a class="navbar-brand me-2" href="../index.html">depictr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,14 +87,14 @@ whether the Bayesian side is drawn from draws or from summaries.</p>
 
 
 <dl><dt id="arg-frequentist">frequentist<a class="anchor" aria-label="anchor" href="#arg-frequentist"></a></dt>
-<dd><p>A frequentist model (e.g. from <code>lm</code>, <code>glm</code> or
-<code><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmerTest::lmer</a></code>) or a tidy data frame of estimates.</p></dd>
+<dd><p>A frequentist model, such as one from <code>lm</code>, <code>glm</code> or
+<code><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmerTest::lmer</a></code>, or a tidy data frame of estimates.</p></dd>
 
 
 <dt id="arg-bayesian">bayesian<a class="anchor" aria-label="anchor" href="#arg-bayesian"></a></dt>
-<dd><p>A Bayesian model, a <code>posterior</code> draws object, a draws
-matrix/data frame, a tidy data frame of posterior summaries or a summary
-matrix such as <code>brms::fixef()</code> returns.</p></dd>
+<dd><p>A Bayesian model, a <code>posterior</code> draws object, a draws matrix
+or data frame, a tidy data frame of posterior summaries or a summary matrix
+such as <code>brms::fixef()</code> returns.</p></dd>
 
 
 <dt id="arg-conf-level">conf_level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
@@ -112,17 +112,17 @@ that only the Bayesian input holds. <code>intercept</code> defaults to <code>TRU
 
 <dt id="arg-facet-scales">facet, scales<a class="anchor" aria-label="anchor" href="#arg-facet-scales"></a></dt>
 <dd><p>Layout controls. Because a Bayesian model almost always
-carries a large intercept alongside small slopes, the comparison defaults
-to a faceted, free-scaled layout (<code>facet = TRUE</code>): each term gets its own
-panel and free x-axis, so every posterior and its frequentist overlay stay
-legible. Pass <code>facet = FALSE</code> (or <code>scales = "fixed"</code>) for the classic
-single shared-axis plot.</p></dd>
+has a large intercept beside small slopes, the comparison defaults to a
+faceted, free-scaled layout (<code>facet = TRUE</code>): each term gets its own panel
+and free x-axis, so every posterior and its frequentist overlay stay
+legible. Pass <code>facet = FALSE</code> (or <code>scales = "fixed"</code>) for a single shared
+axis.</p></dd>
 
 
 <dt id="arg-note-frequentist-no-prior">note_frequentist_no_prior<a class="anchor" aria-label="anchor" href="#arg-note-frequentist-no-prior"></a></dt>
-<dd><p>If <code>TRUE</code>, append "(no prior)" to the
-frequentist legend label, which is helpful when the title names the
-Bayesian prior.</p></dd>
+<dd><p>If <code>TRUE</code>, append <code>"(no prior)"</code> to the
+frequentist legend label, which helps when the title names the Bayesian
+prior.</p></dd>
 
 
 <dt id="arg-vertical-line-at-x">vertical_line_at_x<a class="anchor" aria-label="anchor" href="#arg-vertical-line-at-x"></a></dt>
@@ -150,15 +150,16 @@ path (ignored on the distribution path).</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>When <code>bayesian</code> carries posterior <em>draws</em> (a <code>brms</code>/<code>rstanarm</code> fit, a
-<code>posterior</code> draws object, a draws matrix, or a long/wide draws data frame),
-the full posterior <em>distribution</em> is drawn per term (a 'ggdist' half-eye)
-and the frequentist point and confidence interval is overlaid at the same
-position. When <code>bayesian</code> is only a table of posterior <em>summaries</em>, the
-function shows the familiar two-source forest plot via <code><a href="compare_models.html">compare_models()</a></code>.
-It reads tidy columns (<code>term</code>, <code>estimate</code>, <code>conf.low</code>, <code>conf.high</code>), the
-<code>Estimate</code>, <code>Q2.5</code> and <code>Q97.5</code> of the matrix <code>brms::fixef()</code> returns, and the
-<code>l-95% CI</code> and <code>u-95% CI</code> of <code>summary(fit)$fixed</code>.</p>
+    <p>When <code>bayesian</code> holds posterior draws (a <code>brms</code> or <code>rstanarm</code> fit, a
+<code>posterior</code> draws object, a draws matrix or a long or wide draws data frame),
+the full posterior distribution of each term is drawn as a 'ggdist' half-eye,
+with the frequentist point and confidence interval overlaid at the same
+position. When <code>bayesian</code> is only a table of posterior summaries, the
+function draws the familiar two-source forest plot through
+<code><a href="compare_models.html">compare_models()</a></code>.
+It reads tidy columns (<code>term</code>, <code>estimate</code>, <code>conf.low</code>, <code>conf.high</code>). It also
+reads the <code>Estimate</code>, <code>Q2.5</code> and <code>Q97.5</code> of the matrix <code>brms::fixef()</code>
+returns and the <code>l-95% CI</code> and <code>u-95% CI</code> of <code>summary(fit)$fixed</code>.</p>
 <p>A data frame counts as draws when it holds a sampler index column (<code>.chain</code>,
 <code>.iteration</code> or <code>.draw</code>), when it is long, with a parameter column
 (<code>parameter</code>, <code>term</code>, <code>.variable</code> or <code>variable</code>) and a value column
@@ -167,8 +168,8 @@ It reads tidy columns (<code>term</code>, <code>estimate</code>, <code>conf.low<
 Any other data frame is read as summaries. The half-eyes need the 'ggdist'
 package. Without it, each posterior is drawn as its median and <code>conf_level</code>
 interval, with a message.</p>
-<p>Terms are aligned by their canonical display label, so the <code>brms</code>-style <code>b_</code>
-prefix is reconciled automatically against the frequentist term names. Draws
+<p>Terms are aligned by their display label, so the <code>b_</code> prefix of <code>brms</code> is
+matched automatically against the frequentist term names. Draws
 are read as in <code><a href="posterior_plot.html">posterior_plot()</a></code>, so a draws object holding <code>b_</code> parameters
 keeps only those, and two terms that would share a label are an error. With
 draws, only the terms both sides share are drawn, and a message names any
@@ -186,10 +187,10 @@ level of each source's intervals or says that they are as supplied.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Summary path: a tidy "Bayesian" summary as a data frame. The summary here</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Summary path: a tidy 'Bayesian' summary as a data frame. The summary here</span></span></span>
 <span class="r-in"><span><span class="co"># stands in for a regularised posterior, so a weakly informative prior pulls</span></span></span>
-<span class="r-in"><span><span class="co"># each estimate toward zero and narrows its interval; a real posterior would</span></span></span>
-<span class="r-in"><span><span class="co"># come from the model fit rather than from arithmetic on the frequentist one.</span></span></span>
+<span class="r-in"><span><span class="co"># each estimate towards zero and narrows its interval. A real posterior would</span></span></span>
+<span class="r-in"><span><span class="co"># come from the model fit, not from arithmetic on the frequentist one.</span></span></span>
 <span class="r-in"><span><span class="va">freq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">life_satisfaction</span> <span class="op">~</span> <span class="va">stress</span> <span class="op">+</span> <span class="va">sleep_hours</span> <span class="op">+</span> <span class="va">exercise_days</span>,</span></span>
 <span class="r-in"><span>           data <span class="op">=</span> <span class="va">wellbeing_survey</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">bayes</span> <span class="op">&lt;-</span> <span class="fu"><a href="tidy_estimates.html">tidy_estimates</a></span><span class="op">(</span><span class="va">freq</span><span class="op">)</span></span></span>
@@ -202,7 +203,7 @@ level of each source's intervals or says that they are as supplied.</p>
 <span class="r-plt img"><img src="frequentist_bayesian_plot-1.png" alt="" width="672" height="432"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Distribution path: simulated posterior draws (one column per term) drawn as</span></span></span>
-<span class="r-in"><span><span class="co"># full posteriors with the frequentist point + CI overlaid.</span></span></span>
+<span class="r-in"><span><span class="co"># full posteriors with the frequentist point and interval overlaid.</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">co</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">freq</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">co</span>, <span class="kw">function</span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">400</span>, <span class="va">m</span>, <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span> <span class="op">*</span> <span class="fl">0.1</span> <span class="op">+</span> <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>

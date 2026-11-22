@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">depictr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,9 +86,8 @@
 
     
     
-<p>Beyond regression, depictr covers three staples of applied data
-analysis: principal component analysis, clustering (with quality
-diagnostics) and survival curves.</p>
+<p>Beyond regression, depictr covers principal component analysis,
+clustering (with quality diagnostics) and survival curves.</p>
 <div class="section level2">
 <h2 id="principal-component-analysis">Principal component analysis<a class="anchor" aria-label="anchor" href="#principal-component-analysis"></a>
 </h2>
@@ -115,9 +114,9 @@ so you can analyse once and plot several views:</p>
 <div class="section level2">
 <h2 id="clustering">Clustering<a class="anchor" aria-label="anchor" href="#clustering"></a>
 </h2>
-<p><code><a href="../reference/cluster_plot.html">cluster_plot()</a></code> runs k-means and shows the clusters on
-the first two principal components (so it works for any number of
-variables), with convex hulls and labelled centroids.
+<p><code><a href="../reference/cluster_plot.html">cluster_plot()</a></code> runs k-means and shows the clusters, with
+convex hulls and labelled centroids, on the first two principal
+components, so it works for any number of variables.
 <code><a href="../reference/dendrogram_plot.html">dendrogram_plot()</a></code> draws a hierarchical-clustering tree and
 can cut it into <code>k</code> groups.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -136,10 +135,10 @@ can cut it into <code>k</code> groups.</p>
 <div class="section level2">
 <h2 id="choosing-the-number-of-clusters">Choosing the number of clusters<a class="anchor" aria-label="anchor" href="#choosing-the-number-of-clusters"></a>
 </h2>
-<p>Choosing <code>k</code> should not be guesswork.
-<code><a href="../reference/k_diagnostic.html">k_diagnostic()</a></code> evaluates a cluster-quality criterion across
-a range of <code>k</code> and suggests a value, using the average
-silhouette width <span class="citation">(the default, after <a href="#ref-rousseeuw1987">Rousseeuw, 1987</a>)</span>, the
+<p><code><a href="../reference/k_diagnostic.html">k_diagnostic()</a></code> evaluates a cluster-quality criterion
+across a range of <code>k</code> and suggests a value. The criterion is
+the average silhouette width <span class="citation">(the default, after
+<a href="#ref-rousseeuw1987">Rousseeuw, 1987</a>)</span>, the
 within-sum-of-squares elbow or the gap statistic <span class="citation">(<a href="#ref-tibshirani2001">Tibshirani et al.,
 2001</a>)</span>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -182,28 +181,29 @@ attributes:</p>
 </tr>
 </tbody>
 </table>
-<p>The gap statistic compares the within-cluster dispersion against a
-null reference, so unlike the other two criteria it can also support
-<code>k = 1</code>, and its default search starts there. The elbow’s
-default search starts at 1 as well. The elbow is the candidate farthest
-from the line joining the first and last points of the curve, though, so
-it never picks either end of the range. The silhouette width is
-undefined for a single cluster, and its search starts at 2. The
-reference samples are drawn at random, so the chunk is seeded for a
-reproducible build.</p>
+<p>The silhouette width is undefined for a single cluster, and its
+search starts at 2. The elbow’s default search starts at 1. Because the
+elbow is the candidate farthest from the line joining the first and last
+points of the curve, it never picks either end of the range. The gap
+statistic compares the within-cluster dispersion against a null
+reference, so, unlike the other two criteria, it can also support
+<code>k = 1</code>, and its default search starts there. It draws its
+reference samples at random, so the chunk is seeded for a reproducible
+build.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/k_diagnostic.html">k_diagnostic</a></span><span class="op">(</span><span class="va">crop_yield</span>, cols <span class="op">=</span> <span class="va">num</span>, method <span class="op">=</span> <span class="st">"gap"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="multivariate-and-survival_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="672"></p>
-<p>The verdict is <code>k = 1</code>, which is worth taking seriously:
-the three-cluster partition drawn above is a description imposed on the
-data rather than evidence of groups within it.</p>
-<p><code><a href="../reference/silhouette_plot.html">silhouette_plot()</a></code> then shows the quality of an actual
-clustering, one bar per observation grouped by cluster, with the average
-silhouette width per cluster and overall (the dashed line). Wide
-positive bars are well-placed observations, and a bar below zero marks
-an observation that sits closer to a neighbouring cluster than to its
-own.</p>
+<p>The gap statistic suggests <code>k = 1</code>, so the three-cluster
+partition drawn above is a description imposed on the data rather than
+evidence of groups within it.</p>
+<p><code><a href="../reference/silhouette_plot.html">silhouette_plot()</a></code> shows the quality of a given
+clustering, with one bar per observation grouped by cluster. It labels
+the average silhouette width of each cluster and draws the overall
+average as a dashed line. Wide positive bars are well-placed
+observations, and a bar below zero marks an observation that may belong
+to a neighbouring cluster, because it sits closer to that cluster than
+to its own.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/kmeans.html" class="external-link">kmeans</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">crop_yield</span><span class="op">[</span><span class="va">num</span><span class="op">]</span><span class="op">)</span>, centers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">kd</span>, <span class="st">"suggested"</span><span class="op">)</span>,</span>
@@ -215,9 +215,9 @@ own.</p>
 bars fall below zero, none of them by much. Kaufman and Rousseeuw’s
 <span class="citation">(<a href="#ref-kaufman1990">1990</a>)</span>
 rough guide treats an average at or below 0.25 as no substantial
-structure, so this figure agrees with the gap statistic: k-means returns
-clusters whether or not the data contains any, and the silhouette is one
-way of asking which case you are in.</p>
+structure, so this figure agrees with the gap statistic. Since k-means
+returns clusters whether or not the data contains any, the silhouette is
+one way of asking which case you are in.</p>
 <p>The same diagnostics apply to the numeric profile of the wellbeing
 survey:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
@@ -247,12 +247,12 @@ no modelling package is needed. You can pass follow-up times and an
 event indicator directly, a data frame or a
 <code><a href="https://rdrr.io/pkg/survival/man/survfit.html" class="external-link">survival::survfit</a></code> object, whose limits are recomputed at
 the requested <code>conf_level</code>.</p>
-<p>The <code>clinical_trial</code> dataset has two arms with a real
-survival difference (the treatment arm has a lower hazard), so the
-curves separate. Turning on the three publication annotations gives a
-survminer-style figure: a number-at-risk table beneath the curves, the
-log-rank test of the difference as a subtitle and dashed guides to the
-median survival of each arm whose curve reaches 0.5. A survival curve is
+<p>In the <code>clinical_trial</code> dataset, the treatment arm has a
+lower hazard than the placebo arm, so the curves separate. Turning on
+the three publication annotations gives a survminer-style figure. The
+annotations are a number-at-risk table beneath the curves, the log-rank
+test of the difference as a subtitle and dashed guides to the median
+survival of each arm whose curve reaches 0.5. A survival curve is
 monotone-decreasing, so its bottom-left corner is always empty, and
 <code>legend_inside = TRUE</code> puts the group legend there.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
@@ -266,7 +266,8 @@ monotone-decreasing, so its bottom-left corner is always empty, and
 months, while the treatment arm’s curve stays above 0.5 to the 36-month
 study end, so its median is not reached and it gets no guide. Because
 its event times are longer, that arm is also more often right-censored
-at the study end, visible as the denser run of censoring marks.</p>
+at the study end, and its curve shows a denser run of censoring
+marks.</p>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
@@ -278,8 +279,8 @@ bands for the survival function based on transformations.
 <em>Scandinavian Journal of Statistics</em>, <em>17</em>(1), 35–41.
 </div>
 <div id="ref-greenwood1926" class="csl-entry">
-Greenwood, M. (1926). <em>The natural duration of cancer</em> (Vol. 33,
-pp. 1–26). His Majesty’s Stationery Office.
+Greenwood, M. (1926). <em>A report on the natural duration of
+cancer</em> (Vol. 33, pp. 1–26). His Majesty’s Stationery Office.
 </div>
 <div id="ref-kaplan1958" class="csl-entry">
 Kaplan, E. L., &amp; Meier, P. (1958). Nonparametric estimation from

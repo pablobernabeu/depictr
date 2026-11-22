@@ -2,11 +2,11 @@
 
 Computes a cluster-quality diagnostic across a range of `k` and draws
 the diagnostic curve, with the suggested `k` highlighted. Three criteria
-are available: the average silhouette width (maximised), the total
-within-cluster sum of squares "elbow" (the candidate farthest from the
-straight line joining the first and last points of the curve), and the
+are available: the average silhouette width (maximised), the elbow of
+the total within-cluster sum of squares (the candidate farthest from the
+straight line joining the first and last points of the curve) and the
 gap statistic (the smallest `k` whose gap is within one standard error
-of the next, using the Tibshirani et al. heuristic).
+of the next, by the heuristic of Tibshirani et al., 2001).
 
 ## Usage
 
@@ -36,8 +36,8 @@ k_diagnostic(
   `"silhouette"`. Candidates the chosen criterion cannot evaluate are
   skipped with a message naming them: `k = 1` under `"silhouette"` (a
   lone cluster has no neighbouring cluster to compare against, so the
-  width is undefined), and any `k` at or above the number of
-  observations under every criterion.
+  width is undefined) and any `k` at or above the number of observations
+  under every criterion.
 
 - method:
 
@@ -50,8 +50,8 @@ k_diagnostic(
 
 - scale:
 
-  Whether to scale variables to unit variance first. Columns with
-  (near-)zero variance cannot be scaled and are dropped with a message,
+  Whether to scale variables to unit variance first. Columns with zero
+  or near-zero variance cannot be scaled and are dropped with a message,
   as in
   [`correlation_heatmap()`](https://pablobernabeu.github.io/depictr/reference/correlation_heatmap.md).
 

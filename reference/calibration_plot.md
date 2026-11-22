@@ -1,12 +1,12 @@
 # Calibration plot
 
 Assesses how well predicted probabilities match observed frequencies.
-The scores are split into bins; for each bin the mean predicted
+The scores are split into bins, and for each bin, the mean predicted
 probability is plotted against the observed event rate, with the
 diagonal marking perfect calibration. A Wilson binomial confidence
 interval is drawn on each bin's observed proportion so that bins backed
-by few observations are not over-interpreted. Pass a *named list* of
-models / (actual, score) pairs to overlay several colour-coded
+by few observations are not over-interpreted. Pass a named list of
+models or of (actual, score) pairs to overlay several colour-coded
 calibration curves with a legend.
 
 ## Usage
@@ -26,29 +26,29 @@ calibration_plot(
 
 - x:
 
-  A binomial `glm`, the vector of observed outcomes, or a *named* list
-  of models / (actual, score) pairs to overlay.
+  A binomial `glm`, the vector of observed outcomes or a named list of
+  models or of (actual, score) pairs to overlay.
 
 - score:
 
-  When `x` is an outcome vector, the matching predicted probabilities
-  (or a list of them for the multi-model case).
+  When `x` is an outcome vector, the matching predicted probabilities,
+  or a list of them for several models.
 
 - bins:
 
-  Number of (equal-count) bins.
+  Number of equal-count bins.
 
 - colour:
 
-  Point/line colour for the single-model case. Defaults to the depictr
-  brand blue. Ignored when several models are overlaid.
+  Colour of the points and lines for a single model. Defaults to the
+  depictr brand blue. Ignored when several models are overlaid.
 
 - conf_level:
 
   Confidence level for the per-bin Wilson interval on the observed
   proportion, a single number strictly between 0 and 1. Use `NA` to omit
-  the intervals. Intervals are only drawn in the single-model case to
-  keep the overlay legible.
+  the intervals. Intervals are drawn only for a single model, to keep
+  the overlay legible.
 
 - title:
 

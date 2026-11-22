@@ -7,8 +7,8 @@ assembles the classic panel.
 [`influence_plot()`](https://pablobernabeu.github.io/depictr/reference/influence_plot.md)
 and
 [`qq_plot()`](https://pablobernabeu.github.io/depictr/reference/qq_plot.md)
-zoom in on particular checks. We fit a linear model to the crop-yield
-trial.
+each show one of its checks in more detail. We fit a linear model to the
+crop-yield trial.
 
 ``` r
 
@@ -34,9 +34,9 @@ observation’s influence on the fitted coefficients ([Cook,
 1977](#ref-cook1977)).
 
 [`vif_plot()`](https://pablobernabeu.github.io/depictr/reference/vif_plot.md)
-checks for multicollinearity among the predictors. The crop-yield
-predictors are close to orthogonal, so to see the diagnostic do its job
-we add a soil-moisture measure that is largely driven by rainfall.
+checks for multicollinearity among the predictors. Because the
+crop-yield predictors are close to orthogonal, we create collinearity by
+adding a soil-moisture measure that is largely driven by rainfall.
 
 ``` r
 
@@ -54,17 +54,19 @@ Rainfall and soil moisture each carry a variance inflation factor near
 
 ## Diagnostics for a generalised linear model
 
-For a binary `glm` the raw residuals take only a few values, so a plain
+For a binary `glm`, the raw residuals take only a few values, so a plain
 residual-versus-fitted plot is hard to read.
 [`binned_residual_plot()`](https://pablobernabeu.github.io/depictr/reference/binned_residual_plot.md)
 instead splits the data into equal-count bins of fitted values and plots
 the mean residual per bin ([Gelman & Hill, 2007](#ref-gelman2007))
-against a band of +/- 2 standard errors, which the fitted model implies
-for each bin’s mean. Under a correct model, about 95% of the points sit
-inside the band, scattered around zero.
+against a band of +/- 2 standard errors. These are the standard errors
+that the fitted model implies for each bin’s mean. Under a correct
+model, about 95% of the points sit inside the band, scattered around
+zero.
 
-We model the *rare* adverse-event outcome from the clinical trial (about
-a 10% base rate) on the baseline biomarker, age and treatment arm.
+We model the adverse-event outcome from the clinical trial on the
+baseline biomarker, age and treatment arm. The outcome is rare, with a
+base rate of about 10%.
 
 ``` r
 
@@ -79,11 +81,12 @@ binned_residual_plot(gfit, title = "Binned residuals: adverse-event model")
 
 ![](diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-6-1.png)
 
+For a `glm`,
 [`residual_diagnostics_plot()`](https://pablobernabeu.github.io/depictr/reference/residual_diagnostics_plot.md)
-recognises a `glm` and switches to GLM-appropriate panels (binned
+replaces two of the classic panels with GLM-appropriate ones: binned
 residuals and a Q-Q plot of randomised quantile residuals, which are
 standard-normal under a correct model regardless of the response
-distribution):
+distribution.
 
 ``` r
 
@@ -94,8 +97,8 @@ residual_diagnostics_plot(gfit, title = "Adverse-event model")
 
 ## Classification on an imbalanced outcome
 
-The adverse-event outcome is imbalanced, the case the precision-recall,
-gains and lift charts are built for. depictr’s classification plots each
+The precision-recall, gains and lift charts are built for an imbalanced
+outcome such as the adverse event. depictr’s classification plots each
 read a binomial `glm` directly, a pair of vectors or, to compare several
 models, a named list of models.
 
@@ -110,7 +113,7 @@ roc_curve_plot(gfit, youden = TRUE)
 
 ![](diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-8-1.png)
 
-When the positive class is rare the precision-recall curve is more
+When the positive class is rare, the precision-recall curve is more
 informative than the ROC curve, because it ignores the many true
 negatives. The baseline is the positive prevalence, and `f1 = TRUE`
 marks the maximum-F1 operating point:
@@ -124,8 +127,8 @@ pr_curve_plot(gfit, f1 = TRUE)
 
 ### Comparing two models in one figure
 
-A *named list* overlays one colour-coded curve per model, with a
-per-curve AUC (or average precision) in the legend. Here the full model
+Passing a named list overlays one colour-coded curve per model, with a
+per-curve AUC (or average precision) in the legend. Here, the full model
 is compared with a biomarker-only model.
 
 ``` r
@@ -135,9 +138,9 @@ reduced <- glm(adverse_event ~ biomarker, data = clinical_trial,
 models <- list(Full = gfit, `Biomarker only` = reduced)
 ```
 
-Because an ROC curve hugs the top-left, the bottom-right corner is
-always free, so `legend_inside = TRUE` tucks the per-model legend there
-and reclaims the right-hand margin:
+An ROC curve rises towards the top-left corner, so its bottom-right
+corner is always empty. `legend_inside = TRUE` puts the per-model legend
+in that corner, and the figure then needs no right-hand margin.
 
 ``` r
 
@@ -155,7 +158,7 @@ pr_curve_plot(models, f1 = TRUE)
 
 For ranking and targeting tasks, the cumulative gains and lift charts
 show how many positive cases are captured as more of the score-ordered
-population is targeted, again overlaying both models:
+population is targeted. Both charts again overlay the two models.
 
 ``` r
 
@@ -173,11 +176,12 @@ lift_plot(models, legend_inside = TRUE)
 
 ### Choosing an operating point
 
+For choosing a threshold,
 [`threshold_plot()`](https://pablobernabeu.github.io/depictr/reference/threshold_plot.md)
-sweeps the decision threshold across the full range of scores and plots
-each metric as it trades off, marking the Youden threshold with a dashed
-line and the maximum-F1 threshold with a dotted one. It is the natural
-companion to the ROC and PR curves for actually *choosing* a cut-off.
+complements the ROC and PR curves. It sweeps the decision threshold
+across the range of scores and plots how each metric trades off against
+the others. A dashed line marks the Youden threshold and a dotted line
+the maximum-F1 threshold.
 
 ``` r
 
@@ -200,8 +204,8 @@ attr(tp, "thresholds")   # the Youden and max-F1 thresholds
 [`calibration_plot()`](https://pablobernabeu.github.io/depictr/reference/calibration_plot.md)
 checks whether predicted probabilities match observed frequencies. Each
 bin’s observed rate carries a Wilson binomial confidence interval, so
-bins backed by few observations (common in the sparse upper tail when
-the outcome is rare) are not over-interpreted.
+bins backed by few observations are not over-interpreted. Such bins are
+common in the sparse upper tail when the outcome is rare.
 
 ``` r
 
@@ -210,9 +214,8 @@ calibration_plot(gfit, bins = 6)
 
 ![](diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-16-1.png)
 
-A confusion-matrix heatmap completes the picture. Passing
-`threshold = "youden"` reuses the same operating point the ROC curve
-marks, so the two agree:
+For the confusion-matrix heatmap, `threshold = "youden"` reuses the
+operating point that the ROC curve marks.
 
 ``` r
 
@@ -224,9 +227,9 @@ confusion_matrix_plot(gfit, threshold = "youden", normalise = "row")
 ## Uncertainty
 
 [`posterior_plot()`](https://pablobernabeu.github.io/depictr/reference/posterior_plot.md)
-summarises draws (posterior, bootstrap, simulation) as a distribution
-per parameter. Here are the posterior draws from a Bayesian fit of the
-lexical-decision model, shown as point-and-interval forests.
+summarises posterior, bootstrap or simulation draws as a distribution
+per parameter. The example shows the posterior draws from a Bayesian fit
+of the lexical-decision model as point-and-interval forests.
 
 ``` r
 
@@ -249,10 +252,10 @@ posterior_plot(draws[c("conditionunrelated", "modalityauditory",
 reads a
 [`simr::powerCurve()`](https://rdrr.io/pkg/simr/man/powerCurve.html)
 object or a tidy data frame, so a slow power simulation does not have to
-be re-run to redraw it. The package ships a `powerCurve` object produced
-by a `simr` analysis of the lexical-decision design, which simulated
-power for the word-frequency slope as the number of participants grows.
-We read it straight from disk.
+be re-run to redraw it. The package includes a `powerCurve` object
+produced by a `simr` analysis of the lexical-decision design, which
+simulated power for the word-frequency slope as the number of
+participants grows. We read it from disk.
 
 ``` r
 
@@ -291,11 +294,11 @@ panel
 ![](diagnostics-and-uncertainty_files/figure-html/unnamed-chunk-22-1.png)
 
 [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
-writes it out at a print-ready 300 dpi by default, creating any missing
-directories along the way. A PDF or EPS embeds its fonts and a TIFF is
-LZW-compressed, as journals ask of submitted figures, and the help page,
+writes it at a print-ready 300 dpi by default and creates any missing
+directories. A PDF or EPS embeds its fonts and a TIFF is LZW-compressed,
+as journals ask of submitted figures. The help page,
 [`?save_plot`](https://pablobernabeu.github.io/depictr/reference/save_plot.md),
-lists the formats PLOS, Nature and Elsevier accept.
+lists the formats that PLOS, Nature and Elsevier accept.
 
 ``` r
 

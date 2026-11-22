@@ -2,11 +2,11 @@
 
 Discrete ggplot2 scales using
 [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
-These are the canonical colour and fill scales used throughout the
-package. They honour the global `options(depictr.palette = )` (via
+These are the colour and fill scales used throughout the package. They
+honour the global `options(depictr.palette = )` (through
 [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md))
-and `options(depictr.na_value = )` settings; see
-[`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md).
+and `options(depictr.na_value = )` settings (see
+[`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md)).
 
 ## Usage
 
@@ -42,12 +42,12 @@ scale_fill_depictr(
 
   Optional number of colours to draw from
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
-  By default ggplot2 requests exactly as many colours as there are
-  groups; pass `n` only to force a fixed slice of the palette. More than
-  eight groups means the built-in qualitative palette is interpolated,
-  which loses the colour-vision-deficiency guarantee and warns at draw
-  time; facet the groups or use a sequential scale when there are that
-  many.
+  By default, ggplot2 requests exactly as many colours as there are
+  groups, so pass `n` only to force a fixed slice of the palette. With
+  more than eight groups, the built-in qualitative palette is
+  interpolated, which loses the colour-vision-deficiency guarantee and
+  warns when the plot is drawn. Facet the groups or use a sequential
+  scale when there are that many.
 
 - palette:
 

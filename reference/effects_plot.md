@@ -1,9 +1,9 @@
 # Plot predicted values for one predictor
 
 Shows the values a model predicts as one focal predictor varies, holding
-the other predictors at typical values (the mean for numeric predictors,
-the most frequent level for factors). A confidence band (numeric
-predictor) or confidence intervals (factor predictor) convey
+the other predictors at typical values (the mean for numeric predictors
+and the most frequent level for factors). A confidence band for a
+numeric predictor, or confidence intervals for a factor, show the
 uncertainty.
 
 ## Usage
@@ -26,7 +26,7 @@ effects_plot(
 
 - model:
 
-  A fitted model (`lm`, `glm`, `merMod`, ...).
+  A fitted model, such as an `lm`, `glm` or `merMod`.
 
 - predictor:
 
@@ -46,12 +46,11 @@ effects_plot(
 
 - rug:
 
-  Whether to add a rug of the observed predictor values (numeric
-  predictors).
+  Whether to add a rug of the observed values of a numeric predictor.
 
 - colour:
 
-  Colour for the line/points and band. Defaults to the depictr brand
+  Colour for the line, points and band. Defaults to the depictr brand
   blue.
 
 - title, x_lab, y_lab:
@@ -94,10 +93,10 @@ model was fitted to, on the link scale. For a Poisson rate model with
 geometric-mean exposure. The offset stays at its mean when the focal
 predictor enters it too, as in `log(exposure) + offset(log(exposure))`,
 so the line then shows the predictor's effect beyond the offset. The
-y-axis label ends in "at the mean offset".
+y-axis label ends in 'at the mean offset'.
 
 Predictions and standard errors come from
-[`stats::predict()`](https://rdrr.io/r/stats/predict.html); `glm`
+[`stats::predict()`](https://rdrr.io/r/stats/predict.html). `glm`
 predictions are formed on the link scale and back-transformed, so a
 binomial model shows predicted probabilities. The band uses the
 multiplier of the model's own tests, as
@@ -106,12 +105,13 @@ does. An `lm`, and a `glm` whose dispersion is estimated, get t on the
 residual degrees of freedom, so a Gaussian `glm` draws the band of the
 same `lm`. Binomial and Poisson fits and mixed models get z. Mixed
 models fitted with
-[`lme4::lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html)/[`lme4::glmer()`](https://rdrr.io/pkg/lme4/man/glmer.html)
-are supported too: predictions use only the fixed effects (as
-`re.form = NA` does) and standard errors come from the fixed-effect
-design matrix and [`vcov()`](https://rdrr.io/r/stats/vcov.html). Works
-with `lm`, `glm` and `merMod`; other model classes are attempted on a
-best-effort basis.
+[`lme4::lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html) or
+[`lme4::glmer()`](https://rdrr.io/pkg/lme4/man/glmer.html) are supported
+too. Their predictions use only the fixed effects, as `re.form = NA`
+does, and their standard errors come from the fixed-effect design matrix
+and [`vcov()`](https://rdrr.io/r/stats/vcov.html). Works with `lm`,
+`glm` and `merMod`. Other model classes are attempted without a
+guarantee.
 
 ## Examples
 

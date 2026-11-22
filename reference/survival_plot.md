@@ -3,7 +3,7 @@
 Draws Kaplan-Meier survival curves, optionally by group, with stepwise
 confidence limits and censoring marks. The Kaplan-Meier estimate and its
 Greenwood standard error are computed with base R, so no modelling
-package is required; a `survfit` object from the 'survival' package is
+package is required. A `survfit` object from the 'survival' package is
 also accepted.
 
 ## Usage
@@ -34,9 +34,8 @@ survival_plot(
 
   A numeric vector of follow-up times, a data frame with `time`,
   `status` and optional `group` columns, or a `survfit` object. Every
-  time must be finite: a missing or infinite one is an error rather than
-  a silent exclusion, since dropping it would move the number at risk
-  unannounced.
+  time must be finite. A missing or infinite time is an error, since
+  dropping it would change the number at risk without notice.
 
 - status:
 
@@ -45,7 +44,7 @@ survival_plot(
   convention (`0` = censored, `1` = event) or the
   [`survival::Surv()`](https://rdrr.io/pkg/survival/man/Surv.html) 1/2
   convention (`1` = censored, `2` = event) is accepted, read over all
-  groups together; logical values are also allowed. Other codings raise
+  groups together. Logical values are also allowed. Other codings raise
   an error, among them a code that is not a whole number and a factor or
   character indicator, whose values do not say which one is the event.
   Observations whose status is missing are dropped with a message, since
@@ -94,15 +93,15 @@ survival_plot(
 
 - palette:
 
-  Colours for the groups; defaults to
+  Colours for the groups. Defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
 
 - legend_inside:
 
-  When `TRUE` (and there are several groups), draw the group legend
-  inside the panel (in the bottom-left corner a monotone-decreasing
-  survival curve always leaves empty) over a translucent background,
-  instead of in a right-hand margin. Defaults to `FALSE`.
+  When `TRUE` and there are several groups, the group legend is drawn
+  inside the panel, over a translucent background, in the bottom-left
+  corner, which a decreasing survival curve always leaves empty.
+  Otherwise, it is drawn in a right-hand margin. Defaults to `FALSE`.
 
 - title, x_lab, y_lab:
 
@@ -137,27 +136,27 @@ a `survfit` object are recomputed from its standard errors at
 with the same `conf.int` and `conf.type` (`conf_level` names the objects
 that keep their own).
 
-For publication-ready figures the plot offers the three annotations that
-define a "survminer-style" Kaplan-Meier display, each behind its own
-argument and off by default:
+For publication-ready figures, the plot offers the three annotations of
+a Kaplan-Meier display in the style of the 'survminer' package, each
+behind its own argument and off by default:
 
-- **Number-at-risk table** (`risk_table = TRUE`): a small panel composed
-  beneath the curves with 'patchwork', giving the number of subjects
-  still at risk in each group at the x-axis breaks.
+- `risk_table = TRUE` adds a number-at-risk table, a small panel
+  composed beneath the curves with 'patchwork' that gives the number of
+  subjects still at risk in each group at the x-axis breaks.
 
-- **Median-survival guides** (`median_line = TRUE`): dashed reference
+- `median_line = TRUE` draws median-survival guides, dashed reference
   lines from the 0.5 survival level down to each group's median survival
   time, with the median value labelled. The median is the time at which
   the curve falls below 0.5. Where the curve stays at 0.5 until a later
   drop, or until its last time, the median is the midpoint of that
   stretch, as in
   [`survival::quantile.survfit()`](https://rdrr.io/pkg/survival/man/quantile.survfit.html).
-  Groups whose curve never reaches 0.5 (median not estimable) are
+  A group whose curve never reaches 0.5 has no estimable median and is
   skipped.
 
-- **Log-rank test** (`logrank = TRUE`): for two or more groups, the
-  chi-squared log-rank statistic and its p-value are added as a
-  subtitle. For vector or data-frame input,
+- `logrank = TRUE` adds a log-rank test for two or more groups, with the
+  chi-squared statistic and its p-value as a subtitle. For vector or
+  data-frame input,
   [`survival::survdiff()`](https://rdrr.io/pkg/survival/man/survdiff.html)
   computes it when the 'survival' package is installed. For a `survfit`
   object, which keeps only its risk and event tables, or without
@@ -172,8 +171,8 @@ observations.” *Journal of the American Statistical Association*,
 [doi:10.1080/01621459.1958.10501452](https://doi.org/10.1080/01621459.1958.10501452)
 .
 
-Greenwood M (1926). *The natural duration of cancer*, volume 33 of
-*Reports on Public Health and Medical Subjects*. His Majesty's
+Greenwood M (1926). *A report on the natural duration of cancer*, volume
+33 of *Reports on Public Health and Medical Subjects*. His Majesty's
 Stationery Office, London.
 
 Borgan Ø, Liestøl K (1990). “A note on confidence intervals and bands

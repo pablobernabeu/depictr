@@ -2,10 +2,10 @@
 
 Visualises how the fixed-effect estimates of a mixed model vary across
 the optimisers tried by
-[`lme4::allFit()`](https://rdrr.io/pkg/lme4/man/allFit.html). It offers
-a quick check that a model has settled on a stable solution: tight
-clusters of points indicate agreement between optimisers, whereas
-scatter signals a fragile fit.
+[`lme4::allFit()`](https://rdrr.io/pkg/lme4/man/allFit.html). It checks
+that a model has reached a stable solution: tight clusters of points
+indicate agreement between optimisers, whereas scattered points signal a
+fragile fit.
 
 ## Usage
 
@@ -44,8 +44,8 @@ optimizer_fixef_plot(
 
 - select_terms:
 
-  Optional character vector of terms to display (the intercept is always
-  kept when `intercept = TRUE`).
+  Optional character vector of terms to display. The intercept is always
+  kept when `intercept = TRUE`.
 
 - interaction:
 
@@ -55,17 +55,17 @@ optimizer_fixef_plot(
 
 - labels:
 
-  Optional named character vector renaming the term panels, e.g.
+  Optional named character vector renaming the term panels, such as
   `c(conditionunrelated = "Unrelated priming")`. When `x` is a raw
   [`lme4::allFit()`](https://rdrr.io/pkg/lme4/man/allFit.html) object, a
   factor's coefficients are labelled with the variable and the level
-  automatically (e.g. `conditionunrelated` becomes
-  `condition: unrelated`) and these labels override that default.
+  automatically (`conditionunrelated` becomes `condition: unrelated`),
+  and these labels override that default.
 
 - number_optimizers:
 
   Whether to prefix each optimiser name with a number, so that the
-  legend doubles as an index.
+  legend also serves as an index.
 
 - free_y:
 
@@ -83,7 +83,7 @@ optimizer_fixef_plot(
 
 - palette:
 
-  Colours for the optimisers; defaults to
+  Colours for the optimisers. Defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
 
 - y_lab, title:

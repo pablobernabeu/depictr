@@ -2,7 +2,7 @@
 
 Combines the classic regression diagnostic plots (residuals against
 fitted values, a normal Q-Q plot of the standardised residuals, a
-scale-location plot, and residuals against leverage) into a single panel
+scale-location plot and residuals against leverage) into a single panel
 using 'patchwork'. The function works with `lm` and `glm` objects.
 
 ## Usage
@@ -65,17 +65,17 @@ A 'patchwork' object (printable like a
 
 ## Details
 
-For a `glm`, the default panels are made GLM-aware
-(`glm_panels = TRUE`): the "residuals vs. fitted" panel is replaced by a
-*binned*-residual plot (Gelman & Hill, 2007; see
+For a `glm`, the default panels suit a GLM (`glm_panels = TRUE`): the
+panel of residuals against fitted values is replaced by a
+binned-residual plot (Gelman & Hill, 2007, see
 [`binned_residual_plot()`](https://pablobernabeu.github.io/depictr/reference/binned_residual_plot.md)),
 which is readable even for binary or count models, and the Q-Q panel
-uses *randomised quantile* residuals (Dunn & Smyth, 1996), which are
-standard normal under a correctly specified model regardless of the
-response family. In a Gaussian or Gamma model, prior weights enter these
+uses randomised quantile residuals (Dunn & Smyth, 1996), which are
+standard normal under a correctly specified model whatever the response
+family. In a Gaussian or Gamma model, prior weights enter these
 residuals as they enter the fit, through each observation's variance.
 The scale-location and leverage panels are unchanged. Set
-`glm_panels = FALSE` to force the classic `lm`-style panels for a `glm`
+`glm_panels = FALSE` to draw the classic `lm`-style panels for a `glm`
 as well.
 
 ## References

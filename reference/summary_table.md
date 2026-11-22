@@ -1,4 +1,4 @@
-# A "Table 1" style descriptive summary
+# A descriptive summary in the style of 'Table 1'
 
 Builds the kind of descriptive table that opens many empirical papers:
 numeric variables are summarised as mean (SD), categorical variables as
@@ -51,9 +51,10 @@ summary_table(
 
 - max_levels:
 
-  When `vars` is `NULL`, character/factor columns whose distinct-level
-  count is at least `max_levels` *and* exceeds half the number of rows
-  are treated as identifiers and skipped. Defaults to `20`.
+  When `vars` is `NULL`, character or factor columns whose
+  distinct-level count is at least `max_levels` and exceeds half the
+  number of rows are treated as identifiers and skipped. Defaults to
+  `20`.
 
 ## Value
 
@@ -64,9 +65,9 @@ trailing `Missing` column. The first row reports `N`.
 ## Details
 
 The first row of the table always reports the sample size (`N`) overall
-and per group. By default each variable is also followed by a
-`Missing, n (%)` row whenever it contains missing values; set
-`missing = FALSE` to suppress these.
+and per group. By default, each variable is also followed by a
+`Missing, n (%)` row whenever it contains missing values. Set
+`missing = FALSE` to leave these out.
 
 A date or date-time column (`Date`, `POSIXct`) gets a single `Range`
 row, written as `<earliest> to <latest>` in each column. The cells give
@@ -75,11 +76,11 @@ time to the minute, or to the second when any time has seconds. A
 duration (`difftime`) is summarised as mean (SD) in its own units, which
 the statistic names, as in `Mean (SD), days`.
 
-When `vars` is `NULL`, high-cardinality character/factor columns (those
-whose number of distinct levels approaches the number of rows, e.g.
-identifier columns) are skipped automatically, with a message, rather
-than being expanded into hundreds of one-per-row entries. Pass such a
-column explicitly via `vars` to override this.
+When `vars` is `NULL`, high-cardinality character or factor columns,
+whose number of distinct levels approaches the number of rows, such as
+identifier columns, are skipped automatically, with a message, so that
+they are not expanded into hundreds of one-per-row entries. Pass such a
+column explicitly in `vars` to override this.
 
 ## Examples
 

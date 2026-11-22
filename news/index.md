@@ -1,6 +1,8 @@
 # Changelog
 
-## depictr (development version)
+## depictr 0.4.0
+
+CRAN release: 2026-11-22
 
 ### Upgrading from the previous release (0.3.0)
 
@@ -644,9 +646,9 @@
   [`palette_safety()`](https://pablobernabeu.github.io/depictr/reference/palette_safety.md)
   and
   [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md),
-  kept to reproduce colour distances computed before this release. The
-  default, `"ciede2000"`, replaces it, and a later release will remove
-  it.
+  kept to reproduce colour distances computed before this release, gives
+  a warning once per session. The default, `"ciede2000"`, replaces it,
+  and a later release will remove it.
 
 ### Documentation
 
@@ -731,6 +733,27 @@
   and covers four publishers’ text floors, Nature’s ceiling, the
   contrast-first palette order and how the audit treats a continuous
   colour scale.
+- Citations were checked against their published records. The reference
+  to Greenwood (1926) gives the report’s full title, ‘A report on the
+  natural duration of cancer’. WCAG 2.2 is dated 2024, where it was
+  dated 2023, since its address serves the Recommendation of 12
+  December 2024. The help page of
+  [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
+  and
+  [`vignette("depictr")`](https://pablobernabeu.github.io/depictr/articles/depictr.md)
+  cite Crameri et al. (2020) for preferring a perceptually uniform map,
+  such as viridis, to a rainbow, and no longer for depictr’s own ramps.
+  The help page of
+  [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
+  no longer calls the Okabe-Ito set ‘widely recommended’, and that of
+  [`model_fit_table()`](https://pablobernabeu.github.io/depictr/reference/model_fit_table.md)
+  credits Cameron and Windmeijer (1997) with the Kullback-Leibler
+  R-squared for exponential-family models only. The help page of
+  [`save_plot()`](https://pablobernabeu.github.io/depictr/reference/save_plot.md)
+  capitalises the word after the colon in the title of Nature’s figure
+  guide, and that of
+  [`k_diagnostic()`](https://pablobernabeu.github.io/depictr/reference/k_diagnostic.md)
+  gives the year of its citation of Tibshirani et al. (2001).
 
 ## depictr 0.3.0
 

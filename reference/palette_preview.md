@@ -2,11 +2,11 @@
 
 Displays the colours returned by
 [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md)
-as labelled swatches. It is useful when choosing how many groups to
-show, selecting a palette type, or documenting a figure. Each swatch's
-hex label is drawn in black or white, whichever has the higher WCAG
-contrast against that tile, so every label reaches the 4.5:1 that WCAG
-2.2 asks of text.
+as labelled swatches, which helps when choosing how many groups to show,
+selecting a palette type or documenting a figure. Each swatch's hex
+label is drawn in black or white, whichever has the higher WCAG contrast
+against that tile, so every label reaches the 4.5:1 that WCAG 2.2 asks
+of text.
 
 ## Usage
 
@@ -27,7 +27,7 @@ palette_preview(
 - type:
 
   Palette type to preview: `"qualitative"`, `"sequential"`,
-  `"diverging"`, or `"all"` to show all three, one panel each, without
+  `"diverging"` or `"all"` to show all three, one panel each, without
   the hex labels.
 
 - cvd:
@@ -46,9 +46,9 @@ object.
 
 Set `cvd` to render the swatches as they would appear under a
 colour-vision deficiency, using the Machado et al. (2009) simulation.
-The tiles are recoloured to the simulated appearance while the labels
-keep the *original* hex code, so you can see whether two groups would
-still be told apart by a colourblind reader.
+The tiles are recoloured to the simulated appearance, while the labels
+keep the original hex code, which shows whether a colourblind reader
+could still tell two groups apart.
 
 ## References
 
@@ -57,7 +57,7 @@ model for simulation of color vision deficiency.” *IEEE Transactions on
 Visualization and Computer Graphics*, **15**(6), 1291–1298.
 [doi:10.1109/TVCG.2009.113](https://doi.org/10.1109/TVCG.2009.113) .
 
-World Wide Web Consortium (2023). “Web Content Accessibility Guidelines
+World Wide Web Consortium (2024). “Web Content Accessibility Guidelines
 (WCAG) 2.2.” W3C Recommendation, <https://www.w3.org/TR/WCAG22/>.
 Accessed 2026-08-18.
 

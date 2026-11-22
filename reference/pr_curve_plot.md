@@ -4,9 +4,9 @@ Plots precision against recall for a binary classifier and reports the
 average precision (the area under the curve). The precision-recall curve
 is more informative than the ROC curve when the positive class is rare,
 because it ignores the many true negatives. A horizontal line marks the
-no-skill baseline (the positive-class prevalence). Pass a *named list*
-of models / (actual, score) pairs to overlay several colour-coded curves
-with a legend and per-curve average precision.
+no-skill baseline (the positive-class prevalence). Pass a named list of
+models or of (actual, score) pairs to overlay several colour-coded
+curves with a legend and per-curve average precision.
 
 ## Usage
 
@@ -24,24 +24,24 @@ pr_curve_plot(
 
 - x:
 
-  A binomial `glm`; the vector of observed outcomes (0/1, logical or a
-  two-level factor with the positive class second); or a *named* list of
-  models / (actual, score) pairs to overlay.
+  A binomial `glm`, the vector of observed outcomes (0 and 1, logical or
+  a two-level factor with the positive class second) or a named list of
+  models or of (actual, score) pairs to overlay.
 
 - score:
 
   When `x` is an outcome vector, the matching scores or predicted
-  probabilities (or a list of them for the multi-model case).
+  probabilities, or a list of them for several models.
 
 - colour:
 
-  Curve colour for the single-model case. Defaults to the depictr brand
-  blue. Ignored when several models are overlaid.
+  Curve colour for a single model. Defaults to the depictr brand blue.
+  Ignored when several models are overlaid.
 
 - f1:
 
-  Logical; if `TRUE`, mark the maximum-F1 operating point on each curve
-  (the threshold maximising the harmonic mean of precision and recall).
+  Whether to mark the maximum-F1 operating point, the threshold that
+  maximises the harmonic mean of precision and recall, on each curve.
 
 - title:
 
@@ -51,8 +51,8 @@ pr_curve_plot(
 
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
 object. The average precision is stored in
-`attr(plot, "average_precision")` (a named vector when several models
-are supplied). With `f1 = TRUE`, the maximum-F1 point is stored in
+`attr(plot, "average_precision")`, a named vector when several models
+are supplied. With `f1 = TRUE`, the maximum-F1 point is stored in
 `attr(plot, "max_f1")`: a list of `threshold`, `recall`, `precision` and
 `f1`, or a list of such lists named by model when several models are
 supplied.

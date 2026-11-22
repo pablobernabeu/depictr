@@ -40,7 +40,7 @@ confusion_matrix_plot(
 - normalise:
 
   One of `"none"`, `"row"` (by actual class) or `"col"` (by predicted
-  class); controls the fill shading and the cell annotation.
+  class). Controls the fill shading and the cell annotation.
 
 - title:
 
@@ -49,8 +49,7 @@ confusion_matrix_plot(
 ## Value
 
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
-object. The threshold actually used is stored in
-`attr(plot, "threshold")`.
+object. The threshold used is stored in `attr(plot, "threshold")`.
 
 ## Examples
 

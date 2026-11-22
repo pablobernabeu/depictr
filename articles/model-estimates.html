@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">depictr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,21 +86,20 @@
 
     
     
-<p>This is the flagship article. It works through depictr’s model-result
-plots (coefficients, model comparison, predicted values, interactions,
-random effects and goodness-of-fit) and then reaches the capability that
-<code><a href="../reference/frequentist_bayesian_plot.html">frequentist_bayesian_plot()</a></code> is named for: showing a
-frequentist estimate and a full Bayesian posterior for the same model on
+<p>This article works through depictr’s model-result plots
+(coefficients, model comparison, predicted values, interactions, random
+effects and goodness-of-fit). It also covers
+<code><a href="../reference/frequentist_bayesian_plot.html">frequentist_bayesian_plot()</a></code>, which shows a frequentist
+estimate and the Bayesian posterior distribution for the same model on
 one figure.</p>
-<p>The running example is <code>lexical_decision</code>, a
-counterbalanced, crossed lexical-decision experiment (24 participants,
-40 items, 960 trials). We model reaction time on correct trials as a
-function of priming <code>condition</code> (related/unrelated),
-presentation <code>modality</code> (visual/auditory) and item
+<p>The running example is <code>lexical_decision</code>, a crossed
+lexical-decision experiment (24 participants, 40 items, 960 trials). We
+model reaction time on correct trials as a function of priming
+<code>condition</code> (related/unrelated), presentation
+<code>modality</code> (visual/auditory) and item
 <code>word_frequency</code>, with crossed random intercepts for
-participant and item. The design is counterbalanced, so neither fixed
-factor is collinear with the item random effect, a clean fit for a mixed
-model.</p>
+participant and item. Because the design is counterbalanced, neither
+fixed factor is collinear with the item random effect.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">correct</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">lexical_decision</span>, <span class="va">accuracy</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">lmerTest</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span></span>
@@ -113,11 +112,10 @@ model.</p>
 <div class="section level2">
 <h2 id="coefficient-forest-plots">Coefficient (forest) plots<a class="anchor" aria-label="anchor" href="#coefficient-forest-plots"></a>
 </h2>
-<p><code><a href="../reference/coefficient_plot.html">coefficient_plot()</a></code> reads the fitted mixed model directly
-(through <code><a href="../reference/tidy_estimates.html">tidy_estimates()</a></code>) and draws a horizontal
-point-and-interval (‘forest’) plot. Unrelated primes and auditory
-presentation both slow responses, while more frequent words speed them
-up.</p>
+<p><code><a href="../reference/coefficient_plot.html">coefficient_plot()</a></code> reads the fitted mixed model through
+<code><a href="../reference/tidy_estimates.html">tidy_estimates()</a></code> and draws a horizontal point-and-interval
+(‘forest’) plot. Unrelated primes and auditory presentation both slow
+responses, while more frequent words speed them up.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/coefficient_plot.html">coefficient_plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit</span>, order <span class="op">=</span> <span class="st">"ascending"</span>,</span>
@@ -127,40 +125,41 @@ up.</p>
 <span>  title <span class="op">=</span> <span class="st">"Predictors of lexical-decision RT (ms)"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-estimates_files/figure-html/coef-1.png" class="r-plt" alt="" width="672"></p>
-<p>Coefficient names are tidied automatically. A factor’s coefficient is
-labelled with its variable and the level compared with the reference, so
-<code>conditionunrelated</code> becomes
-<code>condition: unrelated</code>, and <code>word_frequency</code>
-becomes <code>word frequency</code>. Pass <code>labels</code> to
-override any of them. A slope per Zipf unit and a contrast between two
-conditions are in different units. <code>standardise = TRUE</code>
-multiplies the slope of each continuous predictor by that predictor’s
-standard deviation, so the word-frequency slope reads as the change in
-RT per SD. The two factor contrasts stay as differences in milliseconds
-between conditions. A contrast already compares two groups, and its
-per-SD value would depend on how evenly the trials happen to be split
-between them <span class="citation">(<a href="#ref-gelman2008">Gelman,
-2008</a>)</span>. An interaction is scaled through its inputs in the
-same way, and the axis label names the convention. Gelman recommends two
-SDs, which makes a continuous slope roughly comparable with a binary
-contrast. <code>sd_multiple = 2</code> follows that convention:</p>
+<p>Coefficient names are tidied automatically.
+<code>word_frequency</code> becomes <code>word frequency</code>, and a
+factor’s coefficient is labelled with its variable and the level
+compared with the reference, so <code>conditionunrelated</code> becomes
+<code>condition: unrelated</code>. Pass <code>labels</code> to override
+any of them.</p>
+<p>A slope per Zipf unit and a contrast between two conditions are in
+different units. <code>standardise = TRUE</code> multiplies the slope of
+each continuous predictor by that predictor’s standard deviation, so the
+word-frequency slope reads as the change in RT per SD. The two factor
+contrasts stay as differences in milliseconds between conditions. A
+contrast already compares two groups, and its per-SD value would depend
+on how evenly the trials happen to be split between them <span class="citation">(<a href="#ref-gelman2008">Gelman, 2008</a>)</span>. An
+interaction is scaled through its inputs in the same way. Gelman
+recommends two SDs, which makes a continuous slope roughly comparable
+with a binary contrast. <code>sd_multiple = 2</code> follows that
+convention, and the axis label names whichever convention is used:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/coefficient_plot.html">coefficient_plot</a></span><span class="op">(</span><span class="va">fit</span>, standardise <span class="op">=</span> <span class="cn">TRUE</span>, sd_multiple <span class="op">=</span> <span class="fl">2</span>, order <span class="op">=</span> <span class="st">"ascending"</span>,</span>
 <span>                 title <span class="op">=</span> <span class="st">"Predictors of RT, word frequency per 2 SD"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-estimates_files/figure-html/coef-std-1.png" class="r-plt" alt="" width="672"></p>
 <p>To keep the raw units instead, including a large intercept that would
-otherwise squash the slopes, <code>facet = TRUE</code> gives each term
-its own free-scaled panel (the layout the frequentist-vs-Bayesian
-comparison below uses by default).</p>
+otherwise compress the slopes, set <code>facet = TRUE</code>, which
+gives each term its own free-scaled panel.
+<code><a href="../reference/frequentist_bayesian_plot.html">frequentist_bayesian_plot()</a></code>, shown below, uses this layout
+by default.</p>
 </div>
 <div class="section level2">
 <h2 id="comparing-models">Comparing models<a class="anchor" aria-label="anchor" href="#comparing-models"></a>
 </h2>
 <p><code><a href="../reference/compare_models.html">compare_models()</a></code> overlays the estimates from several
 models so you can see how a coefficient moves as the specification
-changes. Here a reduced model (dropping <code>modality</code>) is
-compared with the full model, and <code><a href="../reference/model_fit_table.html">model_fit_table()</a></code>
-summarises their fit.</p>
+changes. Here a reduced model without <code>modality</code> is compared
+with the full model, and <code><a href="../reference/model_fit_table.html">model_fit_table()</a></code> summarises their
+fit.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">reduced</span> <span class="op">&lt;-</span> <span class="fu">lmerTest</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/lmerTest/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span></span>
 <span>  <span class="va">RT</span> <span class="op">~</span> <span class="va">condition</span> <span class="op">+</span> <span class="va">word_frequency</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">participant</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">item</span><span class="op">)</span>,</span>
@@ -205,29 +204,27 @@ summarises their fit.</p>
 </tr>
 </tbody>
 </table>
-<p>Both the reduced and the full model were fitted by restricted maximum
-likelihood (REML), the default of <code>lmer()</code>. A REML likelihood
-is the likelihood of the residuals left once the fixed effects are
-removed. It changes with the fixed effects, so REML criteria cannot
-compare models that differ in them, as these two do.
-<code><a href="../reference/model_fit_table.html">model_fit_table()</a></code> therefore takes AIC, BIC and the
-log-likelihood from a maximum-likelihood refit, as <code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova()</a></code>
-does for lme4 fits, and says so in a message. The <code>R2</code> column
-reads <code>NA</code> for mixed models, since no single R-squared is
-standard for them. For a <code>glm</code>, it reports the deviance
-R-squared <span class="citation">(<a href="#ref-cameron1997">Cameron
-&amp; Windmeijer, 1997</a>)</span>, the share of the null deviance that
-the predictors explain. That equals the ordinary R-squared for a
-Gaussian model with the identity link and McFadden’s pseudo-R-squared
-<span class="citation">(<a href="#ref-mcfadden1974">McFadden,
-1974</a>)</span> for binary logistic regression.</p>
+<p>Both models were fitted by restricted maximum likelihood (REML), the
+default of <code>lmer()</code>. A REML likelihood is the likelihood of
+the residuals left once the fixed effects are removed. It changes with
+the fixed effects, so REML criteria cannot compare models that differ in
+them, as these two do. <code><a href="../reference/model_fit_table.html">model_fit_table()</a></code> therefore takes
+AIC, BIC and the log-likelihood from a maximum-likelihood refit, as
+<code><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova()</a></code> does for lme4 fits, and says so in a message.</p>
+<p>The <code>R2</code> column reads <code>NA</code> for mixed models,
+since no single R-squared is standard for them. For a <code>glm</code>,
+the column reports the deviance R-squared <span class="citation">(<a href="#ref-cameron1997">Cameron &amp; Windmeijer, 1997</a>)</span>, the
+share of the null deviance that the predictors explain. That equals the
+ordinary R-squared for a Gaussian model with the identity link and
+McFadden’s pseudo-R-squared <span class="citation">(<a href="#ref-mcfadden1974">McFadden, 1974</a>)</span> for binary logistic
+regression.</p>
 </div>
 <div class="section level2">
 <h2 id="predicted-values-and-interactions">Predicted values and interactions<a class="anchor" aria-label="anchor" href="#predicted-values-and-interactions"></a>
 </h2>
 <p><code><a href="../reference/effects_plot.html">effects_plot()</a></code> shows what the model predicts as one
 predictor varies, holding the others at typical values. It also works on
-the mixed model: predictions use the fixed effects only
+the mixed model, where its predictions use the fixed effects only
 (<code>re.form = NA</code>) and the band is built from the fixed-effect
 design matrix and <code><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov()</a></code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -235,11 +232,11 @@ design matrix and <code><a href="https://rdrr.io/r/stats/vcov.html" class="exter
 <span>             title <span class="op">=</span> <span class="st">"Predicted RT across word frequency"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-estimates_files/figure-html/effects-1.png" class="r-plt" alt="" width="672"></p>
 <p><code><a href="../reference/interaction_plot.html">interaction_plot()</a></code> shows how a relationship changes
-across a second predictor. The lexical-decision model is additive, so
-for a <em>genuine</em> interaction we switch to <code>crop_yield</code>,
-whose data-generating process contains a real fertiliser-by-treatment
-effect: fertiliser raises yield far more under the <code>enhanced</code>
-treatment than under <code>standard</code>, so the slopes diverge.</p>
+across a second predictor. The lexical-decision model is additive, so we
+switch to <code>crop_yield</code>, whose data-generating process
+contains a fertiliser-by-treatment interaction. Fertiliser raises yield
+far more under the <code>enhanced</code> treatment than under
+<code>standard</code>, so the slopes diverge.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">crop_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">fertiliser</span> <span class="op">*</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">rainfall</span>, data <span class="op">=</span> <span class="va">crop_yield</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/interaction_plot.html">interaction_plot</a></span><span class="op">(</span><span class="va">crop_fit</span>, <span class="st">"fertiliser"</span>, <span class="st">"treatment"</span>,</span>
@@ -249,19 +246,16 @@ treatment than under <code>standard</code>, so the slopes diverge.</p>
 <div class="section level2">
 <h2 id="frequentist-and-bayesian-estimates-together">Frequentist and Bayesian estimates together<a class="anchor" aria-label="anchor" href="#frequentist-and-bayesian-estimates-together"></a>
 </h2>
-<p>This is the capability <code><a href="../reference/frequentist_bayesian_plot.html">frequentist_bayesian_plot()</a></code> is
-named for. Given the frequentist fit and a set of Bayesian posterior
-draws, the function draws the <em>full posterior distribution</em> for
-each term (a ‘ggdist’ half-eye) and overlays the frequentist point and
-confidence interval at the same position. The entire shape of the
-posterior appears next to the frequentist estimate, rather than a point
-and two limits alone, with the two sources in the two leading
-colourblind-safe palette colours.</p>
-<p>The draws here are the real fixed-effect posterior from a
-<code>brms</code> fit of the same model (1000 draws x 4 parameters),
-shipped with the package so the slow MCMC need not be re-run. Terms are
-matched by canonical label, so the <code>brms</code> parameter names
-line up with the frequentist ones automatically.</p>
+<p>Given the frequentist fit and a set of Bayesian posterior draws,
+<code><a href="../reference/frequentist_bayesian_plot.html">frequentist_bayesian_plot()</a></code> shows the posterior
+distribution of each term as a ‘ggdist’ half-eye and overlays the
+frequentist point and confidence interval at the same position. The two
+sources take the first two colours of the colourblind-safe palette.</p>
+<p>The draws here are the fixed-effect posterior from a
+<code>brms</code> fit of the same model (1000 draws x 4 parameters).
+They are stored in the package so that the slow MCMC need not be re-run.
+Terms are matched by canonical label, so the <code>brms</code> parameter
+names line up with the frequentist ones automatically.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"lexdec_draws.rds"</span>, package <span class="op">=</span> <span class="st">"depictr"</span><span class="op">)</span></span>
@@ -275,25 +269,25 @@ line up with the frequentist ones automatically.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-estimates_files/figure-html/fbp-1.png" class="r-plt" alt="" width="672"></p>
 <p>The frequentist confidence interval and the bulk of the Bayesian
-posterior land in the same place (reassuring agreement between the two
-paradigms), but only the posterior shows the density, the skew and the
-mass on either side of zero.</p>
-<p>If <code>ggdist</code> is unavailable the function falls back to a
-point-and-interval forest plot of the two sources, and when the Bayesian
-side is supplied as a <em>summary</em> table instead of draws (for
-instance the <code>Estimate</code>/<code>Q2.5</code>/<code>Q97.5</code>
-of <code>brms::fixef()</code>) it draws the familiar two-source forest
-plot.</p>
+posterior fall in the same place, but only the posterior shows the
+density, the skew and the mass on either side of zero.</p>
+<p>If <code>ggdist</code> is unavailable, the function falls back to a
+point-and-interval forest plot of the two sources. When the Bayesian
+side is supplied as a <em>summary</em> table instead of draws, for
+instance the <code>Estimate</code>, <code>Q2.5</code> and
+<code>Q97.5</code> of <code>brms::fixef()</code>, it draws the familiar
+two-source forest plot.</p>
 </div>
 <div class="section level2">
 <h2 id="posterior-distributions-on-their-own">Posterior distributions on their own<a class="anchor" aria-label="anchor" href="#posterior-distributions-on-their-own"></a>
 </h2>
 <p><code><a href="../reference/posterior_plot.html">posterior_plot()</a></code> summarises any draws (posterior,
 bootstrap or simulation) as a distribution per parameter. With
-<code>style = "halfeye"</code> it shows the density slab and a
+<code>style = "halfeye"</code>, it shows the density slab and a
 point-and-interval. A region of practical equivalence (ROPE) can be
-shaded and each parameter annotated with its probability of direction
-(the posterior mass on its majority side of the reference line).</p>
+shaded, and each parameter can be annotated with its probability of
+direction, the posterior mass on its majority side of the reference
+line.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">draws</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"lexdec_draws.rds"</span>, package <span class="op">=</span> <span class="st">"depictr"</span><span class="op">)</span></span>
@@ -308,17 +302,17 @@ shaded and each parameter annotated with its probability of direction
 <span>  title <span class="op">=</span> <span class="st">"Fixed-effect posteriors (ms), with ROPE and pd"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-estimates_files/figure-html/posterior-1.png" class="r-plt" alt="" width="672"></p>
-<p>The probability of direction for <code>word_frequency</code> and
-<code>conditionunrelated</code> is effectively 100%: the posterior sits
-almost entirely on one side of zero.</p>
+<p>The posteriors of <code>word_frequency</code> and
+<code>conditionunrelated</code> lie almost entirely on one side of zero,
+so their probability of direction is effectively 100%.</p>
 </div>
 <div class="section level2">
 <h2 id="random-effects">Random effects<a class="anchor" aria-label="anchor" href="#random-effects"></a>
 </h2>
-<p><code><a href="../reference/random_effects_plot.html">random_effects_plot()</a></code> draws a caterpillar plot of the
-conditional modes (‘BLUPs’). Reading the fitted model directly, it shows
-the by-item and by-participant departures from the average, sorted, with
-their uncertainty, the usual way to spot unusual groups.</p>
+<p><code><a href="../reference/random_effects_plot.html">random_effects_plot()</a></code> reads the fitted model and draws a
+caterpillar plot of the conditional modes (‘BLUPs’). It shows the
+by-item and by-participant departures from the average, sorted and with
+their uncertainty, which is the usual way to spot unusual groups.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/random_effects_plot.html">random_effects_plot</a></span><span class="op">(</span><span class="va">fit</span>, title <span class="op">=</span> <span class="st">"By-group departures (random intercepts)"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-estimates_files/figure-html/ranef-1.png" class="r-plt" alt="" width="672"></p>
@@ -329,12 +323,12 @@ their uncertainty, the usual way to spot unusual groups.</p>
 <p>A mixed-model fit should be stable across optimisers.
 <code><a href="https://rdrr.io/pkg/lme4/man/allFit.html" class="external-link">lme4::allFit()</a></code> refits the model with every available
 optimiser, and <code><a href="../reference/optimizer_fixef_plot.html">optimizer_fixef_plot()</a></code> then shows the fixed
-effects side by side, one panel per term. Tight clusters mean the fit
-has settled, while scatter would signal a fragile solution.</p>
-<p>The package ships the <code>allFit()</code> summary for this model,
-so we can plot it without re-running the (slow) refits. The plot accepts
-a tidy data frame of optimiser-by-term values, which we read straight
-off the stored summary.</p>
+effects side by side, one panel per term. Tight clusters mean that the
+fit is stable, and scattered points would signal a fragile solution.</p>
+<p>The package includes the <code>allFit()</code> summary for this
+model, so we can plot it without re-running the slow refits. The plot
+accepts a tidy data frame of optimiser-by-term values, which we take
+from the stored summary.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">af</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"allfit_lexdec.rds"</span>, package <span class="op">=</span> <span class="st">"depictr"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">fx</span> <span class="op">&lt;-</span> <span class="va">af</span><span class="op">$</span><span class="va">fixef</span>    <span class="co"># optimisers x fixed effects</span></span>
@@ -351,19 +345,19 @@ off the stored summary.</p>
 <span>             word_frequency <span class="op">=</span> <span class="st">"word frequency"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="model-estimates_files/figure-html/optim-1.png" class="r-plt" alt="" width="672"></p>
-<p>Every optimiser lands on the same estimate for each term (the points
-coincide within each panel), so this fit is stable.</p>
+<p>The points coincide within each panel, so every optimiser reaches the
+same estimate for each term and this fit is stable.</p>
 </div>
 <div class="section level2">
 <h2 id="a-one-figure-model-report">A one-figure model report<a class="anchor" aria-label="anchor" href="#a-one-figure-model-report"></a>
 </h2>
-<p><code><a href="../reference/model_report.html">model_report()</a></code> composes several views (coefficients, the
-effect of a focal predictor, residuals against fitted values and a Q-Q
-plot, with a fit-statistics subtitle) into a single figure for a rapid
-review or a report appendix. It works on
-<code>lm</code>/<code>glm</code> models, and here we use the crop-yield
-model. A <code>glm</code> gets the binned-residual and quantile-residual
-panels of <code><a href="../reference/residual_diagnostics_plot.html">residual_diagnostics_plot()</a></code>.</p>
+<p><code><a href="../reference/model_report.html">model_report()</a></code> composes the coefficients, the effect of
+a focal predictor, residuals against fitted values and a Q-Q plot into a
+single figure, with a subtitle of fit statistics, for a quick review or
+a report appendix. It works on <code>lm</code> and <code>glm</code>
+models, and a <code>glm</code> gets the binned-residual and
+quantile-residual panels of <code><a href="../reference/residual_diagnostics_plot.html">residual_diagnostics_plot()</a></code>.
+Here we use the crop-yield model.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">full</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">yield</span> <span class="op">~</span> <span class="va">rainfall</span> <span class="op">+</span> <span class="va">fertiliser</span> <span class="op">+</span> <span class="va">soil_ph</span> <span class="op">+</span> <span class="va">treatment</span>,</span>
 <span>           data <span class="op">=</span> <span class="va">crop_yield</span><span class="op">)</span></span>

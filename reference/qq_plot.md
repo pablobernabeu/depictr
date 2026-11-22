@@ -2,9 +2,9 @@
 
 A normal Q-Q plot for a numeric vector or for the standardised residuals
 of a fitted model, with a reference line and an optional confidence band
-that makes departures from normality easier to judge. Points that stray
-outside the band are unusual under normality; under a normal sample
-roughly `level` of the points fall inside a pointwise band.
+that makes departures from normality easier to judge. Points outside the
+band are unusual under normality. In a normal sample, about `level` of
+the points fall inside a pointwise band.
 
 ## Usage
 
@@ -28,8 +28,8 @@ qq_plot(
 
 - x:
 
-  A numeric vector, or a fitted `lm`/`glm` model (its standardised
-  residuals are used).
+  A numeric vector, or a fitted `lm` or `glm` model, whose standardised
+  residuals are used.
 
 - colour:
 
@@ -41,7 +41,7 @@ qq_plot(
 
 - band:
 
-  Whether to draw a confidence band/envelope.
+  Whether to draw a confidence band or envelope.
 
 - band_type:
 

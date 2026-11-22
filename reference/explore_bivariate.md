@@ -2,9 +2,9 @@
 
 Chooses an appropriate plot for the relationship between two variables
 according to their types. Two numeric variables are shown as a scatter
-plot with a fitted trend; a numeric and a categorical variable as box
-plots of the numeric variable by level; and two categorical variables as
-a filled bar chart of proportions.
+plot with a fitted trend. A numeric and a categorical variable are shown
+as box plots of the numeric variable by level. Two categorical variables
+are shown as a filled bar chart of proportions.
 
 ## Usage
 
@@ -33,18 +33,18 @@ explore_bivariate(
 
 - method:
 
-  Smoothing method for the numeric-numeric case (passed to
-  [`ggplot2::geom_smooth()`](https://ggplot2.tidyverse.org/reference/geom_smooth.html));
-  `NULL` for no trend.
+  Smoothing method for two numeric variables, passed to
+  [`ggplot2::geom_smooth()`](https://ggplot2.tidyverse.org/reference/geom_smooth.html),
+  or `NULL` for no trend.
 
 - palette:
 
-  Colours used when a fill/colour is needed; defaults to
+  Colours used when a fill or colour is needed. Defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
 
 - title, x_lab, y_lab:
 
-  Title and axis labels (default to variable names).
+  Title and axis labels, which default to the variable names.
 
 ## Value
 

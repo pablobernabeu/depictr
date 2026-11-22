@@ -2,9 +2,9 @@
 
 A matrix of pairwise plots for a set of numeric variables: scatter plots
 below the diagonal, densities on the diagonal and correlation
-coefficients above the diagonal. Optionally colour everything by a
-grouping variable. Built with 'patchwork', so it shares the package
-theme and palette.
+coefficients above the diagonal, optionally coloured by a grouping
+variable. Built with 'patchwork', so it shares the package theme and
+palette.
 
 ## Usage
 
@@ -61,7 +61,7 @@ explore_pairs(
 
 - palette:
 
-  Colours for the groups; defaults to
+  Colours for the groups. Defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
 
 - title:

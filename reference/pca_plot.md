@@ -1,11 +1,11 @@
 # PCA biplot
 
 Runs a principal component analysis on the numeric columns of a data
-frame (or takes an existing
-[`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html) object) and
+frame, or takes an existing
+[`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html) object, and
 draws a biplot: the observations projected onto two components, with the
-variable loadings shown as arrows. Optionally colour the observations by
-a grouping variable.
+variable loadings shown as arrows. The observations can be coloured by a
+grouping variable.
 
 ## Usage
 
@@ -27,13 +27,13 @@ pca_plot(
 
 - x:
 
-  A data frame, or a
+  A data frame or a
   [`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html) object.
 
 - cols:
 
-  When `x` is a data frame, the numeric columns to analyse (default: all
-  numeric).
+  When `x` is a data frame, the numeric columns to analyse (by default,
+  all numeric columns).
 
 - group:
 
@@ -64,7 +64,7 @@ pca_plot(
 
 - palette:
 
-  Colours for the groups; defaults to
+  Colours for the groups. Defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
 
 - title:

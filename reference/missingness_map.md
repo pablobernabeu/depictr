@@ -3,8 +3,8 @@
 Draws a tile map of the data frame with one column per variable and one
 row per observation, shading the cells that are missing. The variables
 are ordered by their proportion of missing values, and that proportion
-is shown in the axis labels, making it easy to spot variables and
-patterns that need attention before modelling.
+is shown in the axis labels, so variables and patterns that need
+attention before modelling are easy to spot.
 
 ## Usage
 
@@ -28,7 +28,7 @@ missingness_map(
 
 - cols:
 
-  Optional character vector of columns to include (default: all).
+  Optional character vector of columns to include (by default, all).
 
 - sort:
 
@@ -48,10 +48,10 @@ missingness_map(
 
 - legend_inside:
 
-  When `TRUE` (and `sort = TRUE`), draw the legend inside the panel, in
-  the top-right (where the most-complete columns put a solid "Present"
-  block, so it hides no "Missing" mark) instead of in a right-hand
-  margin. Defaults to `FALSE`.
+  When `TRUE` and `sort = TRUE`, the legend is drawn inside the panel,
+  in the top-right corner, where the most complete columns put a solid
+  block of present cells, so it hides no missing cell. Otherwise, it is
+  drawn in a right-hand margin. Defaults to `FALSE`.
 
 - title:
 

@@ -1,13 +1,12 @@
 # Tidy raw coefficient names for display
 
-Cleans up the term names produced by modelling functions so that they
-read well on a plot: the intercept is renamed, an optional `b_`/`bs_`
-Bayesian prefix is stripped, interaction colons are converted to a
-chosen symbol, and underscores are shown as spaces (e.g.
-`word_frequency` becomes `"word frequency"`). The `b_`/`bs_` prefix is
-stripped from *each* component of an interaction (e.g. `b_x:b_y`), not
-just the leading term. Missing values (`NA`) are kept as `NA` rather
-than being rendered as the literal text `"NA"`.
+Tidies the term names produced by modelling functions so that they read
+well on a plot: the intercept is renamed, an optional Bayesian prefix
+`b_` or `bs_` is stripped, interaction colons are converted to a chosen
+symbol and underscores are shown as spaces, so `word_frequency` becomes
+`"word frequency"`. The prefix is stripped from every component of an
+interaction, such as `b_x:b_y`, and not only from the leading term.
+Missing values (`NA`) stay `NA` and are not rendered as the text `"NA"`.
 
 ## Usage
 
@@ -45,8 +44,8 @@ format_terms(
 - wrap:
 
   Optional integer width at which to wrap long labels onto new lines
-  (see [`base::strwrap()`](https://rdrr.io/r/base/strwrap.html)). `NULL`
-  (default) leaves labels unwrapped.
+  (see [`base::strwrap()`](https://rdrr.io/r/base/strwrap.html)).
+  `NULL`, the default, leaves labels unwrapped.
 
 ## Value
 

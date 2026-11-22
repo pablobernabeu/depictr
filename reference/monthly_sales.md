@@ -2,17 +2,16 @@
 
 A reproducibly simulated seasonal monthly time series in tidy long form,
 for the time-series examples. It holds two product lines (`indoor` and
-`outdoor`), each with six years of monthly observations carrying a
-linear trend, a clear twelve-month seasonal cycle (with different
-seasonal peaks per line) and noise. The two-series shape exercises the
-multi-group
+`outdoor`), each with six years of monthly observations with a linear
+trend, a clear twelve-month seasonal cycle (with different seasonal
+peaks per line) and noise. The two series show the grouped
 [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
-path on first-party data; extracting one series as a monthly `ts`
+on the package's own data, and one series extracted as a monthly `ts`
 (frequency 12) lets
 [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md)
 and
 [`acf_plot()`](https://pablobernabeu.github.io/depictr/reference/acf_plot.md)
-reveal the trend and seasonality.
+show the trend and seasonality.
 
 ## Usage
 
@@ -38,7 +37,7 @@ A data frame with 144 rows and 3 variables:
 
 ## Source
 
-Simulated; see `data-raw/generate_datasets.R`.
+Simulated by `data-raw/generate_datasets.R` in the source repository.
 
 ## Details
 

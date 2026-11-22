@@ -1,12 +1,12 @@
 # Save a plot with publication-ready defaults
 
-A convenience wrapper around
+A wrapper around
 [`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html)
-with sensible defaults for figures in papers and reports: a moderate
-size, 300 dpi, and the output directory created if needed. The device is
-inferred from the file extension, and PDF, EPS and TIFF files are
-written to pass the technical checks journals run on submitted figures.
-With `check = TRUE`, the figure is also audited with
+with defaults for figures in papers and reports: a moderate size, 300
+dpi and an output directory created if needed. The device is inferred
+from the file extension, and PDF, EPS and TIFF files are written to pass
+the technical checks journals run on submitted figures. With
+`check = TRUE`, the figure is also audited with
 [`check_figure()`](https://pablobernabeu.github.io/depictr/reference/check_figure.md)
 at the width it is saved at.
 
@@ -29,12 +29,12 @@ save_plot(
 
 - filename:
 
-  Output file path. The extension sets the device (e.g. `.png`, `.pdf`,
-  `.eps`, `.tiff`).
+  Output file path. The extension sets the device, such as `.png`,
+  `.pdf`, `.eps` or `.tiff`.
 
 - plot:
 
-  The plot to save; defaults to the last plot drawn.
+  The plot to save. Defaults to the last plot drawn.
 
 - width, height:
 
@@ -69,7 +69,7 @@ save_plot(
   [`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html),
   which passes what it does not use on to the device. A `device` or
   device argument given here overrides the defaults described under
-  "Formats journals accept".
+  'Formats journals accept'.
 
 ## Value
 
@@ -92,8 +92,8 @@ An EPS or PostScript file is written with
 [`grDevices::cairo_ps()`](https://rdrr.io/r/grDevices/cairo.html), with
 its fonts embedded too. PostScript has no transparency, and
 [`grDevices::postscript()`](https://rdrr.io/r/grDevices/postscript.html)
-leaves every translucent layer out of the file: the points and the
-confidence band of the plot in the examples below vanish.
+leaves every translucent layer out of the file, so the points and the
+confidence band of the plot in the examples below would be missing.
 [`cairo_ps()`](https://rdrr.io/r/grDevices/cairo.html) rasterises those
 layers, together with whatever they overlap, at `fallback_resolution`,
 by default `max(dpi, 600)` here. A message says so when a layer of the
@@ -135,8 +135,6 @@ and for line art and text that are not rasterised. A figure with
 translucent layers therefore goes to Nature as a PDF. Elsevier asks for
 a graph sent as a TIFF at 1000 dpi, so pass `dpi = 1000` for one.
 
-The Python twin takes the plot first, as `save_plot(plot, filename)`.
-
 ## References
 
 PLOS ONE. Figures. <https://journals.plos.org/plosone/s/figures>
@@ -144,7 +142,7 @@ PLOS ONE. Figures. <https://journals.plos.org/plosone/s/figures>
 Nature. Guide to preparing final artwork.
 <https://www.nature.com/documents/nature-final-artwork.pdf>
 
-Nature research figure guide. Preparing figures: our specifications.
+Nature research figure guide. Preparing figures: Our specifications.
 <https://research-figure-guide.nature.com/figures/preparing-figures-our-specifications/>
 
 Elsevier. Artwork overview.

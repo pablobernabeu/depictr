@@ -14,7 +14,7 @@ scree_plot(x, cols = NULL, scale = TRUE, n = NULL, title = NULL)
 
 - x:
 
-  A data frame, or a
+  A data frame or a
   [`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html) object.
 
 - cols:

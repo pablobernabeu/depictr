@@ -3,11 +3,11 @@
 Plots the receiver operating characteristic (ROC) curve for a binary
 classifier and reports the area under the curve (AUC). The input can be
 a fitted binomial `glm`, a pair of vectors (observed binary outcome and
-a continuous score), or, to compare several models, a *named list* of
+a continuous score), or, to compare several models, a named list of
 models or of (actual, score) pairs, which are overlaid as colour-coded
 curves with a legend and a per-curve AUC. An optional bootstrap
-confidence band can be drawn for the (single-model) curve and its AUC,
-and the Youden's J operating point can be marked.
+confidence band can be drawn for the curve of a single model and its
+AUC, and the Youden's J operating point can be marked.
 
 ## Usage
 
@@ -28,29 +28,30 @@ roc_curve_plot(
 
 - x:
 
-  A binomial `glm`; the vector of observed outcomes (0/1, logical or a
-  two-level factor with the positive class second); or a *named* list of
-  models / (actual, score) pairs to overlay (see Details).
+  A binomial `glm`, the vector of observed outcomes (0 and 1, logical or
+  a two-level factor with the positive class second) or a named list of
+  models or of (actual, score) pairs to overlay (see Details).
 
 - score:
 
   When `x` is an outcome vector, the matching vector of scores or
   predicted probabilities. When `x` is a named list of outcome vectors,
-  a matching named/positional list of score vectors.
+  a matching list of score vectors, named or in the same order.
 
 - colour:
 
-  Curve colour for the single-model case. Defaults to the depictr brand
-  blue. Ignored when several models are overlaid (the colourblind-aware
+  Curve colour for a single model. Defaults to the depictr brand blue.
+  Ignored when several models are overlaid, which take the
+  colourblind-aware
   [`scale_colour_depictr()`](https://pablobernabeu.github.io/depictr/reference/scale_colour_depictr.md)
-  palette is used instead).
+  palette.
 
 - ci:
 
-  Bootstrap confidence band for a single ROC curve and its AUC. `FALSE`
-  (default) draws none; `TRUE` uses 2000 resamples; a positive integer
-  sets the number of resamples. The resamples come from the session's
-  random-number stream, so call
+  Bootstrap confidence band for a single ROC curve and its AUC. `FALSE`,
+  the default, draws none, `TRUE` uses 2000 resamples and a positive
+  integer sets the number of resamples. The resamples come from the
+  session's random-number stream, so call
   [`set.seed()`](https://rdrr.io/r/base/Random.html) first for a
   reproducible band. Ignored when several models are overlaid.
 
@@ -61,15 +62,15 @@ roc_curve_plot(
 
 - youden:
 
-  Logical; if `TRUE`, mark the Youden's J operating point (the threshold
-  maximising sensitivity + specificity - 1) on each curve.
+  Whether to mark the Youden's J operating point, the threshold that
+  maximises sensitivity + specificity - 1, on each curve.
 
 - legend_inside:
 
-  When `TRUE` (and several models are overlaid), draw the legend inside
-  the panel (in the bottom-right corner the curve leaves empty) over a
-  translucent background, instead of in a right-hand margin. Defaults to
-  `FALSE`.
+  When `TRUE` and several models are overlaid, the legend is drawn
+  inside the panel, over a translucent background, in the bottom-right
+  corner, which the curve leaves empty. Otherwise, it is drawn in a
+  right-hand margin. Defaults to `FALSE`.
 
 - title:
 
@@ -78,9 +79,9 @@ roc_curve_plot(
 ## Value
 
 A [ggplot2::ggplot](https://ggplot2.tidyverse.org/reference/ggplot.html)
-object. The AUC(s) are stored in `attr(plot, "auc")` (a named vector
-when several models are supplied). When `ci` draws a band, which it does
-for a single model, the bootstrap interval of the AUC is stored in
+object. The AUC is stored in `attr(plot, "auc")`, a named vector when
+several models are supplied. When `ci` draws a band, which it does for a
+single model, the bootstrap interval of the AUC is stored in
 `attr(plot, "auc_ci")`, a vector named `lower` and `upper`. With
 `youden = TRUE`, the Youden point is stored in `attr(plot, "youden")`: a
 list of `threshold`, `fpr`, `tpr`, `j`, `sensitivity` and `specificity`,
@@ -88,10 +89,11 @@ or a list of such lists named by model when several models are supplied.
 
 ## Details
 
-A named list overlays one curve per element, e.g.
+A named list overlays one curve per element, such as
 `roc_curve_plot(list("Full" = fit_full, "Reduced" = fit_reduced))`. Each
-element may be a `glm`, a length-2 list/data frame of `(actual, score)`,
-or an outcome vector paired with the matching element of a `score` list.
+element may be a `glm`, a list or data frame of length 2 holding
+`(actual, score)`, or an outcome vector paired with the matching element
+of a `score` list.
 
 ## Examples
 

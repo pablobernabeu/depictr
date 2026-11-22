@@ -1,9 +1,9 @@
 # Forest (coefficient) plot
 
-Draws a horizontal point-and-interval ("forest") plot of model
-estimates. The input can be a fitted model (anything
+Draws a horizontal point-and-interval plot, or forest plot, of model
+estimates. The input can be a fitted model that
 [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md)
-understands) or a data frame of pre-computed estimates.
+reads or a data frame of pre-computed estimates.
 
 ## Usage
 
@@ -39,17 +39,17 @@ coefficient_plot(
 
 - conf_level:
 
-  Confidence/credible level, passed to
+  Confidence or credible level, a single number strictly between 0
+  and 1. It is passed to
   [`tidy_estimates()`](https://pablobernabeu.github.io/depictr/reference/tidy_estimates.md),
   which uses it for a model and for the limits it fills in from the
-  standard errors of a data frame: a single number strictly between 0
-  and 1.
+  standard errors of a data frame.
 
 - intercept:
 
   Whether to keep the intercept term. Defaults to `FALSE`, since the
-  intercept is seldom of interest on a forest plot and its scale often
-  overwhelms the other terms.
+  intercept is seldom of interest on a forest plot and its size often
+  compresses the scale of the other terms.
 
 - order:
 
@@ -97,16 +97,15 @@ coefficient_plot(
 - facet:
 
   Whether to give each term its own panel with a free x-axis, laid out
-  one per row. This removes the squish that occurs when terms live on
-  very different scales (for example a large intercept alongside small
-  slopes). Defaults to `FALSE`, preserving the shared-axis layout. A
-  convenience alias for `scales = "free"`.
+  one per row. This keeps terms on very different scales readable, such
+  as a large intercept beside small slopes. A shortcut for
+  `scales = "free"`. Defaults to `FALSE`, the shared-axis layout.
 
 - scales:
 
   Either `"fixed"` (the default, a single shared x-axis) or `"free"`
-  (one free-scaled panel per term). When `facet = TRUE` this is forced
-  to `"free"`.
+  (one free-scaled panel per term). When `facet = TRUE`, it is set to
+  `"free"`.
 
 - standardise:
 
@@ -115,19 +114,19 @@ coefficient_plot(
   two distinct values) is scaled by `sd_multiple` times its standard
   deviation in the rows the model used, so its slope becomes the change
   in the outcome per SD. Factor, character, logical and two-valued
-  numeric inputs (0/1, say) are left unscaled, since a contrast already
-  compares two groups and its per-SD value would depend on how balanced
-  the groups happen to be. An interaction is scaled through its inputs:
-  `rainfall:treatment` by the SD of `rainfall`, and a product of two
-  continuous inputs by both their SDs. Matrix-valued terms such as
-  [`poly()`](https://rdrr.io/r/stats/poly.html) and `ns()` are left
-  unscaled, with a message. An interaction of continuous inputs draws a
-  warning unless they are all centred. Otherwise, each input's main
-  effect is its slope where the others are zero, and Gelman's remedy is
-  to centre the inputs and refit. A continuous slope and a contrast are
-  comparable only roughly, most nearly with `sd_multiple = 2`. Requires
-  a fitted model (ignored, with a warning, for a tidy data frame).
-  Defaults to `FALSE`.
+  numeric inputs, such as one coded 0 and 1, are left unscaled, since a
+  contrast already compares two groups and its per-SD value would depend
+  on how balanced the groups happen to be. An interaction is scaled
+  through its inputs: `rainfall:treatment` by the SD of `rainfall`, and
+  a product of two continuous inputs by both their SDs. Matrix-valued
+  terms such as [`poly()`](https://rdrr.io/r/stats/poly.html) and `ns()`
+  are left unscaled, with a message. An interaction of continuous inputs
+  draws a warning unless they are all centred. Otherwise, each input's
+  main effect is its slope where the others are zero, and Gelman's
+  remedy is to centre the inputs and refit. A continuous slope and a
+  contrast are comparable only roughly, most nearly with
+  `sd_multiple = 2`. Requires a fitted model, and is ignored with a
+  warning for a tidy data frame. Defaults to `FALSE`.
 
 - sd_multiple:
 
@@ -147,16 +146,16 @@ coefficient_plot(
 
 - title, subtitle, x_lab:
 
-  Plot title, subtitle and x-axis label. `x_lab` defaults to "Estimate",
-  or, when `standardise`, "Estimate per SD of predictor" ("per 2 SD"
-  with `sd_multiple = 2`), followed by "(contrasts unscaled)" when a
+  Plot title, subtitle and x-axis label. `x_lab` defaults to 'Estimate',
+  or, when `standardise`, 'Estimate per SD of predictor' ('per 2 SD'
+  with `sd_multiple = 2`), followed by '(contrasts unscaled)' when a
   factor or binary term is drawn. The label names the convention on the
   figure itself, because only the predictors are rescaled here: a fully
   standardised beta would rescale the outcome too. With
-  `exponentiate = TRUE`, "Estimate" gives way to the name of the ratio:
-  "Odds ratio" for a logit link, "Rate ratio" for a log link in a
-  Poisson, quasi-Poisson or negative binomial model, "Risk ratio" for a
-  binomial model with a log link and "exp(Estimate)" otherwise. The last
+  `exponentiate = TRUE`, 'Estimate' gives way to the name of the ratio:
+  'Odds ratio' for a logit link, 'Rate ratio' for a log link in a
+  Poisson, quasi-Poisson or negative binomial model, 'Risk ratio' for a
+  binomial model with a log link and 'exp(Estimate)' otherwise. The last
   covers an `lm(log(y) ~ x)` slope, whose exponential is a ratio of
   geometric means.
 
@@ -183,8 +182,8 @@ coefficient_plot(fit)
 coefficient_plot(fit, order = "descending", title = "Drivers of crop yield")
 
 
-# When an intercept or large term squishes the rest, give each term its own
-# free-scaled panel:
+# When an intercept or a large term compresses the rest, give each term its
+# own free-scaled panel:
 coefficient_plot(fit, intercept = TRUE, facet = TRUE)
 
 

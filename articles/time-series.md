@@ -1,17 +1,17 @@
 # Time series
 
-depictr provides a small, consistent set of time-series plots. The
-examples use the bundled `monthly_sales` dataset: two product lines
-(`indoor` and `outdoor`), each with six years of monthly observations
-carrying a trend, a twelve-month seasonal cycle and noise.
+depictr provides a small set of time-series plots. The examples use the
+bundled `monthly_sales` dataset: two product lines (`indoor` and
+`outdoor`), each with six years of monthly observations carrying a
+trend, a twelve-month seasonal cycle and noise.
 
 ## Plotting one or several series
 
 [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
 accepts a `ts` object, a numeric vector or a data frame with time, value
 and (optionally) group columns. Passing the long-form data frame with a
-grouping column draws both series at once, each in its own colour, and a
-moving-average overlay is one argument away.
+grouping column draws both series at once, each in its own colour, and
+the `rolling` argument adds a moving-average overlay.
 
 ``` r
 
@@ -28,7 +28,7 @@ average that the caption names ([Hyndman & Athanasopoulos, 2021, Section
 two-month one, which centres it on each month.
 
 For the single-series views (decomposition, autocorrelation, the
-seasonal plot and forecasting) we extract one line as a monthly `ts`
+seasonal plot and forecasting), we extract one line as a monthly `ts`
 object of frequency 12.
 
 ``` r
@@ -44,9 +44,8 @@ indoor_ts <- ts(indoor$sales, start = c(2018, 1), frequency = 12)
 separates a seasonal series into trend, seasonal and remainder
 components. Use `method = "stl"` (the default, loess-based) or
 `method = "classical"`. Setting `confidence = TRUE` shades a band around
-the smoothed trend, from the spread of the remainder, so the scale of
-the unexplained variation is visible rather than implied by the line
-alone.
+the smoothed trend. The band’s width comes from the spread of the
+remainder and shows the scale of the unexplained variation.
 
 ``` r
 
@@ -85,9 +84,12 @@ decompose_plot(AirPassengers, s_window = 13,
 ## Autocorrelation
 
 [`acf_plot()`](https://pablobernabeu.github.io/depictr/reference/acf_plot.md)
-draws the autocorrelation (or, with `type = "partial"`, the partial
-autocorrelation) function, with approximate significance bounds. The
-spikes at multiples of twelve are the annual seasonality.
+draws the autocorrelation function or, with `type = "partial"`, the
+partial autocorrelation function, each with approximate significance
+bounds. For the 72-month indoor series, the default lags run from 1 to
+18. The annual seasonality shows as a wave in the autocorrelation, which
+dips near lag six and rises again near lag twelve, the only multiple of
+twelve in that range.
 
 ``` r
 
@@ -108,10 +110,9 @@ acf_plot(indoor_ts, type = "partial")
 [`seasonal_plot()`](https://pablobernabeu.github.io/depictr/reference/seasonal_plot.md)
 draws a seasonal-subseries (cycle) plot: one small panel per month, with
 the value traced across successive years and a reference line at each
-month’s mean. This shows the seasonal shape (differences *between*
-panels) and the year-on-year trend within each month (the slope *inside*
-each panel) at the same time, something a single overlaid line cannot
-do.
+month’s mean. The differences between panels show the seasonal shape,
+and the slope inside each panel shows the year-on-year trend within that
+month. A single overlaid line cannot show both at once.
 
 ``` r
 
@@ -120,8 +121,8 @@ seasonal_plot(indoor_ts, title = "Indoor sales: monthly subseries")
 
 ![](time-series_files/figure-html/unnamed-chunk-8-1.png)
 
-With `style = "season"` every year becomes its own line over the months
-on a shared axis, which is handy for spotting an unusual year.
+For spotting an unusual year, `style = "season"` draws every year as its
+own line over the months on a shared axis.
 
 ``` r
 
@@ -155,11 +156,11 @@ head(fc)
     5 2024.333 351.7003 294.8458 408.5547
     6 2024.417 346.0037 283.3144 408.6930
 
-Passing an integer horizon straight to
+Passing an integer horizon to
 [`timeseries_plot()`](https://pablobernabeu.github.io/depictr/reference/timeseries_plot.md)
-overlays that forecast on the history: the point forecast continues the
-line and the shaded ribbon shows the (growing) 90% prediction interval,
-named in the caption.
+overlays that forecast on the history. The point forecast continues the
+line, and the shaded ribbon shows the widening 90% prediction interval
+that the caption names.
 
 ``` r
 
@@ -178,11 +179,13 @@ their level, the nominal 95% band covered 92% of one-step-ahead
 outcomes. From three to 12 steps ahead, it covered 99%. The band
 therefore runs somewhat narrow at the shortest horizons and wide further
 out, where the uncertainty of a random walk keeps growing while these
-series stay close to their trend. When the swing does grow with the
-level, as it does for `AirPassengers`, set `lambda = 0` to forecast the
-logarithm. The forecast comes back on the original scale, where the
-point forecast is the median of the forecast distribution ([Hyndman &
-Athanasopoulos, 2021, Section 5.6](#ref-hyndman2021)).
+series stay close to their trend.
+
+When the swing does grow with the level, as it does for `AirPassengers`,
+set `lambda = 0` to forecast the logarithm. The forecast comes back on
+the original scale, where the point forecast is the median of the
+forecast distribution ([Hyndman & Athanasopoulos, 2021, Section
+5.6](#ref-hyndman2021)).
 
 ``` r
 
@@ -193,8 +196,8 @@ timeseries_plot(AirPassengers, forecast = 24, level = 0.9, lambda = 0,
 
 ![](time-series_files/figure-html/unnamed-chunk-12-1.png)
 
-For a different model, fit it yourself (for example with
-[`forecast::forecast()`](https://generics.r-lib.org/reference/forecast.html))
+For a different model, fit it yourself, for example with
+[`forecast::forecast()`](https://generics.r-lib.org/reference/forecast.html),
 and pass the resulting `time`/`fit`/`lwr`/`upr` columns to
 `timeseries_plot(forecast = )` as a data frame.
 

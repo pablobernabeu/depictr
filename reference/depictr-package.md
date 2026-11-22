@@ -12,7 +12,7 @@ one colourblind-aware palette and one set of label conventions.
 ## Exploring data
 
 - [`explore_distribution()`](https://pablobernabeu.github.io/depictr/reference/explore_distribution.md):
-  histograms / densities of one variable.
+  histograms and densities of one variable.
 
 - [`ecdf_plot()`](https://pablobernabeu.github.io/depictr/reference/ecdf_plot.md):
   empirical cumulative distribution, optionally by group.
@@ -33,7 +33,7 @@ one colourblind-aware palette and one set of label conventions.
   a map of missing values.
 
 - [`outlier_plot()`](https://pablobernabeu.github.io/depictr/reference/outlier_plot.md):
-  box / violin plots flagging outliers.
+  box and violin plots flagging outliers.
 
 - [`raincloud_plot()`](https://pablobernabeu.github.io/depictr/reference/raincloud_plot.md):
   half-violin, box and raw points together.
@@ -54,7 +54,7 @@ one colourblind-aware palette and one set of label conventions.
   scatter plot with a fitted trend.
 
 - [`summary_table()`](https://pablobernabeu.github.io/depictr/reference/summary_table.md):
-  a "Table 1" style descriptive summary.
+  a descriptive summary in the style of 'Table 1'.
 
 ## Multivariate and survival
 
@@ -85,10 +85,10 @@ one colourblind-aware palette and one set of label conventions.
   one or more series over time.
 
 - [`acf_plot()`](https://pablobernabeu.github.io/depictr/reference/acf_plot.md):
-  autocorrelation / partial autocorrelation.
+  autocorrelation and partial autocorrelation.
 
 - [`decompose_plot()`](https://pablobernabeu.github.io/depictr/reference/decompose_plot.md):
-  trend / seasonal / remainder decomposition.
+  trend, seasonal and remainder decomposition.
 
 - [`seasonal_plot()`](https://pablobernabeu.github.io/depictr/reference/seasonal_plot.md):
   seasonal subseries across cycles.
@@ -102,13 +102,13 @@ one colourblind-aware palette and one set of label conventions.
   the shared tidy estimate table.
 
 - [`coefficient_plot()`](https://pablobernabeu.github.io/depictr/reference/coefficient_plot.md):
-  forest / coefficient plot.
+  forest plot of coefficients.
 
 - [`compare_models()`](https://pablobernabeu.github.io/depictr/reference/compare_models.md):
   estimates from several models, side by side.
 
 - [`frequentist_bayesian_plot()`](https://pablobernabeu.github.io/depictr/reference/frequentist_bayesian_plot.md):
-  frequentist vs. Bayesian estimates.
+  frequentist and Bayesian estimates compared.
 
 - [`effects_plot()`](https://pablobernabeu.github.io/depictr/reference/effects_plot.md):
   predicted values for one predictor.

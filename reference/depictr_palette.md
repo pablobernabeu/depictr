@@ -1,13 +1,13 @@
 # The depictr colour palettes
 
 Colourblind-aware palettes shared by every depictr plot. The qualitative
-palette is based on the Okabe-Ito set (Okabe & Ito, 2008), a widely
-recommended categorical palette that stays distinguishable under the
-common forms of colour-vision deficiency. It keeps six of that set's
-eight colours. The depictr brand blue (`#005b96`) takes the place of its
-blue (`#0072b2`) and leads the palette, and a grey (`#999999`) takes the
-place of its black. The sequential and diverging palettes are
-perceptually ordered single-hue and red-blue ramps.
+palette is based on the Okabe-Ito set (Okabe & Ito, 2008), a categorical
+palette that stays distinguishable under the common forms of
+colour-vision deficiency. It keeps six of that set's eight colours. The
+depictr brand blue (`#005b96`) takes the place of its blue (`#0072b2`)
+and leads the palette, and a grey (`#999999`) takes the place of its
+black. The sequential and diverging palettes are perceptually ordered
+single-hue and red-blue ramps.
 
 ## Usage
 
@@ -27,12 +27,12 @@ depictr_palette(
   palette returns all of its base colours, the eight built-in colours
   unless `options(depictr.palette = )` supplies another set, and the
   sequential and diverging ramps return seven. For the qualitative
-  palette an `n` larger than the available base colours is interpolated;
-  the sequential and diverging palettes are ramps and accept any `n`.
-  Interpolating the built-in qualitative palette beyond its eight base
-  colours loses the colour-vision-deficiency guarantee and warns, so
-  facet the groups or use the sequential ramp when many groups are
-  needed.
+  palette, an `n` larger than the available base colours is
+  interpolated. The sequential and diverging palettes are ramps and
+  accept any `n`. Interpolating the built-in qualitative palette beyond
+  its eight base colours loses the colour-vision-deficiency guarantee
+  and warns, so facet the groups or use the sequential ramp when many
+  groups are needed.
 
 - type:
 
@@ -52,16 +52,15 @@ A character vector of hex colour codes.
 
 ## Details
 
-The guarantee belongs to the eight built-in colours themselves, not to
-any number of colours: past eight the qualitative palette has to
-interpolate between them, and the interpolated colours sit close enough
-together to fail the package's own colour-distance check. That case
-warns rather than handing back colours under a guarantee it cannot keep.
+The guarantee covers the eight built-in colours only. Past eight, the
+qualitative palette interpolates between them, and the interpolated
+colours are close enough to fail the package's own colour-distance
+check, so the palette warns.
 
 The qualitative palette can be overridden globally with
 `options(depictr.palette = )` (see
-[`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md));
-when set, that custom palette replaces the eight built-in colours and is
+[`depictr_options()`](https://pablobernabeu.github.io/depictr/reference/depictr_options.md)).
+When set, that custom palette replaces the eight built-in colours and is
 interpolated when more colours are requested than it provides. The
 sequential and diverging ramps are unaffected.
 
@@ -111,7 +110,7 @@ Okabe M, Ito K (2008). “Color Universal Design (CUD): How to make
 figures and presentations that are friendly to colorblind people.”
 <https://jfly.uni-koeln.de/color/>. Accessed 2026-06-14.
 
-World Wide Web Consortium (2023). “Web Content Accessibility Guidelines
+World Wide Web Consortium (2024). “Web Content Accessibility Guidelines
 (WCAG) 2.2.” W3C Recommendation, <https://www.w3.org/TR/WCAG22/>.
 Accessed 2026-08-18.
 

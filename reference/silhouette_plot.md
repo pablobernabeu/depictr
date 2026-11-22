@@ -4,9 +4,9 @@ Draws a silhouette plot for a clustering: one horizontal bar per
 observation, grouped and sorted within cluster, with the average
 silhouette width shown per cluster and overall. The silhouette width
 \\s(i)\\ compares how close an observation is to its own cluster against
-the nearest other cluster, and lies in \\\[-1, 1\]\\ (higher is better;
-negative suggests the point may belong to another cluster). It is a
-standard internal measure of cluster quality.
+the nearest other cluster, and lies in \\\[-1, 1\]\\. Higher is better,
+and a negative width suggests that the point may belong to another
+cluster. It is a standard internal measure of cluster quality.
 
 ## Usage
 
@@ -26,7 +26,7 @@ silhouette_plot(
 
 - data:
 
-  A data frame, a numeric matrix, or a
+  A data frame, a numeric matrix or a
   [stats::dist](https://rdrr.io/r/stats/dist.html) object.
 
 - clusters:
@@ -36,8 +36,8 @@ silhouette_plot(
 
 - cols:
 
-  When `data` is a data frame, the numeric columns to use (default: all
-  numeric columns).
+  When `data` is a data frame, the numeric columns to use (by default,
+  all numeric columns).
 
 - scale:
 
@@ -52,7 +52,7 @@ silhouette_plot(
 
 - palette:
 
-  Colours for the clusters; defaults to
+  Colours for the clusters. Defaults to
   [`depictr_palette()`](https://pablobernabeu.github.io/depictr/reference/depictr_palette.md).
 
 - title:
