@@ -3,6 +3,11 @@
 # in as_binary()/binary_inputs(), factor-level safety, and real class names in
 # confusion_matrix_plot() for glm inputs.
 
+# This file is among the slowest of the suite. CRAN's check of the whole
+# package must stay under ten minutes, so the file skips on CRAN and runs in
+# CI, where NOT_CRAN is set, on Linux, Windows and macOS.
+skip_on_cran()
+
 test_that("AUC is order-independent and equals Mann-Whitney with ties at 0.5", {
   # All-equal scores: AUC must be 0.5 for every row ordering.
   actual <- c(rep(1, 5), rep(0, 5))

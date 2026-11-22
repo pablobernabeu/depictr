@@ -8,6 +8,11 @@
 # rendering is tested without brms/rstanarm; the fitted-model extraction paths
 # are guarded with skip_if_not_installed().
 
+# This file is among the slowest of the suite. CRAN's check of the whole
+# package must stay under ten minutes, so the file skips on CRAN and runs in
+# CI, where NOT_CRAN is set, on Linux, Windows and macOS.
+skip_on_cran()
+
 # A simulated posterior with a near-normal, a skewed and a bimodal parameter.
 sim_draws <- function(n = 3000, seed = 42) {
   set.seed(seed)

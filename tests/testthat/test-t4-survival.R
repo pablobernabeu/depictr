@@ -3,6 +3,11 @@
 # against the survival package on the first-party clinical_trial dataset, and
 # the base-R log-rank fallback is checked against survival::survdiff.
 
+# This file is among the slowest of the suite. CRAN's check of the whole
+# package must stay under ten minutes, so the file skips on CRAN and runs in
+# CI, where NOT_CRAN is set, on Linux, Windows and macOS.
+skip_on_cran()
+
 render_ok <- function(p) {
   # Render to a throwaway device and assert it draws with no warnings (so the
   # patchwork composition and every geom actually build).

@@ -2,6 +2,11 @@
 # plain transforms, and the requested level, on the vector and survfit routes.
 # Each is checked against survival::survfit() at the same level and transform.
 
+# This file is among the slowest of the suite. CRAN's check of the whole
+# package must stay under ten minutes, so the file skips on CRAN and runs in
+# CI, where NOT_CRAN is set, on Linux, Windows and macOS.
+skip_on_cran()
+
 limit_types <- c("log-log", "log", "plain")
 lung_times <- c(60, 180, 365, 540, 730, 900)
 

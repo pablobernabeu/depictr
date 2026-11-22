@@ -1,5 +1,10 @@
 # Tier-2 reporting changes ---------------------------------------------------
 
+# This file is among the slowest of the suite. CRAN's check of the whole
+# package must stay under ten minutes, so the file skips on CRAN and runs in
+# CI, where NOT_CRAN is set, on Linux, Windows and macOS.
+skip_on_cran()
+
 test_that("arrange_plots() title uses the canonical brand colour", {
   p1 <- explore_distribution(crop_yield, yield)
   p2 <- scatter_trend(crop_yield, fertiliser, yield)

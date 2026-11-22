@@ -7,6 +7,11 @@
 # tests/test_grouping.py as well, so that a level takes the same colour in both
 # packages.
 
+# This file is among the slowest of the suite. CRAN's check of the whole
+# package must stay under ten minutes, so the file skips on CRAN and runs in
+# CI, where NOT_CRAN is set, on Linux, Windows and macOS.
+skip_on_cran()
+
 # Each plot is called on a frame with numeric `x` and `y`, a categorical `cat`
 # for explore_categorical() to count and the grouping column `grp`. The
 # aesthetics are those each function maps to the group.

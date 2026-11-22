@@ -1,6 +1,11 @@
 # Tests for the expanded time-series suite: seasonal_plot(), forecast overlay
 # on timeseries_plot(), ts_forecast(), and decompose_plot() ribbons / robust STL.
 
+# This file is among the slowest of the suite. CRAN's check of the whole
+# package must stay under ten minutes, so the file skips on CRAN and runs in
+# CI, where NOT_CRAN is set, on Linux, Windows and macOS.
+skip_on_cran()
+
 # Helper: a single monthly_sales series as a ts (trend + 12-month seasonality)
 ms_ts <- function(which = "indoor") {
   data(monthly_sales, package = "depictr", envir = environment())

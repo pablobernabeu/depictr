@@ -1,5 +1,10 @@
 # check_figure(): the accessibility and honesty audit -------------------------
 
+# This file is among the slowest of the suite. CRAN's check of the whole
+# package must stay under ten minutes, so the file skips on CRAN and runs in
+# CI, where NOT_CRAN is set, on Linux, Windows and macOS.
+skip_on_cran()
+
 library(ggplot2)
 
 # Two reference figures with known answers. The good one is separable under

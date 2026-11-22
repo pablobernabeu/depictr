@@ -1,5 +1,10 @@
 # GLM-appropriate diagnostics: binned residuals, quantile residuals, QQ band ---
 
+# This file is among the slowest of the suite. CRAN's check of the whole
+# package must stay under ten minutes, so the file skips on CRAN and runs in
+# CI, where NOT_CRAN is set, on Linux, Windows and macOS.
+skip_on_cran()
+
 test_that("binned_residual_plot() returns a ggplot and per-bin summary", {
   gfit <- glm(adverse_event ~ biomarker + age + arm,
               data = clinical_trial, family = binomial)

@@ -1,3 +1,8 @@
+# This file is among the slowest of the suite. CRAN's check of the whole
+# package must stay under ten minutes, so the file skips on CRAN and runs in
+# CI, where NOT_CRAN is set, on Linux, Windows and macOS.
+skip_on_cran()
+
 test_that("coefficient_plot() returns a ggplot and drops the intercept by default", {
   fit <- lm(yield ~ rainfall + fertiliser + treatment, data = crop_yield)
   p <- coefficient_plot(fit)
