@@ -102,6 +102,7 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"depictr"</span><span class="op">)</span></span></code></pre></div>
 <p>The heavier modelling back-ends, <code>lme4</code>, <code>broom</code> and <code>simr</code>, are optional. They are listed in <code>Suggests</code> and used only when installed. The core functions, examples, tests and vignettes run on base <code>lm</code>/<code>glm</code> and the bundled data alone.</p>
+<p>depictr needs R 4.1.0 or later and is tested on R 4.1 with ggplot2 3.5.2. ggplot2 4.0.0 and later import S7, whose current release needs R 4.2, so on R 4.1 install ggplot2 3.5.2 before depictr, for example with <code>remotes::install_version("ggplot2", "3.5.2")</code>.</p>
 <p>The development version can be installed from GitHub:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
