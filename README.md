@@ -46,6 +46,11 @@ The heavier modelling back-ends, `lme4`, `broom` and `simr`, are optional. They
 are listed in `Suggests` and used only when installed. The core functions,
 examples, tests and vignettes run on base `lm`/`glm` and the bundled data alone.
 
+depictr needs R 4.1.0 or later and is tested on R 4.1 with ggplot2 3.5.2.
+ggplot2 4.0.0 and later import S7, whose current release needs R 4.2, so on
+R 4.1 install ggplot2 3.5.2 before depictr, for example with
+`remotes::install_version("ggplot2", "3.5.2")`.
+
 The development version can be installed from GitHub:
 
 ```r

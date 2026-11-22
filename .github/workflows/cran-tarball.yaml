@@ -54,7 +54,8 @@ jobs:
       # ghostscript and qpdf compact PDFs in the build and check their size.
       # tidy validates the HTML manual, which the check otherwise skips with a
       # NOTE. aspell spells the Description field, as CRAN's incoming checks
-      # do.
+      # do, once _R_CHECK_CRAN_INCOMING_USE_ASPELL_ in the check step below
+      # turns that check on (R leaves it off by default).
       - name: Install the system tools that CRAN's checks use
         run: |
           sudo apt-get update
@@ -111,6 +112,7 @@ jobs:
         env:
           _R_CHECK_CRAN_INCOMING_: 'true'
           _R_CHECK_CRAN_INCOMING_REMOTE_: 'true'
+          _R_CHECK_CRAN_INCOMING_USE_ASPELL_: 'true'
           R_CRAN_WEB: https://cloud.r-project.org
           R_CRAN_SRC: https://cloud.r-project.org
           PKG: ${{ steps.build.outputs.pkg }}
