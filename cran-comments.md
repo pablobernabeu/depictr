@@ -1,3 +1,13 @@
+## Resubmission
+
+This is a resubmission of 0.4.0. CRAN's incoming check on 21 November found
+the overall check time on r-devel-windows-x86_64 above ten minutes (12 min),
+with 357 s in the tests, and the CRAN team asked for shorter test times. The 17
+slowest of the 51 test files now call skip_on_cran() at the top, so they skip
+on CRAN and run in CI, where NOT_CRAN is set, on Linux, Windows and macOS. With
+NOT_CRAN unset, the test suite took 127 s on a laptop, where it took 410 s.
+Nothing else in the package has changed.
+
 ## Submission
 
 This is an update from depictr 0.3.0, which CRAN published on 2026-09-01, to
@@ -23,11 +33,11 @@ urlchecker::url_check() finds the URL correct.
 
 ## Test environments
 
-GitHub Actions, run 44942007539 on 2026-11-21, started by pull request #26 at
-commit 9fbd80e on the release branch. The package sources of this submission
+GitHub Actions, run 44969832946 on 2026-11-22, started by pull request #26 at
+commit 9e50737 on the release branch. The package sources of this submission
 are those of that commit. Because a pull request started the run, each job
-checked out GitHub's merge of that commit into main (aa5b03d), which differs
-from 9fbd80e only in one workflow file under .github, a directory that
+checked out GitHub's merge of that commit into main (8a9e46c), which differs
+from 9e50737 only in one workflow file under .github, a directory that
 .Rbuildignore keeps out of the tarball. Each leg built the tarball with
 `--compact-vignettes=gs+qpdf` and ran `R CMD check --as-cran --no-manual` on
 it, without the CRAN incoming checks, which r-lib/actions turns off. Each leg
@@ -63,7 +73,8 @@ Three more checks of the same run, all on Ubuntu 26.04.1 LTS, had no failure:
   package skipped.
 * On the R-devel leg, the test suite ran again in a Latin-9 locale
   (en_US.iso885915) with NOT_CRAN unset, as on CRAN's
-  r-devel-linux-x86_64-debian-clang flavour.
+  r-devel-linux-x86_64-debian-clang flavour. The 17 files that skip on CRAN
+  skipped there too, and the other tests passed.
 
 ## Notes
 
@@ -78,7 +89,8 @@ Three more checks of the same run, all on Ubuntu 26.04.1 LTS, had no failure:
   which the package's bootstrap intervals are compared. colorspace is an
   independent implementation of the Machado colour-vision transforms, against
   which the package's own transforms are compared. callr runs one test in a
-  fresh R session. The boot and callr tests and tests/spelling.R skip on CRAN.
+  fresh R session. The boot and callr tests, tests/spelling.R and the 17
+  slowest test files skip on CRAN.
   testthat and withr run the tests, and knitr and rmarkdown build the
   vignettes.
 * Example variants that draw several multi-panel figures are wrapped in
